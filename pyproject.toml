@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "thing_description_schema"
+version = "0.0.0.post1.dev0+dfeaf46"
+description = "Thing Description Information Model as a LinkML schema"
+authors = ["Mahda Noura <mahdanoura@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+include = ["README.md", "src/thing_description_schema/schema", "project"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+linkml-runtime = "^1.1.24"
+
+[tool.poetry-dynamic-versioning]
+enable = false
+vcs = "git"
+style = "pep440"
+
+[tool.poetry.dev-dependencies]
+linkml = "^1.3.5"
+mkdocs-material = "^8.2.8"
+mkdocs-mermaid2-plugin = "^0.6.0"
+schemasheets = "^0.1.14"
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry.extras]
+docs = ["linkml", "mkdocs-material"]
+
