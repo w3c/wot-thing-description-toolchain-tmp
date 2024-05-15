@@ -18,7 +18,7 @@ For more information please refer to the [WoT github repo](https://github.com/w3
 ## Developer Documentation
 
 * Install [Make](https://www.gnu.org/software/make)
-* Install Python 3
+* Install Python 3 (try to upgrade your version if the following steps do not work)
 * Install [Poetry](https://python-poetry.org/)
 * Run `poetry install` to install dependencies
 * Run `make all` create all resources
