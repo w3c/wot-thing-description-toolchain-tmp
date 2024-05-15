@@ -17,14 +17,9 @@ For more information please refer to the [WoT github repo](https://github.com/w3
 
 ## Developer Documentation
 
-- Install Python 3
-- Install [Poetry](https://python-poetry.org/)
-- Run `poetry install` to install dependencies
-
-<details>
-Use the `make` command to generate project artifacts:
-
-* `make test`: validate the LinkML schema on test instances
-* `make all`: make everything
-<!-- * `make deploy`: deploys site -->
-</details>
+* Install [Make](https://www.gnu.org/software/make)
+* Install Python 3
+* Install [Poetry](https://python-poetry.org/)
+* Run `poetry install` to install dependencies
+* Run `make all` create all resources
+* When ready, run `make test` to validate the LinkML schema, based on the test data found in `examples` folder
