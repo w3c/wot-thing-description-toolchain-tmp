@@ -1,5 +1,7 @@
 ---
 site_name: "thing-description-schema"
+docs_dir: resources/gens/docs
+
 theme:
   name: material
   # palette:
@@ -14,12 +16,7 @@ nav:
   # - Home: home.md
   - Index: index.md
   - About: about.md
-site_url: https://mahdanoura.github.io/thing-description-schema
-repo_url: https://github.com/mahdanoura/thing-description-schema
+site_url: https://github.io/w3c/wot-thing-description-toolchain-tmp
+repo_url: https://github.com/w3c/wot-thing-description-toolchain-tmp
 
-# Uncomment this block to enable use of Google Analytics.
-# Replace the property value with your own ID.
-# extra:
-#   analytics:
-#     provider: google
-#     property: G-XXXXXXXXXX
+

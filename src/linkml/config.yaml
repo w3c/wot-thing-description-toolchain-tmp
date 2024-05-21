@@ -1,0 +1,28 @@
+generator_args:
+  owl:
+    mergeimports: true
+    metaclasses: true
+    type_objects: true
+    # throws 'Cannot handle metadata profile: rdfs'
+    # metadata_profile: rdfs
+  markdown:
+    mergeimports: true
+  jsonld:
+    mergeimports: true
+  jsonschema:
+    mergeimports: true
+  jsonldcontext:
+    mergeimports: true
+  python:
+    mergeimports: true
+  prefixmap:
+    mergeimports: true
+  shacl:
+    mergeimports: true
+  shex:
+    mergeimports: true
+  sqlddl:
+    mergeimports: true
+  typescript:
+    mergeimports: true
+    metadata: true
