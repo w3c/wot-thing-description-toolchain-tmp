@@ -3,7 +3,7 @@ id: td
 name: thing-description-schema
 title: thing-description-schema
 description: |-
-  LinkML schema for modelling the Web of Things Thing Description information model. This schema is used to generate
+  LinkML schema for modelling the W3C Web of Things Thing Description information model. This schema is used to generate
   JSON Schema, SHACL shapes, and RDF.
 license: MIT
 see_also:
