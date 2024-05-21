@@ -1,8 +1,4 @@
-# Configuration of generators (defaults illustrated)
----
 generator_args:
-  excel:
-    mergeimports: true
   owl:
     mergeimports: true
     metaclasses: true
@@ -11,11 +7,6 @@ generator_args:
     # metadata_profile: rdfs
   markdown:
     mergeimports: true
-  graphql:
-    mergeimports: true
-  java:
-    mergeimports: true
-    metadata: true
   jsonld:
     mergeimports: true
   jsonschema:
@@ -26,8 +17,6 @@ generator_args:
     mergeimports: true
   prefixmap:
     mergeimports: true
-  proto:
-    mergeimports: true
   shacl:
     mergeimports: true
   shex:
@@ -37,5 +26,3 @@ generator_args:
   typescript:
     mergeimports: true
     metadata: true
-
-...
