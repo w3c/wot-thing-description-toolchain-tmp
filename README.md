@@ -11,7 +11,7 @@ For more information please refer to the [WoT github repo](https://github.com/w3
 * [src/](src/) - source files 
   * [thing_description_schema](src/thing_description_schema)
     * [schema](src/thing_description_schema/schema) -- LinkML schema
-    * [datamodel](src/thing_description_schema/datamodel) -- generated
+    * [datamodel](resources/gens/datamodel) -- generated
       Python datamodel
 * [tests/](tests/) - Python tests
 
