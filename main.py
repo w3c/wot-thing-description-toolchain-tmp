@@ -1,4 +1,5 @@
 import argparse
+import subprocess
 import yaml
 
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
@@ -23,6 +24,10 @@ LINKML_GENERATORS_CONFIG_YAML_PATH = SOURCE_PATH / LINKML_PATH / 'config.yaml'
 DOCDIR = GENS_PATH / 'docs'
 
 
+def serve_docs():
+    subprocess.run(['mkdocs', 'serve'], check=True)
+
+
 def generate_docs(yaml_path, docdir):
     docdir.mkdir(parents=True, exist_ok=True)
     doc_generator = DocGenerator(yaml_path)
@@ -38,7 +43,7 @@ def config_file_parse(config_path):
     return generators
 
 
-def main(yaml_path, config_path, generate_docs_flag):
+def main(yaml_path, config_path, generate_docs_flag, serve_docs_flag):
     yaml_content = yaml_path.read_text()
     generators = config_file_parse(config_path)
 
@@ -80,6 +85,9 @@ def main(yaml_path, config_path, generate_docs_flag):
     if generate_docs_flag:
         generate_docs(yaml_path, DOCDIR)
 
+    if serve_docs_flag:
+        serve_docs()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='WoT TD toolchain for automating specification generation')
@@ -89,5 +97,7 @@ if __name__ == '__main__':
                         help='Path to YAML configuration for specifying the required LinkML generators.')
     parser.add_argument('-d', '--generate-docs', action='store_true',
                         help='Boolean for documentation generation.')
+    parser.add_argument('-s', '--serve-docs', action='store_true',
+                        help='Boolean for serving the documentation generated.')
     args = parser.parse_args()
-    main(Path(args.yaml), Path(args.config_file), args.generate_docs)
+    main(Path(args.yaml), Path(args.config_file), args.generate_docs, args.serve_docs)
