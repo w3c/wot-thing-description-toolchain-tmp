@@ -1,6 +1,6 @@
 import argparse
-
 import yaml
+
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.shaclgen import ShaclGenerator
 from linkml.generators.shexgen import ShExGenerator
@@ -10,6 +10,7 @@ from linkml.generators.jsonldgen import JSONLDGenerator
 from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.typescriptgen import TypescriptGenerator
 from linkml.generators.protogen import ProtoGenerator
+from linkml.generators.docgen import DocGenerator
 from pathlib import Path
 
 RESOURCES_PATH = Path('resources')
@@ -19,6 +20,13 @@ YAML_SCHEMA_PATH = RESOURCES_PATH / 'thing_description_schema.yaml'
 SOURCE_PATH = Path('src')
 LINKML_PATH = Path('linkml')
 LINKML_GENERATORS_CONFIG_YAML_PATH = SOURCE_PATH / LINKML_PATH / 'config.yaml'
+DOCDIR = GENS_PATH / 'docs'
+
+
+def generate_docs(yaml_path, docdir):
+    docdir.mkdir(parents=True, exist_ok=True)
+    doc_generator = DocGenerator(yaml_path)
+    doc_generator.serialize(directory=str(docdir))
 
 
 def config_file_parse(config_path):
@@ -30,9 +38,10 @@ def config_file_parse(config_path):
     return generators
 
 
-def main(yaml_path, config_path):
+def main(yaml_path, config_path, generate_docs_flag):
     yaml_content = yaml_path.read_text()
     generators = config_file_parse(config_path)
+
     for generator in generators:
         output_dir = GENS_PATH / generator
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -68,11 +77,17 @@ def main(yaml_path, config_path):
             print(f"Unknown generator: {generator}")
             continue
 
+    if generate_docs_flag:
+        generate_docs(yaml_path, DOCDIR)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='WoT TD toolchain for automating specification generation')
     parser.add_argument('-y', '--yaml', default=YAML_SCHEMA_PATH,
                         help='Path to the LinkML schema formatted as a YAML file.')
     parser.add_argument('-c', '--config-file', default=LINKML_GENERATORS_CONFIG_YAML_PATH,
                         help='Path to YAML configuration for specifying the required LinkML generators.')
+    parser.add_argument('-d', '--generate-docs', action='store_true',
+                        help='Boolean for documentation generation.')
     args = parser.parse_args()
-    main(Path(args.yaml), Path(args.config_file))
+    main(Path(args.yaml), Path(args.config_file), args.generate_docs)
