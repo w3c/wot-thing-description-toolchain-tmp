@@ -2,6 +2,14 @@ import argparse
 
 import yaml
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
+from linkml.generators.shaclgen import ShaclGenerator
+from linkml.generators.shexgen import ShExGenerator
+from linkml.generators.owlgen import OwlSchemaGenerator
+from linkml.generators.markdowngen import MarkdownGenerator
+from linkml.generators.jsonldgen import JSONLDGenerator
+from linkml.generators.jsonldcontextgen import ContextGenerator
+from linkml.generators.typescriptgen import TypescriptGenerator
+from linkml.generators.protogen import ProtoGenerator
 from pathlib import Path
 
 RESOURCES_PATH = Path('resources')
@@ -23,11 +31,42 @@ def config_file_parse(config_path):
 
 
 def main(yaml_path, config_path):
-    generators = config_file_parse(config_path)
     yaml_content = yaml_path.read_text()
-    json_schema_generator = JsonSchemaGenerator(yaml_content)
-    (JSON_SCHEMA_PATH / f'{yaml_path.stem}.json').write_text(json_schema_generator.serialize())
+    generators = config_file_parse(config_path)
+    for generator in generators:
+        output_dir = GENS_PATH / generator
+        output_dir.mkdir(parents=True, exist_ok=True)
 
+        if generator == 'jsonschema':
+            json_schema_generator = JsonSchemaGenerator(yaml_content)
+            (JSON_SCHEMA_PATH / f'{yaml_path.stem}.json').write_text(json_schema_generator.serialize())
+        elif generator == 'owl':
+            owl_generator = OwlSchemaGenerator(yaml_content)
+            (output_dir / f'{yaml_path.stem}.owl.ttl').write_text(owl_generator.serialize())
+        elif generator == 'markdown':
+            markdown_generator = MarkdownGenerator(yaml_content)
+            (output_dir / f'{yaml_path.stem}.md').write_text(markdown_generator.serialize(directory=str(output_dir)))
+        elif generator == 'shacl':
+            shacl_generator = ShaclGenerator(yaml_content)
+            (output_dir / f'{yaml_path.stem}.shacl.ttl').write_text(shacl_generator.serialize())
+        elif generator == 'shex':
+            shex_generator = ShExGenerator(yaml_content)
+            (output_dir / f'{yaml_path.stem}.shex').write_text(shex_generator.serialize())
+        elif generator == 'jsonld':
+            jsonld_generator = JSONLDGenerator(yaml_content)
+            (output_dir / f'{yaml_path.stem}.jsonld').write_text(jsonld_generator.serialize())
+        elif generator == 'jsonldcontext':
+            context_generator = ContextGenerator(yaml_content)
+            (output_dir / f'{yaml_path.stem}.context.jsonld').write_text(context_generator.serialize())
+        elif generator == 'typescript':
+            typescript_generator = TypescriptGenerator(yaml_content)
+            (output_dir / f'{yaml_path.stem}.js').write_text(typescript_generator.serialize())
+        elif generator == 'protobuf':
+            protobuf_generator = ProtoGenerator(yaml_content)
+            (output_dir / f'{yaml_path.stem}.js').write_text(protobuf_generator.serialize())
+        else:
+            print(f"Unknown generator: {generator}")
+            continue
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='WoT TD toolchain for automating specification generation')
