@@ -9,7 +9,7 @@ This project leverages [LinkML](https://linkml.io/linkml/) for modelling the [We
 
 ## Prerequisites
 
-*  Python 3.9 or greater. [Download and install Python.](https://www.python.org/downloads/)
+*  Python 3.11 or greater. [Download and install Python.](https://www.python.org/downloads/)
 * The `poetry` dependency manager. [See the poetry installation documentation for more details.](https://python-poetry.org/docs/#installing-with-pipx)
 
 
