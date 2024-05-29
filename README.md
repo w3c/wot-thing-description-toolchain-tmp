@@ -17,7 +17,7 @@ This project leverages [LinkML](https://linkml.io/linkml/) for modelling the [We
 1. Clone the repository and navigate to the project directory:
 ```
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
-cd /wot-thing-description-toolchain-tmp
+cd wot-thing-description-toolchain-tmp
 ```
 
 2. Install project dependencies with `poetry`:
@@ -56,9 +56,9 @@ Generate and serve documentation locally:
 `python main.py -l -s`
 
 #### Default Paths
-LinkML schema: `/resources/thing_description_schema.yaml`
-Config file: `/src/linkml/config.yaml`
-Generated WoT resources: `/resources/gens`
+LinkML schema: `resources/thing_description_schema.yaml`
+Config file: `src/linkml/config.yaml`
+Generated WoT resources: `resources/gens`
 
 ## Contribution Guidelines
 We welcome contributions! Please fork the repository, create a branch, and submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
