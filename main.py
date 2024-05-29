@@ -97,8 +97,8 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--config-file', default=LINKML_GENERATORS_CONFIG_YAML_PATH,
                         help='Path to YAML configuration for specifying the required LinkML generators.')
     parser.add_argument('-l', '--local-docs', action='store_true',
-                        help='Boolean for documentation generation locally.')
+                        help='Boolean for local documentation generation.')
     parser.add_argument('-s', '--serve-docs', action='store_true',
-                        help='Boolean for serving the documentation generated.')
+                        help='Boolean for serving the generated documentation.')
     args = parser.parse_args()
     main(Path(args.yaml), Path(args.config_file), args.local_docs, args.serve_docs)
