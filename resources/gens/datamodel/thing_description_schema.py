@@ -1,9 +1,9 @@
 # Auto generated from thing_description_schema.yaml by pythongen.py version: 0.0.1
-# Generation date: 2024-05-21T15:16:14
+# Generation date: 2024-05-22T14:37:39
 # Schema: thing-description-schema
 #
 # id: td
-# description: LinkML schema for modelling the Web of Things Thing Description information model. This schema is used to generate
+# description: LinkML schema for modelling the W3C Web of Things Thing Description information model. This schema is used to generate
 #   JSON Schema, SHACL shapes, and RDF.
 # license: MIT
 
