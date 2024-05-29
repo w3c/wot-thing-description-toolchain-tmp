@@ -56,9 +56,9 @@ Generate and serve documentation locally:
 `python main.py -l -s`
 
 #### Default Paths
-LinkML schema: `resources/thing_description_schema.yaml`
-Config file: `src/linkml/config.yaml`
-Generated WoT resources: `resources/gens`
+* LinkML schema: `resources/thing_description_schema.yaml`
+* Config file: `src/linkml/config.yaml`
+* Generated WoT resources: `resources/gens`
 
 ## Contribution Guidelines
 We welcome contributions! Please fork the repository, create a branch, and submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
