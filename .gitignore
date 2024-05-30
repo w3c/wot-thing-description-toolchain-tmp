@@ -131,3 +131,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Only commit the lockfile in the release branch
+poetry.lock
+
+# Never commit generated files
+resources/gens/
