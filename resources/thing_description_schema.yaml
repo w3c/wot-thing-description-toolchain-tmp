@@ -1,10 +1,9 @@
----
-id: td
+id: https://raw.githubusercontent.com/w3c/wot-thing-description/main
 name: thing-description-schema
 title: thing-description-schema
 description: |-
   LinkML schema for modelling the W3C Web of Things Thing Description information model. This schema is used to generate
-  JSON Schema, SHACL shapes, and RDF.
+  WoT resources e.g., JSON Schema, SHACL shapes, and RDF.
 license: MIT
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
@@ -62,6 +61,7 @@ types:
     uri: xsd:anyURI
     base: URI
 
+
 slots:
   id:
     identifier: true
@@ -71,8 +71,10 @@ slots:
   title:
     description: >-
       Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
-    range: MultiLanguage
-    required:
+    any_of:
+      - range: string
+      - range: MultiLanguage
+    required: true
     slot_uri: td:title
   description:
     range: MultiLanguage
@@ -97,7 +99,12 @@ slots:
       convention, a language tag must be added to the object of descriptionInLanguage. Otherwise use description.
     range: MultiLanguage
   "@type":
-    multivalued: true
+#    range: Any
+    exactly_one_of:
+      - range: string_with_constraint
+      - range: array_of_strings_with_constraint
+#    inlined: true
+#    inlined_as_list: true
   target:
     description: >-
       Target IRI of a link or submission target of a Form
@@ -105,7 +112,20 @@ slots:
     required: true
     range: anyUri
 
+
+
 classes:
+  string_with_constraint:
+    attributes:
+      value:
+        none_of:
+          - equals_string: 'tm:ThingModel'
+  array_of_strings_with_constraint:
+#    multivalued: true
+    attributes:
+      value:
+        none_of:
+          - equals_string: 'tm:ThingModel'
 
   VersionInfo:
     class_uri: schema:version
