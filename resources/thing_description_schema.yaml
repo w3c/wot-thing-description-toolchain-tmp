@@ -62,11 +62,12 @@ types:
     uri: xsd:anyURI
     base: URIorCURIE
 
-  StringWithLanguageTag:
+  LanguageTag:
     description: "A string with an optional language tag"
     uri: xsd:string
     base: str
     pattern: "^(((([A-Za-z]{2,3}(-([A-Za-z]{3}(-[A-Za-z]{3}){0,2}))?)|[A-Za-z]{4}|[A-Za-z]{5,8})(-([A-Za-z]{4}))?(-([A-Za-z]{2}|[0-9]{3}))?(-([A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*(-([0-9A-WY-Za-wy-z](-[A-Za-z0-9]{2,8})+))*(-(x(-[A-Za-z0-9]{1,8})+))?)|(x(-[A-Za-z0-9]{1,8})+)|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
+
 
 
 slots:
@@ -79,15 +80,14 @@ slots:
       Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
     exactly_one_of:
       - range: string
-      - range: StringWithLanguageTag
+      - range: LanguageTag
     required: true
     slot_uri: td:title
   description:
     range: MultiLanguage
   titles:
-    multivalued: true
-    range: MultiLanguage
-    inlined: true
+    range: Any
+    inlined_as_list: true
   descriptions:
     description: >- 
       TODO, check, according to the description a description should not contain a lang tag.
@@ -105,7 +105,6 @@ slots:
       convention, a language tag must be added to the object of descriptionInLanguage. Otherwise use description.
     range: MultiLanguage
   "@type":
-#    range: Any
     exactly_one_of:
       - range: type_declaration_string
       - range: type_declaration_array
@@ -121,6 +120,8 @@ slots:
 
 
 classes:
+  Any:
+    class_uri: linkml:Any
 
   type_declaration_string:
     attributes:
@@ -134,6 +135,7 @@ classes:
         multivalued: true
         none_of:
           - equals_string: 'tm:ThingModel'
+
 
   VersionInfo:
     class_uri: schema:version
