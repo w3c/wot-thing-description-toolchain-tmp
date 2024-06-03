@@ -108,8 +108,8 @@ slots:
     exactly_one_of:
       - range: type_declaration_string
       - range: type_declaration_array
-#    inlined: true
-#    inlined_as_list: true
+    inlined: true
+    inlined_as_list: true
   target:
     description: >-
       Target IRI of a link or submission target of a Form
@@ -118,10 +118,11 @@ slots:
     range: anyUri
 
 
-
 classes:
   Any:
     class_uri: linkml:Any
+
+  ThingContext:
 
   type_declaration_string:
     attributes:
@@ -319,13 +320,13 @@ classes:
           Define URI template variables according to RFC6570 as collection based on schema specifications. The individual
           variables DataSchema cannot be an ObjectSchema or an ArraySchema. TODO: range is not obvious from the ontology.
         from_schema: td:hasUriTemplateSchema
-        multivalued: true
         range: DataSchema
+        inlined: true
       forms:
         from_schema: td:hasForm
         description: >-
           Set of form hypermedia controls that describe how an operation can be performed.
-        required:
+        required: true
         multivalued: true
         range: Form
     slots:
@@ -414,6 +415,7 @@ classes:
         from_schema: td:hasNotificationResponseSchema
         range: DataSchema
 
+
   Thing:
     tree_root: true
     description: >-
@@ -421,11 +423,17 @@ classes:
       Description, whereas a virtual entity is the composition of one or more Things.
     class_uri: td:Thing
     attributes:
+      "@context":
+        description: >- 
+          Todo
+        required: true
+        range: ThingContext
+
       securityDefinitions:
         description: >- 
           A security scheme applied to a (set of) affordance(s). TODO check
         from_schema: td:hasSecurityConfiguration
-        required:
+        required: true
         multivalued: true
         any_of:
           - range: string
@@ -435,7 +443,7 @@ classes:
           A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
           TODO: check
         from_schema: td:definesSecurityScheme
-        required:
+        required: true
         multivalued: true
       schemaDefinitions:
         description: TODO CHECK
