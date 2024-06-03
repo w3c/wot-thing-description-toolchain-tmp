@@ -53,7 +53,7 @@ def main(yaml_path, config_path, generate_docs_flag, serve_docs_flag):
 
         if generator == 'jsonschema':
             json_schema_generator = JsonSchemaGenerator(yaml_content)
-            (JSON_SCHEMA_PATH / f'{yaml_path.stem}.json').write_text(json_schema_generator.serialize())
+            (JSON_SCHEMA_PATH / f'{yaml_path.stem}.json').write_text(json_schema_generator.serialize(top_class='Thing'))
         elif generator == 'owl':
             owl_generator = OwlSchemaGenerator(yaml_content)
             (output_dir / f'{yaml_path.stem}.owl.ttl').write_text(owl_generator.serialize())
