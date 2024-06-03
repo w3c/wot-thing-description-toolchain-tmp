@@ -1,6 +1,7 @@
 id: https://raw.githubusercontent.com/w3c/wot-thing-description/main
 name: thing-description-schema
 title: thing-description-schema
+version: "1.1-03-June-2024"
 description: |-
   LinkML schema for modelling the W3C Web of Things Thing Description information model. This schema is used to generate
   WoT resources e.g., JSON Schema, SHACL shapes, and RDF.
@@ -54,19 +55,12 @@ default_range: string
 imports:
   - linkml:types
 
-types:
-  anyUri:
-    name: anyUri
-    description: a complete URI
-    uri: xsd:anyURI
-    base: URI
-
 
 slots:
   id:
     identifier: true
     description: TODO
-    range: anyUri
+    range: uriorcurie
     slot_uri: td:id
   title:
     description: >-
@@ -110,7 +104,7 @@ slots:
       Target IRI of a link or submission target of a Form
     slot_uri: hctl:target
     required: true
-    range: anyUri
+    range: uriorcurie
 
 
 
@@ -159,7 +153,7 @@ classes:
         description: >-
           By default, the context, or anchor, of a link conveyed in the Link header field is the URL of the representation it is associated with, as defined in RFC7231, Section 3.1.4.1, and is serialized as a URI.
         from_schema: hctl
-        range: anyUri
+        range: uriorcurie
       sizes:
         description: >-
           Target attribute that specifies one or more sizes for the referenced icon. Only applicable for relation type 'icon'. The value pattern follows {Height}x{Width} (e.g., \"16x16\", \"16x16 32x32\").
@@ -212,7 +206,7 @@ classes:
     attributes:
       href:
         required: true
-        range: anyUri
+        range: uriorcurie
       contentType:
         from_schema: hctl
         description: >-
@@ -269,7 +263,7 @@ classes:
         description: >-
           URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration
           is for the endpoint.
-        range: anyUri
+        range: uriorcurie
       scheme:
         required: true
         range: SecuritySchemeType
@@ -405,6 +399,7 @@ classes:
         range: DataSchema
 
   Thing:
+    tree_root: true
     description: >-
       An abstraction of a physical or a virtual entity whose metadata and interfaces are described by a WoT Thing
       Description, whereas a virtual entity is the composition of one or more Things.
@@ -435,7 +430,7 @@ classes:
           Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.
         from_schema: td:followsProfile
         multivalued: true
-        range: anyUri
+        range: uriorcurie
       instance:
         description: >-
           Provides a version identicator of this TD instance.
@@ -452,13 +447,13 @@ classes:
       supportContact:
         description: >-
           Provides information about the TD maintainer as URI scheme (e.g., <code>mailto</code> [[RFC6068]],<code>tel</code> [[RFC3966]],<code>https</code> [[RFC9112]]).
-        range: anyUri
+        range: uriorcurie
         from_schema: schema:contactPoint
       base:
         description: >-
           Define the base URI that is used for all relative URI references throughout a TD document.
         from_schema: td:baseURI
-        range: anyUri
+        range: uriorcurie
       version:
         range: VersionInfo
       forms:
