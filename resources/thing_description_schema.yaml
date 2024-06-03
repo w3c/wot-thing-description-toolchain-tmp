@@ -101,8 +101,8 @@ slots:
   "@type":
 #    range: Any
     exactly_one_of:
-      - range: string_with_constraint
-      - range: array_of_strings_with_constraint
+      - range: type_declaration_string
+      - range: type_declaration_array
 #    inlined: true
 #    inlined_as_list: true
   target:
@@ -115,15 +115,15 @@ slots:
 
 
 classes:
-  string_with_constraint:
+  type_declaration_string:
     attributes:
       value:
         none_of:
           - equals_string: 'tm:ThingModel'
-  array_of_strings_with_constraint:
-#    multivalued: true
+  type_declaration_array:
     attributes:
       value:
+        multivalued: true
         none_of:
           - equals_string: 'tm:ThingModel'
 
