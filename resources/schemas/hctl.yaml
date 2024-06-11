@@ -24,27 +24,9 @@ prefixes:
   hctl:
     prefix_prefix: hctl
     prefix_reference: https://www.w3.org/2019/wot/hypermedia#
-  rdfs:
-    prefix_prefix: rdfs
-    prefix_reference: http://www.w3.org/2000/01/rdf-schema#
-  rdf:
-    prefix_prefix: rdf
-    prefix_reference: http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  dcterms:
-    prefix_prefix: dcterms
-    prefix_reference: http://purl.org/dc/terms/
   schema:
     prefix_prefix: schema
     prefix_reference: http://schema.org/
-  xsd:
-    prefix_prefix: xsd
-    prefix_reference: http://www.w3.org/2001/XMLSchema#
-  dct:
-    prefix_prefix: dct
-    prefix_reference: http://purl.org/dc/terms/
-  htv:
-    prefix_prefix: htv
-    prefix_reference: http://www.w3.org/2011/http#
   tm:
     prefix_prefix: tm
     prefix_reference: https://www.w3.org/2019/wot/tm#
