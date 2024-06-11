@@ -149,22 +149,7 @@ classes:
       key:
         identifier: true
         pattern: "^(((([A-Za-z]{2,3}(-([A-Za-z]{3}(-[A-Za-z]{3}){0,2}))?)|[A-Za-z]{4}|[A-Za-z]{5,8})(-([A-Za-z]{4}))?(-([A-Za-z]{2}|[0-9]{3}))?(-([A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*(-([0-9A-WY-Za-wy-z](-[A-Za-z0-9]{2,8})+))*(-(x(-[A-Za-z0-9]{1,8})+))?)|(x(-[A-Za-z0-9]{1,8})+)|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
-  
 
-  SecurityScheme:
-    slots:
-      - "@type"
-      - descriptions
-    attributes:
-      description:
-      proxy:
-        description: >-
-          URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration
-          is for the endpoint.
-        range: anyUri
-      scheme:
-        required: true
-        range: SecuritySchemeType
 
   DataSchema:
     class_uri: jsonschema:DataSchema
@@ -318,7 +303,7 @@ classes:
         multivalued: true
         any_of:
           - range: string
-          - range: SecuritySchemeType
+          - range: wot_security_schema:SecuritySchemeType
       security:
         description: >-
           A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
@@ -465,33 +450,5 @@ enums:
       queryallactions:
         description: Identifies the queryallactions operation on a Thing to get the status of all Actions in a single interaction.
         meaning: td:queryAllActions
-  SecuritySchemeType:
-    permissible_values:
-      nosec:
-        description: A security configuration corresponding to identified by the Vocabulary Term nosec, indicating there is no authentication or other mechanism required to access the resource.
-        meaning: wotsec:NoSecurityScheme
-      combo:
-        description: Elements of this scheme define various ways in which other named schemes defined in securityDefinitions, including other ComboSecurityScheme definitions, are to be combined to create a new scheme definition.
-        meaning: wotsec:ComboSecurityScheme
-      basic:
-        description: Uses an unencrypted username and password.
-        meaning: wotsec:BasicSecurityScheme
-      digest:
-        description: This scheme is similar to basic authentication but with added features to avoid man-in-the-middle attacks.
-        meaning: wotsec:DigestSecurityScheme
-      bearer:
-        description: Bearer tokens are used independently of OAuth2.
-        meaning: wotsec:BearerSecurityScheme
-      psk:
-        description: This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [RFC4279], and that the ciphersuite used for keys will be established during protocol negotiation.
-        meaning: wotsec:PSKSecurityScheme
-      oauth2:
-        description: OAuth 2.0 authentication security configuration for systems conformant with [RFC6749] and [RFC8252].
-        meaning: wotsec:OAuth2SecurityScheme
-      apikey:
-        description: This scheme is to be used when the access token is opaque.
-        meaning: wotsec:APIKeySecurityScheme
-      auto:
-        description: This scheme indicates that the security parameters are going to be negotiated by the underlying protocols at runtime
-        meaning: wotsec:AutoSecurityScheme
+
 
