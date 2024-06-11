@@ -28,8 +28,20 @@ imports:
   - thing_description_schema
 
 
-classes:
+slots:
+  name:
+    description: >-
+      Name for query, header, cookie, or uri parameters.
+  in:
+    description: >-
+      Specifies the location of security authentication information.
+  authorization:
+    description: >-
+      URI of the authorization server.
+    range: anyURI
 
+
+classes:
   SecurityScheme:
     class_uri: wotsec:SecurityScheme
     description: >-
@@ -108,8 +120,13 @@ classes:
     attributes:
       oneOf:
         description: >-
+          Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, 
+          will allow access.  Only one may be chosen for use.
+        multivalued: true
       allOf:
         description: >-
+          Array of two or more strings identifying other named security scheme definitions, all of which must be satisfied for access.
+        multivalued: true
 
   DigestSecurityScheme:
     is_a: SecurityScheme
@@ -166,16 +183,15 @@ classes:
       identity:
         description: >-
           Identifier providing information which can be used for selection or confirmation.
-          
 
-slots:
-  name:
+  APIKeySecurityScheme:
+    is_a: SecurityScheme
     description: >-
-  in:
-    description: >-
-  authorization:
-    description: >-
-    range: anyURI
+      Pre-shared key authentication security configuration identified by the term psk.  
+      This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[rfc4279]], and that the 
+      ciphersuite used for keys will be established during protocol negotiation.
+    slots:
+      - in
 
 
 enums:
