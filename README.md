@@ -1,7 +1,7 @@
 
 # Temporary WoT TD Tooling
 
-The aim of this repository is to simplify the current WoT TD tooling for generating the specification. WoT TD Tooling is a python project to automate the generation of 
+The aim of this repository is to simplify the current WoT TD tooling for generating the specification. WoT TD Tooling is a python project to automate the generation of
  1) WoT resources: SHACL Shapes, JSON Schema, JSON-LD context, and ontology files
  2) Documentation: TD specification and ontology specifications
 
@@ -19,13 +19,18 @@ This project leverages [LinkML](https://linkml.io/linkml/) for modelling the [We
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
 ```
+2. Prepare a clean environment
+```
+python -m venv .venv
+. .venv/bin/activate
+```
 
-2. Install project dependencies with `poetry`:
+3. Install project dependencies with `poetry`:
 ```
 poetry install
 ```
 
-3. View all supported commands:
+4. View all supported commands:
 `python main.py -h`
 
 ## Usage
