@@ -9,6 +9,7 @@ include = ["README.md", "src/thing_description_schema/schema", "project"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+pyyaml = "^6.0.1"
 linkml-runtime = "^1.1.24"
 
 [tool.poetry-dynamic-versioning]
