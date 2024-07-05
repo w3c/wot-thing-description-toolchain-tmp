@@ -1,6 +1,6 @@
 id: https://raw.githubusercontent.com/w3c/wot-thing-description/main/wotsec
-name: wotsec-schema
-title: wotsec-schema
+name: wot_security
+title: wot_security
 version: "1.1-11-June-2024"
 description: |-
   LinkML schema for modelling the TD Security mechanisms.
@@ -28,7 +28,6 @@ default_range: string
 
 imports:
   - linkml:types
-  - resources/schemas/thing_description_schema
 
 
 slots:
