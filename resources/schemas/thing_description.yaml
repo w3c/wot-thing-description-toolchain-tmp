@@ -1,10 +1,11 @@
 id: https://raw.githubusercontent.com/w3c/wot-thing-description/main
 name: thing-description-schema
 title: thing-description-schema
-version: "1.1-03-June-2024"
+version: "1.1-05-July-2024"
 description: |-
-  LinkML schema for modelling the W3C Web of Things Thing Description information model. This schema is used to generate
-  WoT resources e.g., JSON Schema, SHACL shapes, and RDF.
+  This schema defines the classes required for modelling the W3C Web of Things information model
+  according to the W3C WoT Group (https://github.com/w3c/wot). This schema is based on LinkML and is used to generate 
+  the required WoT resources e.g., JSON Schema, SHACL shapes, and RDF programmatically.
 license: MIT
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
@@ -58,23 +59,17 @@ imports:
   - wot_security
 
 types:
-  anyUri:
-    name: anyUri
-    description: a complete URI
-    uri: xsd:anyURI
-    base: URIorCURIE
-
-  LanguageTag:
-    description: "A string with an optional language tag"
-    uri: xsd:string
+  MultiLanguage:
+    description: "Description of the TD element (Thing, interaction affordance, security scheme or data scheme) with language tag."
+    uri: rdf:langString
     base: str
-    pattern: "^(((([A-Za-z]{2,3}(-([A-Za-z]{3}(-[A-Za-z]{3}){0,2}))?)|[A-Za-z]{4}|[A-Za-z]{5,8})(-([A-Za-z]{4}))?(-([A-Za-z]{2}|[0-9]{3}))?(-([A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*(-([0-9A-WY-Za-wy-z](-[A-Za-z0-9]{2,8})+))*(-(x(-[A-Za-z0-9]{1,8})+))?)|(x(-[A-Za-z0-9]{1,8})+)|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
-
 
 
 slots:
   id:
-    description: TODO
+    description: >-
+      Identifier of the Thing in form of a URI [RFC3986] (e.g., stable URI, temporary and mutable URI, 
+      URI with local IP address, URN, etc.).
     range: uri
     slot_uri: td:id
   title:
@@ -82,31 +77,34 @@ slots:
       Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
     exactly_one_of:
       - range: string
-      - range: LanguageTag
+      - range: MultiLanguage
     required: true
     slot_uri: td:title
-  description:
-    range: MultiLanguage
   titles:
-    range: Any
+    description: >-
+      Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
+    multivalued: true
+    exactly_one_of:
+      - range: string
+      - range: MultiLanguage
     inlined_as_list: true
+  description:
+    description: >-
+      Provides additional (human-readable) information based on a default language.
+    exactly_one_of:
+      - range: string
+      - range: MultiLanguage
   descriptions:
     description: >- 
-      TODO, check, according to the description a description should not contain a lang tag.
+      Can be used to support (human-readable) information in different languages.
     multivalued: true
-    range: MultiLanguage
+    exactly_one_of:
+      - range: string
+      - range: MultiLanguage
     inlined: true
-  descriptionInLanguage:
-    description: >-
-      description of the TD element (Thing, interaction affordance, security scheme or data scheme) with language tag. By
-      convention, a language tag must be added to the object of descriptionInLanguage. Otherwise use description.
-    range: MultiLanguage
-  titleInLanguage:
-    description: >-
-      title of the TD element (Thing, interaction affordance, security scheme or data scheme) with language tag. By
-      convention, a language tag must be added to the object of descriptionInLanguage. Otherwise use description.
-    range: MultiLanguage
   "@type":
+    description: >-
+      JSON-LD keyword to label the object with semantic tags (or types).
     exactly_one_of:
       - range: type_declaration_string
       - range: type_declaration_array
@@ -118,15 +116,11 @@ classes:
   # start of intermediate classes due to limitation of LinkML
   Any:
     class_uri: linkml:Any
-
-  ThingContext:
-
   type_declaration_string:
     attributes:
       key:
         none_of:
           - equals_string: 'tm:ThingModel'
-
   type_declaration_array:
     attributes:
       key:
@@ -135,23 +129,26 @@ classes:
           - equals_string: 'tm:ThingModel'
   # end of intermediate classes
 
-
   # start of main classes
   VersionInfo:
     description: >-
       Provides version information.
     attributes:
       instance:
+        description: >-
+          Provides a version identicator of this TD instance.
         required: true
       model:
+        description: >-
+          Provides a version indicator of the underlying TM.
 
-  #TODO, check
-  MultiLanguage:
-    attributes:
-      key:
-        identifier: true
-        pattern: "^(((([A-Za-z]{2,3}(-([A-Za-z]{3}(-[A-Za-z]{3}){0,2}))?)|[A-Za-z]{4}|[A-Za-z]{5,8})(-([A-Za-z]{4}))?(-([A-Za-z]{2}|[0-9]{3}))?(-([A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*(-([0-9A-WY-Za-wy-z](-[A-Za-z0-9]{2,8})+))*(-(x(-[A-Za-z0-9]{1,8})+))?)|(x(-[A-Za-z0-9]{1,8})+)|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
-
+#  #TODO, check
+#  MultiLanguage:
+#    attributes:
+#      key:
+#        identifier: true
+#        pattern: "^(((([A-Za-z]{2,3}(-([A-Za-z]{3}(-[A-Za-z]{3}){0,2}))?)|[A-Za-z]{4}|[A-Za-z]{5,8})(-([A-Za-z]{4}))?(-([A-Za-z]{2}|[0-9]{3}))?(-([A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*(-([0-9A-WY-Za-wy-z](-[A-Za-z0-9]{2,8})+))*(-(x(-[A-Za-z0-9]{1,8})+))?)|(x(-[A-Za-z0-9]{1,8})+)|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
+#
 
   DataSchema:
     class_uri: jsonschema:DataSchema
@@ -170,8 +167,8 @@ classes:
     slots:
       - description
       - title
-      - titleInLanguage
-      - descriptionInLanguage
+      - titles
+      - descriptions
 
 
   InteractionAffordance:
@@ -202,8 +199,8 @@ classes:
       - descriptions
       - title
       - description
-      - titleInLanguage
-      - descriptionInLanguage
+      - titles
+      - descriptions
 
   PropertyAffordance:
     is_a: InteractionAffordance
@@ -293,9 +290,43 @@ classes:
     attributes:
       "@context":
         description: >- 
-          Todo
+          JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
         required: true
-        range: ThingContext
+        range: uri
+        array:
+      version:
+        description: >- 
+          Provides version information.
+        range: VersionInfo
+      created:
+        from_schema: dcterms
+        description: >-
+          Provides information when the TD instance was created.
+        range: datetime
+      modified:
+        from_schema: dcterms
+        description: >-
+          Provides information when the TD instance was last modified.
+        range: datetime
+      supportContact:
+        description: >-
+          Provides information about the TD maintainer as URI scheme (e.g., <code>mailto</code> [[RFC6068]],<code>tel</code> [[RFC3966]],<code>https</code> [[RFC9112]]).
+        range: uri
+        from_schema: schema:contactPoint
+      base:
+        description: >-
+          Define the base URI that is used for all relative URI references throughout a TD document.
+        from_schema: td:baseURI
+        range: uri
+      profile:
+        description: >-
+          Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.
+        from_schema: td:followsProfile
+        range: Any
+        any_of:
+          - range: uri
+            multivalued: true
+          - range: uri
 
       securityDefinitions:
         description: >- 
@@ -317,37 +348,6 @@ classes:
         description: TODO CHECK
         multivalued: true
         range: DataSchema
-      profile:
-        description: >-
-          Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.
-        from_schema: td:followsProfile
-        multivalued: true
-        range: anyUri
-      instance:
-        description: >-
-          Provides a version identicator of this TD instance.
-      created:
-        from_schema: dcterms
-        description: >-
-          Provides information when the TD instance was created.
-        range: datetime
-      modified:
-        from_schema: dcterms
-        description: >-
-          Provides information when the TD instance was last modified.
-        range: datetime
-      supportContact:
-        description: >-
-          Provides information about the TD maintainer as URI scheme (e.g., <code>mailto</code> [[RFC6068]],<code>tel</code> [[RFC3966]],<code>https</code> [[RFC9112]]).
-        range: anyUri
-        from_schema: schema:contactPoint
-      base:
-        description: >-
-          Define the base URI that is used for all relative URI references throughout a TD document.
-        from_schema: td:baseURI
-        range: anyUri
-      version:
-        range: VersionInfo
       forms:
         from_schema: td:hasForm
         description: >-
@@ -389,8 +389,8 @@ classes:
       - titles
       - descriptions
       - "@type"
-      - titleInLanguage
-      - descriptionInLanguage
+      - titles
+      - descriptions
 
 
 enums:
