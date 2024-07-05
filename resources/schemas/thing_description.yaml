@@ -1,0 +1,423 @@
+id: https://raw.githubusercontent.com/w3c/wot-thing-description/main
+name: thing-description-schema
+title: thing-description-schema
+version: "1.1-05-July-2024"
+description: |-
+  This schema defines the classes required for modelling the W3C Web of Things information model
+  according to the W3C WoT Group (https://github.com/w3c/wot). This schema is based on LinkML and is used to generate 
+  the required WoT resources e.g., JSON Schema, SHACL shapes, and RDF programmatically.
+license: MIT
+see_also:
+  - https://www.w3.org/TR/wot-thing-description11/
+
+prefixes:
+  linkml:
+    prefix_prefix: linkml
+    prefix_reference: https://w3id.org/linkml/
+  td:
+    prefix_prefix: td
+    prefix_reference: https://www.w3.org/2019/wot/td#
+  jsonschema:
+    prefix_prefix: jsonschema
+    prefix_reference: https://www.w3.org/2019/wot/json-schema#
+  wotsec:
+    prefix_prefix: wotsec
+    prefix_reference: https://www.w3.org/2019/wot/security#
+  hctl:
+    prefix_prefix: hctl
+    prefix_reference: https://www.w3.org/2019/wot/hypermedia#
+  rdfs:
+    prefix_prefix: rdfs
+    prefix_reference: http://www.w3.org/2000/01/rdf-schema#
+  rdf:
+    prefix_prefix: rdf
+    prefix_reference: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  dcterms:
+    prefix_prefix: dcterms
+    prefix_reference: http://purl.org/dc/terms/
+  schema:
+    prefix_prefix: schema
+    prefix_reference: http://schema.org/
+  xsd:
+    prefix_prefix: xsd
+    prefix_reference: http://www.w3.org/2001/XMLSchema#
+  dct:
+    prefix_prefix: dct
+    prefix_reference: http://purl.org/dc/terms/
+  htv:
+    prefix_prefix: htv
+    prefix_reference: http://www.w3.org/2011/http#
+  tm:
+    prefix_prefix: tm
+    prefix_reference: https://www.w3.org/2019/wot/tm#
+default_prefix: td
+default_range: string
+
+imports:
+  - linkml:types
+  - hctl
+  - wot_security
+  - jsonschema
+
+types:
+  MultiLanguage:
+    description: "Description of the TD element (Thing, interaction affordance, security scheme or data scheme) with language tag."
+    uri: rdf:langString
+    base: str
+
+slots:
+  id:
+    description: >-
+      Identifier of the Thing in form of a URI [RFC3986] (e.g., stable URI, temporary and mutable URI, 
+      URI with local IP address, URN, etc.).
+    range: uri
+    slot_uri: td:id
+  title:
+    description: >-
+      Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
+    exactly_one_of:
+      - range: string
+      - range: MultiLanguage
+    required: true
+    slot_uri: td:title
+  titles:
+    description: >-
+      Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
+    multivalued: true
+    exactly_one_of:
+      - range: string
+      - range: MultiLanguage
+    inlined_as_list: true
+  description:
+    description: >-
+      Provides additional (human-readable) information based on a default language.
+    exactly_one_of:
+      - range: string
+      - range: MultiLanguage
+  descriptions:
+    description: >- 
+      Can be used to support (human-readable) information in different languages.
+    multivalued: true
+    exactly_one_of:
+      - range: string
+      - range: MultiLanguage
+    inlined: true
+    # currently less restrictions are applied, with further restrictions according to the json schema, the following can be partially utilized
+#    exactly_one_of:
+#      - range: type_declaration_string
+#      - range: type_declaration_array
+  "@type":
+    description: >-
+      JSON-LD keyword to label the object with semantic tags (or types).
+    exactly_one_of:
+      - range: string
+      - range: string
+        multivalued: true
+    inlined: true
+    inlined_as_list: true
+  uriVariables:
+    description: >-
+      Define URI template variables according to RFC6570 as collection based on schema specifications. The individual
+      variables DataSchema cannot be an ObjectSchema or an ArraySchema. TODO: range is not obvious from the ontology.
+    from_schema: td:hasUriTemplateSchema
+    range: DataSchema
+    inlined: true
+    multivalued: true
+  forms:
+    from_schema: td:hasForm
+    description: >-
+      Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of
+      Protocol Bindings.
+    multivalued: true
+    range: Form
+
+
+classes:
+  # start of intermediate classes due to limitation of LinkML
+  Any:
+    class_uri: linkml:Any
+  type_declaration_string:
+    attributes:
+      key:
+        none_of:
+          - equals_string: 'tm:ThingModel'
+  type_declaration_array:
+    attributes:
+      key:
+        multivalued: true
+        none_of:
+          - equals_string: 'tm:ThingModel'
+  # end of intermediate classes
+  # start of main classes
+  VersionInfo:
+    description: >-
+      Provides version information.
+    attributes:
+      instance:
+        description: >-
+          Provides a version identicator of this TD instance.
+        required: true
+      model:
+        description: >-
+          Provides a version indicator of the underlying TM.
+  InteractionAffordance:
+    description: >-
+      Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact 
+      with the Thing. There are many types of potential affordances, but W3C WoT defines three types of Interaction 
+      Affordances: Properties, Actions, and Events.
+    class_uri: td:InteractionAffordance
+    attributes:
+      name:
+        description: >-
+          Indexing property to store entity names when serializing them in a JSON-LD @index container.
+        identifier: true
+    slots:
+      - "@type"
+      - titles
+      - descriptions
+      - title
+      - description
+      - titles
+      - uriVariables
+      - forms
+  PropertyAffordance:
+    is_a: InteractionAffordance
+    class_uri: td:PropertyAffordance
+    description: >-
+      An Interaction Affordance that exposes state of the Thing. This state can be retrieved (read) and/or updated.
+    mixins: DataSchema
+    attributes:
+      observable:
+        description: >-
+          A hint that indicates whether Servients hosting the Thing and Intermediaries should probide a Protocol Binding 
+          that supports the observeproperty and unobserveproperty operations for this Property.
+        range: boolean
+  ActionAffordance:
+    is_a: InteractionAffordance
+    class_uri: td:ActionAffordance
+    description: >-
+      An Interaction Affordance that allows to invoke a function of the Thing, which manipulates state (e.g., toggling a lamp
+      on or off) or triggers a process on the Thing (e.g., dim a lamp over time).
+    attributes:
+      safe:
+        description: >-
+          Signals if the action is safe (=true) or not. Used to signal if there is no internal state (cf. resource state)
+          is changed when invoking an Action.
+        from_schema: td:isSafe
+        range: boolean
+      synchronous:
+        description: >-
+          Indicates whether the action is synchronous (=true) or not. A synchronous action means that the response of action
+          contains all the information about the result of the action and no further querying about the status of the action
+          is needed. Lack of this keyword means that no claim on the synchronicity of the action can be made.
+        from_schema: td:isSynchronous
+        range: boolean
+      idempotent:
+        description: >-
+          Indicates whether the action is idempotent (=true) or not. Informs whether the action can be called repeatedly with the same
+          results, if present, based on the same input.
+        from_schema: td:isIdempotent
+        range: boolean
+      input:
+        description: >-
+          Used to define the input data schema of the Action.
+        from_schema: td:hasInputSchema
+        range: DataSchema
+      output:
+        description: >-
+          Used to define the output data schema of the action.
+        from_schema: td:hasOutputSchema
+        range: DataSchema
+  EventAffordance:
+    is_a: InteractionAffordance
+    class_uri: td:EventAffordance
+    description: >-
+      An Interaction Affordance that describes an event source, which asynchronously pushes event data to Consumers
+      (e.g., overhearing alerts).
+    attributes:
+      subscription:
+        description: >-
+          Defines data that needs to be passed upon subscription, e.g., filters or message format for setting up Webhooks.
+        from_schema: td:hasSubscriptionSchema
+        range: DataSchema
+      cancellation:
+        description: >-
+          Defines any data that needs to be passed to cancel a subscription, e.g., a specific message to remove a Webhook.
+        from_schema: td:hasCancellationSchema
+        range: DataSchema
+      data:
+        description: >-
+          Defines the data schema of the Event instance messages pushed by the Thing.
+        from_schema: td:hasNotificationSchema
+        range: DataSchema
+      dataResponse:
+        description: >-
+          Defines the data schema of the Event response messages sent by the consumer in a response to a data message.
+        from_schema: td:hasNotificationResponseSchema
+        range: DataSchema
+  Thing:
+    tree_root: true
+    description: >-
+      An abstraction of a physical or a virtual entity whose metadata and interfaces are described by a WoT Thing
+      Description, whereas a virtual entity is the composition of one or more Things.
+    class_uri: td:Thing
+    attributes:
+      "@context":
+        description: >- 
+          JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
+        required: true
+        range: uri
+        array:
+      version:
+        description: >- 
+          Provides version information.
+        range: VersionInfo
+      created:
+        from_schema: dcterms
+        description: >-
+          Provides information when the TD instance was created.
+        range: datetime
+      modified:
+        from_schema: dcterms
+        description: >-
+          Provides information when the TD instance was last modified.
+        range: datetime
+      supportContact:
+        description: >-
+          Provides information about the TD maintainer as URI scheme (e.g., <code>mailto</code> [[RFC6068]],<code>tel</code> [[RFC3966]],<code>https</code> [[RFC9112]]).
+        range: uri
+        from_schema: schema:contactPoint
+      base:
+        description: >-
+          Define the base URI that is used for all relative URI references throughout a TD document.
+        from_schema: td:baseURI
+        range: uri
+      profile:
+        description: >-
+          Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.
+        from_schema: td:followsProfile
+        range: Any
+        any_of:
+          - range: uri
+            multivalued: true
+          - range: uri
+      security:
+        description: >-
+          A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
+        from_schema: td:definesSecurityScheme
+        required: true
+        any_of:
+          - range: string
+            multivalued: true
+          - range: string
+      securityDefinitions:
+        description: >- 
+          Set of named security configurations (definitions only). Not actually applied unless names are used in 
+          a security name-value pair.
+        from_schema: td:hasSecurityConfiguration
+        required: true
+        range: SecurityScheme
+      schemaDefinitions:
+        description: >- 
+          TODO This has to be checked, it is not in the ontologies anywhere.
+          Set of named data schemas. To be used in a schema name-value pair inside an AdditionalExpectedResponse object.
+        multivalued: true
+        range: DataSchema
+      links:
+        from_schema: td:hasLink
+        description: >-
+          Provides Web links to arbitrary resources that relate to the specified Thing Description.
+        multivalued: true
+        range: Link
+      properties:
+        description: >-
+          All Property-based interaction affordances of the Thing.
+        from_schema: td:hasPropertyAffordance
+        multivalued: true
+        inlined: true
+        range: PropertyAffordance
+      actions:
+        description: >-
+          All Action-based interaction affordances of the Thing.
+        from_schema: td:hasActionAffordance
+        multivalued: true
+        inlined: true
+        range: ActionAffordance
+      events:
+        description: >-
+          All Event-based interaction affordances of the Thing.
+        from_schema: td:hasEventAffordance
+        multivalued: true
+        inlined: true
+        range: EventAffordance
+    slots:
+      - id
+      - title
+      - description
+      - titles
+      - descriptions
+      - "@type"
+      - titles
+      - descriptions
+      - uriVariables
+      - forms
+
+enums:
+  OperationTypes:
+    description: >-
+      Enumerations of well-known operation types necessary to implement the WoT interaction model.
+    permissible_values:
+      readproperty:
+        description: Identifies the read operation on Property Affordances to retrieve the corresponding data.
+        meaning: td:readProperty
+      writeproperty:
+        description: Identifies the write operation on Property Affordances to update the corresponding data.
+        meaning: td:writeProperty
+      observeproperty:
+        description: Identifies the observe operation on Property Affordances to be notified with the new data when the Property is updated.
+        meaning: td:observeProperty
+      unobserveproperty:
+        description: Identifies the unobserve operation on Property Affordances to stop the corresponding notifications.
+        meaning: td:unobserveProperty
+      invokeaction:
+        description: Identifies the invoke operation on Action Affordances to perform the corresponding action.
+        meaning: td:invokeAction
+      queryaction:
+        description: Identifies the querying operation on Action Affordances to get the status of the corresponding action.
+        meaning: td:queryAction
+      cancelaction:
+        description: Identifies the cancel operation on Action Affordances to cancel the ongoing corresponding action.
+        meaning: td:cancelAction
+      subscribeevent:
+        description: Identifies the subscribe operation on Event Affordances to be notified by the Thing when the event occurs.
+        meaning: td:subscribeEvent
+      unsubscribeevent:
+        description: Identifies the unsubscribe operation on Event Affordances to stop the corresponding notifications.
+        meaning: td:unsubscribeEvent
+      readallproperties:
+        description: Identifies the readallproperties operation on a Thing to retrieve the data of all Properties in a single interaction.
+        meaning: td:readAllProperties
+      writeallproperties:
+        description: Identifies the writeallproperties operation on a Thing to update the data of all writable Properties in a single interaction.
+        meaning: writeAllProperties
+      readmultipleproperties:
+        description: Identifies the readmultipleproperties operation on a Thing to retrieve the data of selected Properties in a single interaction.
+        meaning: td:readMultipleProperties
+      writemultipleproperties:
+        description: Identifies the writemultipleproperties operation on a Thing to update the data of selected writable Properties in a single interaction.
+        meaning: td:writeMultipleProperties
+      observeallproperties:
+        description: Identifies the observeallproperties operation on Properties to be notified with new data when any Property is updated.
+        meaning: td:observeAllProperties
+      unobserveallproperties:
+        description: Identifies the unobserveallproperties operation on Properties to stop notifications from all Properties in a single interaction.
+        meaning: td:unobserveAllProperties
+      subscribeallevents:
+        description: Identifies the subscribeallevents operation on Events to subscribe to notifications from all Events in a single interaction.
+        meaning: td:subscribeAllEvents
+      unsubscribeallevents:
+        description: Identifies the unsubscribeallevents operation on Events to unsubscribe from notifications from all Events in a single interaction.
+        meaning: td:unsubscribeAllEvents
+      queryallactions:
+        description: Identifies the queryallactions operation on a Thing to get the status of all Actions in a single interaction.
+        meaning: td:queryAllActions

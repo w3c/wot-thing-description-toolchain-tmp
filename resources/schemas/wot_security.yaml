@@ -1,0 +1,256 @@
+id: https://raw.githubusercontent.com/w3c/wot-thing-description/main/wotsec
+name: wot_security
+title: wot_security
+version: "1.1-5-July-2024"
+description: |-
+  LinkML schema for modelling the TD Security mechanisms.
+license: MIT
+see_also:
+  - https://www.w3.org/TR/wot-thing-description11/
+
+prefixes:
+  linkml:
+    prefix_prefix: linkml
+    prefix_reference: https://w3id.org/linkml/
+  xsd:
+    prefix_prefix: xsd
+    prefix_reference: http://www.w3.org/2001/XMLSchema#
+  td:
+    prefix_prefix: td
+    prefix_reference: https://www.w3.org/2019/wot/td#
+  wotsec:
+    prefix_prefix: wotsec
+    prefix_reference: https://www.w3.org/2019/wot/security#
+
+
+default_prefix: wotsec
+default_range: string
+
+imports:
+  - linkml:types
+
+
+slots:
+  name:
+    description: >-
+      Name for query, header, cookie, or uri parameters.
+  in:
+    description: >-
+      Specifies the location of security authentication information.
+    examples:
+      - value: one of header
+      - value: query
+      - value: body
+      - value: cookie
+      - value: auto
+  authorization:
+    description: >-
+      URI of the authorization server.
+    range: uri
+
+
+classes:
+  SecurityScheme:
+    class_uri: wotsec:SecurityScheme
+    description: >-
+      Metadata describing the configuration of a security mechanism. The value assigned to the name scheme MUSTbe 
+      defined within a data-link-type Vocabulary included in the data-link-type, either in the standard Vocabulary 
+      defined in TD Information Model or in a TD Context Extension.
+    attributes:
+      # The @type attribute has not been added due to LinkML bug.
+      proxy:
+        description: >-
+          URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration
+          is for the endpoint.
+        range: uri
+      scheme:
+        required: true
+        range: SecuritySchemeType
+    slots:
+      - description
+      - descriptions
+      - "@type"
+  BearerSecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      Bearer token authentication security configuration identified by the term <code>bearer.  This scheme is intended 
+      for situations where bearer tokens are used independently of OAuth2.  If the oauth2 scheme is specified it is not 
+      generally necessary to specify this scheme as well as it is implied.  For format, the value jwt indicates conformance 
+      with RFC7519, jws indicates conformance with RFC7797, cwt indicates conformance with RFC8392, and jwe indicates 
+      conformance with !RFC7516, with values for alg interpreted consistently with those standards. 
+      Other formats and algorithms for bearer tokens MAY be specified in vocabulary extensions.
+    attributes:
+      alg:
+        description: >-
+          Encoding, encryption, or digest algorithm.
+        examples:
+          - value: ES256
+          - value: es512-256
+      format:
+        description: >-
+          Specifies format of security authentication information.
+        examples:
+          - value: jwt
+          - value: cwt
+          - value: jwe
+          - value: jws
+    slots:
+      - authorization
+      - name
+      - in
+  OAuth2SecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      OAuth 2.0 authentication security configuration for systems conformant with [[!RFC6749]] and [[!RFC8252]], identified 
+      by the Vocabulary Term oauth2. For the code flow both authorization and token MUST be included. For the client
+      flow token MUST be included. For the client flow authorization MUST NOT be included. For the device flow both 
+      authorization and token MUST be included. In the case of the device flow the value provided for authorization
+      refers to the device authorization endpoint defined in [[!RFC8628]].
+    attributes:
+      flow:
+        description: >-
+          Authorization flow.
+        required: true
+        examples:
+          - value: code
+          - value: client
+      token:
+        description: >-
+          URI of the token server.
+        range: uri
+      refresh:
+        description: >-
+          URI of the refresh server.
+        range: uri
+      scopes:
+        description: >-
+          Set of authorization scope identifiers provided as an array.  These are provided in tokens returned by an 
+          authorization server and associated with forms in order to identify what resources a client may access and how.  
+          The values associated with a form should be chosen from those defined in an OAuth2SecurityScheme active on that form.
+        exactly_one_of:
+          - range: string
+          - range: string
+            multivalued: true
+    slots:
+      - authorization
+
+  ComboSecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      A combination of other security schemes identified by the Vocabulary Term combo. Elements of this scheme define 
+      various ways in which other named schemes defined in securityDefinitions, including other ComboSecurityScheme definitions, 
+      are to be combined to create a new scheme definition. Exactly one of either oneOf or allOf MUST be included.
+    attributes:
+      oneOf:
+        description: >-
+          Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, 
+          will allow access.  Only one may be chosen for use.
+        multivalued: true
+      allOf:
+        description: >-
+          Array of two or more strings identifying other named security scheme definitions, all of which must be satisfied for access.
+        multivalued: true
+  DigestSecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      Digest authentication security configuration identified by the term digest. This scheme is similar to basic 
+      authentication but with added features to avoid man-in-the-middle attacks.
+    attributes:
+      qop:
+        description: >-
+          Quality of protection
+        examples:
+          - value: one of auth
+          - value: oath-int
+    slots:
+      - name
+      - in
+
+  BasicSecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      Basic authentication security configuration identified by the term basic, using an unencrypted username and password.
+    slots:
+      - name
+      - in
+
+  NoSecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      A security configuration corresponding to identified by the term nosec, indicating there is no authentication or 
+      other mechanism required to access the resource.
+  AutoSecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      An automatic authentication security configuration identified by the term auto. 
+      This scheme indicates that the security parameters are going to be negotiated by the underlying protocols at runtime, 
+      subject to the respective specifications for the protocol (e.g. [[!RFC8288]] for Basic Authentication when using HTTP).
+  APISecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      API key authentication security configuration identified by the term apikey.  This scheme is to be used when the 
+      access token is opaque, for example when a key in a proprietary format is provided by a cloud service provider.  
+      In this case the key may not be using a standard token format. This scheme indicates that the key provided by the 
+      service provider needs to be supplied as part of service requests using the mechanism indicated by the \"in\" field.
+    slots:
+      - name
+      - in
+
+  PSKSecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      Pre-shared key authentication security configuration identified by the term psk.  
+      This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[rfc4279]], and that the 
+      ciphersuite used for keys will be established during protocol negotiation.
+    attributes:
+      identity:
+        description: >-
+          Identifier providing information which can be used for selection or confirmation.
+  APIKeySecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      Pre-shared key authentication security configuration identified by the term psk.  
+      This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[rfc4279]], and that the 
+      ciphersuite used for keys will be established during protocol negotiation.
+    slots:
+      - in
+
+enums:
+  SecuritySchemeType:
+    permissible_values:
+      nosec:
+        from_schema: wotsec:NoSecurityScheme
+        description: A security configuration corresponding to identified by the Vocabulary Term nosec, indicating there is no authentication or other mechanism required to access the resource.
+        meaning: wotsec:NoSecurityScheme
+      combo:
+        from_schema: wotsec:ComboSecurityScheme
+        description: Elements of this scheme define various ways in which other named schemes defined in securityDefinitions, including other ComboSecurityScheme definitions, are to be combined to create a new scheme definition.
+        meaning: wotsec:ComboSecurityScheme
+      basic:
+        from_schema: wotsec:BasicSecurityScheme
+        description: Uses an unencrypted username and password.
+        meaning: wotsec:BasicSecurityScheme
+      digest:
+        from_schema: wotsec:DigestSecurityScheme
+        description: This scheme is similar to basic authentication but with added features to avoid man-in-the-middle attacks.
+        meaning: wotsec:DigestSecurityScheme
+      bearer:
+        from_schema: wotsec:BearerSecurityScheme
+        description: Bearer tokens are used independently of OAuth2.
+        meaning: wotsec:BearerSecurityScheme
+      psk:
+        from_schema: wotsec:PSKSecurityScheme
+        description: This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [RFC4279], and that the ciphersuite used for keys will be established during protocol negotiation.
+        meaning: wotsec:PSKSecurityScheme
+      oauth2:
+        from_schema: wotsec:OAuth2SecurityScheme
+        description: OAuth 2.0 authentication security configuration for systems conformant with [RFC6749] and [RFC8252].
+        meaning: wotsec:OAuth2SecurityScheme
+      apikey:
+        from_schema: wotsec:APIKeySecurityScheme
+        description: This scheme is to be used when the access token is opaque.
+        meaning: wotsec:APIKeySecurityScheme
+      auto:
+        from_schema: wotsec:AutoSecurityScheme
+        description: This scheme indicates that the security parameters are going to be negotiated by the underlying protocols at runtime
+        meaning: wotsec:AutoSecurityScheme
