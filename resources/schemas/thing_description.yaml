@@ -54,7 +54,8 @@ default_range: string
 
 imports:
   - linkml:types
-  - resources/schemas/hctl_schema
+  - hctl
+  - wot_security
 
 types:
   anyUri:
@@ -304,7 +305,7 @@ classes:
         multivalued: true
         any_of:
           - range: string
-          - range: wot_security_schema:SecuritySchemeType
+          - range: SecuritySchemeType
       security:
         description: >-
           A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
