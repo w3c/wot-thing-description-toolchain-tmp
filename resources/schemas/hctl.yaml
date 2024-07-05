@@ -83,18 +83,29 @@ classes:
           coding include \"gzip\", \"deflate\", etc.
       securityDefinitions:
         description: >-
-          A security schema applied to a (set of) affordance(s).
+          Set of security definition names, chosen from those defined in securityDefinitions. These must all be satisfied for access to resources.
         slot_uri: td:hasSecurityConfiguration
-        multivalued: true
+        exactly_one_of:
+          - range: string
+          - range: string
+            multivalued: true
       scopes:
         description: >-
-          TODO Check, was not in hctl ontology, if not could be source of discrepancy
-        multivalued: true
+          TODO Check, was not in hctl ontology, if not could be source of discrepancy.
+          Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an 
+          authorization server and associated with forms in order to identify what resources a client may access and how. 
+          The values associated with a form SHOULD be chosen from those defined in an OAuth2SecurityScheme active on that form.
+        exactly_one_of:
+          - range: string
+          - range: string
+            multivalued: true
       response:
         description: >-
           This optional term can be used if, e.g., the output communication metadata differ from input metadata (e.g., output contentType differ from the
           input contentType). The response name contains metadata that is only valid for the response messages.
         slot_uri: hctl:returns
+        aliases:
+          - returns
         range: ExpectedResponse
       additionalResponse:
         description: >-
@@ -102,19 +113,25 @@ classes:
           additional response needs to be distinguished from others in some way (for example, by specifying a protocol-specific
           response code), and may also have its own data schema.
         slot_uri: hctl:additionalReturns
-        range: AdditionalExpectedResponse
         multivalued: true
+        range: AdditionalExpectedResponse
+        aliases:
+          - additional returns
       subprotocol:
         slot_uri: hctl:forSubProtocol
         description: >-
           Indicates the exact mechanism by which an interaction will be accomplished for a given protocol when there
           are multiple options.
+        range: SubProtocolTypes
       op:
         description:
           Indicates the semantic intention of performing the operation(s) described by the form. TODO- Check, in the ontology this does not have a connecting link between operation and OperationType.
         slot_uri: hctl:hasOperationType
-        multivalued: true
         range: OperationTypes
+        exactly_one_of:
+          - range: string
+          - range: string
+            multivalued: true
     slots:
       - href
   ExpectedResponse:
@@ -161,3 +178,10 @@ slots:
       - target
     required: true
     range: uri
+
+enums:
+  SubProtocolTypes:
+    permissible_values:
+      longpoll:
+      websub:
+      sse:
