@@ -172,12 +172,12 @@ classes:
           Indexing property to store entity names when serializing them in a JSON-LD @index container.
         identifier: true
     slots:
+      - "@type"
       - titles
       - descriptions
       - title
       - description
       - titles
-      - descriptions
       - uriVariables
       - forms
   PropertyAffordance:
@@ -220,7 +220,7 @@ classes:
         range: boolean
       input:
         description: >-
-          Used to define the input data schema of the action.
+          Used to define the input data schema of the Action.
         from_schema: td:hasInputSchema
         range: DataSchema
       output:
@@ -245,12 +245,12 @@ classes:
           Defines any data that needs to be passed to cancel a subscription, e.g., a specific message to remove a Webhook.
         from_schema: td:hasCancellationSchema
         range: DataSchema
-      notification:
+      data:
         description: >-
           Defines the data schema of the Event instance messages pushed by the Thing.
         from_schema: td:hasNotificationSchema
         range: DataSchema
-      notificationResponse:
+      dataResponse:
         description: >-
           Defines the data schema of the Event response messages sent by the consumer in a response to a data message.
         from_schema: td:hasNotificationResponseSchema
