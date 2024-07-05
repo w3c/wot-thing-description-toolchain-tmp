@@ -1,0 +1,59 @@
+id: https://raw.githubusercontent.com/w3c/wot-thing-description/main/dataschema
+name: jsonschema
+title: jsonschema
+version: "1.1-05-July-2024"
+description: |-
+  LinkML schema for modelling the TD Module for data schema specifications.
+license: MIT
+see_also:
+  - https://www.w3.org/TR/wot-thing-description11/
+
+prefixes:
+  linkml:
+    prefix_prefix: linkml
+    prefix_reference: https://w3id.org/linkml/
+  td:
+    prefix_prefix: td
+    prefix_reference: https://www.w3.org/2019/wot/td#
+  jsonschema:
+    prefix_prefix: jsonschema
+    prefix_reference: https://www.w3.org/2019/wot/json-schema#
+  wotsec:
+    prefix_prefix: wotsec
+    prefix_reference: https://www.w3.org/2019/wot/security#
+  hctl:
+    prefix_prefix: hctl
+    prefix_reference: https://www.w3.org/2019/wot/hypermedia#
+  schema:
+    prefix_prefix: schema
+    prefix_reference: http://schema.org/
+  tm:
+    prefix_prefix: tm
+    prefix_reference: https://www.w3.org/2019/wot/tm#
+default_prefix: jsonschema
+default_range: string
+
+imports:
+  - linkml:types
+
+
+classes:
+  DataSchema:
+    class_uri: jsonschema:DataSchema
+    description: >-
+      Metadata that describes the data format used. It can be used for validation.
+    attributes:
+      propertyName:
+        description: >-
+          Used to store the indexing name in the parent object when this schema appears as a property of an object schema.
+      writeOnly:
+        description: >-
+          Boolean value that is a hint to indicate whether a property interaction/value is write only (=true) or not (=false).
+      readonly:
+        description: >-
+          Boolean value that is a hint to indicate whether a property interaction/value is read only (=true) or not (=false).
+    slots:
+      - description
+      - title
+      - titles
+      - descriptions
