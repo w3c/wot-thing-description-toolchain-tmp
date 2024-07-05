@@ -78,7 +78,7 @@ classes:
           Boolean value that is a hint to indicate whether a property interaction/value is read only (=true) or not (=false).
         range: boolean
     slots:
-      - "@type""
+      - "@type"
       - description
       - title
       - titles
@@ -199,19 +199,19 @@ classes:
         description: >-
           Specifies the encoding used to store the contents, as specified in [RFC2045] (Section 6.1) and [RFC4648].
         examples:
-          - 7bit
-          - 8bit
-          - binary
-          - quoted-printable
-          - base16
-          - base32
-          - base64
+          - value: 7bit
+          - value: 8bit
+          - value: binary
+          - value: quoted-printable
+          - value: base16
+          - value: base32
+          - value: base64
       contentMediaType:
         description: >-
           Specifies the MIME type of the contents of a string value, as described in [RFC2046].
         examples:
-          - image/png
-          - audio/mpeg
+          - value: image/png
+          - value: audio/mpeg
   NullSchema:
     is_a: DataSchema
     description: >-
