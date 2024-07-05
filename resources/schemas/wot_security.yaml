@@ -52,16 +52,18 @@ classes:
       defined in TD Information Model or in a TD Context Extension.
     attributes:
       # The @type attribute has not been added due to LinkML bug.
-      description:
-        range: MultiLanguage
       proxy:
         description: >-
           URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration
           is for the endpoint.
-        range: uriorcurie
+        range: uri
       scheme:
         required: true
         range: SecuritySchemeType
+    slots:
+      - description
+      - descriptions
+      - "@type"
 
   BearerSecurityScheme:
     is_a: SecurityScheme
