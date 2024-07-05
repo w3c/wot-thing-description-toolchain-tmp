@@ -1,6 +1,6 @@
 id: https://raw.githubusercontent.com/w3c/wot-thing-description/main/hctl
-name: hypermedia-controls-schema
-title: hypermedia-controls-schema
+name: hctl
+title: hctl
 version: "1.1-11-June-2024"
 description: |-
   LinkML schema for modelling the TD Hypermedia Control information model, in particular links and forms.
@@ -35,7 +35,6 @@ default_range: string
 
 imports:
   - linkml:types
-  - thing_description_schema
 
 
 classes:
@@ -64,7 +63,7 @@ classes:
         multivalued: true
         pattern: "^(((([A-Za-z]{2,3}(-([A-Za-z]{3}(-[A-Za-z]{3}){0,2}))?)|[A-Za-z]{4}|[A-Za-z]{5,8})(-([A-Za-z]{4}))?(-([A-Za-z]{2}|[0-9]{3}))?(-([A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*(-([0-9A-WY-Za-wy-z](-[A-Za-z0-9]{2,8})+))*(-(x(-[A-Za-z0-9]{1,8})+))?)|(x(-[A-Za-z0-9]{1,8})+)|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
     slots:
-      - target
+      - href
 
   Form:
     class_uri: hctl:Form
@@ -89,8 +88,7 @@ classes:
         description: >-
           A security schema applied to a (set of) affordance(s).
         slot_uri: td:hasSecurityConfiguration
-        is_a: td:hasSecurityConfiguration
-        multivalues: true
+        multivalued: true
       scopes:
         description: >-
           TODO Check, was not in hctl ontology, if not could be source of discrepancy

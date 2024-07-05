@@ -1,4 +1,4 @@
-d: https://raw.githubusercontent.com/w3c/wot-thing-description/main/wotsec
+id: https://raw.githubusercontent.com/w3c/wot-thing-description/main/wotsec
 name: wotsec-schema
 title: wotsec-schema
 version: "1.1-11-June-2024"
@@ -12,6 +12,9 @@ prefixes:
   linkml:
     prefix_prefix: linkml
     prefix_reference: https://w3id.org/linkml/
+  xsd:
+    prefix_prefix: xsd
+    prefix_reference: http://www.w3.org/2001/XMLSchema#
   td:
     prefix_prefix: td
     prefix_reference: https://www.w3.org/2019/wot/td#
@@ -25,7 +28,7 @@ default_range: string
 
 imports:
   - linkml:types
-  - thing_description_schema
+  - resources/schemas/thing_description_schema
 
 
 slots:
@@ -38,7 +41,7 @@ slots:
   authorization:
     description: >-
       URI of the authorization server.
-    range: anyURI
+    range: uriorcurie
 
 
 classes:
@@ -49,13 +52,14 @@ classes:
       defined within a data-link-type Vocabulary included in the data-link-type, either in the standard Vocabulary 
       defined in TD Information Model or in a TD Context Extension.
     attributes:
+      # The @type attribute has not been added due to LinkML bug.
       description:
         range: MultiLanguage
       proxy:
         description: >-
           URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration
           is for the endpoint.
-        range: anyUri
+        range: uriorcurie
       scheme:
         required: true
         range: SecuritySchemeType
@@ -97,11 +101,11 @@ classes:
       token:
         description: >-
           URI of the token server.
-        range: anyURI
+        range: uriorcurie
       refresh:
         description: >-
           URI of the refresh server.
-        range: anyURI
+        range: uriorcurie
       scopes:
         description: >-
           Set of authorization scope identifiers provided as an array.  These are provided in tokens returned by an 
