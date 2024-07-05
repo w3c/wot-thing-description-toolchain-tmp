@@ -115,6 +115,21 @@ slots:
         multivalued: true
     inlined: true
     inlined_as_list: true
+  uriVariables:
+    description: >-
+      Define URI template variables according to RFC6570 as collection based on schema specifications. The individual
+      variables DataSchema cannot be an ObjectSchema or an ArraySchema. TODO: range is not obvious from the ontology.
+    from_schema: td:hasUriTemplateSchema
+    range: DataSchema
+    inlined: true
+    multivalued: true
+  forms:
+    from_schema: td:hasForm
+    description: >-
+      Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of
+      Protocol Bindings.
+    multivalued: true
+    range: Form
 
 
 classes:
@@ -147,6 +162,7 @@ classes:
         description: >-
           Provides a version indicator of the underlying TM.
 
+
 #  #TODO, check
 #  MultiLanguage:
 #    attributes:
@@ -178,27 +194,15 @@ classes:
 
   InteractionAffordance:
     description: >-
-      TOOD
+      Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact 
+      with the Thing. There are many types of potential affordances, but W3C WoT defines three types of Interaction 
+      Affordances: Properties, Actions, and Events.
     class_uri: td:InteractionAffordance
     attributes:
       name:
         description: >-
           Indexing property to store entity names when serializing them in a JSON-LD @index container.
         identifier: true
-      uriVariables:
-        description: >-
-          Define URI template variables according to RFC6570 as collection based on schema specifications. The individual
-          variables DataSchema cannot be an ObjectSchema or an ArraySchema. TODO: range is not obvious from the ontology.
-        from_schema: td:hasUriTemplateSchema
-        range: DataSchema
-        inlined: true
-      forms:
-        from_schema: td:hasForm
-        description: >-
-          Set of form hypermedia controls that describe how an operation can be performed.
-        required: true
-        multivalued: true
-        range: Form
     slots:
       - titles
       - descriptions
@@ -206,6 +210,8 @@ classes:
       - description
       - titles
       - descriptions
+      - uriVariables
+      - forms
 
   PropertyAffordance:
     is_a: InteractionAffordance
@@ -349,16 +355,11 @@ classes:
         required: true
         range: SecurityScheme
       schemaDefinitions:
-        description: TODO CHECK
+        description: >- 
+          TODO This has to be checked, it is not in the ontologies anywhere.
+          Set of named data schemas. To be used in a schema name-value pair inside an AdditionalExpectedResponse object.
         multivalued: true
         range: DataSchema
-      forms:
-        from_schema: td:hasForm
-        description: >-
-          Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of
-          Protocol Bindings.
-        multivalued: true
-        range: Form
       links:
         from_schema: td:hasLink
         description: >-
@@ -395,6 +396,8 @@ classes:
       - "@type"
       - titles
       - descriptions
+      - uriVariables
+      - forms
 
 
 enums:
