@@ -102,12 +102,17 @@ slots:
       - range: string
       - range: MultiLanguage
     inlined: true
+    # currently less restrictions are applied, with further restrictions according to the json schema, the following can be partially utilized
+#    exactly_one_of:
+#      - range: type_declaration_string
+#      - range: type_declaration_array
   "@type":
     description: >-
       JSON-LD keyword to label the object with semantic tags (or types).
     exactly_one_of:
-      - range: type_declaration_string
-      - range: type_declaration_array
+      - range: string
+      - range: string
+        multivalued: true
     inlined: true
     inlined_as_list: true
 
@@ -327,23 +332,22 @@ classes:
           - range: uri
             multivalued: true
           - range: uri
-
-      securityDefinitions:
-        description: >- 
-          A security scheme applied to a (set of) affordance(s). TODO check
-        from_schema: td:hasSecurityConfiguration
-        required: true
-        multivalued: true
-        any_of:
-          - range: string
-          - range: SecuritySchemeType
       security:
         description: >-
           A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
-          TODO: check
         from_schema: td:definesSecurityScheme
         required: true
-        multivalued: true
+        any_of:
+          - range: string
+            multivalued: true
+          - range: string
+      securityDefinitions:
+        description: >- 
+          Set of named security configurations (definitions only). Not actually applied unless names are used in 
+          a security name-value pair.
+        from_schema: td:hasSecurityConfiguration
+        required: true
+        range: SecurityScheme
       schemaDefinitions:
         description: TODO CHECK
         multivalued: true
