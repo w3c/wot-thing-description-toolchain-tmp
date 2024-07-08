@@ -1,0 +1,1 @@
+This category contains various examples of Thing Descriptions with more complex data schemas.

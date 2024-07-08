@@ -1,0 +1,1 @@
+This category contains various examples concerning the "properties" interaction affordance.
