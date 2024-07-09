@@ -79,7 +79,7 @@ slots:
     description: >-
       Identifier of the Thing in form of a URI [RFC3986] (e.g., stable URI, temporary and mutable URI, 
       URI with local IP address, URN, etc.).
-    range: uri
+    range: uriorcurie
     slot_uri: td:id
   title:
     description: >-
@@ -284,7 +284,7 @@ classes:
         description: >- 
           JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
         required: true
-        range: uri
+        range: uriorcurie
         array:
       version:
         description: >- 
@@ -303,22 +303,22 @@ classes:
       supportContact:
         description: >-
           Provides information about the TD maintainer as URI scheme (e.g., <code>mailto</code> [[RFC6068]],<code>tel</code> [[RFC3966]],<code>https</code> [[RFC9112]]).
-        range: uri
+        range: uriorcurie
         from_schema: schema:contactPoint
       base:
         description: >-
           Define the base URI that is used for all relative URI references throughout a TD document.
         from_schema: td:baseURI
-        range: uri
+        range: uriorcurie
       profile:
         description: >-
           Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.
         from_schema: td:followsProfile
         range: Any
         any_of:
-          - range: uri
+          - range: uriorcurie
             multivalued: true
-          - range: uri
+          - range: uriorcurie
       security:
         description: >-
           A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
@@ -334,7 +334,17 @@ classes:
           a security name-value pair.
         from_schema: td:hasSecurityConfiguration
         required: true
-        range: SecurityScheme
+        exactly_one_of:
+          - range: BearerSecurityScheme
+          - range: OAuth2SecurityScheme
+          - range: ComboSecurityScheme
+          - range: DigestSecurityScheme
+          - range: BasicSecurityScheme
+          - range: NoSecurityScheme
+          - range: AutoSecurityScheme
+          - range: APISecurityScheme
+          - range: PSKSecurityScheme
+          - range: APIKeySecurityScheme
       schemaDefinitions:
         description: >- 
           TODO This has to be checked, it is not in the ontologies anywhere.
