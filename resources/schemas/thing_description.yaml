@@ -61,9 +61,18 @@ imports:
 
 types:
   MultiLanguage:
-    description: "Description of the TD element (Thing, interaction affordance, security scheme or data scheme) with language tag."
+    name: MultiLanguage
+    description: Description with a language tag.
+    from_schema: rdf
+    exact_mappings:
+    - rdf:langString
+    base: rdf:PlainLiteral
+    uri: rdf:PlainLiteral
+  languageString:
+    base: rdf:langString
     uri: rdf:langString
-    base: str
+    structured_pattern:
+      syntax: "{text}@{tag}"
 
 slots:
   id:
@@ -75,9 +84,7 @@ slots:
   title:
     description: >-
       Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
-    exactly_one_of:
-      - range: string
-      - range: MultiLanguage
+    range: languageString
     required: true
     slot_uri: td:title
   titles:
@@ -147,6 +154,17 @@ classes:
         multivalued: true
         none_of:
           - equals_string: 'tm:ThingModel'
+  language:
+    attributes:
+      text:
+        description: >-
+          The string part of the plain literal.
+        required: true
+      tag:
+        description: The optional language tag for the plain literal.
+        range: LanguageTags
+
+
   # end of intermediate classes
   # start of main classes
   VersionInfo:
@@ -306,7 +324,7 @@ classes:
           A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
         from_schema: td:definesSecurityScheme
         required: true
-        any_of:
+        exactly_one_of:
           - range: string
             multivalued: true
           - range: string
@@ -421,3 +439,23 @@ enums:
       queryallactions:
         description: Identifies the queryallactions operation on a Thing to get the status of all Actions in a single interaction.
         meaning: td:queryAllActions
+
+  LanguageTags:
+    description: >-
+      Enumerations of well-known operation types necessary to implement the WoT interaction model.
+    permissible_values:
+      en:
+        description: English
+        meaning: td:readProperty
+      fr:
+        description: French
+        meaning: td:readProperty
+      de:
+        description: German
+        meaning: td:readProperty
+      es:
+        description: Spanish
+        meaning: td:readProperty
+      it:
+        description: Italian
+        meaning: td:readProperty
