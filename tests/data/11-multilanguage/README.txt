@@ -1,1 +1,1 @@
-This category contains examples on how multiple languages as well as reading directions can be implemented on a Thing Description.
+This category contains examples demonstrating implementation of multiple languages in, as well as reading directions from, a Thing Description.
