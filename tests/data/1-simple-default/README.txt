@@ -1,1 +1,1 @@
-This category contains multiple simple/basic examples of Thing Description as well as its most basic components.
+This category contains multiple simple/basic examples demonstrating use of Thing Description as well as its most basic components.
