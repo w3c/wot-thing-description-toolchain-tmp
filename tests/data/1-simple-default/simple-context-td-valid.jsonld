@@ -5,7 +5,7 @@
     "title": "MyLampThing",
     "$title": "@context",
     "description": "TD for a lamp thing",
-    "$description": "A member with the name @context and a value of type string is generally used to identify the TD representation format version defined by this specification.",
+    "$description": "A member with the name '@context' and a value of type 'string' is generally used to identify the TD representation format version defined by this specification.",
     "securityDefinitions": {
         "basic_sc": {"scheme": "basic", "in": "header"}
     },
