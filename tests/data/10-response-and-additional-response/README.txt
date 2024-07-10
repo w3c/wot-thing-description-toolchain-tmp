@@ -1,1 +1,1 @@
-This category contains examples that show how an interaction affordance can provide additonal metadata as a response.
+This category contains examples demonstrating use of an interaction affordance to provide additional metadata as a response.
