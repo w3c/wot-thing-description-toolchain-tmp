@@ -5,7 +5,7 @@
     "title": "MyLampThing",
     "$title": "Apikey Security",
     "description": "TD for a Lamp Thing",
-    "$description": "API key can be included in the request to the Thing in different ways. One way it can be used, is as a URI template where the API key should be replaced in the URI when sending an HTTPS request.",
+    "$description": "An API key can be included in a request to the Thing in various ways. One way to do this is to use a URI template where the API key should be replaced in the URI when sending an HTTPS request.",
     "securityDefinitions": {
         "apikey_key": {
             "scheme": "apikey",
