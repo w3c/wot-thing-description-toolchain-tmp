@@ -10,7 +10,7 @@
     "title": "شيء يخصني يقيس درجة الحرارة",
     "$title": "String Direction",
     "description": "TD for a sensor that measures the temperature",
-    "$description": "Metadata can be used to determine the base direction of string values, utilizing @direction and the values rtl, ltr and null for default direcction.",
+    "$description": "Metadata can be used to communicate the base direction of string values, utilizing @direction and the values rtl, ltr, and null, respectively meaning right-to-left, left-to-right, and the default direction",
     "securityDefinitions": {
         "basic_sc": {"scheme": "basic", "in": "header"}
     },
