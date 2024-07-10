@@ -23,7 +23,7 @@
         "zh-Hans": "TD 用于各种语言的通用事物",
         "zh-Hant": "TD 用於各種語言的通用事物"
     },
-    "$description": "TD instances may also combine the use of title and description with titles and descriptions. title and description are seeing as the default text.",
+    "$description": "TD instances can use both title and description fields along with titles and descriptions ifor multilingual support. The title and description fields contain text in the default language specified, while titles and descriptions provide localized versions in multiple languages.",
     "securityDefinitions": {
         "basic_sc": {
             "scheme": "basic",
