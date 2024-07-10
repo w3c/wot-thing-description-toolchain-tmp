@@ -1,1 +1,1 @@
-This category contains various examples concerning the different types of security schemas that could/should be used for a Thing Description, as well as the different ways to combine multiple security schemes.
+This category contains various examples demonstrating use of different types of security schema that can be used in a Thing Description, as well as different ways to combine multiple security schemas.
