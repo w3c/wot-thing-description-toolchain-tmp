@@ -1,0 +1,12 @@
+{
+  "@context": ["https://www.w3.org/2019/wot/td/v1"],
+  "@type": "Thing",
+  "id": "urn:example:thing:securityDefinitions1",
+  "title": "Example Thing with Security Definitions",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": ["nosec_sc"]
+}
