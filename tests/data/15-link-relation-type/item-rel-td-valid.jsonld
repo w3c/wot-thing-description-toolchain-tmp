@@ -5,7 +5,7 @@
     "title": "Electric Drive",
     "$title": "Item Relation",
     "description": "TD for an Electric Drive Thing",
-    "$description": "A superordinate Thing can collect a group of Things and refer to them by using the item value.",
+    "$description": "A superordinate Thing can collect a group of Things and use the item value to refer to them.",
     "securityDefinitions": {
         "basic_sc": {"scheme": "basic", "in": "header"}
     },
