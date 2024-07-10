@@ -5,7 +5,7 @@
     "title": "MyLampThing",
     "$title": "Multiple Security Forms",
     "description": "TD for a Lamp Thing",
-    "$description": "Security configurations can also be specified for different forms within the same Interaction Affordance.",
+    "$description": "Security configurations can be specified for different forms within the same Interaction Affordance.",
     "securityDefinitions": {
         "basic_sc": { "scheme": "basic" },
         "digest_sc": { "scheme": "digest" },
