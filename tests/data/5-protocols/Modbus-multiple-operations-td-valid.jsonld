@@ -9,7 +9,7 @@
     "title": "ModbusPLC",
     "$title": "Modbus Multiple Operations",
     "description": "TD for a ModbusPLC",
-    "$description": "To describe forms with multiple operations types, the Entity keyword can be used to create a short description of the modbus endpoint. This example shows how to use the read and write property in a single coil.",
+    "$description": "To describe forms with multiple operation types, the Entity keyword can be used to create a short description of the modbus endpoint. This example shows how to use the read and write properties in a single coil.",
     "id": "uri:dev:ModbusTCPThing",
     "securityDefinitions": {
         "nosec_sc": {
