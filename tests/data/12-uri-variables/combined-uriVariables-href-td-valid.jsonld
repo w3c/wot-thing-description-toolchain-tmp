@@ -4,7 +4,7 @@
     "title": "MyWeatherThing",
     "$title": "Combined URI variables in href",
     "description": "TD for Weather Sensor Thing",
-    "$description": "Combined dynamic uriVariables and uriVariables in href structure.",
+    "$description": "Dynamic uriVariables combined with uriVariables in href structure.",
     "securityDefinitions": {
         "basic_sc": {
             "scheme": "basic",
