@@ -5,7 +5,7 @@
     "title": "MyLampThing",
     "$title": "Readallproperties",
     "description": "TD for a Lamp Thing",
-    "$description": "When forms are present at the top level, it can be used to describe meta interactions offered by a Thing. readallproperties is a type of meta interaction which allows the consumer to read all properties at once.",
+    "$description": "When a form is present at the top level, it can be used to describe meta interactions offered by a Thing. readallproperties is a type of meta interaction which allows the consumer to read all properties at once.",
     "securityDefinitions": {
         "basic_sc": {"scheme": "basic", "in": "header"}
     },
