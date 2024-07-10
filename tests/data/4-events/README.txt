@@ -1,1 +1,1 @@
-This category contains various examples concerning the "events" interaction affordance.
+This category contains various examples demonstrating use of the "events" interaction affordance.
