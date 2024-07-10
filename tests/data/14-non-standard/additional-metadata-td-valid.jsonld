@@ -17,7 +17,7 @@
     "title": "MyTemperatureSensor",
     "$title": "Additional Metadata",
     "description": "TD for a Temperature Sensor Thing",
-    "$description": "This example provides additional metadata terms from different external context files as provided in @context.",
+    "$description": "This example provides additional metadata terms from different external context files as found in @context.",
     "securityDefinitions": {
         "basic_sc": {"scheme": "basic", "in": "header"}
     },
