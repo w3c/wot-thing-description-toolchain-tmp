@@ -5,7 +5,7 @@
     "title": "MyCameraThing",
     "$title": "contentType",
     "description": "Thing description for a camera thing",
-    "$description": "The contentType member is used to assign a media type [RFC2046] including media type parameters as attribute-value pairs separated by a ; character.",
+    "$description": "The contentType member is used to assign a media type [RFC2046] including media type parameters as attribute-value pairs separated by a semicolon (";").",
     "securityDefinitions": {
         "basic_sc": {"scheme": "basic", "in": "header"}
     },
