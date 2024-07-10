@@ -5,7 +5,7 @@
     "title": "MyLampThing",
     "$title": "Apikey In Body",
     "description": "TD for a Lamp Thing",
-    "$description": "This in an example on how to include security parameters along with the payload.",
+    "$description": "This in an example demonstrating inclusion of security parameters along with the payload.",
     "securityDefinitions": {
         "apikey_body": {
             "scheme": "apikey",
