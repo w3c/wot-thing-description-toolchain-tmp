@@ -1,0 +1,11 @@
+{
+  "@context": ["https://www.w3.org/2019/wot/td/v1"],
+  "@type": "Thing",
+  "id": "urn:example:thing:actions1",
+  "title": "Example Thing with Actions",
+  "actions": {
+    "toggle": {
+      "href": "https://example.com/actions/toggle"
+    }
+  }
+}

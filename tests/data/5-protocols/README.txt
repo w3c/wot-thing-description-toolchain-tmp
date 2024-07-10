@@ -1,0 +1,1 @@
+This category contains various examples demonstrating use of the different types of protocol that can be used with Thing Descriptions, such as HTTP, Modbus, CoAP, etc.
