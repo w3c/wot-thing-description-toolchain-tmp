@@ -5,7 +5,7 @@
     "title": "MyLampThing",
     "$title": "Extended Forms Multiple op",
     "description": "TD for a Lamp Thing",
-    "$description": "In the case of a forms entry that has multiple op values the usage of the htv:methodName is not permitted. A TD Processor will extend the multiple op values to separate forms entries and associates a single operation with the default assumption.",
+    "$description": "In a form entry that has multiple op values, the usage of the htv:methodName is not permitted. A TD Processor will extend the multiple op values to separate form entries and associate a single operation with the default assumption.",
     "securityDefinitions": {
         "basic_sc": {
             "scheme": "basic",
