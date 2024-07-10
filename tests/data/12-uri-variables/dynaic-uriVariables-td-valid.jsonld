@@ -19,12 +19,12 @@
                     "type": "number", 
                     "minimum": 0, 
                     "maximum": 90, 
-                    "description": "Latitude for the desired location in the world" },
+                    "description": "Latitude for the desired location on Earth" },
                 "long": { 
                     "type": "number", 
                     "minimum": -180, 
                     "maximum": 180, 
-                    "description": "Longitude for the desired location in the world" }
+                    "description": "Longitude for the desired location on Earth" }
             },
             "forms": [{
               "href": "http://mymap.example.org/weather/{?lat,long}",
