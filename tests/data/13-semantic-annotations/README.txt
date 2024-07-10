@@ -1,1 +1,1 @@
-This category contains examples on how to use semantic annotations to allow for the use of additional vocabulary terms in a Thing Description instance.
+This category contains examples demonstrating use of semantic annotations to allow for the use of additional vocabulary terms in a Thing Description instance.
