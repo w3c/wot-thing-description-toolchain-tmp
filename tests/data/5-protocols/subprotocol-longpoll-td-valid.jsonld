@@ -5,7 +5,7 @@
     "title": "MyLampThing",
     "$title": "Subprotocol Longpoll",
     "description": "TD for a Lamp Thing",
-    "$description": "protocols may have defined Subprotocols that can be used for some interaction types. For example, to receive asynchronous notifications using HTTP, some servers may support long polling.",
+    "$description": "Protocols may have defined Subprotocols that can be used for some interaction types. For example, some servers may support long polling to receive asynchronous notifications using HTTP.",
     "securityDefinitions": {
         "basic_sc": {
             "scheme": "basic",
