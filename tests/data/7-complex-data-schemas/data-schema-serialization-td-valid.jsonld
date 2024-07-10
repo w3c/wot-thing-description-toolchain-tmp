@@ -5,7 +5,7 @@
     "title": "MyLampThing",
     "$title": "Data Schema Serialization",
     "description": "TD for a Lamp Thing",
-    "$description": "Data schema serialization applies to PropertyAffordance instances, the values assigned to input and output in ActionAffordance instances, the values assigned to subscription, data, and cancellation in EventAffordance instances, and the value assigned to uriVariables in instances of Subclasses of InteractionAffordance.",
+    "$description": "Data schema serialization applies to: PropertyAffordance instances; the values assigned to input and output in ActionAffordance instances; the values assigned to subscription, data, and cancellation in EventAffordance instances; and the value assigned to uriVariables in instances of Subclasses of InteractionAffordance.",
     "securityDefinitions": {
         "basic_sc": {"scheme": "basic", "in": "header"}
     },
