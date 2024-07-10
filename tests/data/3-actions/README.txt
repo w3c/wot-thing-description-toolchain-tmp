@@ -1,1 +1,1 @@
-This category contains various examples concerning the "actions" interaction affordance.
+This category contains various examples demonstrating use of the "actions" interaction affordance.
