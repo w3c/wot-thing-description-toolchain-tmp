@@ -5,7 +5,7 @@
     "title": "MyLampThing",
     "$title": "controlledBy Relation",
     "description": "TD for a Lamp Thing",
-    "$description": "A reference can be provided that points to a Thing (e.g., a controller) that controls the underlying unit (e.g., a lamp) utilizing controlledBy.",
+    "$description": "A reference can be provided that uses controlledBy to point to a Thing (e.g., a controller) that controls the underlying unit (e.g., a lamp).",
     "securityDefinitions": {
         "basic_sc": {"scheme": "basic", "in": "header"}
     },
