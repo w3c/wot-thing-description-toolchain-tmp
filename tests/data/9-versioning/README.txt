@@ -1,1 +1,1 @@
-This category contains examples that show how to manage versioning on Thing Descriptions.
+This category contains examples demonstrating how to manage versioning on Thing Descriptions.
