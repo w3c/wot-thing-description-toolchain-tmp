@@ -5,7 +5,7 @@
     "title": "MyLampThing",
     "$title": "HTTP Simple with Defaults",
     "description": "TD for a Lamp Thing",
-    "$description": "This example shows the default values for Procol Binding based on HTTP.",
+    "$description": "This example shows the default values for Protocol Binding, based on HTTP.",
     "securityDefinitions": {
         "basic_sc": {
             "scheme": "basic",
