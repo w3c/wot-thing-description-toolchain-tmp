@@ -17,7 +17,7 @@
             "uriVariables": {
                 "city": {
                     "type": "string",
-                    "description": "City name to find the weather information for"
+                    "description": "City name for which the weather information is desired"
                 },
                 "unit": {
                     "type": "string",
