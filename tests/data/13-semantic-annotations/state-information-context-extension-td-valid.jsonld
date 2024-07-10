@@ -15,7 +15,7 @@
     "title": "MyLampThing",
     "$title": "State Information Context Extension",
     "description": "TD for a Lamp Thing",
-    "$description": "TD Context Extensions may be used to annotate pieces of a data schema, to be able to semantically process the state information of the physical world object, which is represented by the data exchanged during an interaction.",
+    "$description": "TD Context Extensions may be used to annotate pieces of a data schema, enabling semantic processing of the state information of the physical world object, which is represented by the data exchanged during an interaction.",
     "securityDefinitions": {
         "basic_sc": {"scheme": "basic", "in": "header"}
     },
