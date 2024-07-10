@@ -5,7 +5,7 @@
     "title": "MyLampThing",
     "$title": "Basic Security",
     "description": "TD for a Lamp Thing",
-    "$description": "A simple security configuration specifying basic username/password authentication in the header.",
+    "$description": "A simple security configuration demonstrating basic username/password authentication via the header.",
     "securityDefinitions": {
         "basic_sc": {
             "scheme": "basic",
