@@ -4,7 +4,7 @@
     "title": "MyWeatherThing",
     "$title": "URI href Structure",
     "description": "TD for Weather sensor Thing",
-    "$description": "As defined in [RFC6570], uriVariables can be used for replacing the href structure.",
+    "$description": "As defined in [RFC6570], uriVariables can be used for replacement in the href structure.",
     "securityDefinitions": {
         "basic_sc": {
             "scheme": "basic",
