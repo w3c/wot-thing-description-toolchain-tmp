@@ -120,8 +120,8 @@ slots:
       - range: string
       - range: string
         multivalued: true
-    inlined: true
-    inlined_as_list: true
+    inlined: false
+#    inlined_as_list: true
   uriVariables:
     description: >-
       Define URI template variables according to RFC6570 as collection based on schema specifications. The individual
@@ -226,6 +226,7 @@ classes:
         description: >-
           Indexing property to store entity names when serializing them in a JSON-LD @index container.
         identifier: true
+
     slots:
       - "@type"
       - titles
@@ -233,6 +234,7 @@ classes:
       - title
       - description
       - titles
+      - type
       - uriVariables
       - forms
 
