@@ -86,6 +86,12 @@ classes:
       contentEncoding:
         description: >-
           todo
+      contentMediaType:
+        description: >-
+          Specifies the MIME type of the contents of a string value, as described in [RFC2046].
+        examples:
+          - value: image/png
+          - value: audio/mpeg
     slots:
       - "@type"
       - description
@@ -216,12 +222,6 @@ classes:
           - value: base16
           - value: base32
           - value: base64
-      contentMediaType:
-        description: >-
-          Specifies the MIME type of the contents of a string value, as described in [RFC2046].
-        examples:
-          - value: image/png
-          - value: audio/mpeg
   NullSchema:
     is_a: DataSchema
     description: >-
