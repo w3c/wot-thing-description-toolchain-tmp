@@ -83,12 +83,16 @@ classes:
         description: >-
           Boolean value that is a hint to indicate whether a property interaction/value is read only (=true) or not (=false).
         range: boolean
+      contentEncoding:
+        description: >-
+          todo
     slots:
       - "@type"
       - description
       - title
       - titles
       - descriptions
+      - type
   ArraySchema:
     is_a: DataSchema
     attributes:
