@@ -85,7 +85,6 @@ slots:
     description: >-
       Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
     range: languageString
-    required: true
     slot_uri: td:title
   titles:
     description: >-
@@ -98,16 +97,17 @@ slots:
   description:
     description: >-
       Provides additional (human-readable) information based on a default language.
-    exactly_one_of:
-      - range: string
-      - range: MultiLanguage
+#    range_expression: "(string and not MultiLanguage) or (not string and MultiLanguage)"
+#    exactly_one_of:
+#      - string
+#      - MultiLanguage
   descriptions:
     description: >- 
       Can be used to support (human-readable) information in different languages.
     multivalued: true
-    exactly_one_of:
-      - range: string
-      - range: MultiLanguage
+#    exactly_one_of:
+#      - range: string
+#      - range: MultiLanguage
     inlined: true
     # currently less restrictions are applied, with further restrictions according to the json schema, the following can be partially utilized
 #    exactly_one_of:
@@ -137,6 +137,19 @@ slots:
       Protocol Bindings.
     multivalued: true
     range: Form
+  something:
+    range: Any
+    exactly_one_of:
+      - range: BearerSecurityScheme
+      - range: OAuth2SecurityScheme
+      - range: ComboSecurityScheme
+      - range: DigestSecurityScheme
+      - range: BasicSecurityScheme
+      - range: NoSecurityScheme
+      - range: AutoSecurityScheme
+      - range: APISecurityScheme
+      - range: PSKSecurityScheme
+      - range: APIKeySecurityScheme
 
 
 classes:
@@ -164,9 +177,9 @@ classes:
         description: The optional language tag for the plain literal.
         range: LanguageTags
 
-
   # end of intermediate classes
   # start of main classes
+
   VersionInfo:
     description: >-
       Provides version information.
@@ -178,6 +191,30 @@ classes:
       model:
         description: >-
           Provides a version indicator of the underlying TM.
+
+  securityDefinitionsRange:
+    description: >-
+      Provides version information.
+    attributes:
+      name:
+        description: >-
+          Indexing property to store entity names when serializing them in a JSON-LD @index container.
+        identifier: true
+      value:
+        inlined: true
+        range: Any
+        exactly_one_of:
+          - range: BearerSecurityScheme
+          - range: OAuth2SecurityScheme
+          - range: ComboSecurityScheme
+          - range: DigestSecurityScheme
+          - range: BasicSecurityScheme
+          - range: NoSecurityScheme
+          - range: AutoSecurityScheme
+          - range: APISecurityScheme
+          - range: PSKSecurityScheme
+          - range: APIKeySecurityScheme
+
   InteractionAffordance:
     description: >-
       Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact 
@@ -198,6 +235,7 @@ classes:
       - titles
       - uriVariables
       - forms
+
   PropertyAffordance:
     is_a: InteractionAffordance
     class_uri: td:PropertyAffordance
@@ -333,18 +371,12 @@ classes:
           Set of named security configurations (definitions only). Not actually applied unless names are used in 
           a security name-value pair.
         from_schema: td:hasSecurityConfiguration
+        range: securityDefinitionsRange
         required: true
-        exactly_one_of:
-          - range: BearerSecurityScheme
-          - range: OAuth2SecurityScheme
-          - range: ComboSecurityScheme
-          - range: DigestSecurityScheme
-          - range: BasicSecurityScheme
-          - range: NoSecurityScheme
-          - range: AutoSecurityScheme
-          - range: APISecurityScheme
-          - range: PSKSecurityScheme
-          - range: APIKeySecurityScheme
+        minimum_cardinality: 1
+        inlined: true
+        multivalued: true
+
       schemaDefinitions:
         description: >- 
           TODO This has to be checked, it is not in the ontologies anywhere.
