@@ -37,16 +37,13 @@ slots:
   in:
     description: >-
       Specifies the location of security authentication information.
-    examples:
-      - value: one of header
-      - value: query
-      - value: body
-      - value: cookie
-      - value: auto
+    range: InHeader
   authorization:
     description: >-
       URI of the authorization server.
-    range: uri
+    range: uriorcurie
+  scheme:
+    required: true
 
 
 classes:
@@ -62,7 +59,7 @@ classes:
         description: >-
           URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration
           is for the endpoint.
-        range: uri
+        range: uriorcurie
       scheme:
         required: true
         range: SecuritySchemeType
@@ -80,6 +77,8 @@ classes:
       conformance with !RFC7516, with values for alg interpreted consistently with those standards. 
       Other formats and algorithms for bearer tokens MAY be specified in vocabulary extensions.
     attributes:
+      scheme:
+        equals_string: bearer
       alg:
         description: >-
           Encoding, encryption, or digest algorithm.
@@ -107,6 +106,8 @@ classes:
       authorization and token MUST be included. In the case of the device flow the value provided for authorization
       refers to the device authorization endpoint defined in [[!RFC8628]].
     attributes:
+      scheme:
+        equals_string: oauth2
       flow:
         description: >-
           Authorization flow.
@@ -117,11 +118,11 @@ classes:
       token:
         description: >-
           URI of the token server.
-        range: uri
+        range: uriorcurie
       refresh:
         description: >-
           URI of the refresh server.
-        range: uri
+        range: uriorcurie
       scopes:
         description: >-
           Set of authorization scope identifiers provided as an array.  These are provided in tokens returned by an 
@@ -141,6 +142,8 @@ classes:
       various ways in which other named schemes defined in securityDefinitions, including other ComboSecurityScheme definitions, 
       are to be combined to create a new scheme definition. Exactly one of either oneOf or allOf MUST be included.
     attributes:
+      scheme:
+        equals_string: combo
       oneOf:
         description: >-
           Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, 
@@ -156,6 +159,8 @@ classes:
       Digest authentication security configuration identified by the term digest. This scheme is similar to basic 
       authentication but with added features to avoid man-in-the-middle attacks.
     attributes:
+      scheme:
+        equals_string: digest
       qop:
         description: >-
           Quality of protection
@@ -170,6 +175,9 @@ classes:
     is_a: SecurityScheme
     description: >-
       Basic authentication security configuration identified by the term basic, using an unencrypted username and password.
+    attributes:
+      scheme:
+        equals_string: basic
     slots:
       - name
       - in
@@ -179,12 +187,18 @@ classes:
     description: >-
       A security configuration corresponding to identified by the term nosec, indicating there is no authentication or 
       other mechanism required to access the resource.
+    attributes:
+      scheme:
+        equals_string: nosec
   AutoSecurityScheme:
     is_a: SecurityScheme
     description: >-
       An automatic authentication security configuration identified by the term auto. 
       This scheme indicates that the security parameters are going to be negotiated by the underlying protocols at runtime, 
       subject to the respective specifications for the protocol (e.g. [[!RFC8288]] for Basic Authentication when using HTTP).
+    attributes:
+      scheme:
+        equals_string: auto
   APISecurityScheme:
     is_a: SecurityScheme
     description: >-
@@ -192,6 +206,9 @@ classes:
       access token is opaque, for example when a key in a proprietary format is provided by a cloud service provider.  
       In this case the key may not be using a standard token format. This scheme indicates that the key provided by the 
       service provider needs to be supplied as part of service requests using the mechanism indicated by the \"in\" field.
+    attributes:
+      scheme:
+        equals_string: apikey
     slots:
       - name
       - in
@@ -203,6 +220,8 @@ classes:
       This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[rfc4279]], and that the 
       ciphersuite used for keys will be established during protocol negotiation.
     attributes:
+      scheme:
+        equals_string: psk
       identity:
         description: >-
           Identifier providing information which can be used for selection or confirmation.
@@ -212,6 +231,9 @@ classes:
       Pre-shared key authentication security configuration identified by the term psk.  
       This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[rfc4279]], and that the 
       ciphersuite used for keys will be established during protocol negotiation.
+    attributes:
+      scheme:
+        equals_string: apikey
     slots:
       - in
 
@@ -254,3 +276,15 @@ enums:
         from_schema: wotsec:AutoSecurityScheme
         description: This scheme indicates that the security parameters are going to be negotiated by the underlying protocols at runtime
         meaning: wotsec:AutoSecurityScheme
+  InHeader:
+    permissible_values:
+      header:
+        from_schema: wotsec:NoSecurityScheme
+      query:
+        from_schema: wotsec:NoSecurityScheme
+      body:
+        from_schema: wotsec:NoSecurityScheme
+      cookie:
+        from_schema: wotsec:NoSecurityScheme
+      auto:
+        from_schema: wotsec:NoSecurityScheme
