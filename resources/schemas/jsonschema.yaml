@@ -36,6 +36,12 @@ default_range: string
 imports:
   - linkml:types
 
+slots:
+  type:
+    description: >-
+      DataSchema type required for the JSON-LD type definitions
+    range: DataschemaTypes
+
 classes:
   DataSchema:
     class_uri: jsonschema:DataSchema
@@ -220,3 +226,14 @@ classes:
       not mean the absence of a value. It is analogous to null in JavaScript, None in Python, null in Java and nil in 
       Ruby programming languages. It can be used as part of a oneOf declaration, where it is used to indicate, that 
       the data can also be null.
+
+enums:
+  DataschemaTypes:
+    permissible_values:
+      boolean:
+      integer:
+      number:
+      string:
+      object:
+      array:
+      null:
