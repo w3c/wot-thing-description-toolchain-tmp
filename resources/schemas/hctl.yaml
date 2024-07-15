@@ -51,7 +51,7 @@ classes:
       anchor:
         description: >-
           By default, the context, or anchor, of a link conveyed in the Link header field is the URL of the representation it is associated with, as defined in RFC7231, Section 3.1.4.1, and is serialized as a URI.
-        range: uri
+        range: uriorcurie
       sizes:
         description: >-
           Target attribute that specifies one or more sizes for the referenced icon. Only applicable for relation type 'icon'. The value pattern follows {Height}x{Width} (e.g., \"16x16\", \"16x16 32x32\").
@@ -177,7 +177,7 @@ slots:
     aliases:
       - target
     required: true
-    range: uri
+    range: uriorcurie
 
 enums:
   SubProtocolTypes:
