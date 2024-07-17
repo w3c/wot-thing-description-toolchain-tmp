@@ -2,7 +2,7 @@
 # Temporary WoT TD Tooling
 
 The aim of this repository is to simplify the current WoT TD tooling for generating the specification. WoT TD Tooling is a python project to automate the generation of
- 1) WoT resources: SHACL Shapes, JSON Schema, JSON-LD context, and ontology files
+ 1) WoT resources: [SHACL Shapes](https://www.w3.org/TR/shacl/), [JSON Schema](https://json-schema.org/specification), [JSON-LD context](https://www.w3.org/TR/json-ld11/), and [RDF](https://www.w3.org/TR/rdf11-concepts/)
  2) Documentation: TD specification and ontology specifications
 
 Here is an overview of the process:
