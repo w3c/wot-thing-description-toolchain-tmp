@@ -40,13 +40,10 @@ poetry install
 ## Usage
 The main.py script supports various options:
 ```
-main.py [-h] [-y YAML] [-c CONFIG_FILE] [-l] [-s]
+main.py [-h] [-l] [-s]
 
 options:
   -h, --help            show this help message and exit
-  -y YAML, --yaml YAML  Path to the LinkML schema formatted as a YAML file.
-  -c CONFIG_FILE, --config-file CONFIG_FILE
-                        Path to YAML configuration for specifying the required generators.
   -l, --local-docs      Boolean for local documentation generation.
   -s, --serve-docs      Boolean for serving the generated documentation.
 ```
@@ -56,18 +53,13 @@ Generate resources using the default schema and configuration:
 python main.py
 ```
 
-Specify a custom LinkML schema and configuration file:
-```
-python main.py -y /path/to/schema.yaml -c /path/to/config.yaml
-```
-
-Generate and serve documentation locally:
+Generate documentation locally and serve it:
 `python main.py -l -s`
 
 #### Default Paths
-* LinkML schema: `resources/thing_description_schema.yaml`
-* Config file: `src/linkml/config.yaml`
+* LinkML schema: `resources/schemas/thing_description.yaml`
 * Generated WoT resources: `resources/gens`
+* Generated full LinkML schema: `resources/gens/linkml`
 
 ## Contribution Guidelines
 We welcome contributions! Please fork the repository, create a branch, and submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
