@@ -5,7 +5,8 @@ The aim of this repository is to simplify the current WoT TD tooling for generat
  1) WoT resources: SHACL Shapes, JSON Schema, JSON-LD context, and ontology files
  2) Documentation: TD specification and ontology specifications
 
-Here is an overview of the process
+Here is an overview of the process:
+
 <img title="WoT Toolchain Overview" src="images/toolchain.svg">
 
 This project leverages [LinkML](https://linkml.io/linkml/) for modelling the [Web of Things Thing Description](https://www.w3.org/TR/wot-thing-description11/) information model.
