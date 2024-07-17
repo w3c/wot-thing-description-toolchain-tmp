@@ -97,17 +97,10 @@ slots:
   description:
     description: >-
       Provides additional (human-readable) information based on a default language.
-#    range_expression: "(string and not MultiLanguage) or (not string and MultiLanguage)"
-#    exactly_one_of:
-#      - string
-#      - MultiLanguage
   descriptions:
     description: >- 
       Can be used to support (human-readable) information in different languages.
     multivalued: true
-#    exactly_one_of:
-#      - range: string
-#      - range: MultiLanguage
     inlined: true
     # currently less restrictions are applied, with further restrictions according to the json schema, the following can be partially utilized
 #    exactly_one_of:
@@ -121,7 +114,6 @@ slots:
       - range: string
         multivalued: true
     inlined: false
-#    inlined_as_list: true
   uriVariables:
     description: >-
       Define URI template variables according to RFC6570 as collection based on schema specifications. The individual
@@ -137,23 +129,9 @@ slots:
       Protocol Bindings.
     multivalued: true
     range: Form
-  something:
-    range: Any
-    exactly_one_of:
-      - range: BearerSecurityScheme
-      - range: OAuth2SecurityScheme
-      - range: ComboSecurityScheme
-      - range: DigestSecurityScheme
-      - range: BasicSecurityScheme
-      - range: NoSecurityScheme
-      - range: AutoSecurityScheme
-      - range: APISecurityScheme
-      - range: PSKSecurityScheme
-      - range: APIKeySecurityScheme
-
 
 classes:
-  # start of intermediate classes due to limitation of LinkML
+  # start of intermediate classes, they may not be required for RDF generation
   Any:
     class_uri: linkml:Any
   type_declaration_string:
@@ -176,9 +154,8 @@ classes:
       tag:
         description: The optional language tag for the plain literal.
         range: LanguageTags
-
-  # end of intermediate classes
-  # start of main classes
+        
+  # start of main classes, required for RDF generation
 
   VersionInfo:
     description: >-
@@ -191,7 +168,6 @@ classes:
       model:
         description: >-
           Provides a version indicator of the underlying TM.
-
   securityDefinitionsRange:
     description: >-
       Provides version information.
@@ -214,7 +190,6 @@ classes:
           - range: APISecurityScheme
           - range: PSKSecurityScheme
           - range: APIKeySecurityScheme
-
   InteractionAffordance:
     description: >-
       Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact 
@@ -226,7 +201,6 @@ classes:
         description: >-
           Indexing property to store entity names when serializing them in a JSON-LD @index container.
         identifier: true
-
     slots:
       - "@type"
       - titles
@@ -237,7 +211,6 @@ classes:
       - type
       - uriVariables
       - forms
-
   PropertyAffordance:
     is_a: InteractionAffordance
     class_uri: td:PropertyAffordance
@@ -378,7 +351,6 @@ classes:
         minimum_cardinality: 1
         inlined: true
         multivalued: true
-
       schemaDefinitions:
         description: >- 
           TODO This has to be checked, it is not in the ontologies anywhere.
@@ -483,7 +455,6 @@ enums:
       queryallactions:
         description: Identifies the queryallactions operation on a Thing to get the status of all Actions in a single interaction.
         meaning: td:queryAllActions
-
   LanguageTags:
     description: >-
       Enumerations of well-known operation types necessary to implement the WoT interaction model.
