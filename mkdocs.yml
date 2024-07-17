@@ -1,6 +1,6 @@
 ---
 site_name: "thing-description-schema"
-docs_dir: resources/gens/docs
+docs_dir: resources/gens/docs/ontology/
 
 theme:
   name: material
@@ -15,7 +15,6 @@ plugins:
 nav:
   # - Home: home.md
   - Index: index.md
-  - About: about.md
 site_url: https://github.io/w3c/wot-thing-description-toolchain-tmp
 repo_url: https://github.com/w3c/wot-thing-description-toolchain-tmp
 
