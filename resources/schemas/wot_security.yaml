@@ -22,13 +22,11 @@ prefixes:
     prefix_prefix: wotsec
     prefix_reference: https://www.w3.org/2019/wot/security#
 
-
 default_prefix: wotsec
 default_range: string
 
 imports:
   - linkml:types
-
 
 slots:
   name:
@@ -44,7 +42,6 @@ slots:
     range: uriorcurie
   scheme:
     required: true
-
 
 classes:
   SecurityScheme:
@@ -134,7 +131,6 @@ classes:
             multivalued: true
     slots:
       - authorization
-
   ComboSecurityScheme:
     is_a: SecurityScheme
     description: >-
@@ -170,7 +166,6 @@ classes:
     slots:
       - name
       - in
-
   BasicSecurityScheme:
     is_a: SecurityScheme
     description: >-
@@ -181,7 +176,6 @@ classes:
     slots:
       - name
       - in
-
   NoSecurityScheme:
     is_a: SecurityScheme
     description: >-
@@ -212,7 +206,6 @@ classes:
     slots:
       - name
       - in
-
   PSKSecurityScheme:
     is_a: SecurityScheme
     description: >-
