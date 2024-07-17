@@ -36,6 +36,12 @@ default_range: string
 imports:
   - linkml:types
 
+slots:
+  type:
+    description: >-
+      DataSchema type required for the JSON-LD type definitions
+    range: DataschemaTypes
+
 classes:
   DataSchema:
     class_uri: jsonschema:DataSchema
@@ -77,12 +83,22 @@ classes:
         description: >-
           Boolean value that is a hint to indicate whether a property interaction/value is read only (=true) or not (=false).
         range: boolean
+      contentEncoding:
+        description: >-
+          todo
+      contentMediaType:
+        description: >-
+          Specifies the MIME type of the contents of a string value, as described in [RFC2046].
+        examples:
+          - value: image/png
+          - value: audio/mpeg
     slots:
       - "@type"
       - description
       - title
       - titles
       - descriptions
+      - type
   ArraySchema:
     is_a: DataSchema
     attributes:
@@ -206,12 +222,6 @@ classes:
           - value: base16
           - value: base32
           - value: base64
-      contentMediaType:
-        description: >-
-          Specifies the MIME type of the contents of a string value, as described in [RFC2046].
-        examples:
-          - value: image/png
-          - value: audio/mpeg
   NullSchema:
     is_a: DataSchema
     description: >-
@@ -220,3 +230,14 @@ classes:
       not mean the absence of a value. It is analogous to null in JavaScript, None in Python, null in Java and nil in 
       Ruby programming languages. It can be used as part of a oneOf declaration, where it is used to indicate, that 
       the data can also be null.
+
+enums:
+  DataschemaTypes:
+    permissible_values:
+      boolean:
+      integer:
+      number:
+      string:
+      object:
+      array:
+      null:
