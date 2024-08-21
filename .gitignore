@@ -133,7 +133,8 @@ dmypy.json
 .pyre/
 
 # Only commit the lockfile in the release branch
-poetry.lock
+uv.lock
 
 # Never commit generated files
 resources/gens/
+src/wot_thing_description_toolchain_tmp
