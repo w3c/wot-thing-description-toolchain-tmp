@@ -168,7 +168,7 @@ classes:
       model:
         description: >-
           Provides a version indicator of the underlying TM.
-        class_uri: td:model
+        slot_uri: td:model
   securityDefinitionsRange:
     description: >-
       TODO.
@@ -176,6 +176,7 @@ classes:
       name:
         description: >-
           Indexing property to store entity names when serializing them in a JSON-LD @index container.
+        slot_uri: wotsec:name
         identifier: true
       value:
         inlined: true
@@ -201,6 +202,7 @@ classes:
       name:
         description: >-
           Indexing property to store entity names when serializing them in a JSON-LD @index container.
+        slot_uri: td:name
         identifier: true
     slots:
       - "@type"
@@ -336,8 +338,8 @@ classes:
           - range: uriorcurie
       security:
         description: >-
-          A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
-        from_schema: td:definesSecurityScheme
+          A security configuration is a a security scheme applied to a (set of) affordance(s).
+        slot_uri: td:hasSecurityConfiguration
         required: true
         exactly_one_of:
           - range: string
@@ -345,9 +347,8 @@ classes:
           - range: string
       securityDefinitions:
         description: >- 
-          Set of named security configurations (definitions only). Not actually applied unless names are used in 
-          a security name-value pair.
-        from_schema: td:hasSecurityConfiguration
+          A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
+        slot_uri: td:definesSecurityScheme
         range: securityDefinitionsRange
         required: true
         minimum_cardinality: 1
@@ -357,6 +358,7 @@ classes:
         description: >- 
           TODO This has to be checked, it is not in the ontologies anywhere.
           Set of named data schemas. To be used in a schema name-value pair inside an AdditionalExpectedResponse object.
+        slot_uri: td:schemaDefinitions
         multivalued: true
         range: DataSchema
       links:
@@ -368,21 +370,21 @@ classes:
       properties:
         description: >-
           All Property-based interaction affordances of the Thing.
-        from_schema: td:hasPropertyAffordance
+        slot_uri: td:hasPropertyAffordance
         multivalued: true
         inlined: true
         range: PropertyAffordance
       actions:
         description: >-
           All Action-based interaction affordances of the Thing.
-        from_schema: td:hasActionAffordance
+        slot_uri: td:hasActionAffordance
         multivalued: true
         inlined: true
         range: ActionAffordance
       events:
         description: >-
           All Event-based interaction affordances of the Thing.
-        from_schema: td:hasEventAffordance
+        slot_uri: td:hasEventAffordance
         multivalued: true
         inlined: true
         range: EventAffordance
