@@ -143,15 +143,6 @@ classes:
         multivalued: true
         none_of:
           - equals_string: 'tm:ThingModel'
-  language:
-    attributes:
-      text:
-        description: >-
-          The string part of the plain literal.
-        required: true
-      tag:
-        description: The optional language tag for the plain literal.
-        range: LanguageTags
         
   # start of main classes, required for RDF generation
 
