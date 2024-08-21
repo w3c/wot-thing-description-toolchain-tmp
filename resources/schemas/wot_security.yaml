@@ -60,6 +60,12 @@ classes:
       scheme:
         required: true
         range: SecuritySchemeType
+      hasInstanceConfiguration:
+        slot_uri: td:hasInstanceConfiguration
+        description: >-
+          Instantiation, as used here, is a form of non-symmetric equivalence between a scheme and a configuration: 
+          whatever statement on the scheme is also true of the configuration but not vice-versa.
+
     slots:
       - description
       - descriptions
