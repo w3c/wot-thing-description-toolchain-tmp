@@ -42,7 +42,14 @@ slots:
       DataSchema type required for the JSON-LD type definitions
       TODO: Check, maybe the range is not a Datatype property rather pointing to classes
     slot_uri: rdf:type
-    range: DataschemaTypes
+    exactly_one_of:
+      - range: object
+      - range: array
+      - range: boolean
+      - range: string
+      - range: number
+      - range: integer
+      - range: null
 
 classes:
   DataSchema:
@@ -112,7 +119,7 @@ classes:
       - titles
       - descriptions
       - type
-  ArraySchema:
+  array:
     is_a: DataSchema
     class_uri: jsonschema:ArraySchema
     attributes:
@@ -134,14 +141,14 @@ classes:
           Defines the maximum number of items that have to be in the array.
         slot_uri: jsonschema:maxItems
         range: integer
-  BooleanSchema:
+  boolean:
     is_a: DataSchema
     class_uri: jsonschema:BooleanSchema
     description: >-
       Metadata describing data of type boolean. This Subclass is indicated by the value boolean assigned to type 
       in DataSchema instances.
     slot_uri: jsonschema:BooleanSchema
-  NumberSchema:
+  number:
     is_a: DataSchema
     class_uri: jsonschema:NumberSchema
     description: >-
@@ -178,7 +185,7 @@ classes:
           associated number or integer types.
         slot_uri: jsonschema:multipleOf
         range: double
-  IntegerSchema:
+  integer:
     is_a: DataSchema
     class_uri: jsonschema:IntegerSchema
     description: >-
@@ -215,7 +222,7 @@ classes:
           associated number or integer types.
         slot_uri: jsonschema:multipleOf
         range: integer
-  ObjectSchema:
+  object:
     is_a: DataSchema
     class_uri: jsonschema:ObjectSchema
     description: >-
@@ -235,7 +242,7 @@ classes:
           is to be sent (e.g. input of invokeaction, writeproperty) and what members will be definitely delivered in 
           the payload that is being received (e.g. output of invokeaction, readproperty).
         multivalued: true
-  StringSchema:
+  string:
     is_a: DataSchema
     class_uri: jsonschema:StringSchema
     description: >-
@@ -269,7 +276,7 @@ classes:
           - value: base16
           - value: base32
           - value: base64
-  NullSchema:
+  null:
     is_a: DataSchema
     class_uri: jsonschema:NullSchema
     description: >-
@@ -278,14 +285,3 @@ classes:
       not mean the absence of a value. It is analogous to null in JavaScript, None in Python, null in Java and nil in 
       Ruby programming languages. It can be used as part of a oneOf declaration, where it is used to indicate, that 
       the data can also be null.
-
-enums:
-  DataschemaTypes:
-    permissible_values:
-      boolean:
-      integer:
-      number:
-      string:
-      object:
-      array:
-      null:
