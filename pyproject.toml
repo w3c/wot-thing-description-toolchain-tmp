@@ -1,31 +1,26 @@
-[tool.poetry]
+[project]
 name = "thing_description_schema"
-version = "0.0.0.post1.dev0+dfeaf46"
+version = "0.1.0"
 description = "Thing Description Information Model as a LinkML schema"
-authors = ["Mahda Noura <mahdanoura@gmail.com>"]
+authors = [
+    { name = "Mahda Noura", email = "mahdanoura@gmail.com" }
+]
 license = "MIT"
 readme = "README.md"
 include = ["README.md", "src/thing_description_schema/schema", "project"]
-package-mode = false
 
-[tool.poetry.dependencies]
-python = "^3.11"
-linkml-runtime = "^1.8.0rc2"
-
-[tool.poetry-dynamic-versioning]
-enable = false
-vcs = "git"
-style = "pep440"
-
-[tool.poetry.dev-dependencies]
-linkml = "^1.8.0rc2"
-mkdocs-material = "^8.2.8"
-mkdocs-mermaid2-plugin = "^0.6.0"
-schemasheets = "^0.1.14"
+requires-python = ">=3.12"
+dependencies = [
+    "linkml-runtime>=1.8.1",
+    "linkml>=1.8.2",
+    "mkdocs-mermaid2-plugin>=1.1.1",
+    "mkdocs-material>=9.5.32",
+    "schemasheets>=0.3.1",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
-build-backend = "poetry_dynamic_versioning.backend"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.extras]
-docs = ["linkml", "mkdocs-material"]
+[tool.hatch.build]
+only-include = ["main.py"]

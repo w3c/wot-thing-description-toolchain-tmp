@@ -13,9 +13,7 @@ This project leverages [LinkML](https://linkml.io/linkml/) for modelling the [We
 
 ## Prerequisites
 
-*  Python 3.11 or greater. [Download and install Python.](https://www.python.org/downloads/)
-* The `poetry` dependency manager. [See the poetry installation documentation for more details.](https://python-poetry.org/docs/#installing-with-pipx)
-
+The [uv](https://docs.astral.sh/uv/) package manager.
 
 ## Quick Start
 1. Clone the repository and navigate to the project directory:
@@ -23,24 +21,15 @@ This project leverages [LinkML](https://linkml.io/linkml/) for modelling the [We
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
 ```
-2. Prepare a clean environment
+2. Run the script using `uv`
 ```
-python -m venv .venv
-. .venv/bin/activate
+uv run main.py -h
 ```
-
-3. Install project dependencies with `poetry`:
-```
-poetry install
-```
-
-4. View all supported commands:
-`python main.py -h`
 
 ## Usage
 The main.py script supports various options:
 ```
-main.py [-h] [-l] [-s]
+uv run main.py [-h] [-l] [-s]
 
 options:
   -h, --help            show this help message and exit
@@ -50,11 +39,11 @@ options:
 ## Examples
 Generate resources using the default schema and configuration:
 ```
-python main.py
+uv run main.py
 ```
 
 Generate documentation locally and serve it:
-`python main.py -l -s`
+`uv run main.py -l -s`
 
 #### Default Paths
 * LinkML schema: `resources/schemas/thing_description.yaml`
