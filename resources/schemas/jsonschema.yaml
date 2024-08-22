@@ -37,19 +37,36 @@ imports:
   - linkml:types
 
 slots:
-  type:
+  minimum:
     description: >-
-      DataSchema type required for the JSON-LD type definitions
-      TODO: Check, maybe the range is not a Datatype property rather pointing to classes
-    slot_uri: rdf:type
-    exactly_one_of:
-      - range: object
-      - range: array
-      - range: boolean
-      - range: string
-      - range: number
-      - range: integer
-      - range: null
+      Specifies a minimum numeric value, representing an inclusive lower limit. Only applicable for associated number
+      or integer types.
+    slot_uri: jsonschema:minimum
+    range: Decimal
+  exclusiveMinimum:
+    description: >-
+      Specifies a minimum numeric value, representing an exclusive lower limit. Only applicable for associated number
+      or integer types.
+    slot_uri: jsonschema:exclusiveMinimum
+    range: Decimal
+  maximum:
+    description: >-
+      Specifies a maximum numeric value, representing an inclusive upper limit. Only applicable for associated 
+      number or integer types.
+    slot_uri: jsonschema:maximum
+    range: Decimal
+  exclusiveMaximum:
+    description: >-
+      Specifies a maximum numeric value, representing an exclusive upper limit. Only applicable for associated number
+      or integer types.
+    slot_uri: jsonschema:exclusiveMaximum
+    range: Decimal
+  multipleOf:
+    description: >-
+      Specifies the multipleOf value number. The value must strictly greater than 0. Only applicable for 
+      associated number or integer types.
+    slot_uri: jsonschema:multipleOf
+    range: Decimal
 
 classes:
   DataSchema:
@@ -76,7 +93,20 @@ classes:
         description: >-
           Used to ensure that the data is valid against one of the specified schemas in the array. 
           This can be used to describe multiple input or output schemas.
+        multivalued: true
         slot_uri: jsonschema:oneof
+        range: DataSchema
+      allOf:
+        description: >-
+          Used to ensure that the data is valid against all of the specified schemas in the array.
+        multivalued: true
+        slot_uri: jsonschema:allOf
+        range: DataSchema
+      anyOf:
+        description: >-
+          Used to ensure that the data is valid against any of the specified schemas in the array.
+        slot_uri: jsonschema:anyOf
+        range: DataSchema
       enum:
         description: >-
           Restricted set of values provided as an array.
@@ -113,12 +143,25 @@ classes:
         examples:
           - value: image/png
           - value: audio/mpeg
+      type:
+        description: >-
+          DataSchema type required for the JSON-LD type definitions
+          TODO: Check, maybe the range is not a Datatype property rather pointing to classes
+        slot_uri: rdf:type
+        exactly_one_of:
+          - range: object
+          - range: array
+          - range: boolean
+          - range: string
+          - range: number
+          - range: integer
+          - range: null
     slots:
       - description
       - title
       - titles
       - descriptions
-      - type
+
   array:
     is_a: DataSchema
     class_uri: jsonschema:ArraySchema
@@ -155,73 +198,24 @@ classes:
       Metadata describing data of type number. This Subclass is indicated by the value number assigned to type in 
       DataSchema instances.
     attributes:
-      minimum:
-        description: >-
-          Specifies a minimum numeric value, representing an inclusive lower limit. Only applicable for associated 
-          number or integer types.
-        slot_uri: jsonschema:minimum
-        range: double
-      exclusiveMinimum:
-        description: >-
-          Specifies a minimum numeric value, representing an exclusive lower limit. Only applicable for associated 
-          number or integer types.
-        slot_uri: jsonschema:exclusiveMinimum
-        range: double
-      maximum:
-        description: >-
-          Specifies a maximum numeric value, representing an inclusive upper limit. Only applicable for associated 
-          number or integer types.
-        slot_uri: jsonschema:maximum
-        range: double
-      exclusiveMaximum:
-        description: >-
-          Specifies a maximum numeric value, representing an exclusive upper limit. Only applicable for associated 
-          number or integer types.
-        slot_uri: jsonschema:exclusiveMaximum
-        range: double
-      multipleOf:
-        description: >-
-          Specifies the multipleOf value number. The value must strictly greater than 0. Only applicable for 
-          associated number or integer types.
-        slot_uri: jsonschema:multipleOf
-        range: double
+    slots:
+      - minimum
+      - maximum
+      - exclusiveMinimum
+      - exclusiveMaximum
+      - multipleOf
   integer:
     is_a: DataSchema
     class_uri: jsonschema:IntegerSchema
     description: >-
       Metadata describing data of type integer. This Subclass is indicated by the value integer assigned to type in 
       DataSchema instances.
-    attributes:
-      minimum:
-        description: >-
-          Specifies a minimum numeric value, representing an inclusive lower limit. Only applicable for associated number
-          or integer types.
-        slot_uri: jsonschema:minimum
-        range: integer
-      exclusiveMinimum:
-        description: >-
-          Specifies a minimum numeric value, representing an exclusive lower limit. Only applicable for associated number
-          or integer types.
-        slot_uri: jsonschema:exclusiveMinimum
-        range: integer
-      maximum:
-        description: >-
-          Specifies a maximum numeric value, representing an inclusive upper limit. Only applicable for associated number 
-          or integer types.
-        slot_uri: jsonschema:maximum
-        range: integer
-      exclusiveMaximum:
-        description: >-
-          Specifies a maximum numeric value, representing an exclusive upper limit. Only applicable for associated number
-          or integer types.
-        slot_uri: jsonschema:exclusiveMaximum
-        range: integer
-      multipleof:
-        description: >-
-          Specifies the multipleOf value number. The value must strictly greater than 0. Only applicable for 
-          associated number or integer types.
-        slot_uri: jsonschema:multipleOf
-        range: integer
+    slots:
+      - minimum
+      - maximum
+      - exclusiveMinimum
+      - exclusiveMaximum
+      - multipleOf
   object:
     is_a: DataSchema
     class_uri: jsonschema:ObjectSchema
