@@ -104,14 +104,15 @@ slots:
 #    exactly_one_of:
 #      - range: type_declaration_string
 #      - range: type_declaration_array
-  "@type":
-    description: >-
-      JSON-LD keyword to label the object with semantic tags (or types).
-    exactly_one_of:
-      - range: string
-      - range: string
-        multivalued: true
-    inlined: false
+
+#  "@type":
+#    description: >-
+#      JSON-LD keyword to label the object with semantic tags (or types).
+#    exactly_one_of:
+#      - range: string
+#      - range: string
+#        multivalued: true
+#    inlined: false
   uriVariables:
     description: >-
       Define URI template variables according to RFC6570 as collection based on schema specifications. The individual
@@ -196,7 +197,6 @@ classes:
         slot_uri: td:name
         identifier: true
     slots:
-      - "@type"
       - titles
       - descriptions
       - title
@@ -385,7 +385,6 @@ classes:
       - description
       - titles
       - descriptions
-      - "@type"
       - titles
       - descriptions
       - uriVariables
