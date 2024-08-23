@@ -30,6 +30,9 @@ prefixes:
   tm:
     prefix_prefix: tm
     prefix_reference: https://www.w3.org/2019/wot/tm#
+  rdf:
+    prefix_prefix: rdf
+    prefix_reference: http://www.w3.org/1999/02/22-rdf-syntax-ns#
 default_prefix: jsonschema
 default_range: string
 
@@ -42,31 +45,31 @@ slots:
       Specifies a minimum numeric value, representing an inclusive lower limit. Only applicable for associated number
       or integer types.
     slot_uri: jsonschema:minimum
-    range: Decimal
+    range: double
   exclusiveMinimum:
     description: >-
       Specifies a minimum numeric value, representing an exclusive lower limit. Only applicable for associated number
       or integer types.
     slot_uri: jsonschema:exclusiveMinimum
-    range: Decimal
+    range: decimal
   maximum:
     description: >-
       Specifies a maximum numeric value, representing an inclusive upper limit. Only applicable for associated 
       number or integer types.
     slot_uri: jsonschema:maximum
-    range: Decimal
+    range: decimal
   exclusiveMaximum:
     description: >-
       Specifies a maximum numeric value, representing an exclusive upper limit. Only applicable for associated number
       or integer types.
     slot_uri: jsonschema:exclusiveMaximum
-    range: Decimal
+    range: decimal
   multipleOf:
     description: >-
       Specifies the multipleOf value number. The value must strictly greater than 0. Only applicable for 
       associated number or integer types.
     slot_uri: jsonschema:multipleOf
-    range: Decimal
+    range: decimal
 
 classes:
   DataSchema:
@@ -89,13 +92,11 @@ classes:
           Provides unit information that is used, e.g., in international science, engineering, and business. 
           To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition.
         slot_uri: schema:unitCode
-      oneof:
+      oneOf:
         description: >-
           Used to ensure that the data is valid against one of the specified schemas in the array. 
           This can be used to describe multiple input or output schemas.
-        multivalued: true
-        slot_uri: jsonschema:oneof
-        range: DataSchema
+        slot_uri: jsonschema:oneOf
       allOf:
         description: >-
           Used to ensure that the data is valid against all of the specified schemas in the array.
@@ -149,20 +150,19 @@ classes:
           TODO: Check, maybe the range is not a Datatype property rather pointing to classes
         slot_uri: rdf:type
         exactly_one_of:
-          - range: object
-          - range: array
-          - range: boolean
-          - range: string
-          - range: number
-          - range: integer
-          - range: null
+          - range: arraySchema
+          - range: nullSchema
+          - range: objectSchema
+          - range: booleanSchema
+          - range: stringSchema
+          - range: numberSchema
+          - range: integerSchema
     slots:
       - description
       - title
       - titles
       - descriptions
-
-  array:
+  arraySchema:
     is_a: DataSchema
     class_uri: jsonschema:ArraySchema
     attributes:
@@ -170,10 +170,8 @@ classes:
         description: >-
           Used to define the characteristics of an array.
         slot_uri: jsonschema:items
-        exactly_one_of:
-          - range: DataSchema
-          - range: DataSchema
-            multivalued: true
+        range: DataSchema
+        multivalued: true
       minItems:
         description: >-
           Defines the minimum number of items that have to be in the array.
@@ -184,27 +182,25 @@ classes:
           Defines the maximum number of items that have to be in the array.
         slot_uri: jsonschema:maxItems
         range: integer
-  boolean:
+  booleanSchema:
     is_a: DataSchema
     class_uri: jsonschema:BooleanSchema
     description: >-
       Metadata describing data of type boolean. This Subclass is indicated by the value boolean assigned to type 
       in DataSchema instances.
-    slot_uri: jsonschema:BooleanSchema
-  number:
+  numberSchema:
     is_a: DataSchema
     class_uri: jsonschema:NumberSchema
     description: >-
       Metadata describing data of type number. This Subclass is indicated by the value number assigned to type in 
       DataSchema instances.
-    attributes:
     slots:
       - minimum
       - maximum
       - exclusiveMinimum
       - exclusiveMaximum
       - multipleOf
-  integer:
+  integerSchema:
     is_a: DataSchema
     class_uri: jsonschema:IntegerSchema
     description: >-
@@ -216,7 +212,7 @@ classes:
       - exclusiveMinimum
       - exclusiveMaximum
       - multipleOf
-  object:
+  objectSchema:
     is_a: DataSchema
     class_uri: jsonschema:ObjectSchema
     description: >-
@@ -236,7 +232,8 @@ classes:
           is to be sent (e.g. input of invokeaction, writeproperty) and what members will be definitely delivered in 
           the payload that is being received (e.g. output of invokeaction, readproperty).
         multivalued: true
-  string:
+  stringSchema:
+    # the name has to be changed because apparantly there is an issue with LinkML
     is_a: DataSchema
     class_uri: jsonschema:StringSchema
     description: >-
@@ -270,7 +267,7 @@ classes:
           - value: base16
           - value: base32
           - value: base64
-  null:
+  nullSchema:
     is_a: DataSchema
     class_uri: jsonschema:NullSchema
     description: >-
