@@ -174,16 +174,15 @@ classes:
         inlined: true
         range: Any
         exactly_one_of:
-          - range: BearerSecurityScheme
-          - range: OAuth2SecurityScheme
-          - range: ComboSecurityScheme
-          - range: DigestSecurityScheme
-          - range: BasicSecurityScheme
-          - range: NoSecurityScheme
-          - range: AutoSecurityScheme
-          - range: APISecurityScheme
-          - range: PSKSecurityScheme
-          - range: APIKeySecurityScheme
+          - range: bearer
+          - range: oauth2
+          - range: combo
+          - range: digest
+          - range: basic
+          - range: nosec
+          - range: auto
+          - range: psk
+          - range: apikey
   InteractionAffordance:
     description: >-
       Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact 
