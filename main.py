@@ -9,6 +9,7 @@ from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.docgen import DocGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml_runtime.utils.schemaview import SchemaView
+from linkml_runtime.linkml_model.meta import AnonymousSlotExpression
 from pathlib import Path
 from pyld import jsonld
 
@@ -32,8 +33,25 @@ def generate_docs():
 def post_process_jsonldcontext(schema_view: SchemaView, serialized_schema: str) -> str:
     serialized_schema_json = json.loads(serialized_schema)
     for slot in schema_view.all_slots().values():
-        if slot.slot_uri is not None and 'InLanguage' in slot.slot_uri and isinstance(serialized_schema_json['@context'][slot.name], dict):
+        # Update JSON-LD context as a workaround for no langString support in LinkML
+        is_langString = slot.range == 'langString'
+        is_exactly_one_langString = (
+                slot.range is None and
+                any(
+                    expr.range == 'langString'
+                    for expr in slot.exactly_one_of if isinstance(expr, AnonymousSlotExpression)
+                )
+        )
+        if (is_langString or is_exactly_one_langString) and isinstance(serialized_schema_json['@context'][slot.name],
+                                                                       dict):
             serialized_schema_json['@context'][slot.name]['@container'] = '@language'
+            if '@type' in serialized_schema_json['@context'][slot.name]:
+                del serialized_schema_json['@context'][slot.name]['@type']
+        # if slot.slot_uri is not None and 'InLanguage' in slot.slot_uri and isinstance(serialized_schema_json['@context'][slot.name], dict):
+            serialized_schema_json['@context'][slot.name]['@container'] = '@language'
+            if '@type' in serialized_schema_json['@context'][slot.name]:
+                del serialized_schema_json['@context'][slot.name]['@type']
+
         if slot.multivalued and str(slot.range) == 'Any' and isinstance(serialized_schema_json['@context'][slot.name], dict):
             if '@type' in serialized_schema_json['@context'][slot.name].keys():
                 del serialized_schema_json['@context'][slot.name]['@type']
