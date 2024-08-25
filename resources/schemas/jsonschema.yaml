@@ -97,17 +97,19 @@ classes:
           Used to ensure that the data is valid against one of the specified schemas in the array. 
           This can be used to describe multiple input or output schemas.
         slot_uri: jsonschema:oneOf
+        multivalued: true
       allOf:
         description: >-
           Used to ensure that the data is valid against all of the specified schemas in the array.
         multivalued: true
         slot_uri: jsonschema:allOf
-        range: DataSchema
+#        range: DataSchema
       anyOf:
         description: >-
           Used to ensure that the data is valid against any of the specified schemas in the array.
         slot_uri: jsonschema:anyOf
         range: DataSchema
+        multivalued: true
       enum:
         description: >-
           Restricted set of values provided as an array.
