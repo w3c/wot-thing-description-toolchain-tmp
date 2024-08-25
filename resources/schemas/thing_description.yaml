@@ -57,16 +57,21 @@ imports:
   - jsonschema
 
 types:
-  MultiLanguage:
-    name: MultiLanguage
-    description: Description with a language tag.
-    from_schema: rdf
-    exact_mappings:
-      - rdf:langString
-    base: rdf:PlainLiteral
-    uri: rdf:PlainLiteral
-    structured_pattern:
-      syntax: "{text}@{tag}"
+  langString:
+    name: langString
+    description: A boolean flag indicating that the string could also include language tag.
+    base: Bool
+    uri: xsd:boolean
+#  MultiLanguage:
+#    name: MultiLanguage
+#    description: Description with a language tag.
+#    from_schema: rdf
+#    exact_mappings:
+#      - rdf:langString
+#    base: rdf:PlainLiteral
+#    uri: rdf:PlainLiteral
+#    structured_pattern:
+#      syntax: "{text}@{tag}"
 
 slots:
   id:
@@ -84,9 +89,7 @@ slots:
       Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
     slot_uri: td:titleInLanguage
     multivalued: true
-    exactly_one_of:
-      - range: string
-      - range: MultiLanguage
+    range: langString
     inlined_as_list: true
   description:
     description: >-
@@ -97,6 +100,7 @@ slots:
     slot_uri: td:descriptionInLanguage
     multivalued: true
     inlined: true
+    range: langString
     # currently less restrictions are applied, with further restrictions according to the json schema, the following can be partially utilized
 #    exactly_one_of:
 #      - range: type_declaration_string
