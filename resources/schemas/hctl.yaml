@@ -4,6 +4,7 @@ title: hctl
 version: "1.1-11-June-2024"
 description: |-
   LinkML schema for modelling the TD Hypermedia Control information model, in particular links and forms.
+contributors: Mahda_Noura
 license: MIT
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
