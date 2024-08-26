@@ -10,7 +10,7 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
-linkml-runtime = "^1.8.0rc2"
+linkml-runtime = "^1.8.2"
 
 [tool.poetry-dynamic-versioning]
 enable = false
@@ -18,7 +18,7 @@ vcs = "git"
 style = "pep440"
 
 [tool.poetry.dev-dependencies]
-linkml = "^1.8.0rc2"
+linkml = "^1.8.3"
 mkdocs-material = "^8.2.8"
 mkdocs-mermaid2-plugin = "^0.6.0"
 schemasheets = "^0.1.14"
