@@ -227,6 +227,7 @@ classes:
         slot_uri: jsonschema:properties
         range: DataSchema
         multivalued: true
+        inlined: true
       required:
         slot_uri: jsonschema:required
         description: >-
