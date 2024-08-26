@@ -48,7 +48,9 @@ def post_process_jsonldcontext(schema_view: SchemaView, serialized_schema: str) 
             serialized_schema_json['@context'][slot.name]['@container'] = '@language'
             if '@type' in serialized_schema_json['@context'][slot.name]:
                 del serialized_schema_json['@context'][slot.name]['@type']
-        # if slot.slot_uri is not None and 'InLanguage' in slot.slot_uri and isinstance(serialized_schema_json['@context'][slot.name], dict):
+        if slot.in_language and isinstance(serialized_schema_json['@context'][slot.name],
+                                                                       dict):
+            serialized_schema_json['@context'][slot.name]['@language'] = slot.in_language
         if slot.inlined and slot.multivalued and not slot.inlined_as_list and isinstance(serialized_schema_json['@context'][slot.name], dict):
             serialized_schema_json['@context'][slot.name]['@container'] = '@index'
             if slot.instantiates:
