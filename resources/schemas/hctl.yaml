@@ -76,14 +76,6 @@ classes:
           Content codings are primarily used to allow a representation to be compressed or otherwise usefully transformed 
           without losing the identity of its underlying media type and without loss of information. Examples of content
           coding include \"gzip\", \"deflate\", etc.
-      securityDefinitions:
-        description: >-
-          Set of security definition names, chosen from those defined in securityDefinitions. These must all be satisfied for access to resources.
-        slot_uri: td:hasSecurityConfiguration
-        exactly_one_of:
-          - range: string
-          - range: string
-            multivalued: true
       scopes:
         description: >-
           TODO Check, was not in hctl ontology, if not could be source of discrepancy.
@@ -129,6 +121,7 @@ classes:
             multivalued: true
     slots:
       - href
+      - security
   ExpectedResponse:
     class_uri: hctl:ExpectedResponse
     description: >-
