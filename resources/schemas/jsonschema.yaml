@@ -4,6 +4,7 @@ title: jsonschema
 version: "1.1-05-July-2024"
 description: |-
   LinkML schema for modelling the TD Module for data schema specifications.
+contributors: Mahda_Noura
 license: MIT
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
@@ -226,8 +227,11 @@ classes:
           Data schema nested definitions.
         slot_uri: jsonschema:properties
         range: DataSchema
+        instantiates: propertyName
         multivalued: true
         inlined: true
+        inlined_as_list: false
+
       required:
         slot_uri: jsonschema:required
         description: >-
