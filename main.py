@@ -31,6 +31,7 @@ def generate_docs():
 
 
 def post_process_jsonldcontext(schema_view: SchemaView, serialized_schema: str) -> str:
+    #Addressing JSON-LD @Container keywords that support values: [@list, @set, @language, @index, @id, @type, Null]
     serialized_schema_json = json.loads(serialized_schema)
     for slot in schema_view.all_slots().values():
         # Update JSON-LD context as a workaround for no langString support in LinkML
@@ -48,10 +49,8 @@ def post_process_jsonldcontext(schema_view: SchemaView, serialized_schema: str) 
             if '@type' in serialized_schema_json['@context'][slot.name]:
                 del serialized_schema_json['@context'][slot.name]['@type']
         # if slot.slot_uri is not None and 'InLanguage' in slot.slot_uri and isinstance(serialized_schema_json['@context'][slot.name], dict):
-            serialized_schema_json['@context'][slot.name]['@container'] = '@language'
-            if '@type' in serialized_schema_json['@context'][slot.name]:
-                del serialized_schema_json['@context'][slot.name]['@type']
-
+        if slot.inlined and isinstance(serialized_schema_json['@context'][slot.name], dict):
+            serialized_schema_json['@context'][slot.name]['@container'] = '@index'
         if slot.multivalued and str(slot.range) == 'Any' and isinstance(serialized_schema_json['@context'][slot.name], dict):
             if '@type' in serialized_schema_json['@context'][slot.name].keys():
                 del serialized_schema_json['@context'][slot.name]['@type']
