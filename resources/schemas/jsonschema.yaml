@@ -168,6 +168,8 @@ classes:
   arraySchema:
     is_a: DataSchema
     class_uri: jsonschema:ArraySchema
+    aliases:
+      - array
     attributes:
       items:
         description: >-
@@ -188,12 +190,16 @@ classes:
   booleanSchema:
     is_a: DataSchema
     class_uri: jsonschema:BooleanSchema
+    aliases:
+      - boolean
     description: >-
       Metadata describing data of type boolean. This Subclass is indicated by the value boolean assigned to type 
       in DataSchema instances.
   numberSchema:
     is_a: DataSchema
     class_uri: jsonschema:NumberSchema
+    aliases:
+      - number
     description: >-
       Metadata describing data of type number. This Subclass is indicated by the value number assigned to type in 
       DataSchema instances.
@@ -206,6 +212,8 @@ classes:
   integerSchema:
     is_a: DataSchema
     class_uri: jsonschema:IntegerSchema
+    aliases:
+      - integer
     description: >-
       Metadata describing data of type integer. This Subclass is indicated by the value integer assigned to type in 
       DataSchema instances.
@@ -218,6 +226,8 @@ classes:
   objectSchema:
     is_a: DataSchema
     class_uri: jsonschema:ObjectSchema
+    aliases:
+      - object
     description: >-
       Metadata describing data of type Object. This Subclass is indicated by the value object assigned to type in 
       DataSchema instances.
@@ -243,6 +253,8 @@ classes:
     # the name has to be changed because apparantly there is an issue with LinkML
     is_a: DataSchema
     class_uri: jsonschema:StringSchema
+    aliases:
+      - string
     description: >-
       Metadata describing data of type string. This Subclass is indicated by the value string assigned to type 
       in DataSchema instances.
@@ -277,6 +289,8 @@ classes:
   nullSchema:
     is_a: DataSchema
     class_uri: jsonschema:NullSchema
+    aliases:
+      - null
     description: >-
       Metadata describing data of type null. This subclass is indicated by the value null assigned to type in DataSchema 
       instances. This Subclass describes only one acceptable value, namely null. It is important to note that null does 
