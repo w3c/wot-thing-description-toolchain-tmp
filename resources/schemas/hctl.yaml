@@ -104,7 +104,7 @@ classes:
         multivalued: true
         range: AdditionalExpectedResponse
         aliases:
-          - additional returns
+          - additionalReturns
       subprotocol:
         slot_uri: hctl:forSubProtocol
         description: >-
