@@ -160,10 +160,12 @@ classes:
           Provides a version identicator of this TD instance.
         slot_uri: td:instance
         required: true
+        range: string
       model:
         description: >-
           Provides a version indicator of the underlying TM.
         slot_uri: td:model
+        range: string
 #  securityDefinitionsRange:
 #    description: >-
 #      TODO.
