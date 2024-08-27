@@ -30,35 +30,40 @@ def generate_docs():
     doc_generator.serialize(directory=str(DOCDIR))
 
 
-#Addressing JSON-LD @Container keywords that support values: [@list, @set, @language, @index, @id, @type, Null]
-def post_process_jsonldcontext(schema_view: SchemaView, serialized_schema: str) -> str:
+def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str) -> str:
     serialized_schema_json = json.loads(serialized_schema)
+    generated_context = serialized_schema_json.get('@context', {})
     for slot in schema_view.all_slots().values():
-        # Update JSON-LD context as a workaround for no langString support in LinkML
-        is_langString = slot.range == 'langString'
-        is_exactly_one_langString = (
-                slot.range is None and
-                any(
-                    expr.range == 'langString'
-                    for expr in slot.exactly_one_of if isinstance(expr, AnonymousSlotExpression)
-                )
+        slot_name = slot.name
+        context_entry = generated_context.get(slot_name, {})
+        # Update JSON-LD context for slots with multi-language support
+        is_langstring = slot.range == 'langString'
+        is_exactly_one_language = (
+            slot.range is None and
+            any(
+                expr.range == 'langString'
+                for expr in slot.exactly_one_of if isinstance(expr, AnonymousSlotExpression)
+            )
         )
-        if (is_langString or is_exactly_one_langString) and isinstance(serialized_schema_json['@context'][slot.name],
-                                                                       dict):
-            serialized_schema_json['@context'][slot.name]['@container'] = '@language'
-            if '@type' in serialized_schema_json['@context'][slot.name]:
-                del serialized_schema_json['@context'][slot.name]['@type']
-        if slot.in_language and isinstance(serialized_schema_json['@context'][slot.name],
-                                                                       dict):
-            serialized_schema_json['@context'][slot.name]['@language'] = slot.in_language
-        if slot.inlined and slot.multivalued and not slot.inlined_as_list and isinstance(serialized_schema_json['@context'][slot.name], dict):
-            serialized_schema_json['@context'][slot.name]['@container'] = '@index'
+        if is_langstring or is_exactly_one_language and isinstance(context_entry, dict):
+            context_entry['@container'] = '@language'
+            context_entry.pop('@type', None)
+        # Update JSON-LD context for slots with a specific encoded language
+        if slot.in_language and isinstance(context_entry, dict):
+            context_entry['@language'] = slot.in_language
+        # inlined and multivalued slot conditions are used to identify dictionaries
+        if slot.inlined and slot.multivalued and not slot.inlined_as_list and isinstance(context_entry, dict):
+            context_entry['@container'] = '@index'
             if slot.instantiates:
-                serialized_schema_json['@context'][slot.name]['@index'] = slot.instantiates
-        if slot.multivalued and str(slot.range) == 'Any' and isinstance(serialized_schema_json['@context'][slot.name], dict):
-            if '@type' in serialized_schema_json['@context'][slot.name].keys():
-                del serialized_schema_json['@context'][slot.name]['@type']
-            serialized_schema_json['@context'][slot.name]['@container'] = '@set'
+                context_entry['@index'] = slot.instantiates
+        generated_context[slot_name] = context_entry
+    #The multivalued slots which do not already have a @container are assigned to a @set
+    for slot in schema_view.all_slots().values():
+        context_entry = generated_context.get(slot.name, {})
+        if slot.multivalued and isinstance(context_entry, dict) and '@container' not in context_entry:
+            context_entry['@container'] = '@set'
+            context_entry.pop('@type', None)
+        generated_context[slot.name] = context_entry
     return json.dumps(serialized_schema_json, indent=3)
 
 
@@ -83,8 +88,8 @@ def main(generate_docs_flag, serve_docs_flag):
             (output_dir / 'ontology.owl.ttl').write_text(owl_generator.serialize())
         elif generator == 'jsonldcontext':
             context_generator = ContextGenerator(linkml_schema_view.schema, mergeimports=True)
-            (output_dir / 'context.jsonld').write_text(post_process_jsonldcontext(linkml_schema_view,
-                                                                                  context_generator.serialize()))
+            (output_dir / 'context.jsonld').write_text(post_process_jsonld_context(linkml_schema_view,
+                                                                                   context_generator.serialize()))
         elif generator == 'linkml':
             linkml_generator = LinkmlGenerator(linkml_schema_view.schema, mergeimports=True, format='yaml', output='linkml.yaml')
             (output_dir / 'linkml.yaml').write_text(linkml_generator.serialize())
