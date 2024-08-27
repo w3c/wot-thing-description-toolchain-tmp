@@ -67,6 +67,7 @@ classes:
         range: uri
       scheme:
         required: true
+        #if this is extra in the json schema, you can remove the range, and use induced slot
         range: SecuritySchemeType
       hasInstanceConfiguration:
         slot_uri: td:hasInstanceConfiguration
@@ -231,13 +232,11 @@ classes:
       In this case the key may not be using a standard token format. This scheme indicates that the key provided by the 
       service provider needs to be supplied as part of service requests using the mechanism indicated by the \"in\" field.
     attributes:
-      apiKeyIn:
-        description: >-
-          Specifies the location of security authentication information.
       scheme:
         equals_string: apikey
     slots:
       - name
+      - in
   psk:
     is_a: SecurityScheme
     class_uri: wotsec:PSKSecurityScheme
