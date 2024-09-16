@@ -12,7 +12,7 @@ include = ["README.md", "src/thing_description_schema/schema", "project"]
 requires-python = ">=3.12"
 dependencies = [
     "linkml-runtime>=1.8.2",
-    "linkml>=1.8.3",
+    "linkml>=1.8.2",
     "mkdocs-mermaid2-plugin>=1.1.1",
     "mkdocs-material>=9.5.32",
     "schemasheets>=0.3.1",
