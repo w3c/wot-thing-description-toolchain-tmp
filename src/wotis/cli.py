@@ -14,20 +14,36 @@ from linkml.generators.docgen import DocGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
-from src import YAML_SCHEMA_PATH, GENS_PATH, GENERATORS, DOCDIR
+from src.wotis import YAML_SCHEMA_PATH, GENS_PATH, GENERATORS, DOCDIR
 
 
-input_option = click.option('i', '--input_schema', help="Path to the input schema specified as LinkML yaml.", default=YAML_SCHEMA_PATH)
-docs_option = click.option('-d', '--generate_docs', help="Boolean for local documentation generation.")
-serve_docs_option = click.option('-s', '--serve_docs', help="Boolean for serving the generated documentation.")
+input_option = click.option('-i', '--input_schema',
+                            type=str,
+                            show_default=True,
+                            help="Path to the input schema specified as LinkML yaml.",
+                            default=YAML_SCHEMA_PATH)
+docs_option = click.option('-d',
+                           '--generate_docs',
+                           type=bool,
+                           is_flag=True,
+                           default=False,
+                           show_default=True,
+                           help="Boolean for local documentation generation.")
+serve_docs_option = click.option('-s',
+                                 '--serve_docs',
+                                 type=bool,
+                                 is_flag=True,
+                                 default=False,
+                                 show_default=True,
+                                 help="Boolean for serving the generated documentation.")
 
 
 # Documentation serving function
-def serve_docs():
+def serve_documentation():
     subprocess.run(['mkdocs', 'serve'], check=True)
 
 
-def generate_docs():
+def generate_documentation():
     DOCDIR.mkdir(parents=True, exist_ok=True)
     doc_generator = DocGenerator(YAML_SCHEMA_PATH, mergeimports=False)
     doc_generator.serialize(directory=str(DOCDIR))
@@ -37,7 +53,6 @@ def generate_docs():
 def run_generator(schema_view, generator, output_dir):
     if generator == 'jsonschema':
         logging.info(f"JSON Schema generation")
-        # json_schema_generator = JsonSchemaGenerator(yaml_content, top_class="Thing")
         json_schema_generator = JsonSchemaGenerator(schema_view.schema, mergeimports=True)
         (output_dir / 'jsonschema.json').write_text(json_schema_generator.serialize())
     elif generator == 'shacl':
@@ -83,10 +98,10 @@ def main(verbose: int, quiet: bool):
 @input_option
 @docs_option
 @serve_docs_option
-def generate_wot_resources(input_schema, generate_docs, serve_docs):
+def generate_wot_resources(input_schema: str, generate_docs: bool, serve_docs: bool):
     """
-    Toolchain for generating WoT resources (RDF, JSON-LD Context, SHACL Shapes, and JSON Schema) from manually
-    constructed LinkML-based schemas.
+    Generating WoT resources (RDF, JSON-LD Context, SHACL Shapes, and JSON Schema) from manually constructed
+    LinkML-based schemas.
     """
     if input_schema and not Path(input_schema).exists():
         raise FileNotFoundError(f"Cannot find input LinkML schema file {input_schema}.")
@@ -104,9 +119,11 @@ def generate_wot_resources(input_schema, generate_docs, serve_docs):
         except yaml.YAMLError as e:
             logging.info(f"LinkML schema validation failed: {e}")
         if generate_docs:
-            generate_docs()
+            logging.info(f"Generating documentation locally as markdown files...")
+            generate_documentation()
         if serve_docs:
-            serve_docs()
+            logging.info(f"GServing documentation...")
+            serve_documentation()
 
 
 if __name__ == "__main__":
