@@ -1,21 +1,25 @@
 [project]
-name = "thing_description_schema"
+name = "wotis"
 version = "0.1.0"
-description = "Thing Description Information Model as a LinkML schema"
+description = "A CLI for Web of Things Integrated Schemas (WOTIS)"
 authors = [
-    { name = "Mahda Noura", email = "mahdanoura@gmail.com" }
+    { name = "Mahda Noura", email = "mahda.noura@siemens.com" }
 ]
 license = "MIT"
 readme = "README.md"
-include = ["README.md", "src/thing_description_schema/schema", "project"]
-
-requires-python = ">=3.12"
+include = ["README.md", "resources/schemas/*"]
+requires-python = ">=3.11"
 dependencies = [
     "linkml-runtime>=1.8.2",
     "linkml>=1.8.2",
     "mkdocs-mermaid2-plugin>=1.1.1",
     "mkdocs-material>=9.5.32",
-    "schemasheets>=0.3.1",
+    "schemasheets>=0.3.1"
+]
+
+[project.optional-dependencies]
+cli = [
+    "click>=8.1.7"
 ]
 
 [build-system]
@@ -23,4 +27,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build]
-only-include = ["main.py"]
+only-include = ["src/wotis/cli.py"]
+
+[tool.hatch.metadata]
+root = "src"
+
+[project.scripts]
+wotis = "src.wotis.cli:main"

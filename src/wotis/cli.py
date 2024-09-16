@@ -1,4 +1,4 @@
-"""Command line interface for WoT toolchain."""
+"""Command line interface for WoTIS."""
 
 import click
 import logging
@@ -13,7 +13,6 @@ from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.docgen import DocGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml_runtime.utils.schemaview import SchemaView
-from linkml_runtime.linkml_model.meta import AnonymousSlotExpression
 
 from src import YAML_SCHEMA_PATH, GENS_PATH, GENERATORS, DOCDIR
 
@@ -36,8 +35,8 @@ def generate_docs():
 
 # Main generation function
 def run_generator(schema_view, generator, output_dir):
-    logging.info(f"Input file directory")
     if generator == 'jsonschema':
+        logging.info(f"JSON Schema generation")
         # json_schema_generator = JsonSchemaGenerator(yaml_content, top_class="Thing")
         json_schema_generator = JsonSchemaGenerator(schema_view.schema, mergeimports=True)
         (output_dir / 'jsonschema.json').write_text(json_schema_generator.serialize())
@@ -63,7 +62,7 @@ def run_generator(schema_view, generator, output_dir):
 @click.option("-v", "--verbose", count=True)
 @click.option("-q", "--quiet")
 def main(verbose: int, quiet: bool):
-    """CLI for WoT toolchain.
+    """CLI for WOTIS (Web of Things Integrated Schemas) toolchain.
 
     :param verbose: Verbosity while running.
     :param quiet: Boolean to be quiet or verbose.
@@ -86,7 +85,8 @@ def main(verbose: int, quiet: bool):
 @serve_docs_option
 def generate_wot_resources(input_schema, generate_docs, serve_docs):
     """
-    WoT TD toolchain CLI for automating WoT resources generation
+    Toolchain for generating WoT resources (RDF, JSON-LD Context, SHACL Shapes, and JSON Schema) from manually
+    constructed LinkML-based schemas.
     """
     if input_schema and not Path(input_schema).exists():
         raise FileNotFoundError(f"Cannot find input LinkML schema file {input_schema}.")
@@ -99,9 +99,10 @@ def generate_wot_resources(input_schema, generate_docs, serve_docs):
             for generator in GENERATORS:
                 output_dir = GENS_PATH / generator
                 output_dir.mkdir(parents=True, exist_ok=True)
+                logging.info(f"Proceeding with WoT resource generation")
                 run_generator(linkml_schema_view, generator, output_dir)
         except yaml.YAMLError as e:
-            logging.info(f"Error in LinkML schema validation: {e}")
+            logging.info(f"LinkML schema validation failed: {e}")
         if generate_docs:
             generate_docs()
         if serve_docs:
