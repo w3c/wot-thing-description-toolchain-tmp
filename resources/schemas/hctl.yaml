@@ -67,7 +67,6 @@ classes:
           The hreflang attribute specifies the language of a linked document. The value of this must be a valid 
           language tag [[BCP47]].
         slot_uri: hctl:hasHreflang
-
     slots:
       - href
   Form:

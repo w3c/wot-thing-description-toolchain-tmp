@@ -48,7 +48,7 @@ prefixes:
   tm:
     prefix_prefix: tm
     prefix_reference: https://www.w3.org/2019/wot/tm#
-default_prefix: td
+#default_prefix: td
 default_range: string
 
 imports:
@@ -150,7 +150,7 @@ classes:
 
   # start of main classes, required for RDF generation
 
-  VersionInfo:
+  versionInfo:
     description: >-
       Provides version information.
     class_uri: td:versionInfo
@@ -301,7 +301,7 @@ classes:
         description: >- 
           Provides version information.
         slot_uri: td:versionInfo
-        range: VersionInfo
+        range: versionInfo
       created:
         slot_uri: dct:created
         description: >-

@@ -153,19 +153,19 @@ classes:
           TODO: Check, maybe the range is not a Datatype property rather pointing to classes
         slot_uri: rdf:type
         exactly_one_of:
-          - range: arraySchema
-          - range: nullSchema
-          - range: objectSchema
-          - range: booleanSchema
-          - range: stringSchema
-          - range: numberSchema
-          - range: integerSchema
+          - range: ArraySchema
+          - range: NullSchema
+          - range: ObjectSchema
+          - range: BooleanSchema
+          - range: StringSchema
+          - range: NumberSchema
+          - range: IntegerSchema
     slots:
       - description
       - title
       - titles
       - descriptions
-  arraySchema:
+  ArraySchema:
     is_a: DataSchema
     class_uri: jsonschema:ArraySchema
     aliases:
@@ -187,7 +187,7 @@ classes:
           Defines the maximum number of items that have to be in the array.
         slot_uri: jsonschema:maxItems
         range: integer
-  booleanSchema:
+  BooleanSchema:
     is_a: DataSchema
     class_uri: jsonschema:BooleanSchema
     aliases:
@@ -195,7 +195,7 @@ classes:
     description: >-
       Metadata describing data of type boolean. This Subclass is indicated by the value boolean assigned to type 
       in DataSchema instances.
-  numberSchema:
+  NumberSchema:
     is_a: DataSchema
     class_uri: jsonschema:NumberSchema
     aliases:
@@ -209,7 +209,7 @@ classes:
       - exclusiveMinimum
       - exclusiveMaximum
       - multipleOf
-  integerSchema:
+  IntegerSchema:
     is_a: DataSchema
     class_uri: jsonschema:IntegerSchema
     aliases:
@@ -223,7 +223,7 @@ classes:
       - exclusiveMinimum
       - exclusiveMaximum
       - multipleOf
-  objectSchema:
+  ObjectSchema:
     is_a: DataSchema
     class_uri: jsonschema:ObjectSchema
     aliases:
@@ -249,7 +249,7 @@ classes:
           is to be sent (e.g. input of invokeaction, writeproperty) and what members will be definitely delivered in 
           the payload that is being received (e.g. output of invokeaction, readproperty).
         multivalued: true
-  stringSchema:
+  StringSchema:
     # the name has to be changed because apparantly there is an issue with LinkML
     is_a: DataSchema
     class_uri: jsonschema:StringSchema
@@ -286,7 +286,7 @@ classes:
           - value: base16
           - value: base32
           - value: base64
-  nullSchema:
+  NullSchema:
     is_a: DataSchema
     class_uri: jsonschema:NullSchema
     aliases:
