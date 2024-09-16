@@ -7,6 +7,7 @@ description: |-
   according to the W3C WoT Group (https://github.com/w3c/wot). This schema is based on LinkML and is used to generate 
   the required WoT resources e.g., JSON Schema, SHACL shapes, and RDF programmatically.
 license: MIT
+contributors: Mahda_Noura
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
 
@@ -32,9 +33,6 @@ prefixes:
   rdf:
     prefix_prefix: rdf
     prefix_reference: http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  dcterms:
-    prefix_prefix: dcterms
-    prefix_reference: http://purl.org/dc/terms/
   schema:
     prefix_prefix: schema
     prefix_reference: http://schema.org/
@@ -50,7 +48,7 @@ prefixes:
   tm:
     prefix_prefix: tm
     prefix_reference: https://www.w3.org/2019/wot/tm#
-default_prefix: td
+#default_prefix: td
 default_range: string
 
 imports:
@@ -60,16 +58,12 @@ imports:
   - jsonschema
 
 types:
-  MultiLanguage:
-    name: MultiLanguage
-    description: Description with a language tag.
-    from_schema: rdf
-    exact_mappings:
-      - rdf:langString
-    base: rdf:PlainLiteral
-    uri: rdf:PlainLiteral
-    structured_pattern:
-      syntax: "{text}@{tag}"
+  langString:
+    name: langString
+    description: A boolean flag indicating that the string could also include language tag.
+    base: Bool
+    uri: xsd:boolean
+
 
 slots:
   id:
@@ -80,26 +74,24 @@ slots:
   title:
     description: >-
       Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
-    range: string
+    in_language: en
     slot_uri: td:title
   titles:
     description: >-
       Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
     slot_uri: td:titleInLanguage
     multivalued: true
-    exactly_one_of:
-      - range: string
-      - range: MultiLanguage
-    inlined_as_list: true
+    range: langString
   description:
     description: >-
       Provides additional (human-readable) information based on a default language.
+    in_language: en
   descriptions:
     description: >- 
       Can be used to support (human-readable) information in different languages.
     slot_uri: td:descriptionInLanguage
     multivalued: true
-    inlined: true
+    range: langString
     # currently less restrictions are applied, with further restrictions according to the json schema, the following can be partially utilized
 #    exactly_one_of:
 #      - range: type_declaration_string
@@ -113,6 +105,15 @@ slots:
 #      - range: string
 #        multivalued: true
 #    inlined: false
+  security:
+    description: >-
+      A security configuration is a a security scheme applied to a (set of) affordance(s).
+    slot_uri: td:hasSecurityConfiguration
+    required: true
+    exactly_one_of:
+      - range: string
+        multivalued: true
+      - range: string
   uriVariables:
     description: >-
       Define URI template variables according to RFC6570 as collection based on schema specifications. The individual
@@ -120,7 +121,9 @@ slots:
     slot_uri: td:hasUriTemplateSchema
     range: DataSchema
     inlined: true
+    inlined_as_list: false
     multivalued: true
+    instantiates: name
   forms:
     slot_uri: td:hasForm
     description: >-
@@ -144,10 +147,10 @@ classes:
         multivalued: true
         none_of:
           - equals_string: 'tm:ThingModel'
-        
+
   # start of main classes, required for RDF generation
 
-  VersionInfo:
+  versionInfo:
     description: >-
       Provides version information.
     class_uri: td:versionInfo
@@ -157,32 +160,34 @@ classes:
           Provides a version identicator of this TD instance.
         slot_uri: td:instance
         required: true
+        range: string
       model:
         description: >-
           Provides a version indicator of the underlying TM.
         slot_uri: td:model
-  securityDefinitionsRange:
-    description: >-
-      TODO.
-    attributes:
-      name:
-        description: >-
-          Indexing property to store entity names when serializing them in a JSON-LD @index container.
-        slot_uri: wotsec:name
-        identifier: true
-      value:
-        inlined: true
-        range: Any
-        exactly_one_of:
-          - range: bearer
-          - range: oauth2
-          - range: combo
-          - range: digest
-          - range: basic
-          - range: nosec
-          - range: auto
-          - range: psk
-          - range: apikey
+        range: string
+#  securityDefinitionsRange:
+#    description: >-
+#      TODO.
+#    attributes:
+#      name:
+#        description: >-
+#          Indexing property to store entity names when serializing them in a JSON-LD @index container.
+#        slot_uri: wotsec:name
+#        identifier: true
+#      value:
+#        inlined: true
+#        range: Any
+#        exactly_one_of:
+#          - range: bearer
+#          - range: oauth2
+#          - range: combo
+#          - range: digest
+#          - range: basic
+#          - range: nosec
+#          - range: auto
+#          - range: psk
+#          - range: apikey
   InteractionAffordance:
     description: >-
       Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact 
@@ -290,13 +295,13 @@ classes:
         description: >- 
           JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
         required: true
-        range: uriorcurie
+        range: uri
         array:
       version:
         description: >- 
           Provides version information.
         slot_uri: td:versionInfo
-        range: VersionInfo
+        range: versionInfo
       created:
         slot_uri: dct:created
         description: >-
@@ -323,27 +328,29 @@ classes:
         slot_uri: td:followsProfile
         range: Any
         any_of:
-          - range: uriorcurie
+          - range: uri
             multivalued: true
-          - range: uriorcurie
-      security:
-        description: >-
-          A security configuration is a a security scheme applied to a (set of) affordance(s).
-        slot_uri: td:hasSecurityConfiguration
-        required: true
-        exactly_one_of:
-          - range: string
-            multivalued: true
-          - range: string
+          - range: uri
       securityDefinitions:
         description: >- 
           A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
         slot_uri: td:definesSecurityScheme
-        range: securityDefinitionsRange
+        exactly_one_of:
+          - range: bearer
+          - range: oauth2
+          - range: combo
+          - range: digest
+          - range: basic
+          - range: nosec
+          - range: auto
+          - range: psk
+          - range: apikey
         required: true
         minimum_cardinality: 1
         inlined: true
+        inlined_as_list: false
         multivalued: true
+        instantiates: hasInstanceConfiguration
       schemaDefinitions:
         description: >- 
           TODO This has to be checked, it is not in the ontologies anywhere.
@@ -351,6 +358,8 @@ classes:
         slot_uri: td:schemaDefinitions
         multivalued: true
         range: DataSchema
+        inlined: true
+        inlined_as_list: false
       links:
         slot_uri: td:hasLink
         description: >-
@@ -363,21 +372,27 @@ classes:
         slot_uri: td:hasPropertyAffordance
         multivalued: true
         inlined: true
+        inlined_as_list: false
         range: PropertyAffordance
+        instantiates: name
       actions:
         description: >-
           All Action-based interaction affordances of the Thing.
         slot_uri: td:hasActionAffordance
         multivalued: true
         inlined: true
+        inlined_as_list: false
         range: ActionAffordance
+        instantiates: name
       events:
         description: >-
           All Event-based interaction affordances of the Thing.
         slot_uri: td:hasEventAffordance
         multivalued: true
         inlined: true
+        inlined_as_list: false
         range: EventAffordance
+        instantiates: name
     slots:
       - id
       - title
@@ -388,6 +403,7 @@ classes:
       - descriptions
       - uriVariables
       - forms
+      - security
 
 enums:
   OperationTypes:
