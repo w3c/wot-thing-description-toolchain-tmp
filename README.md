@@ -19,8 +19,9 @@ Step 2: Generate the final WoT TD specification document using the generated WoT
 <img title="WoT Toolchain Overview" src="images/toolchain.svg">
 
 ## Prerequisites
+Ensure you have Python 3.11 or greater installed.
 
-The [uv](https://docs.astral.sh/uv/) package manager.
+The [uv](https://docs.astral.sh/uv/) package manager is required.
 
 ## Quick Start
 1. Clone the repository and navigate to the project directory:
@@ -28,29 +29,29 @@ The [uv](https://docs.astral.sh/uv/) package manager.
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
 ```
-2. Run the script using `uv`
-```
-uv run main.py -h
-```
+2. Install the package
+`uv install`
 
 ## Usage
-The main.py script supports various options:
+See the list of all WOTIS commands:
+`wotis --help`
+
+Generate WoT resources (RDF, JSON-LD Context, SHACL Shapes, and JSON Schema) from a default LinkML schema: 
 ```
-uv run main.py [-h] [-l] [-s]
+wotis generate-wot-resources [-i] [-d] [-s] [--help]
 
 options:
-  -h, --help            show this help message and exit
-  -l, --local-docs      Boolean for local documentation generation.
-  -s, --serve-docs      Boolean for serving the generated documentation.
-```
-## Examples
-Generate resources using the default schema and configuration:
-```
-uv run main.py
+  -i, --input_schema       Path to the input schema specified as LinkML yaml.
+                           [default: resources/schemas/thing_description.yaml]
+                           
+  -d, --generate_docs      Boolean for local documentation generation.
+  -s, --serve_docs         Boolean for serving the generated documentation.
+  --help                   Show this help message and exit.
 ```
 
-Generate documentation locally and serve it:
-`uv run main.py -l -s`
+## Examples
+Generate documentation using the default schema locally and serve it:
+`wotis generate-wot-resources -l -s`
 
 #### Default Paths
 * LinkML schema: `resources/schemas/thing_description.yaml`
