@@ -1,6 +1,8 @@
 import argparse
+import click
 import json
 import subprocess
+from pathlib import Path
 
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.shaclgen import ShaclGenerator
@@ -10,10 +12,7 @@ from linkml.generators.docgen import DocGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 from linkml_runtime.linkml_model.meta import AnonymousSlotExpression
-from pathlib import Path
-from pyld import jsonld
 
-from linkml_runtime.linkml_model.meta import SlotDefinition
 
 RESOURCES_PATH = Path('resources')
 GENS_PATH = RESOURCES_PATH / 'gens'
