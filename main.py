@@ -13,6 +13,8 @@ from linkml_runtime.linkml_model.meta import AnonymousSlotExpression
 from pathlib import Path
 from pyld import jsonld
 
+from linkml_runtime.linkml_model.meta import SlotDefinition
+
 RESOURCES_PATH = Path('resources')
 GENS_PATH = RESOURCES_PATH / 'gens'
 SCHEMA_PATH = RESOURCES_PATH / 'schemas'
@@ -30,9 +32,18 @@ def generate_docs():
     doc_generator.serialize(directory=str(DOCDIR))
 
 
+#camelCase conversion of class names in the generated context file
+    # updated_context = {}
+    # for cn, value in generated_context.items():
+    #     camel_case_key = cn[0].lower() + cn[1:]
+    #     if value != {}:
+    #         updated_context[camel_case_key] = value
+    # serialized_schema_json['@context'] = updated_context
+    # generated_context = updated_context
 def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str) -> str:
     serialized_schema_json = json.loads(serialized_schema)
     generated_context = serialized_schema_json.get('@context', {})
+    default_range = schema_view.schema.default_range if schema_view.schema.default_range else "string"
     for slot in schema_view.all_slots().values():
         slot_name = slot.name
         context_entry = generated_context.get(slot_name, {})
@@ -46,16 +57,33 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
             )
         )
         if is_langstring or is_exactly_one_language and isinstance(context_entry, dict):
-            context_entry['@container'] = '@language'
-            context_entry.pop('@type', None)
+            serialized_schema_json['@context'][slot_name]['@container'] = '@language'
+            if '@type' in serialized_schema_json['@context'][slot_name].keys():
+                del serialized_schema_json['@context'][slot_name]['@type']
         # Update JSON-LD context for slots with a specific encoded language
         if slot.in_language and isinstance(context_entry, dict):
             context_entry['@language'] = slot.in_language
         # inlined and multivalued slot conditions are used to identify dictionaries
         if slot.inlined and slot.multivalued and not slot.inlined_as_list and isinstance(context_entry, dict):
             context_entry['@container'] = '@index'
+            if not hasattr(context_entry, '@type'):
+                context_entry['@type'] = '@id'
             if slot.instantiates:
                 context_entry['@index'] = slot.instantiates
+        #exactly_one_of expressions
+        if hasattr(slot, 'exactly_one_of') and slot.exactly_one_of:
+            ranges = [opt['range'] for opt in slot.exactly_one_of if 'range' in opt]
+            if len(set(ranges)) == 1:
+                range_type = ranges[0]
+                context_entry["@type"] = f"xsd:{range_type}"
+            else:
+                print(f"Warning: Slot {slot_name} has different ranges")
+        elif slot.range == default_range:
+            context_entry["@type"] = f"xsd:{default_range}"
+        #Change property name with those that provide aliases
+        # if slot.aliases and isinstance(context_entry, dict):
+        #     generated_context[slot.aliases[0]] = generated_context.pop(slot_name)
+        #     context_entry = generated_context[slot.aliases[0]]
         generated_context[slot_name] = context_entry
     #The multivalued slots which do not already have a @container are assigned to a @set
     for slot in schema_view.all_slots().values():
@@ -64,6 +92,13 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
             context_entry['@container'] = '@set'
             context_entry.pop('@type', None)
         generated_context[slot.name] = context_entry
+    # for c in schema_view.all_classes().values():
+    #     class_name = c.name
+    #     context_entry = generated_context.get(class_name, {})
+    #     if c.aliases and isinstance(context_entry, dict):
+    #         generated_context[c.aliases[0]] = generated_context.pop(class_name)
+    #         context_entry = generated_context[c.aliases[0]]
+    #     generated_context[class_name] = context_entry
     return json.dumps(serialized_schema_json, indent=3)
 
 
