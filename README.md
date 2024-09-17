@@ -55,7 +55,7 @@ options:
 ## Examples
 Generate documentation using the default schema locally and serve it:
 ```bash
-wotis generate-wot-resources -l -s
+wotis generate-wot-resources -d -s
 ```
 
 #### Default Paths
