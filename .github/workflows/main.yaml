@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11"]
+        py: ["3.12"]
 
     steps:
       - name: Check out repository
@@ -21,4 +21,4 @@ jobs:
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Run the program
-        run: uv run main.py
+        run: uv run -p ${{ matrix.py }} wotis
