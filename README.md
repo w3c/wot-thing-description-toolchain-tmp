@@ -28,7 +28,7 @@ Step 2: Generate the final WoT TD specification document using the generated WoT
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
 ```
-2. Install the package
+2. Install the package or run it using `uv run wotis`
 ```bash
 uv install
 ```
