@@ -3,7 +3,7 @@
 
 The aim of this repository is to simplify the current tooling required for generating the WoT Thing Description (TD) specification and related resources. 
 WoTIS toolchain is a python-based project designed to automate the generation of
- 1) WoT resources: [SHACL Shapes](https://www.w3.org/TR/shacl/), [JSON Schema](https://json-schema.org/specification), [JSON-LD context](https://www.w3.org/TR/json-ld11/), [RDF](https://www.w3.org/TR/rdf11-concepts/) and visual figures
+ 1) WoT resources: [SHACL Shapes](https://www.w3.org/TR/shacl/), [JSON Schema](https://json-schema.org/specification), [JSON-LD context](https://www.w3.org/TR/json-ld11/), [RDF](https://www.w3.org/TR/rdf11-concepts/), and visual figures
  2) Documentation: TD specification and ontology specifications
 
 This project leverages [LinkML](https://linkml.io/linkml/) for modelling the [Web of Things Thing Description](https://www.w3.org/TR/wot-thing-description11/) information model.
