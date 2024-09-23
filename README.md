@@ -14,7 +14,7 @@ This project leverages [LinkML](https://linkml.io/linkml/) for modelling the [We
 
 Below is a simplified overview of the process:
 
-Step 1: Generate WoT resources using WOTIS
+Step 1: Generate WoT resources using WoTIS
 
 Step 2: Generate the final WoT TD specification document using the generated WoT resources along with a static ```index.html```
 
@@ -36,7 +36,7 @@ uv install
 ```
 
 ## Usage
-See the list of all WOTIS commands:
+See the list of all WoTIS commands:
 ```bash
 wotis --help
 ```
