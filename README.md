@@ -21,7 +21,6 @@ Step 2: Generate the final WoT TD specification document using the generated WoT
 <img title="WoT Toolchain Overview" src="images/toolchain.svg">
 
 ## Prerequisites
-* Python 3.11 or greater. [Download and install Python.](https://www.python.org/downloads/)
 * The [uv](https://docs.astral.sh/uv/) package manager.
 
 ## Quick Start
