@@ -8,7 +8,7 @@ authors = [
 license = "MIT"
 readme = "README.md"
 include = ["README.md", "resources/schemas/*"]
-requires-python = ">=3.11"
+requires-python = ">=3.11, <=3.13"
 dependencies = [
     "linkml-runtime>=1.9.2",
     "linkml>=1.9.2",
