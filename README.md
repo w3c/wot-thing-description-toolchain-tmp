@@ -1,4 +1,3 @@
-
 # WoTIS - Web of Things Integrated Schemas
 
 WoTIS - work in progress!
@@ -14,9 +13,17 @@ This project leverages [LinkML](https://linkml.io/linkml/) for modelling the [We
 
 Below is a simplified overview of the process:
 
+Step 1: Generate WoT resources using WOTIS
+
+Step 2: Generate the final WoT TD specification document using the generated WoT resources along with a static ```index.html```
+
+<img title="WoT Toolchain Overview" src="images/toolchain.svg">
+
 Step 1: Generate WoT resources using WoTIS
 
 Step 2: Generate the final WoT TD specification document using the generated WoT resources along with a static ```index.html```
+
+* Python 3.13 or greater. [Download and install Python.](https://www.python.org/downloads/)
 
 <img title="WoT Toolchain Overview" src="images/toolchain.svg">
 
@@ -29,6 +36,7 @@ Step 2: Generate the final WoT TD specification document using the generated WoT
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
 ```
+
 2. Install the package or run it by executing
 ```bash
 uv run wotis
