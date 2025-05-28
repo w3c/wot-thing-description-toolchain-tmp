@@ -14,7 +14,7 @@ from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
 from src.wotis import YAML_SCHEMA_PATH, GENS_PATH, GENERATORS, DOCDIR
-from src.wotis.post_processors.jsonld_context_postprocessor import post_process_jsonld_context
+from src.wotis.postprocessors.jsonld_context_postprocessor import post_process_jsonld_context
 
 
 input_option = click.option('-i', '--input_schema',
