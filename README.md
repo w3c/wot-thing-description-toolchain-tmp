@@ -1,8 +1,7 @@
-
 # WoTIS - Web of Things Integrated Schemas
 
 The aim of this repository is to simplify the current tooling required for generating the WoT Thing Description (TD) specification and related resources. 
-WoTIS toolchain is a python-based project designed to automate the generation of
+WoTIS toolchain is a python-based project designed to automate the generation of: 
  1) WoT resources: [SHACL Shapes](https://www.w3.org/TR/shacl/), [JSON Schema](https://json-schema.org/specification), [JSON-LD context](https://www.w3.org/TR/json-ld11/), [RDF](https://www.w3.org/TR/rdf11-concepts/), and visual figures
  2) Documentation: TD specification and ontology specifications
 
@@ -19,7 +18,8 @@ Step 2: Generate the final WoT TD specification document using the generated WoT
 <img title="WoT Toolchain Overview" src="images/toolchain.svg">
 
 ## Prerequisites
-* Python 3.11 or greater. [Download and install Python.](https://www.python.org/downloads/)
+
+* Python 3.13 or greater. [Download and install Python.](https://www.python.org/downloads/)
 * The [uv](https://docs.astral.sh/uv/) package manager.
 
 ## Quick Start
@@ -28,6 +28,7 @@ Step 2: Generate the final WoT TD specification document using the generated WoT
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
 ```
+
 2. Install the package or run it using `uv run wotis`
 ```bash
 uv install
@@ -35,6 +36,7 @@ uv install
 
 ## Usage
 See the list of all WOTIS commands:
+
 ```bash
 wotis --help
 ```
