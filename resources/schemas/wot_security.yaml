@@ -32,6 +32,11 @@ classes:
       within a Vocabulary included in the Thing Description. For all security schemes, any keys, passwords, or other 
       sensitive information directly providing access MUST NOT be stored in the TD and should instead be shared and 
       stored out-of-band via other mechanisms.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
     slots:
       - proxy
       - description
@@ -54,20 +59,44 @@ classes:
     description: >-
       API key authentication security configuration identified by the term apikey. This scheme is to be used when the 
       access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
     slots:
-      - apikeyIn
+      - in
       - name
+    slot_usage:
+      scheme:
+        pattern: ^apikey$
+      in:
+        required: true
+        range: SecurityLocationType
 
   AutoSecurityScheme:
     is_a: SecurityScheme
     description: >-
       An automatic authentication security configuration identified by the term auto. This scheme indicates that the security 
       parameters are going to be negotiated by the underlying protocols at runtime.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
+    slot_usage:
+      scheme:
+        pattern: ^auto$
 
   BasicSecurityScheme:
     is_a: SecurityScheme
     description: >-
       Basic Authentication security configuration using an unencrypted username and password.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
     slots:
       - in
       - name
@@ -76,6 +105,11 @@ classes:
     is_a: SecurityScheme
     description: >-
       Bearer Token security configuration for situations where bearer tokens are used independently of OAuth2.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
     slots:
       - alg
       - format
@@ -87,16 +121,23 @@ classes:
     is_a: SecurityScheme
     description: >-
       A combination of other security schemes. Exactly one of either oneOf or allOf vocabulary terms MUST be included.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
     slots:
       - oneOf
       - allOf
     slot_usage:
+      scheme:
+        pattern: ^combo$
       oneOf:
-        range: SecurityScheme
+        range: string
         multivalued: true
         minimum_value: 2
       allOf:
-        range: SecurityScheme
+        range: string
         multivalued: true
         minimum_value: 2
 
@@ -105,6 +146,11 @@ classes:
     description: >-
       Digest Access Authentication security configuration. This scheme is similar to basic authentication but with 
       added features to avoid man-in-the-middle attacks.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
     slots:
       - in
       - name
@@ -114,11 +160,24 @@ classes:
     is_a: SecurityScheme
     description: >-
       A security configuration indicating there is no authentication or other mechanism required to access the resource.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
+    slot_usage:
+      scheme:
+        pattern: ^nosec$
 
   OAuth2SecurityScheme:
     is_a: SecurityScheme
     description: >-
       OAuth 2.0 authentication security configuration for systems conformant with RFC6749 and RFC8252.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
     slots:
       - flow
       - scopes
@@ -142,6 +201,11 @@ classes:
     description: >-
       Pre-shared key authentication security configuration. This is meant to identify that a standard is used for 
       pre-shared keys such as TLS-PSK.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
     slots:
       - identity
 
@@ -213,12 +277,6 @@ slots:
     range: string
 
   in:
-    description: Specifies the location of security authentication information.
-    range: SecurityLocationType
-    comments:
-      - Default value should be provided by implementations
-
-  apikeyIn:
     description: Specifies the location of security authentication information.
     range: SecurityLocationType
     comments:
