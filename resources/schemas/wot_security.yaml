@@ -1,8 +1,12 @@
 id: https://www.w3.org/2019/wot/security
 name: wot_security
-description: Security mechanisms for the Web of Things based on well-established security mechanisms that are directly built into protocols eligible as Protocol Bindings for W3C WoT.
-version: 0.0.1
-license: http://purl.org/NET/rdflicense/cc-by4.0
+title: WoT Security Schema
+description: LinkML Schema for modelling the Thing Description security mechanisms .
+version: "1.1-2-June-2025"
+license: MIT
+contributors: Mahda_Noura
+see_also:
+  - https://www.w3.org/TR/wot-thing-description11/#sec-security-vocabulary-definition
 prefixes:
   wot: https://www.w3.org/2019/wot/security#
   linkml: https://w3id.org/linkml/
@@ -88,12 +92,13 @@ classes:
       - allOf
     slot_usage:
       oneOf:
-        required: false
+        range: SecurityScheme
+        multivalued: true
+        minimum_value: 2
       allOf:
-        required: false
-    rules:
-      - description: "Exactly one of either oneOf or allOf must be included"
-        expression: "oneOf.empty? != allOf.empty?"
+        range: SecurityScheme
+        multivalued: true
+        minimum_value: 2
 
   DigestSecurityScheme:
     is_a: SecurityScheme
@@ -186,6 +191,11 @@ enums:
         description: Client credentials flow
 
 slots:
+  scheme:
+    description: Identification of the security mechanism being configured
+    required: true
+    range: string
+
   alg:
     description: Encoding, encryption, or digest algorithm (e.g., ES256, ES512-256).
     range: string
