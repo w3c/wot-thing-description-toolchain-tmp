@@ -138,3 +138,23 @@ uv.lock
 # Never commit generated files
 resources/gens/
 src/wot_thing_description_toolchain_tmp
+
+# Poetry
+poetry.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Backup files
+backup/
+
+# Test artifacts
+tests/src/jsonld_context_fixes.txt
