@@ -78,7 +78,6 @@ The validator provides:
 - Validation against both generated and benchmark schemas
 - Detailed validation results with rich CLI output
 - Statistics on schema compatibility
-- Support for validating multiple TD instances
 
 #### Default Paths
 * LinkML schema: `resources/schemas/thing_description.yaml`

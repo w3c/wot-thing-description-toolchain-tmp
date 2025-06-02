@@ -4,7 +4,7 @@ This directory contains test files and validation tools for the WoT Thing Descri
 
 ## TD Instance Validation
 
-The `validate_td_instances.py` script provides functionality to validate Thing Description (TD) instances against both the generated JSON Schema and a benchmark schema. This helps ensure that our generated schema maintains compatibility with the WoT TD specification.
+The `validate_td_instances.py` script provides functionality to validate TD instances against both the generated JSON Schema and a benchmark schema. This helps ensure that our generated schema maintains compatibility with the WoT TD specification.
 
 ### Usage
 
@@ -21,9 +21,8 @@ python src/validate_td_instances.py --schema <path-to-generated-schema> --benchm
 ### Features
 
 - **Dual Schema Validation**: Validates TD instances against both the generated schema and a benchmark schema
-- **Rich CLI Output**: Uses the `rich` library to provide clear, colorful validation results
+- **CLI Output**: Provide validation results
 - **Validation Statistics**: Shows statistics about schema compatibility and validation consistency
-- **Batch Processing**: Can validate multiple TD instances in a directory structure
 - **Detailed Error Reporting**: Provides detailed error messages when validation fails
 
 ### Example Output
