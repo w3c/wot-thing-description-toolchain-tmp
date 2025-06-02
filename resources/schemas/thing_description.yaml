@@ -144,18 +144,6 @@ slots:
     range: string
     multivalued: true
 
-  "@context":
-    description: >-
-      JSON-LD context of the Thing Description
-    range: ThingContext
-    required: true
-
-  "@type":
-    description: >-
-      JSON-LD keyword to label the object with semantic tags (or types)
-    range: string
-    multivalued: true
-
   id:
     description: >-
       Unique identifier of the Thing
