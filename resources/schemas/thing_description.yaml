@@ -386,12 +386,6 @@ types:
     uri: xsd:string
     pattern: "^(((([A-Za-z]{2,3}(-([A-Za-z]{3}(-[A-Za-z]{3}){0,2}))?)|[A-Za-z]{4}|[A-Za-z]{5,8})(-([A-Za-z]{4}))?(-([A-Za-z]{2}|[0-9]{3}))?(-([A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*(-([0-9A-WY-Za-wy-z](-[A-Za-z0-9]{2,8})+))*(-(x(-[A-Za-z0-9]{1,8})+))?)|(x(-[A-Za-z0-9]{1,8})+)|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
 
-  ThingContextURI:
-    typeof: string
-    description: >-
-      A URI that identifies the TD context version
-    pattern: ^(https://www\.w3\.org/2019/wot/td/v1|https://www\.w3\.org/2022/wot/td/v1\.1|http://www\.w3\.org/ns/td)$
-
 classes:
   MultiLanguage:
     description: >-
@@ -401,15 +395,6 @@ classes:
         range: string
         multivalued: true
         pattern: "^[a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2})?$"
-
-  ThingContext:
-    description: >-
-      The JSON-LD context of a Thing Description, which can be the TD context URI or an array of context URIs
-    attributes:
-      context_value:
-        range: ThingContextURI
-        multivalued: true
-        minimum_value: 1
 
   Thing:
     tree_root: true
@@ -440,8 +425,14 @@ classes:
       - uriVariables
     slot_usage:
       "@context":
-        range: ThingContext
+        range: string
         required: true
+        pattern: ^(https://www\.w3\.org/2019/wot/td/v1|https://www\.w3\.org/2022/wot/td/v1\.1|http://www\.w3\.org/ns/td)$
+        exactly_one_of:
+          - range: string
+          - range: string
+            multivalued: true
+            minimum_value: 1
       title:
         required: true
       security:
@@ -641,63 +632,3 @@ classes:
       Describes the expected response from an interaction
     slots:
       - contentType
-
-enums:
-  OperationType:
-    description: >-
-      Enumerations of well-known operation types necessary to implement the WoT interaction model.
-    permissible_values:
-      readproperty:
-        description: Identifies the read operation on Property Affordances to retrieve the corresponding data.
-        meaning: td:readProperty
-      writeproperty:
-        description: Identifies the write operation on Property Affordances to update the corresponding data.
-        meaning: td:writeProperty
-      observeproperty:
-        description: Identifies the observe operation on Property Affordances to be notified with the new data when the Property is updated.
-        meaning: td:observeProperty
-      unobserveproperty:
-        description: Identifies the unobserve operation on Property Affordances to stop the corresponding notifications.
-        meaning: td:unobserveProperty
-      invokeaction:
-        description: Identifies the invoke operation on Action Affordances to perform the corresponding action.
-        meaning: td:invokeAction
-      queryaction:
-        description: Identifies the querying operation on Action Affordances to get the status of the corresponding action.
-        meaning: td:queryAction
-      cancellation:
-        description: Identifies the cancel operation on Action Affordances to cancel the ongoing corresponding action.
-        meaning: td:cancelAction
-      subscribeevent:
-        description: Identifies the subscribe operation on Event Affordances to be notified by the Thing when the event occurs.
-        meaning: td:subscribeEvent
-      unsubscribeevent:
-        description: Identifies the unsubscribe operation on Event Affordances to stop the corresponding notifications.
-        meaning: td:unsubscribeEvent
-      readallproperties:
-        description: Identifies the readallproperties operation on a Thing to retrieve the data of all Properties in a single interaction.
-        meaning: td:readAllProperties
-      writeallproperties:
-        description: Identifies the writeallproperties operation on a Thing to update the data of all writable Properties in a single interaction.
-        meaning: writeAllProperties
-      readmultipleproperties:
-        description: Identifies the readmultipleproperties operation on a Thing to retrieve the data of selected Properties in a single interaction.
-        meaning: td:readMultipleProperties
-      writemultipleproperties:
-        description: Identifies the writemultipleproperties operation on a Thing to update the data of selected writable Properties in a single interaction.
-        meaning: td:writeMultipleProperties
-      observeallproperties:
-        description: Identifies the observeallproperties operation on Properties to be notified with new data when any Property is updated.
-        meaning: td:observeAllProperties
-      unobserveallproperties:
-        description: Identifies the unobserveallproperties operation on Properties to stop notifications from all Properties in a single interaction.
-        meaning: td:unobserveAllProperties
-      subscribeallevents:
-        description: Identifies the subscribeallevents operation on Events to subscribe to notifications from all Events in a single interaction.
-        meaning: td:subscribeAllEvents
-      unsubscribeallevents:
-        description: Identifies the unsubscribeallevents operation on Events to unsubscribe from notifications from all Events in a single interaction.
-        meaning: td:unsubscribeAllEvents
-      queryallactions:
-        description: Identifies the queryallactions operation on a Thing to get the status of all Actions in a single interaction.
-        meaning: td:queryAllActions
