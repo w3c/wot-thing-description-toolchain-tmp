@@ -67,6 +67,19 @@ Generate documentation using the default schema locally and serve it:
 wotis generate-wot-resources -d -s
 ```
 
+## Validation
+The toolchain includes a validation script to verify Thing Description instances against both the generated JSON Schema and a benchmark schema. This helps ensure the generated schema maintains compatibility with the WoT TD specification.
+
+```bash
+python tests/src/validate_td_instances.py --schema resources/gens/jsonschema/jsonschema.json --benchmark-schema resources/benchmark_schemas/td-json-schema-validation.json --test-data tests/data
+```
+
+The validator provides:
+- Validation against both generated and benchmark schemas
+- Detailed validation results with rich CLI output
+- Statistics on schema compatibility
+- Support for validating multiple TD instances
+
 #### Default Paths
 * LinkML schema: `resources/schemas/thing_description.yaml`
 * Generated WoT resources: `resources/gens`
