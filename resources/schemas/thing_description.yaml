@@ -1,5 +1,5 @@
 id: https://www.w3.org/2019/wot/td
-name: td_schema
+name: things_description
 title: Thing Description Schema
 description: |-
   This schema models the Web of Things domain according to the W3C Web of Things information model.
@@ -35,6 +35,220 @@ imports:
   - jsonschema
 
 slots:
+  type:
+    description: >-
+      JSON Schema type (e.g., object, array, string, number, or integer)
+    range: string
+
+  writeOnly:
+    description: >-
+      If true, indicates the value can only be written but not read
+    range: boolean
+
+  readOnly:
+    description: >-
+      If true, indicates the value can only be read but not written
+    range: boolean
+
+  oneOf:
+    description: >-
+      Used to ensure the data is valid against exactly one of the specified schemas
+    range: DataSchema
+    multivalued: true
+
+  unit:
+    description: >-
+      Unit of the value
+    range: string
+
+  enum:
+    description: >-
+      Restricted set of values provided as an array
+    range: string
+    multivalued: true
+    minimum_value: 1
+
+  format:
+    description: >-
+      Provides a hint indicating how the data should be formatted
+    range: string
+
+  const:
+    description: >-
+      Provides a constant value
+    range: string
+
+  default:
+    description: >-
+      Default value
+    range: string
+
+  items:
+    description: >-
+      Used to define the characteristics of an array
+    range: DataSchema
+
+  maxItems:
+    description: >-
+      Maximum number of items in array
+    range: integer
+    minimum_value: 0
+
+  minItems:
+    description: >-
+      Minimum number of items in array
+    range: integer
+    minimum_value: 0
+
+  minimum:
+    description: >-
+      Minimum value
+    range: number
+
+  maximum:
+    description: >-
+      Maximum value
+    range: number
+
+  exclusiveMinimum:
+    description: >-
+      Exclusive minimum value
+    range: number
+
+  exclusiveMaximum:
+    description: >-
+      Exclusive maximum value
+    range: number
+
+  minLength:
+    description: >-
+      Minimum length of string
+    range: integer
+    minimum_value: 0
+
+  maxLength:
+    description: >-
+      Maximum length of string
+    range: integer
+    minimum_value: 0
+
+  multipleOf:
+    description: >-
+      A number that divides the value with no remainder
+    range: number
+    minimum_value: 0.000001
+
+  required:
+    description: >-
+      Required properties
+    range: string
+    multivalued: true
+
+  "@context":
+    description: >-
+      JSON-LD context of the Thing Description
+    range: ThingContext
+    required: true
+
+  "@type":
+    description: >-
+      JSON-LD keyword to label the object with semantic tags (or types)
+    range: string
+    multivalued: true
+
+  id:
+    description: >-
+      Unique identifier of the Thing
+    range: uri
+
+  version:
+    description: >-
+      Version information of the Thing Description
+    range: VersionInfo
+
+  created:
+    description: >-
+      Timestamp of Thing Description creation
+    range: datetime
+
+  modified:
+    description: >-
+      Timestamp of Thing Description modification
+    range: datetime
+
+  support:
+    description: >-
+      Support contact information for the Thing
+    range: uri
+
+  base:
+    description: >-
+      Define the base URI that is used for all relative URI references in the TD
+    range: uri
+
+  properties:
+    description: >-
+      All Property-based Interaction Affordances of the Thing. Each key is a unique property name
+      and its value is a PropertyAffordance object.
+    range: PropertyAffordance
+    inlined: true
+    multivalued: false
+
+  actions:
+    description: >-
+      All Action-based Interaction Affordances of the Thing. Each key is a unique action name
+      and its value is an ActionAffordance object.
+    range: ActionAffordance
+    inlined: true
+    multivalued: false
+
+  events:
+    description: >-
+      All Event-based Interaction Affordances of the Thing. Each key is a unique event name
+      and its value is an EventAffordance object.
+    range: EventAffordance
+    inlined: true
+    multivalued: false
+
+  links:
+    description: >-
+      Provides Web links to arbitrary resources that relate to the specified Thing
+    range: Link
+    multivalued: true
+
+  forms:
+    description: >-
+      Set of form hypermedia controls that describe how an operation can be performed
+    range: Form
+    multivalued: true
+
+  security:
+    description: >-
+      Set of security configuration names, chosen from the SecurityScheme definitions
+    range: string
+    multivalued: true
+    required: true
+
+  securityDefinitions:
+    description: >-
+      Set of named security configurations, defined in the SecurityScheme definitions
+    range: SecurityScheme
+    multivalued: true
+    required: true
+    minimum_value: 1
+
+  profile:
+    description: >-
+      Set of URIs that indicate the TD document conforms to certain constraints and conventions
+    range: uri
+    multivalued: true
+
+  schemaDefinitions:
+    description: >-
+      Set of schema definitions that can be used to define data schemas of a Thing
+    range: DataSchema
+    multivalued: true
+
   uriVariables:
     description: >-
       Define URI template variables according to [RFC6570] as collection based on DataSchema declarations.
@@ -68,10 +282,115 @@ slots:
     slot_uri: td:descriptionInLanguage
     range: MultiLanguage
 
+  op:
+    description: >-
+      Indicates the operation type (e.g., readproperty, writeproperty, observeproperty, etc.)
+    range: string
+    multivalued: true
+
+  contentType:
+    description: >-
+      Media type of the interaction
+    range: string
+
+  href:
+    description: >-
+      URI of the endpoint where an interaction can be initiated
+    range: uri
+    required: true
+
+  contentCoding:
+    description: >-
+      Content coding values indicate an encoding transformation that has been applied to a representation
+    range: string
+
+  contentMediaType:
+    description: >-
+      Media type of the content
+    range: string
+
+  additionalResponses:
+    description: >-
+      This field indicates additional expected responses
+    range: AdditionalExpectedResponse
+    multivalued: true
+
+  response:
+    description: >-
+      This field indicates the expected response media type
+    range: ExpectedResponse
+
+  subprotocol:
+    description: >-
+      Indicates the exact protocol that should be used for additional notifications
+    range: string
+    examples:
+      - value: longpoll
+      - value: websub
+      - value: sse
+
+  contentEncoding:
+    description: >-
+      Content encoding values indicate an encoding transformation that has been applied to a representation
+    range: string
+
+  schema:
+    description: >-
+      Schema of the response
+    range: string
+
+  success:
+    description: >-
+      Indicates whether the response represents a successful interaction
+    range: boolean
+
 types:
+  number:
+    base: decimal
+    uri: xsd:decimal
+    description: >-
+      A number can be an integer or a decimal number
+
+  integer:
+    base: int
+    uri: xsd:integer
+    description: >-
+      An integer number
+
+  boolean:
+    base: bool
+    uri: xsd:boolean
+    description: >-
+      A boolean value (true or false)
+
+  string:
+    base: str
+    uri: xsd:string
+    description: >-
+      A character string
+
+  uri:
+    base: str
+    uri: xsd:anyURI
+    description: >-
+      A URI
+
+  datetime:
+    base: str
+    uri: xsd:dateTime
+    description: >-
+      A date and time value
+
   bcp47_string:
-    typeof: string
+    base: str
+    uri: xsd:string
     pattern: "^(((([A-Za-z]{2,3}(-([A-Za-z]{3}(-[A-Za-z]{3}){0,2}))?)|[A-Za-z]{4}|[A-Za-z]{5,8})(-([A-Za-z]{4}))?(-([A-Za-z]{2}|[0-9]{3}))?(-([A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*(-([0-9A-WY-Za-wy-z](-[A-Za-z0-9]{2,8})+))*(-(x(-[A-Za-z0-9]{1,8})+))?)|(x(-[A-Za-z0-9]{1,8})+)|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
+
+  ThingContextURI:
+    typeof: string
+    description: >-
+      A URI that identifies the TD context version
+    pattern: ^(https://www\.w3\.org/2019/wot/td/v1|https://www\.w3\.org/2022/wot/td/v1\.1|http://www\.w3\.org/ns/td)$
 
 classes:
   MultiLanguage:
@@ -83,159 +402,57 @@ classes:
         multivalued: true
         pattern: "^[a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2})?$"
 
+  ThingContext:
+    description: >-
+      The JSON-LD context of a Thing Description, which can be the TD context URI or an array of context URIs
+    attributes:
+      context_value:
+        range: ThingContextURI
+        multivalued: true
+        minimum_value: 1
+
   Thing:
     tree_root: true
-    class_uri: td:Thing
     description: >-
-      An abstraction of a physical or a virtual entity whose metadata and interfaces are described by a WoT Thing Description,
-      whereas a virtual entity is the composition of one or more Things.
-    attributes:
+      Describes a Thing with its Interaction Affordances (Properties, Actions, and Events), security configurations, and protocol bindings.
+    slots:
+      - "@context"
+      - "@type"
+      - id
+      - title
+      - titles
+      - description
+      - descriptions
+      - version
+      - created
+      - modified
+      - support
+      - base
+      - properties
+      - actions
+      - events
+      - links
+      - forms
+      - security
+      - securityDefinitions
+      - profile
+      - schemaDefinitions
+      - uriVariables
+    slot_usage:
       "@context":
-        description: >-
-          JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
-          Must contain https://www.w3.org/2022/wot/td/v1.1 for TD 1.1.
-          For TD 1.0 compatibility, https://www.w3.org/2019/wot/td/v1 must be first, followed by v1.1.
+        range: ThingContext
         required: true
-        exactly_one_of:
-          - range: uri
-          - range: uri
-            multivalued: true
-        minimum_cardinality: 1
-      "@type":
-        description: >-
-          JSON-LD keyword to label the object with semantic tags (or types).
-        exactly_one_of:
-          - range: string
-          - range: string
-            multivalued: true
-      id:
-        description: >-
-          Identifier of the Thing in form of a URI [RFC3986] (e.g., stable URI, temporary and mutable URI, 
-          URI with local IP address, URN, etc.).
-        slot_uri: td:id
-        range: uri
       title:
-        description: >-
-          Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
-        slot_uri: td:title
-        range: string
         required: true
-      titles:
-        description: >-
-          Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
-        slot_uri: td:titleInLanguage
-        range: MultiLanguage
-      description:
-        description: >-
-          Provides additional (human-readable) information based on a default language.
-        slot_uri: td:description
-        range: string
-      descriptions:
-        description: >-
-          Can be used to support (human-readable) information in different languages.
-        slot_uri: td:descriptionInLanguage
-        range: MultiLanguage
-      version:
-        description: >-
-          Provides version information.
-        slot_uri: td:versionInfo
-        range: VersionInfo
-      created:
-        description: >-
-          Provides information when the TD instance was created.
-        slot_uri: dcterms:created
-        range: datetime
-      modified:
-        description: >-
-          Provides information when the TD instance was last modified.
-        slot_uri: dcterms:modified
-        range: datetime
-      support:
-        description: >-
-          Provides information about the TD maintainer as URI scheme (e.g., mailto [RFC6068], tel [RFC3966], https [RFC9112]).
-        slot_uri: td:supportContact
-        range: uri
-      base:
-        description: >-
-          Define the base URI that is used for all relative URI references throughout a TD document.
-          Does not affect @context URIs and IRIs used within Linked Data graphs.
-        slot_uri: td:baseURI
-        range: uri
-      properties:
-        description: >-
-          All Property-based Interaction Affordances of the Thing.
-        slot_uri: td:hasPropertyAffordance
-        range: PropertyAffordance
-        multivalued: true
-        inlined: true
-        inlined_as_list: false
-      actions:
-        description: >-
-          All Action-based Interaction Affordances of the Thing.
-        slot_uri: td:hasActionAffordance
-        range: ActionAffordance
-        multivalued: true
-        inlined: true
-        inlined_as_list: false
-      events:
-        description: >-
-          All Event-based Interaction Affordances of the Thing.
-        slot_uri: td:hasEventAffordance
-        range: EventAffordance
-        multivalued: true
-        inlined: true
-        inlined_as_list: false
-      forms:
-        description: >-
-          Set of form hypermedia controls that describe how an operation can be performed.
-          Thing level forms are used to describe endpoints for a group of interaction affordances.
-        slot_uri: td:hasForm
-        range: Form
-        multivalued: true
-      links:
-        description: >-
-          Provides Web links to arbitrary resources that relate to the specified Thing Description.
-        slot_uri: td:hasLink
-        range: Link
-        multivalued: true
       security:
-        description: >-
-          Set of security definition names, chosen from those defined in securityDefinitions.
-          These must all be satisfied for access to resources.
-        slot_uri: td:hasSecurityConfiguration
-        exactly_one_of:
-          - range: string
-          - range: string
-            multivalued: true
+        range: string
+        multivalued: true
         required: true
-        minimum_cardinality: 1
       securityDefinitions:
-        description: >-
-          Set of named security configurations (definitions only).
-          Not actually applied unless names are used in a security name-value pair.
-        slot_uri: td:definesSecurityScheme
         range: SecurityScheme
+        multivalued: true
         required: true
-        multivalued: true
-        minimum_cardinality: 1
-        inlined: true
-        inlined_as_list: false
-      profile:
-        description: >-
-          Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.
-        slot_uri: td:followsProfile
-        exactly_one_of:
-          - range: uri
-          - range: uri
-            multivalued: true
-      schemaDefinitions:
-        description: >-
-          Set of named data schemas. To be used in a schema name-value pair inside an AdditionalExpectedResponse object.
-        slot_uri: td:schemaDefinitions
-        range: DataSchema
-        multivalued: true
-        inlined: true
-        inlined_as_list: false
+        minimum_value: 1
 
   VersionInfo:
     class_uri: td:versionInfo
@@ -298,8 +515,33 @@ classes:
       An Interaction Affordance that exposes state of the Thing.
       This state can be retrieved (read) and/or updated (write).
       Things can also choose to make Properties observable by pushing the new state after a change.
-    mixins:
-      - DataSchema
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
+    slots:
+      - type
+      - writeOnly
+      - readOnly
+      - oneOf
+      - unit
+      - enum
+      - format
+      - const
+      - default
+      - items
+      - maxItems
+      - minItems
+      - minimum
+      - maximum
+      - exclusiveMinimum
+      - exclusiveMaximum
+      - minLength
+      - maxLength
+      - multipleOf
+      - properties
+      - required
     attributes:
       observable:
         description: >-
@@ -314,6 +556,11 @@ classes:
     description: >-
       An Interaction Affordance that allows to invoke a function of the Thing,
       which manipulates state (e.g., toggling a lamp on or off) or triggers a process on the Thing (e.g., dim a lamp over time).
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
     attributes:
       input:
         description: >-
@@ -352,6 +599,11 @@ classes:
     description: >-
       An Interaction Affordance that describes an event source,
       which asynchronously pushes event data to Consumers (e.g., overheating alerts).
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
     attributes:
       subscription:
         description: >-
@@ -375,6 +627,20 @@ classes:
           e.g., a specific message to remove a Webhook.
         slot_uri: td:hasCancellationSchema
         range: DataSchema
+
+  AdditionalExpectedResponse:
+    description: >-
+      Describes additional expected responses from an interaction
+    slots:
+      - contentType
+      - schema
+      - success
+
+  ExpectedResponse:
+    description: >-
+      Describes the expected response from an interaction
+    slots:
+      - contentType
 
 enums:
   OperationType:
