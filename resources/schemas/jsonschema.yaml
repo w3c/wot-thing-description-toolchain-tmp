@@ -21,6 +21,16 @@ prefixes:
 imports:
   - linkml:types
 
+types:
+  NonNegativeInteger:
+    typeof: integer
+    minimum_value: 0
+    uri: xsd:nonNegativeInteger
+
+  Decimal:
+    typeof: float
+    uri: xsd:decimal
+
 enums:
   DataSchemaType:
     description: Assignment of JSON-based data types compatible with JSON Schema
@@ -187,7 +197,7 @@ classes:
           Specifies the multipleOf value number. The value must strictly greater than 0. 
           Only applicable for associated number or integer types
         range: Decimal
-        pattern: "^(0*[1-9][0-9]*(\.[0-9]+)?|0+\.[0-9]*[1-9][0-9]*)$"  # Matches any positive decimal number
+        pattern: '^(0*[1-9][0-9]*(\\.[0-9]+)?|0+\\.[0-9]*[1-9][0-9]*)$'  # Matches any positive decimal number
 
   IntegerSchema:
     class_uri: jsonschema:IntegerSchema
@@ -271,3 +281,35 @@ classes:
       that null does not mean the absence of a value. It is analogous to null in JavaScript, None in Python, null 
       in Java and nil in Ruby programming languages. It can be used as part of a oneOf declaration, where it is 
       used to indicate, that the data can also be null. 
+
+slots:
+  minimum:
+    description: >-
+      Specifies a minimum numeric value, representing an inclusive lower limit. 
+      Only applicable for associated number or integer types.
+    range: Decimal
+
+  maximum:
+    description: >-
+      Specifies a maximum numeric value, representing an inclusive upper limit. 
+      Only applicable for associated number or integer types.
+    range: Decimal
+
+  exclusiveMinimum:
+    description: >-
+      Specifies a minimum numeric value, representing an exclusive lower limit. 
+      Only applicable for associated number or integer types.
+    range: Decimal
+
+  exclusiveMaximum:
+    description: >-
+      Specifies a maximum numeric value, representing an exclusive upper limit. 
+      Only applicable for associated number or integer types.
+    range: Decimal
+
+  multipleOf:
+    description: >-
+      Specifies the multipleOf value number. The value must strictly greater than 0. 
+      Only applicable for associated number or integer types.
+    range: Decimal
+    pattern: '^(0*[1-9][0-9]*(\.[0-9]+)?|0+\.[0-9]*[1-9][0-9]*)$'  # Matches any positive decimal number 
