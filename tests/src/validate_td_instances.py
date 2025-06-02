@@ -10,7 +10,7 @@ import click
 from rich.console import Console
 from rich.table import Table
 
-# Type aliases
+
 ValidationResult: TypeAlias = Tuple[bool, bool, str]
 FileResults: TypeAlias = List[Tuple[Path, bool, bool, bool, str]]
 ResultsDict: TypeAlias = Dict[str, FileResults]
@@ -31,7 +31,6 @@ class SchemaValidator:
     
     def __init__(self, schema: dict, benchmark: dict) -> None:
         """Initialize with both schemas and create validators."""
-        # Create validators with format checking
         schema_cls = validator_for(schema)
         schema_cls.check_schema(schema)
         benchmark_cls = validator_for(benchmark)
@@ -45,8 +44,6 @@ class SchemaValidator:
         """Validate a TD instance against both schemas."""
         try:
             td_instance = json.loads(td_path.read_text(encoding='utf-8'))
-            
-            # Validate against generated schema
             try:
                 self.schema_validator.validate(td_instance)
                 is_valid_generated = True
@@ -54,8 +51,6 @@ class SchemaValidator:
             except jsonschema.exceptions.ValidationError as e:
                 is_valid_generated = False
                 error_generated = str(e)
-            
-            # Validate against benchmark schema
             try:
                 self.benchmark_validator.validate(td_instance)
                 is_valid_benchmark = True
@@ -89,8 +84,6 @@ class SchemaValidator:
             sum(1 for _, _, gen_valid, bench_valid, _ in files if gen_valid == bench_valid)
             for files in results.values()
         )
-        
-        # Create and style the results table
         table = Table(title="Validation Results")
         table.add_column("File", style="cyan")
         table.add_column("Expected", style="blue")
@@ -102,7 +95,6 @@ class SchemaValidator:
         for category, files in sorted(results.items()):
             table.add_section()
             table.add_row(f"[bold]{category}[/bold]", "", "", "", "", "")
-            
             for file_path, expected, gen_valid, bench_valid, error in sorted(files, key=lambda x: x[0].name):
                 status = "✓" if gen_valid == bench_valid else "✗"
                 table.add_row(
@@ -113,10 +105,8 @@ class SchemaValidator:
                     status,
                     error or ""
                 )
-        
         self.console.print(table)
-        
-        # Print statistics
+  
         stats_table = Table(title="Schema Comparison Statistics")
         stats_table.add_column("Metric", style="cyan")
         stats_table.add_column("Value", style="green")
@@ -124,7 +114,6 @@ class SchemaValidator:
         stats_table.add_row("Total files tested", str(stats.total_files))
         stats_table.add_row("Matching validation results", str(stats.matching_results))
         stats_table.add_row("Validation consistency", f"{stats.consistency:.2f}%")
-        
         self.console.print(stats_table)
 
 @click.command()
@@ -151,24 +140,18 @@ def main(schema: Path, benchmark_schema: Path, test_data: Path) -> None:
     console = Console()
     
     try:
-        # Load schemas
         with schema.open(encoding='utf-8') as f:
             json_schema = json.load(f)
         with benchmark_schema.open(encoding='utf-8') as f:
             benchmark = json.load(f)
-            
         console.print(f"[green]Loaded schemas from {schema} and {benchmark_schema}[/green]")
-        
         validator = SchemaValidator(json_schema, benchmark)
         td_files = validator.find_td_files(test_data)
-        
         if not td_files:
             console.print(f"[yellow]No TD instances found in {test_data}[/yellow]")
             return
-        
         console.print(f"[green]Found {len(td_files)} TD instances to validate[/green]")
         
-        # Process validation results
         results: ResultsDict = {}
         for file_path, expected_valid in td_files:
             dir_name = file_path.parent.name
