@@ -3,7 +3,7 @@ name: things_description
 title: Thing Description Schema
 description: |-
   This schema models the Web of Things domain according to the W3C Web of Things information model.
-version: "1.1-2-June-2025"
+version: "1.1-22-October-2025"
 license: MIT
 contributors: Mahda_Noura
 see_also:
@@ -38,7 +38,8 @@ slots:
   type:
     description: >-
       JSON Schema type (e.g., object, array, string, number, or integer)
-    range: string
+    range: DataSchemaType
+    slot_uri: jsonschema:type
 
   writeOnly:
     description: >-
@@ -145,84 +146,102 @@ slots:
     multivalued: true
 
   "@context":
-    description: >-
-      JSON-LD context of the Thing Description
-    range: ThingContext
-    required: true
+    description: JSON-LD @context
+    range: string
+    exactly_one_of:
+      - range: string
+        pattern: '^(https://www\.w3\.org/2019/wot/td/v1|https://www\.w3\.org/2022/wot/td/v1\.1|http://www\.w3\.org/ns/td)$'
+      - range: string
+        multivalued: true
+        minimum_value: 1
 
   "@type":
-    description: >-
-      JSON-LD keyword to label the object with semantic tags (or types)
-    range: string
-    multivalued: true
+    description: JSON-LD @type
+    exactly_one_of:
+      - range: string
+      - range: string
+        multivalued: true
+        minimum_value: 1
 
   id:
     description: >-
-      Unique identifier of the Thing
+      Identifier of the Thing in form of a URI [RFC3986] (e.g., stable URI, temporary and mutable URI, 
+      URI with local IP address, URN, etc.).
     range: uri
 
   version:
+    slot_uri: td:versionInfo
     description: >-
       Version information of the Thing Description
     range: VersionInfo
 
   created:
+    slot_uri: dct:created
     description: >-
       Timestamp of Thing Description creation
     range: datetime
 
   modified:
+    slot_uri: dct:modified
     description: >-
       Timestamp of Thing Description modification
     range: datetime
 
   support:
+    slot_uri: td:supportContact
     description: >-
       Support contact information for the Thing
     range: uri
 
   base:
+    slot_uri: td:baseURI
     description: >-
       Define the base URI that is used for all relative URI references in the TD
     range: uri
 
   properties:
+    slot_uri: td:hasPropertyAffordance
     description: >-
       All Property-based Interaction Affordances of the Thing. Each key is a unique property name
       and its value is a PropertyAffordance object.
     range: PropertyAffordance
+    multivalued: true
     inlined: true
-    multivalued: false
 
   actions:
+    slot_uri: td:hasActionAffordance
     description: >-
       All Action-based Interaction Affordances of the Thing. Each key is a unique action name
       and its value is an ActionAffordance object.
     range: ActionAffordance
+    multivalued: true
     inlined: true
-    multivalued: false
 
   events:
+    slot_uri: td:hasEventAffordance
     description: >-
       All Event-based Interaction Affordances of the Thing. Each key is a unique event name
       and its value is an EventAffordance object.
     range: EventAffordance
+    multivalued: true
     inlined: true
-    multivalued: false
 
   links:
+    slot_uri: td:hasLink
     description: >-
       Provides Web links to arbitrary resources that relate to the specified Thing
     range: Link
     multivalued: true
 
   forms:
+    slot_uri: td:hasForm
     description: >-
       Set of form hypermedia controls that describe how an operation can be performed
     range: Form
     multivalued: true
 
   security:
+    slot_uri: td:hasSecurityConfiguration
     description: >-
       Set of security configuration names, chosen from the SecurityScheme definitions
     range: string
@@ -230,24 +249,29 @@ slots:
     required: true
 
   securityDefinitions:
+    slot_uri: td:definesSecurityScheme
     description: >-
       Set of named security configurations, defined in the SecurityScheme definitions
     range: SecurityScheme
     multivalued: true
+    inlined: true
     required: true
     minimum_value: 1
 
   profile:
+    slot_uri: td:followsProfile
     description: >-
       Set of URIs that indicate the TD document conforms to certain constraints and conventions
     range: uri
     multivalued: true
 
   schemaDefinitions:
+    slot_uri: td:schemaDefinitions
     description: >-
       Set of schema definitions that can be used to define data schemas of a Thing
     range: DataSchema
     multivalued: true
+    inlined: true
 
   uriVariables:
     description: >-
@@ -257,6 +281,7 @@ slots:
     slot_uri: td:hasUriTemplateSchema
     range: DataSchema
     multivalued: true
+    inlined: true
 
   title:
     description: >-
@@ -335,6 +360,7 @@ slots:
     range: string
 
   schema:
+    slot_uri: hctl:hasAdditionalOutputSchema
     description: >-
       Schema of the response
     range: string
@@ -397,6 +423,7 @@ classes:
         pattern: "^[a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2})?$"
 
   Thing:
+    class_uri: td:Thing
     tree_root: true
     description: >-
       Describes a Thing with its Interaction Affordances (Properties, Actions, and Events), security configurations, and protocol bindings.
@@ -413,9 +440,6 @@ classes:
       - modified
       - support
       - base
-      - properties
-      - actions
-      - events
       - links
       - forms
       - security
@@ -423,13 +447,15 @@ classes:
       - profile
       - schemaDefinitions
       - uriVariables
+      - properties
+      - actions
+      - events
     slot_usage:
-      "@context":
-        range: string
+      "@context":    
         required: true
-        pattern: ^(https://www\.w3\.org/2019/wot/td/v1|https://www\.w3\.org/2022/wot/td/v1\.1|http://www\.w3\.org/ns/td)$
         exactly_one_of:
           - range: string
+            pattern: ^(https://www\.w3\.org/2019/wot/td/v1|https://www\.w3\.org/2022/wot/td/v1\.1|http://www\.w3\.org/ns/td)$
           - range: string
             multivalued: true
             minimum_value: 1
@@ -444,6 +470,40 @@ classes:
         multivalued: true
         required: true
         minimum_value: 1
+      properties:
+        slot_uri: td:hasPropertyAffordance
+        description: >-
+          All Property-based Interaction Affordances of the Thing. Each key is a unique property name
+          and its value is a PropertyAffordance object.
+        range: PropertyAffordance
+      actions:
+        description: >-
+          All Action-based Interaction Affordances of the Thing. Each key is a unique action name
+          and its value is an ActionAffordance object.
+        range: ActionAffordance
+        multivalued: true
+        inlined: true
+        annotations:
+          jsonschema_config:
+            tag: jsonschema_config
+            value:
+              type: object
+              additionalProperties:
+                $ref: "#/$defs/ActionAffordance"
+      events:
+        description: >-
+          All Event-based Interaction Affordances of the Thing. Each key is a unique event name
+          and its value is an EventAffordance object.
+        range: EventAffordance
+        multivalued: true
+        inlined: true
+        annotations:
+          jsonschema_config:
+            tag: jsonschema_config
+            value:
+              type: object
+              additionalProperties:
+                $ref: "#/$defs/EventAffordance"
 
   VersionInfo:
     class_uri: td:versionInfo
@@ -470,13 +530,6 @@ classes:
       There are three types of Interaction Affordances: Properties, Actions, and Events.
     abstract: true
     attributes:
-      "@type":
-        description: >-
-          JSON-LD keyword to label the object with semantic tags (or types).
-        exactly_one_of:
-          - range: string
-          - range: string
-            multivalued: true
       name:
         description: >-
           Name of the interaction affordance.
@@ -492,12 +545,21 @@ classes:
         multivalued: true
         required: true
         minimum_cardinality: 1
+        annotations:
+          jsonschema_config:
+            tag: jsonschema_config
+            value:
+              type: array
+              items:
+                $ref: "#/$defs/Form"
+              minItems: 1
     slots:
       - title
       - titles
       - description
       - descriptions
       - uriVariables
+      - "@type"
 
   PropertyAffordance:
     is_a: InteractionAffordance
@@ -540,6 +602,23 @@ classes:
           that supports the observeproperty and unobserveproperty operations for this Property.
         slot_uri: td:isObservable
         range: boolean
+      forms:
+        description: >-
+          Set of form hypermedia controls that describe how an operation can be performed.
+          The array cannot be empty.
+        slot_uri: td:hasForm
+        range: Form
+        multivalued: true
+        required: true
+        minimum_cardinality: 1
+        annotations:
+          jsonschema_config:
+            tag: jsonschema_config
+            value:
+              type: array
+              items:
+                $ref: "#/$defs/Form"
+              minItems: 1
 
   ActionAffordance:
     is_a: InteractionAffordance
