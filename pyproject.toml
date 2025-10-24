@@ -8,15 +8,16 @@ authors = [
 license = "MIT"
 readme = "README.md"
 include = ["README.md", "resources/schemas/*"]
-requires-python = ">=3.11, <=3.13"
+requires-python = ">=3.11, <=3.13.2"
 dependencies = [
-    "linkml-runtime>=1.9.2",
-    "linkml>=1.9.2",
+    "linkml-runtime>=1.9.5",
+    "linkml @ git+https://github.com/linkml/linkml.git@main",
     "mkdocs-mermaid2-plugin>=1.1.1",
     "mkdocs-material>=9.5.32",
     "schemasheets>=0.3.1",
     "jsonschema>=4.21.1",
-    "rich>=13.7.0"
+    "rich>=13.7.0",
+    "pyld>=2.0.4",
 ]
 
 [project.optional-dependencies]
@@ -33,6 +34,7 @@ only-include = ["src/wotis/cli.py"]
 
 [tool.hatch.metadata]
 root = "src"
+allow-direct-references = true
 
 [project.scripts]
 wotis = "src.wotis.cli:main"
