@@ -12,7 +12,6 @@ prefixes:
   hctl: https://www.w3.org/2019/wot/hypermedia#
   linkml: https://w3id.org/linkml/
   xsd: http://www.w3.org/2001/XMLSchema#
-  schema: http://schema.org/
   td: https://www.w3.org/2019/wot/td#
   bcp47: https://tools.ietf.org/html/bcp47
   tm: https://www.w3.org/2019/wot/tm#

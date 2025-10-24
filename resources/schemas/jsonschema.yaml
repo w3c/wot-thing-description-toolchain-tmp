@@ -14,7 +14,6 @@ prefixes:
   jsonschema: https://www.w3.org/2019/wot/json-schema#
   linkml: https://w3id.org/linkml/
   xsd: http://www.w3.org/2001/XMLSchema#
-  schema: http://schema.org/
   owl: http://www.w3.org/2002/07/owl#
   td: https://www.w3.org/2019/wot/td#
 
