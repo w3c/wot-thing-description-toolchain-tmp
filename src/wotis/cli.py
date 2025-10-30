@@ -14,9 +14,6 @@ from src.wotis import (YAML_SCHEMA_PATH, GENS_PATH, GENERATORS,
                        RESPEC_TEMPLATE_PATH, FINAL_SPEC_PATH,
                        CORE_SCHEMA_PLACEHOLDER)
 
-from src.wotis.postprocessors.jsonld_context_postprocessor import post_process_jsonld_context
-from src.wotis.postprocessors.jsonschema_postprocessor import post_process_jsonschema
-
 
 input_option = click.option('-i', '--input_schema',
                             type=str,
