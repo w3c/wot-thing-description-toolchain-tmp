@@ -1,0 +1,22 @@
+{# This template renders the vocabulary table for the 'Thing' class. #}
+<table class="def numbered">
+  <caption>Table 3 Vocabulary Terms in Thing Level</caption>
+  <thead>
+    <tr>
+      <th>Vocabulary term</th>
+      <th>Description</th>
+      <th>Assignment</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for slot in slots %}
+    <tr class="rfc2119-table-assertion">
+      <td><code>{{ slot.slot_name }}</code></td>
+      <td>{{ slot.description | safe }}</td> {# Use safe filter as description is pre-escaped #}
+      <td>{{ slot.assignment }}</td>
+      <td>{{ slot.range_text }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
