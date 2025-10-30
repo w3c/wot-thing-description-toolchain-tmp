@@ -1,10 +1,12 @@
 import logging
 import yaml
 
+from jinja2 import Environment, FileSystemLoader, exceptions
 from pathlib import Path
 
 from linkml_runtime.utils.schemaview import SchemaView
 
+from src.wotis import JINJA_TEMPLATE_DIR
 
 
 def get_assignment(slot_name: str, class_def: object, slot_def: object) -> str:
@@ -17,7 +19,7 @@ def get_assignment(slot_name: str, class_def: object, slot_def: object) -> str:
     :param slot_def: The LinkML SlotDefinition object.
     :return: 'mandatory' or 'optional'.
     """
-    # Check for slot_usage override first
+
     slot_usage = class_def.slot_usage.get(slot_name) if class_def.slot_usage else None
 
     # Check 'required' property on slot or slot_usage
@@ -46,46 +48,37 @@ def assemble_respec_spec(template_path: Path, fragment_content: str, final_path:
     :param placeholder: The placeholder string to replace in the template.
     """
     logging.info("Assembling final Respec specification by injecting pre-formatted content...")
-
     if not template_path.exists():
         logging.error(f"Respec template not found at {template_path}. Cannot assemble spec.")
         return
-
     respec_template = template_path.read_text(encoding='utf-8')
-
-    # Perform the injection of the schema tables
     if placeholder not in respec_template:
         logging.error(
             f"Placeholder '{placeholder}' was NOT found in the template: {template_path}. "
             f"This is why the replacement failed and the placeholder is still visible."
         )
         return
-
     final_content = respec_template.replace(placeholder, fragment_content)
-
     final_path.write_text(final_content, encoding='utf-8')
     logging.info(f"Final Respec specification saved to {final_path}. Injected content length: {len(fragment_content)}.")
 
 
-def generate_respec_spec(input_path: Path, gens_path: Path, respec_template_path: Path, final_spec_path: Path,
+def generate_respec_spec(input_path: Path, respec_template_path: Path, final_spec_path: Path,
                          core_schema_placeholder: str):
     """
     Generates the custom HTML table for the 'Thing' class and assembles the
-    final Respec specification.
+    final Respec specification using Jinja2 templates.
 
     :param input_path: Path to the input LinkML schema file.
-    :param gens_path: (Unused here, but kept for signature consistency)
     :param respec_template_path: Path to the Respec HTML template.
     :param final_spec_path: Path to save the final Respec HTML file.
     :param core_schema_placeholder: The placeholder string in the template.
     """
-    # 1. Load the schema view
     try:
         linkml_schema_view = SchemaView(input_path, merge_imports=True)
     except yaml.YAMLError as e:
         logging.error(f"Failed to load LinkML schema for Respec generation: {e}")
         return
-
 
     CLASS_NAME = 'Thing'
     class_def = linkml_schema_view.get_class(CLASS_NAME)
@@ -94,26 +87,14 @@ def generate_respec_spec(input_path: Path, gens_path: Path, respec_template_path
         logging.error(f"Class '{CLASS_NAME}' not found in the schema. Cannot generate table.")
         return
 
-    # Start the HTML table with W3C Respec classes
-    html_table = (
-        '<table class="def numbered">\n'
-        '  <caption>Table 3 Vocabulary Terms in Thing Level</caption>\n'
-        '  <thead>\n'
-        '    <tr>\n'
-        '      <th>Vocabulary term</th>\n'
-        '      <th>Description</th>\n'
-        '      <th>Assignment</th>\n'
-        '      <th>Type</th>\n'
-        '    </tr>\n'
-        '  </thead>\n'
-        '  <tbody>\n'
-    )
+    slot_data = []
 
     for slot_name in class_def.slots:
         slot_def = linkml_schema_view.get_slot(slot_name)
 
         description = slot_def.description or ""
 
+        # Determine the Type text for the table, based on STTL
         if slot_name == '@context':
             range_text = 'anyURI or Array'
         elif slot_name == '@type':
@@ -121,7 +102,6 @@ def generate_respec_spec(input_path: Path, gens_path: Path, respec_template_path
         else:
             range_name = slot_def.range
             is_multivalued = slot_def.multivalued
-
             if slot_def.inlined:
                 range_text = f'Map of {range_name}'
             elif is_multivalued:
@@ -131,21 +111,27 @@ def generate_respec_spec(input_path: Path, gens_path: Path, respec_template_path
 
         assignment = get_assignment(slot_name, class_def, slot_def)
         escaped_description = description.replace("'", "&#39;").replace('"', '&quot;')
+        slot_data.append({
+            'slot_name': slot_name,
+            'description': escaped_description,
+            'assignment': assignment,
+            'range_text': range_text
+        })
 
-        # Append table row using the "rfc2119-table-assertion" class
-        html_table += (
-            f'    <tr class="rfc2119-table-assertion">\n'
-            f'      <td><code>{slot_name}</code></td>\n'
-            f'      <td>{escaped_description}</td>\n'
-            f'      <td>{assignment}</td>\n'
-            f'      <td>{range_text}</td>\n'
-            f'    </tr>\n'
-        )
+    try:
+        if not JINJA_TEMPLATE_DIR.is_dir():
+            raise exceptions.TemplateNotFound(
+                f"Template directory not found: {JINJA_TEMPLATE_DIR}. Please ensure 'resources/jinja_templates' exists.")
+        env = Environment(loader=FileSystemLoader(JINJA_TEMPLATE_DIR), autoescape=True)
+        template = env.get_template('thing_table.jinja2')
+        html_table = template.render(slots=slot_data)
 
-    html_table += (
-        '  </tbody>\n'
-        '</table>\n'
-    )
+    except exceptions.TemplateNotFound as e:
+        logging.error(f"Jinja2 template rendering failed: {e}", exc_info=True)
+        html_table = f"<!-- ERROR: Failed to render HTML table via Jinja2: {e} -->"
+    except Exception as e:
+        logging.error(f"Jinja2 environment setup failed: {e}", exc_info=True)
+        html_table = f"<!-- ERROR: Failed to render HTML table via Jinja2: {e} -->"
+    logging.info(f"Generated HTML table fragment via Jinja2. Length: {len(html_table)} characters.")
 
-    logging.info(f"Generated HTML table for '{CLASS_NAME}' slots. Length: {len(html_table)} characters.")
     assemble_respec_spec(respec_template_path, html_table, final_spec_path, core_schema_placeholder)
