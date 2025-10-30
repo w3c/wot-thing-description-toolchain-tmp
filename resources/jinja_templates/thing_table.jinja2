@@ -13,7 +13,7 @@
     {% for slot in slots %}
     <tr class="rfc2119-table-assertion">
       <td><code>{{ slot.slot_name }}</code></td>
-      <td>{{ slot.description | safe }}</td> {# Use safe filter as description is pre-escaped #}
+      <td>{{ slot.description | safe }}</td>
       <td>{{ slot.assignment }}</td>
       <td>{{ slot.range_text }}</td>
     </tr>
