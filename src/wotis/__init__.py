@@ -6,15 +6,12 @@ SCHEMA_PATH = RESOURCES_PATH / 'schemas'
 MANUAL_PATH = RESOURCES_PATH / 'benchmark_schemas'
 YAML_SCHEMA_PATH = SCHEMA_PATH / 'thing_description.yaml'
 GENERATED_LINKML_SCHEMA = GENS_PATH / 'linkml/linkml.yaml'
-DOCDIR = GENS_PATH / 'docs' / 'ontology'
-
-GENERATORS = ['jsonschema', 'shacl', 'jsonldcontext', 'owl', 'linkml']
-
 RESPEC_TEMPLATE_PATH = RESOURCES_PATH / 'index.template.html'
-RESPEC_FRAGMENT_PATH = GENS_PATH / 'schema_fragment.html'
-FINAL_SPEC_PATH = GENS_PATH / 'final-spec.html'
+FINAL_SPEC_PATH = GENS_PATH / 'index.html'
 JINJA_TEMPLATE_DIR = RESOURCES_PATH / "jinja_templates"
 CORE_SCHEMA_PLACEHOLDER = '%s'
+
+GENERATORS = ['jsonschema', 'shacl', 'jsonldcontext', 'owl', 'linkml']
 
 from .postprocessors.jsonschema_postprocessor import post_process_jsonschema
 
