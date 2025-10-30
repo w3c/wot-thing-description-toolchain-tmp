@@ -19,7 +19,7 @@ prefixes:
   foaf: http://xmlns.com/foaf/0.1/
   rdfs: http://www.w3.org/2000/01/rdf-schema#
   vann: http://purl.org/vocab/vann/
-  dct: http://purl.org/dc/terms/
+  dcterms: http://purl.org/dc/terms/
   hctl: https://www.w3.org/2019/wot/hypermedia#
   wotsec: https://www.w3.org/2019/wot/security#
   jsonschema: https://www.w3.org/2019/wot/json-schema#
@@ -176,13 +176,13 @@ slots:
     range: VersionInfo
 
   created:
-    slot_uri: dct:created
+    slot_uri: dcterms:created
     description: >-
-      Timestamp of Thing Description creation
+      Provides information when the TD instance was created.
     range: datetime
 
   modified:
-    slot_uri: dct:modified
+    slot_uri: dcterms:modified
     description: >-
       Timestamp of Thing Description modification
     range: datetime
@@ -359,7 +359,7 @@ slots:
       Content encoding values indicate an encoding transformation that has been applied to a representation
     range: string
 
-  something:
+  schema:
     slot_uri: hctl:hasAdditionalOutputSchema
     description: >-
       Schema of the response
@@ -426,7 +426,8 @@ classes:
     class_uri: td:Thing
     tree_root: true
     description: >-
-      Describes a Thing with its Interaction Affordances (Properties, Actions, and Events), security configurations, and protocol bindings.
+      An abstraction of a physical or a virtual entity whose metadata and interfaces are described by a WoT Thing
+      Description, whereas a virtual entity is the composition of one or more Things.
     slots:
       - "@context"
       - "@type"
@@ -508,8 +509,7 @@ classes:
   VersionInfo:
     class_uri: td:versionInfo
     description: >-
-      Metadata that provides version information about the TD document.
-      Values should follow semantic versioning pattern (major.minor.patch).
+      Provides version information.
     attributes:
       instance:
         description: >-
@@ -519,7 +519,7 @@ classes:
         required: true
       model:
         description: >-
-          Provides a version indicator of the underlying TM.
+          Provides information when the TD instance was created.
         slot_uri: td:model
         range: string
 
@@ -703,7 +703,7 @@ classes:
       Describes additional expected responses from an interaction
     slots:
       - contentType
-      - something
+      - schema
       - success
 
   ExpectedResponse:
