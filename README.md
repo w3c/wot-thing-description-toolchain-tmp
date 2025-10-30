@@ -56,15 +56,20 @@ options:
   -i, --input_schema       Path to the input schema specified as LinkML yaml.
                            [default: resources/schemas/thing_description.yaml]
                            
-  -d, --generate_docs      Boolean for local documentation generation.
-  -s, --serve_docs         Boolean for serving the generated documentation.
+  -d, --generate_docs      Boolean for the final TD documentation generation.
+                           [default: False]
   --help                   Show this help message and exit.
 ```
 
 ## Examples
-Generate documentation using the default schema locally and serve it:
+Generate all standard WoT resources (JSON-LD, JSON Schema, etc.) using the default schema:
 ```bash
-wotis generate-wot-resources -d -s
+wotis generate-wot-resources
+```
+
+Generate the custom W3C-style TD specification:
+```bash
+wotis generate-wot-resources -d
 ```
 
 ## Validation
