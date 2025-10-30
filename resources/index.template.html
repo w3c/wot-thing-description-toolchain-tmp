@@ -3,7 +3,8 @@
   <head>
     <!-- <link rel="stylesheet" href="testing/atrisk.css"> -->
     <meta charset="utf-8" />
-    <title>Web of Things (WoT) Thing Description - Next</title>
+    <meta name="color-scheme" content="light dark" />
+    <title>Web of Things (WoT) Thing Description 2.0</title>
     <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove"></script>
     <script class="remove">
       var respecConfig = {
@@ -13,7 +14,7 @@
         // previousPublishDate: "2023-12-05",
         prevRecURI: "https://www.w3.org/TR/2023/REC-wot-thing-description11-20231205/",
         // implementationReportURI: "https://w3c.github.io/wot-thing-description/testing/report11.html",
-        shortName: "wot-thing-description-next", // temporary for now
+        shortName: "wot-thing-description-2.0",
         copyrightStart: 2017,
         noLegacyStyle: true,
         inlineCSS: true,
@@ -26,6 +27,14 @@
         issueBase: "https://www.github.com/w3c/wot-thing-description/issues",
         editors: [
           {
+            name: "Ege Korkan",
+            w3cid: "110131",
+            company: "Siemens AG",
+            companyURL: "https://www.siemens.com/"
+          }
+        ],
+        formerEditors: [
+          {
             name: "Sebastian Kaebisch",
             w3cid: "43064",
             company: "Siemens AG",
@@ -37,14 +46,6 @@
             company: "Intel Corp.",
             companyURL: "https://www.intel.com"
           },
-          {
-            name: "Ege Korkan",
-            w3cid: "110131",
-            company: "Siemens AG",
-            companyURL: "https://www.siemens.com/"
-          }
-        ],
-        formerEditors: [
           {
             name: "Takuki Kamiya",
             w3cid: "29376",
@@ -128,7 +129,7 @@
             publisher: "W3C",
             date: "November 2020"
           },
-          "WOT-PROFILE": {
+          "WOT-PROFILES": {
             title: "Web of Things (WoT) Profile",
             href: "https://www.w3.org/TR/wot-profile/",
             authors: [
@@ -148,6 +149,14 @@
             authors: ["Michael McCool", "Elena Reshetova"],
             publisher: "W3C",
             date: "July 2021"
+          },
+          "WOT-BINDING-REGISTRY": {
+            title: "Web of Things (WoT) Binding Registry",
+            href: "https://www.w3.org/TR/wot-binding-registry/",
+            // href: "https://w3c.github.io/wot-binding-registry/",
+            authors: ["Ege Korkan"],
+            publisher: "W3C",
+            date: "TODO" //TODO: Add publication date
           },
           "MQTT": {
             title: "MQTT Version 3.1.1",
@@ -374,7 +383,10 @@
     <!-- ASSERTION HIGHLIGHTING -->
     <style>
       .rfc2119-assertion {
-        background-color: rgb(230, 230, 230);
+        background-color: #e6e6e6;
+      }
+      .darkmode .rfc2119-assertion {
+        background-color: #223a2c;
       }
       .at-risk {
         background-color: yellow;
@@ -386,9 +398,9 @@
     <section id="abstract">
       <p>
         This document describes a formal information model and a common representation for a Web of Things (WoT) Thing
-        Description Next Version. A Thing Description describes the metadata and interfaces of <a>Things</a>, where a
-        <a>Thing</a> is an abstraction of a physical or virtual entity that provides interactions to and participates in
-        the Web of Things. Thing Descriptions provide a set of interactions based on a small vocabulary that makes it
+        Description (TD), Version 2.0. A Thing Description describes the metadata and interfaces of <a>Things</a>, where
+        a <a>Thing</a> is an abstraction of a physical or virtual entity that provides interactions to and participates
+        in the Web of Things. Thing Descriptions provide a set of interactions based on a small vocabulary that makes it
         possible both to integrate diverse devices and to allow diverse applications to interoperate. Thing
         Descriptions, by default, are encoded in a JSON format that also allows JSON-LD processing. The latter provides
         a powerful foundation to represent knowledge about <a>Things</a> in a machine-understandable way. A Thing
@@ -489,7 +501,7 @@
         <aside class="example" id="simple-thing-description-sample" title="Thing Description sample">
           <pre>
 {
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:0804d572-cce8-422a-bb7c-4412fcd56f06",
     "title": "MyLampThing",
     "securityDefinitions": {
@@ -575,7 +587,7 @@
           <pre>
     {
         "@context": [
-            "https://www.w3.org/2022/wot/td/v1.1",
+            "https://www.w3.org/ns/wot-next/td",
             { "saref": "https://w3id.org/saref#" }
         ],
         "id": "urn:uuid:300f4c4b-ca6b-484a-88cf-fd5224a9a61d",
@@ -645,7 +657,7 @@
 
         <pre class="example" title="Thing Model sample" id="td-model-example-lamp">
         {
-            "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+            "@context": ["https://www.w3.org/ns/wot-next/td"],
             "@type": "tm:ThingModel",
             "title": "Lamp Thing Model",
             "properties": {
@@ -777,11 +789,16 @@
           <code>href</code> is defined within the Forms level. Even if not defined, other levels can be used such as
           Links level.
         </dd>
-        <dt><dfn id="dfn-subspecification">Binding Template Subspecification</dfn>, <dfn>subspecification</dfn></dt>
+        <dt><dfn id="dfn-binding-specification">Binding Specification</dfn></dt>
         <dd>
-          A binding template document that is published separately from this document that specifies a binding template
-          for a protocol, payload format or platform. All binding template subspecifications respect the rules set in
-          the <a href="binding-templates">Binding Templates</a> section.
+          A binding specification is a document that specifies a binding for a protocol, a payload format, or both. All
+          bindings follow the rules of the WoT Binding Registry [[WOT-BINDING-REGISTRY]].
+        </dd>
+        <dt><dfn id="dfn-binding-instance">Binding Instance</dfn></dt>
+        <dd>
+          A binding instance is a form instance in a Thing Description containing a specific binding, implementing a
+          <a>Binding Specification</a>. For example, an HTTP Binding instance is a <a href="#form">Form</a> which has
+          <code>href</code> starting with <code>http://</code> or <code>https://</code>.
         </dd>
       </dl>
 
@@ -796,15 +813,21 @@
         specification is identified by the following IRI:
       </p>
       <p>
-        <code>https://www.w3.org/2022/wot/td/v1.1</code>
+        <code>https://www.w3.org/ns/wot-next/td</code>
       </p>
       <p>
         This IRI [[RFC3987]], which is also a URI [[!RFC3986]], can be dereferenced to obtain a
-        <a href="https://www.w3.org/2022/wot/td/v1.1">JSON-LD context file</a> [[?json-ld11]], allowing the compact
+        <a href="https://www.w3.org/ns/wot-next/td">JSON-LD context file</a> [[?json-ld11]], allowing the compact
         strings in <a>TD Documents</a> to be expanded to full IRI-based <a>Vocabulary Terms</a>. However, this
         processing is only required when transforming JSON-based <a>TD Documents</a> to RDF, an optional feature of
         <a>TD Processor</a>
         implementations.
+      </p>
+
+      <p class="note">
+        Note that this namespace is temporary until the specification reaches Recommendation status. At that time, a
+        permanent namespace will be assigned. All documents using the temporary namespace point to the main branch of
+        the git repository of the specification, thus not stable.
       </p>
 
       <p>
@@ -827,19 +850,19 @@
         <tbody>
           <tr>
             <td>Core</td>
-            <td><code>https://www.w3.org/2019/wot/td#</code></td>
+            <td><code>https://www.w3.org/ns/wot-next/td-ontology</code></td>
           </tr>
           <tr>
             <td>Data Schema</td>
-            <td><code> https://www.w3.org/2019/wot/json-schema#</code></td>
+            <td><code>https://www.w3.org/ns/wot-next/json-schema-ontology</code></td>
           </tr>
           <tr>
             <td>Security</td>
-            <td><code>https://www.w3.org/2019/wot/security#</code></td>
+            <td><code>https://www.w3.org/ns/wot-next/security-ontology</code></td>
           </tr>
           <tr>
             <td>Hypermedia Controls</td>
-            <td><code>https://www.w3.org/2019/wot/hypermedia#</code></td>
+            <td><code>https://www.w3.org/ns/wot-next/security-ontologyy</code></td>
           </tr>
         </tbody>
       </table>
@@ -860,7 +883,7 @@
         <tbody>
           <tr>
             <td>Thing Model</td>
-            <td><code>https://www.w3.org/2022/wot/tm#</code></td>
+            <td><code>https://www.w3.org/ns/wot-next/tm-ontology</code></td>
           </tr>
         </tbody>
       </table>
@@ -1143,8 +1166,8 @@
           <p>
             In a TD, concrete data formats are specified in Forms (see <a href="#form"></a>) using content types. When
             the value of a content type in an instance of the Form is <code>application/json</code>, the data schema can
-            be processed directly by JSON Schema processors. Otherwise, Web of Things (WoT) Binding Templates
-            [[?WOT-BINDING-TEMPLATES]] defines data schema's available mappings to other content types such as XML
+            be processed directly by JSON Schema processors. Otherwise, entries in Web of Things (WoT) Binding Registry
+            [[?WOT-BINDING-REGISTRY]] define available mappings from data schemas to other content types such as XML
             [[?xml]]. If the content type in an instance of the Form is not <code>application/json</code> and if no
             mapping is defined for the content type, specifying a data schema does not make sense for the content type.
           </p>
@@ -1309,12 +1332,6 @@
               <td><code>false</code></td>
               <td></td>
             </tr>
-            <tr class="rfc2119-default-assertion" id="td-default-AdditionalResponseContentType">
-              <td><code>AdditionalExpectedResponse</code></td>
-              <td><code>contentType</code></td>
-              <td>value of the <code>contentType</code> of the <code>Form</code> element it belongs to.</td>
-              <td></td>
-            </tr>
             <tr class="rfc2119-default-assertion" id="td-default-contentType">
               <td><code>Form</code></td>
               <td><code>contentType</code></td>
@@ -1395,6 +1412,173 @@
             </tr>
           </tbody>
         </table>
+
+        <p>Additionally, following considerations apply to the use of default values:</p>
+
+        <ul>
+          <li>
+            <span class="rfc2119-assertion" id="td-default-binding-method">
+              When no method (or similar) is indicated in a form,
+              <a>Default Value</a> MUST be assumed from the <a>Protocol Binding</a> identified in the form.
+            </span>
+            Please see
+            <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/http/#example-1">the example</a> in
+            the HTTP Binding.
+          </li>
+          <li>
+            <span class="rfc2119-assertion" id="td-binding-multiple-ops">
+              When a <code>forms</code> entry has multiple <code>op</code> values, the form MUST NOT restrict the
+              messages that can be sent by the Consumer to only one operation.
+            </span>
+            For example, a form with <code>"op":["readproperty", "writeproperty"] </code>cannot contain
+            <code>htv:methodName</code>. Typically, a <a>TD Processor</a> will internally extend the multiple
+            <code>op</code> values to separate <code>forms</code> entries and associate each operation with the concrete
+            protocol request using the default assumption. The address information (e.g., <code>href</code>) and other
+            metadata are carried over to the extended version. Please see
+            <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/http/#example-http-multiform-op"
+              >the example</a
+            >
+            in the HTTP Binding.
+          </li>
+          <li>
+            <span class="rfc2119-assertion" id="td-default-context-expansion">
+              To enable semantic processing when the TD contains items with prefixes that are not defined in the
+              <code>@context</code>, a <a>TD Processor</a> SHOULD expand the <code>@context</code> by adding definitions
+              for those prefixes according to bindings defined in the [[WOT-BINDING-REGISTRY]].
+            </span>
+            This requires that the <a>TD Processor</a> is aware of the prefixes used in the TD. This is typically the
+            case when the <a>TD Processor</a> has been implemented to support a specific set of protocols and data
+            formats. See also [[[#example-context-expansion]]].
+          </li>
+        </ul>
+
+        <aside class="example with-default" id="example-context-expansion">
+          <div class="marker">
+            <span class="example-title">TD with htv prefix and context expansion</span>
+          </div>
+          <div class="with-default-control">
+            <input type="checkbox" />
+            <span><i>with Context Expansion</i></span>
+          </div>
+          <pre class="json">
+{
+    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
+    "title": "MyLampThing",
+    //...
+    "properties": {
+        "status": {
+            "type": "string",
+            "forms": [{
+                "href": "https://mylamp.example.com/status",
+                "htv:methodName": "GET",
+                "op": "readproperty",
+                "contentType": "application/json"
+            }]
+        }
+    }
+}
+        </pre
+          >
+          <pre class="json">
+{
+    "@context": ["https://www.w3.org/2022/wot/td/v1.1", {
+        "htv": "http://www.w3.org/2011/http#"
+    }],
+    "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
+    "title": "MyLampThing",
+    //...
+    "properties": {
+        "status": {
+            "type": "string",
+            "forms": [{
+                "href": "https://mylamp.example.com/status",
+                "htv:methodName": "GET",
+                "op": "readproperty",
+                "contentType": "application/json"
+            }]
+        }
+    }
+}
+        </pre
+          >
+        </aside>
+
+        <p>
+          Note that the default values and the expansion mechanisms can be applied in a sequence. For example, the lack
+          of <code>"readOnly"</code> and <code>"writeOnly"</code> means that the default value <code>false</code> is
+          applied to both, following
+          [[[#table-default-values-of-vocabulary-terms-that-are-used-when-the-terms-are-not-present-in-a-td]]], which in
+          turn means that the default value for <code>"op"</code> is <code>["readproperty", "writeproperty"]</code>.
+          Using the default methods for the protocol binding, this means that both <code>"GET"</code> and
+          <code>"PUT"</code> correspond to <code>"readproperty"</code> and <code>"writeproperty"</code>, respectively.
+          However, following <a href="#td-binding-multiple-ops">the expansion of multiple operations mechanism</a>, two
+          separate forms are created internally, one for each operation and indicating the default method. Then, the
+          <a href="#td-default-context-expansion">default context expansion</a> mechanism is applied to add the
+          definition of the <code>htv</code> prefix to the <code>@context</code>. The example below shows the initial TD
+          and the fully expanded TD after applying all default values and expansion mechanisms.
+        </p>
+
+        <aside class="example with-default" id="example-multiple-defaults-and-expansions">
+          <div class="marker">
+            <span class="example-title">TD with multiple default value and expansion mechanisms</span>
+          </div>
+          <div class="with-default-control">
+            <input type="checkbox" />
+            <span><i>with Defaults and Expansions</i></span>
+          </div>
+          <pre class="json">
+{
+    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
+    "title": "MyLampThing",
+    //...
+    "properties": {
+        "status": {
+            "type": "string",
+            "forms": [{
+                "href": "https://mylamp.example.com/status",
+                "contentType": "application/json"
+            }]
+        }
+    }
+}
+  </pre
+          >
+          <pre class="json">
+{
+    "@context": ["https://www.w3.org/2022/wot/td/v1.1", {
+        "htv": "http://www.w3.org/2011/http#"
+    }],
+    "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
+    "title": "MyLampThing",
+    //...
+    "properties": {
+        "status": {
+            "type": "string",
+            "readOnly": false,
+            "writeOnly": false,
+            "forms": [
+                {
+                  "href": "https://mylamp.example.com/status",
+                  "htv:methodName": "GET",
+                  "op": "readproperty",
+                  "contentType": "application/json"
+                },
+                {
+                  "href": "https://mylamp.example.com/status",
+                  "htv:methodName": "PUT",
+                  "op": "writeproperty",
+                  "contentType": "application/json"
+                }
+            ]
+        }
+    }
+}
+
+  </pre
+          >
+        </aside>
       </section>
     </section>
 
@@ -1554,7 +1738,7 @@
           </div>
           <pre class="json">
 {
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
     "title": "MyLampThing",
     "securityDefinitions": {
@@ -1594,7 +1778,7 @@
           >
           <pre class="json">
 {
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
     "title": "MyLampThing",
     "securityDefinitions": {
@@ -1676,7 +1860,7 @@
             <span class="rfc2119-assertion" id="td-context">
               The root element of a <a>TD Serialization</a> MUST be a JSON object that includes a member with the name
               <code>@context</code> and a value of type string or array that equals or respectively contains
-              <code>https://www.w3.org/2022/wot/td/v1.1</code>.
+              <code>https://www.w3.org/ns/wot-next/td</code>.
             </span>
           </p>
 
@@ -1689,7 +1873,7 @@
 
           <pre class="example">
 {
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "@context": "https://www.w3.org/ns/wot-next/td",
     // ...
 }
 </pre
@@ -1706,7 +1890,7 @@
 
           <pre class="example" id="thing-serialization-sample" title="Sample of Thing serializations">
 {
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "@type": "Thing",
     "id": "urn:uuid:1b37933b-3212-4dad-9c2c-74c6042c3e2b",
     "title": "MyThing",
@@ -1795,7 +1979,7 @@
           <pre class="example">
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         { "@language": "en" }
     ],
     "title": "MyThing",
@@ -1836,13 +2020,38 @@
               For the MultiLanguage <a>Map</a>, TD Consumers MAY infer the
               <a class="lint-ignore">base direction</a> from the language tag of the individual strings.
             </span>
-            The example below illustrates the use of the <code>@direction</code> term. See [[?json-ld11]] and
-            [[string-meta]] for more detailed information.
+            These can be summarized into the steps below that can be implemented by TD Consumers based on the
+            information provided in a TD.
           </p>
+          <ol>
+            <li>
+              <b>File-level metadata:</b> Use the values of <code>@direction</code> found in the <code>@context</code>.
+            </li>
+            <li>
+              <b>Guess from language:</b> Use the value of <code>@language</code> and then guess the direction of the
+              text
+            </li>
+            <li>
+              <b>First-strong:</b>Use the first strongly-directional character in a string. This is equivalent to using
+              <code>dir=auto</code> in HTML attributes.
+            </li>
+          </ol>
+
+          <p class="note">
+            Please note string-specific direction metadata is not possible in the current version of the specification.
+            The working group is working on a mechanism to make it possible. After which, that will be the preferred way
+            to handle text direction for TD Consumers.
+          </p>
+
+          <p>
+            Additionally, the example below illustrates the use of the <code>@direction</code> and
+            <code>@language</code> terms. See [[?json-ld11]] and [[string-meta]] for more detailed information.
+          </p>
+
           <pre class="example">
 			{
         "@context": [
-            "https://www.w3.org/2022/wot/td/v1.1",
+            "https://www.w3.org/ns/wot-next/td",
             {
               "@language": "ar-EG",
               "@direction": "rtl"
@@ -1891,7 +2100,7 @@
 
           <pre class="example">
 {
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "title": "MyThing",
     "titles": {
         "en": "MyThing",
@@ -1957,7 +2166,7 @@
           <pre class="example">
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         { "@language": "de" }
     ],
     "title": "MeinDing",
@@ -2134,7 +2343,7 @@
 
           <pre class="example">
   {
-      "@context": "https://www.w3.org/2022/wot/td/v1.1",
+      "@context": "https://www.w3.org/ns/wot-next/td",
       "id": "urn:uuid:e9ecb6ad-cd4c-481b-96ce-5b4c57ddb844",
       "title": "MyThing",
       "description": "Human readable information.",
@@ -2314,7 +2523,7 @@
             <h3><code>ComboSecurityScheme</code></h3>
 
             <p>
-              To avoid redundancy in this case, e.g. repeating the details of the <code>form</code> elements, a
+              To avoid redundancy in this case, e.g., repeating the details of the <code>form</code> elements, a
               <a href="#combosecurityscheme"><code>ComboSecurityScheme</code></a> with <code>oneOf</code> can be used
               instead.
             </p>
@@ -2360,7 +2569,7 @@
               while ordinary users could be provided with tokens with the <code>limited</code> scope.
             </p>
 
-            <pre class="example">
+            <pre class="example" id="example-oauth2-scopes">
 {
     // ...
     "securityDefinitions": {
@@ -2870,7 +3079,7 @@
             [[websub]]) or customer-oriented event mechanisms (e.g., Webhooks). For this reason,
             <code>subscription</code> and <code>cancellation</code> can be defined according to the desired mechanism.
             Please find further details in [[?WOT-BINDING-TEMPLATES]]. Example
-            <a href="#webhook-example-serialization"></a> illustrates how Events can use <code>subscription</code> and
+            <a href="#sensor-example-webhook"></a> illustrates how Events can use <code>subscription</code> and
             <code>cancellation</code> to describe Webhooks.
           </p>
         </section>
@@ -3042,7 +3251,9 @@
 
             <pre class="example">
 {
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "@context": ["https://www.w3.org/ns/wot-next/td", {
+        "htv": "http://www.w3.org/2011/http#"
+    }],
     // ...
     "properties": {
         "weather": {
@@ -3078,7 +3289,9 @@
             </p>
             <pre class="example">
     {
-        "@context": "https://www.w3.org/2022/wot/td/v1.1",
+        "@context": ["https://www.w3.org/ns/wot-next/td", {
+            "htv": "http://www.w3.org/2011/http#"
+        }],
         // ...
         "properties": {
             "weather": {
@@ -3108,7 +3321,9 @@
             </p>
             <pre class="example">
     {
-        "@context": "https://www.w3.org/2022/wot/td/v1.1",
+        "@context": ["https://www.w3.org/ns/wot-next/td", {
+            "htv": "http://www.w3.org/2011/http#"
+        }],
         // ...
         "properties": {
             "weather": {
@@ -3174,18 +3389,6 @@
             </p>
 
             <p>
-              <span class="rfc2119-assertion" id="td-form-response-object">
-                If present, the value assigned to <code>response</code> in an instance of <code>Form</code> MUST be a
-                JSON object.
-              </span>
-              <span class="rfc2119-assertion" id="td-forms-response">
-                If present, the response object MUST contain a <code>contentType</code> member as defined in the
-                <a>Class</a> definition of <a href="#expectedresponse" class="sec-ref"><code>ExpectedResponse</code></a
-                >.
-              </span>
-            </p>
-
-            <p>
               A <code>form</code> snippet with the <code>response</code> member is shown below based on the
               <code>takePhoto</code> Action described above:
             </p>
@@ -3210,6 +3413,49 @@
 }
 </pre
             >
+
+            <p>
+              In cases where responses are not expected to contain a payload and therefore no `contentType` either, an
+              empty `response` object can be used to convey this information.
+            </p>
+            <pre class="example">
+{
+    // ...
+    "actions": {
+        "brewCoffee": {
+            "description": "Invoking this action does not return a payload.",
+            "input": {
+              "type": "object",
+              "properties": {
+                "coffeeType": {
+                  "enum": [
+                    "espresso",
+                    "americano",
+                    "cappuccino",
+                    "latte"
+                  ]
+                },
+                "useOatMilk": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "required": [
+                "coffeeType"
+              ]
+            },
+            "forms": [{
+                "op": "invokeaction",
+                "href": "http://coffee-maker.example.com/brew-coffee",
+                "contentType": "application/json",
+                "response": {}
+            }]
+        }
+    },
+    // ...
+}
+</pre
+            >
           </section>
           <section id="form-additionalResponses">
             <h3><code>additionalResponses</code></h3>
@@ -3226,10 +3472,12 @@
             </p>
             <p>
               A <code>TD</code> snippet with the <code>additionalResponses</code> member in an Action Affordance is
-              shown below. It describes the case mentioned above when an error response can be sent with another payload
-              than what is described in the <code>output</code>. The <code>success</code> with the value
+              shown below. Its first element ilustrates the case mentioned above when an error response can be sent with
+              another payload than what is described in the <code>output</code>. The <code>success</code> with the value
               <code>false</code> refers to the fact that this payload refers to an error case and
-              <code>schema</code> allows linking to the payload description used at <code>schemaDefinitions</code>:
+              <code>schema</code> allows linking to the payload description used at <code>schemaDefinitions</code>. The
+              second element within `additionalResponses` also describes an error response, but this time the response
+              does not have a payload.
             </p>
 
             <pre class="example">
@@ -3260,11 +3508,16 @@
                 "op": "invokeaction",
                 "href": "http://mycar.example.com/api/engine",
                 "contentType": "application/json",
-                "additionalResponses": [{
+                "additionalResponses": [
+                  {
                     "success": false,
                     "contentType": "application/json",
                     "schema": "actionErrorPayload"
-                }]
+                  },
+                  {
+                    "success": false
+                  },
+                ]
             }]
         }
     },
@@ -3391,7 +3644,7 @@
             },
             "unitSystem": {
                 "type": "string",
-                "enum": ["metric_value","imperial_value","uscustomary_value"],
+                "enum": ["metric","imperial","uscustomary"],
                 "description": "System of Measurement that will be used for the values"
             }
         },
@@ -3606,7 +3859,7 @@
             that can be checked by looking only at the TD itself.
           </p>
           <p>
-            Minimal Validation is appropriate where validation needs to be self-contained (e.g. devices on isolated
+            Minimal Validation is appropriate where validation needs to be self-contained (e.g., devices on isolated
             networks). It does not attempt to validate context extensions and vocabularies.
           </p>
           <p>
@@ -3675,7 +3928,7 @@
       <pre class="example">
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         {
             "eg": "http://example.org/iot#",
             "cov": "http://www.example.org/coap-binding#"
@@ -3734,7 +3987,7 @@
           <pre class="example">
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         {
             "saref": "https://w3id.org/saref#",
             "om": "http://www.ontology-of-units-of-measure.org/resource/om-2/",
@@ -3787,7 +4040,7 @@
           <pre class="example" id="saref-state-annotation-example">
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         {
             "saref": "https://w3id.org/saref#",
             "ssn": "http://www.w3.org/ns/ssn/"
@@ -3851,7 +4104,7 @@
           <pre class="example" id="saref-geolocation-annotation-example">
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         {
             "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#"
         }
@@ -3876,7 +4129,7 @@
           <pre class="example" id="saref-geolocation-annotation-example-2">
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         {
             "schema": "https://schema.org#"
         }
@@ -3910,7 +4163,7 @@
           <pre class="example" id="saref-geolocation-annotation-example-3">
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         {
             "schema": "https://schema.org#"
         }
@@ -3940,13 +4193,13 @@
       </section>
 
       <section>
-        <h3>Adding Protocol Bindings</h3>
+        <h3>Adding Bindings</h3>
 
         <p>
           With the <a>TD Context Extensions</a> in a Thing Description, the communication metadata can be supplemented
-          or new <a>Protocol Bindings</a> added through additional <a>Vocabulary Terms</a> serialized into JSON objects
-          representing a <code>Form</code> instance. Please see <a href="#protocol-bindings"></a> for additional
-          details.
+          via <a>Binding Specifications</a> from the WoT Binding Registry [[WOT-BINDING-REGISTRY]], which are added
+          through additional <a>Vocabulary Terms</a> serialized into JSON objects representing a
+          <code>Form</code> instance. Please see <a href="#bindings"></a> for further information.
         </p>
       </section>
 
@@ -3968,7 +4221,7 @@
         <pre class="example">
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         {
             "cov": "http://www.example.org/coap-binding#",
             "ace": "http://www.example.org/ace-security#"
@@ -4022,154 +4275,84 @@
       </section>
     </section>
 
-    <section id="binding-templates">
-      <h2>Binding Templates</h2>
-      <section id="bindings-old-abstract">
-        <h3>Old Abstract</h3>
-        <p>
-          W3C Web of Things enables applications to interact with and orchestrate connected Things at the Web scale. The
-          standardized abstract interaction model exposed by the WoT Thing Description enables applications to scale and
-          evolve independently of the individual Things.
-        </p>
-        <p>
-          Many network-level protocols, standards and platforms for connected Things have already been developed, and
-          have millions of devices deployed in the field today. These standards are converging on a common set of
-          transport protocols and transfer layers, but each has peculiar content formats, payload schemas, and data
-          types.
-        </p>
-        <p>
-          Despite using unique formats and data models, the high-level interactions exposed by most connected things can
-          be modeled using the Property, Action, and Event interaction affordances of the WoT Thing Description.
-        </p>
-        <p>
-          Binding Templates enable a Thing Description to be adapted to a specific protocol, data payload formats or
-          platforms that combine both in specific ways. This is done through additional descriptive vocabularies, Thing
-          Models and examples that aim to guide the implementors of Things and Consumers alike.
-        </p>
-        <p>
-          This section acts as a base and explains how other binding templates should be designed. Concrete binding
-          templates are then provided in their respective documents, referred to as subspecifications, that are linked
-          to from this document.
-        </p>
-      </section>
-      <section id="binding-introduction">
-        <h4>Introduction to Binding Templates</h4>
-        <p>
-          IoT addresses multiple use cases from different application domains, while requiring different deployment
-          patterns for devices. This results in different protocols and media types, creating the central challenge for
-          the Web of Things: enabling interactions with the plethora of different <a>IoT platforms</a> and devices that
-          do not follow any particular standard, but provide an eligible interface over a suitable network protocol. WoT
-          is addressing this challenge through Binding Templates.
-        </p>
+    <section id="bindings">
+      <h2>Bindings</h2>
+      <p>
+        Every message sent from a Consumer to the Thing and back needs to travel over a network protocol, despite the
+        Property&ndash;Action&ndash;Event abstraction provided by WoT. The operations in the Forms level need to be
+        bound to how the message is meant to look, over the network. Thus, every form in a WoT Thing Description needs
+        to have a submission target, given by the <code>href</code> member, as indicated in <a href="#form">Form</a>.
+        For instance, if the target starts with <code>http</code> or <code>https</code>, a <a>Consumer</a> can infer
+        that the <a>Thing</a> implements the <a>Protocol Binding</a> based on HTTP, and it should expect HTTP-specific
+        terms in an instance of this form. See [[[#protocol-bindings]]] for more explanation and examples.
+      </p>
 
-        <p>
-          Binding Templates consist of multiple specifications, referred to as a <a>subspecification</a> in this
-          document, that enable an application client (a WoT <a>Consumer</a>) to interact, using WoT Thing
-          Description[[WOT-THING-DESCRIPTION]] (TD), with Things that exhibit diverse protocols, payload formats and a
-          combination of these in platforms and frameworks. The mechanism that allows Consumers to interact with a
-          variety of Things is called the Binding Mechanism, without which TDs could not build Hypermedia Controls as
-          explained in the [[WOT-ARCHITECTURE]].
-        </p>
+      <p>
+        Furthermore, the payloads described by the <a>Data Schema</a> in the Affordance Level need to be serialized to a
+        data format and sent on the network protocol. Similar to the way operations are bound to protocol messages, the
+        <a>Data Schema</a> is bound to a data format indicated by the <code>contentType</code> or protocol-specific
+        terms provided in the <a href="#form">Form</a>. From these terms, a <a>Consumer</a> can infer the required
+        serialization method and transform the application-level data to the data to be sent on the network protocol.
+        Similarly, for messages coming from the <a>Thing</a>, the <a>Consumer</a> can deserialize the data and present
+        it to the application level. For example, a <a>Consumer</a> implemented in Python can read
+        <code>application/json</code> as the value of <code>contentType</code> and serialize a Python dictionary data
+        structure into a JSON object. See [[[#payload-bindings]]] for more explanation and examples.
+      </p>
 
-        <p>
-          When describing a particular IoT device or platform, the corresponding Binding Template can be used to look up
-          the communication metadata that is to be provided in the <a>Thing Description</a> to support that platform.
-          [[[#fig-building-block]]] shows how Binding Templates are used. Based on the protocol, media type or platform
-          binding template, a TD is created. The Consumer that is processing a TD implements the required Binding
-          Template that is present in the TD by including a corresponding protocol stack, media type encoder/decoder or
-          platform stack and by configuring the stack (or its messages) according to the information given in the TD
-          such as serialization format of the messages and header options.
-        </p>
+      <p>
+        The mechanism above are called Bindings in the Web of Things and a specific example is illustrated in
+        [[[#fig-mechanism]]] with an excerpt of a TD of a robot arm with of HTTP and JSON Bindings. Here, the Consumer
+        intends to invoke an action of the robot arm (<code>goTo</code>) in order to move it to the position x equals 12
+        and y equals 100. To do so, it creates the correct payload, serializes it, and sends it using the correct
+        protocol options. The Thing gets the message over the network and responds with a message that corresponds to
+        its TD. Other protocols, payload formats, and/or their combination are possible and are explained in
+        [[[#binding-mechanisms]]].
+      </p>
 
-        <figure id="fig-building-block">
-          <img
-            src="visualization/binding-templates.svg"
-            alt="Platforms, Protocols and Media Types as building blocks for binding templates and TD"
-          />
-          <figcaption>Platforms, Protocols and Media Types as building blocks for binding templates and TD</figcaption>
-        </figure>
+      <figure id="fig-mechanism">
+        <img src="visualization/binding-mechanism.drawio.svg" alt="Bindings mechanism with a TD, Thing and Consumer" />
+        <figcaption>Bindings Mechanism inside a TD excerpt with messages of its Thing and a Consumer.</figcaption>
+      </figure>
 
-        <p>
-          Each Interaction Affordance in a TD needs to have a binding to a protocol and to a payload format.
-          [[[#fig-mechanism]]] below illustrates an excerpt of a TD of a robot arm with of HTTP and JSON bindings. Here,
-          the Consumer intends to invoke an action of the robot arm (<code>goTo</code>) in order to move it to the
-          position x equals 12 and y equals 100. In order to do so, it creates the correct payload, serializes it and
-          sends it using the correct protocol options. The Thing gets the message over the network and responds with a
-          message that corresponds to its TD. Other protocols, payload formats or their combination are possible and are
-          explained in [[[#binding-overview]]].
-        </p>
+      <p>
+        In summary, Bindings enable a Thing Description to be adapted to a specific protocol, data payload formats or
+        both in specific ways. This is done through URI Schemes, additional descriptive vocabularies, Thing Models and
+        examples that aim to guide the implementors of Things and Consumers alike. This section explains the overall
+        mechanism and gives basic guidance on creating new Bindings. The [[WOT-BINDING-REGISTRY]] contains a registry
+        (list) of existing Bindings as well the requirements to follow to register new entries to the registry.
+      </p>
 
-        <figure id="fig-mechanism">
-          <img
-            src="visualization/binding-mechanism.drawio.svg"
-            alt="Binding Templates mechanism with a TD, Thing and Consumer"
-          />
-          <figcaption>
-            Binding Templates Mechanism inside a TD excerpt with messages of its Thing and a Consumer.
-          </figcaption>
-        </figure>
+      <p>
+        When producing a TD for a particular IoT device, the corresponding Binding can be used to look up the
+        communication metadata that is to be provided in the <a>Thing Description</a>. [[[#fig-building-block]]] shows
+        how Bindings are used. Based on the protocol or media type, a TD is created. The Consumer that is processing a
+        TD implements the required Bindings that are present in the TD by including a corresponding protocol stack and
+        media type encoder/decoder by configuring the stack (or its messages) according to the information given in the
+        TD such as serialization format of the messages and header options.
+      </p>
 
-        <p class="ednote">
-          The editors also recommend reading the related chapters in [[WOT-ARCHITECTURE]], such as
-          <a href="https://www.w3.org/TR/wot-architecture11/#sec-binding-templates"
-            >WoT Binding Templates Building Block</a
-          >, <a href="https://www.w3.org/TR/wot-architecture11/#sec-hypermedia-controls">Hypermedia Controls</a>,
-          <a href="https://www.w3.org/TR/wot-architecture11/#sec-protocol-bindings">Protocol Bindings</a> and
-          <a href="https://www.w3.org/TR/wot-architecture11/#media-types">Media Types</a>.
-        </p>
-      </section>
+      <figure id="fig-building-block">
+        <img
+          src="visualization/binding-templates.svg"
+          alt="Protocols, Media Types, and their combinations, as building blocks for TDs"
+        />
+        <figcaption>Protocols, Media Types, and their combinations, as building blocks for TDs</figcaption>
+      </figure>
 
-      <section id="binding-overview">
-        <h4>Binding Template Mechanisms</h4>
+      <p class="note">
+        The editors of this specification also recommend reading the related chapters in [[WOT-ARCHITECTURE]], such as
+        <a href="https://www.w3.org/TR/wot-architecture11/#sec-binding-templates"
+          >WoT Binding Templates Building Block</a
+        >, <a href="https://www.w3.org/TR/wot-architecture11/#sec-hypermedia-controls">Hypermedia Controls</a>,
+        <a href="https://www.w3.org/TR/wot-architecture11/#sec-protocol-bindings">Protocol Bindings</a> and
+        <a href="https://www.w3.org/TR/wot-architecture11/#media-types">Media Types</a>.
+      </p>
 
-        <p>
-          TDs can be bound to specific protocols, payload formats and platforms. This is possible through the three core
-          mechanisms that allow WoT to be used in various domains and scenarios. This section explains how these binding
-          mechanism types are structured, should be specified, and links to corresponding binding documents
-          (subspecifications). These 3 types of mechanisms are:
-        </p>
-        <ul>
-          <li>
-            <b>Protocols</b>: Application layer protocols (e.g., HTTP[[?RFC7231]], CoAP[[?RFC7252]], MQTT[[?MQTT]],
-            etc.) whose different message types are mapped to the WoT Thing Description[[WOT-THING-DESCRIPTION]] forms
-            via reusable vocabulary and extensions.
-          </li>
-          <li>
-            <b>Payloads</b>: Different payload formats and media types [[IANA-MEDIA-TYPES]] which can be represented in
-            a TD via Data Schemas or forms.
-          </li>
-          <li>
-            <b>Platforms</b>: Platforms and frameworks who combine the use of protocols and payloads in a certain way,
-            which can be represented via entire Thing Models described by the [[WOT-THING-DESCRIPTION]] or examples of
-            TDs.
-          </li>
-        </ul>
-
-        <p>
-          Each <a>Binding Template Subspecification</a> is an independent document that has a separate list of authors
-          and publication date. This section explains the binding mechanism by giving requirements per respective
-          binding category and links to the respective subspecification. These can be found in sections
-          [[[#protocol-bindings]]], [[[#payload-bindings]]] and [[[#platform-bindings]]].
-        </p>
-
-        <figure id="fig-overview">
-          <img
-            src="visualization/binding-templates-overview.drawio.svg"
-            alt="Binding Templates Overview and the relationships between each document type"
-          />
-          <figcaption>Binding Templates Overview and the Relationships between each Document Type</figcaption>
-        </figure>
-
-        <p>
-          Each Protocol and Payload Binding Template is specified in a way that they stay independent from each other.
-          This means that each document can be read independently from the other and can be also developed
-          independently. However, Platform Binding Templates are dependent on the Protocol and Payload Binding
-          Templates, since a given platform uses different protocols and payload formats that need to be specified first
-          in their respective binding templates and referred to within a Platform Binding Template.
-        </p>
+      <section id="binding-mechanisms">
+        <h4>Binding Mechanisms</h4>
 
         <section id="protocol-bindings">
-          <h5>Protocol Binding Templates</h5>
+          <h5>Protocol Bindings</h5>
           <p>
             [[WOT-THING-DESCRIPTION]] defines abstract operations such as <code>readproperty</code>,
             <code>invokeaction</code>
@@ -4190,22 +4373,22 @@
           </p>
           <p>
             Common methods found in REST and PubSub protocols are GET, PUT, POST, DELETE, PUBLISH, and SUBSCRIBE.
-            Binding Templates describe how these existing methods and associated vocabularies can be used in a
+            Binding specifications describe how these existing methods and associated vocabularies can be used in a
             <a>Thing Description</a> to bind to the WoT operations. This is done by defining the URI scheme of the
             protocol and mapping the protocol methods to the abstract WoT operations such as <code>readproperty</code>,
             <code>invokeaction</code> and <code>subscribeevent</code>. In some cases, additional instructions are
             provided to explain how the vocabulary terms should be used in different cases of protocol usage.
           </p>
           <p>
-            The examples below show the binding of the <code>readproperty</code> operation for the HTTP and Modbus
-            protocols. Please note that these are examples and please always refer to the corresponding binding to learn
-            about the relevant vocabulary terms and their values.
+            The examples below show binding instances of the <code>readproperty</code> operation for the HTTP and Modbus
+            protocols. Please note that these are examples and please always refer to the corresponding binding
+            specification to learn about the relevant vocabulary terms and their values.
           </p>
           <table>
             <tbody>
               <tr>
                 <td style="vertical-align: top; width: 50%">
-                  <pre class="example" title="Binding example of a readproperty operation to HTTP">
+                  <pre class="example" title="Binding instance of a readproperty operation to HTTP">
                                       {
                                           "href": "http://example.com/props/temperature",
                                           "op": "readproperty",
@@ -4215,12 +4398,11 @@
                   >
                 </td>
                 <td style="vertical-align: top; width: 50%">
-                  <pre class="example" title="Binding example of a readproperty operation to Modbus">
+                  <pre class="example" title="Binding instance of a readproperty operation to Modbus">
                                       {
-                                          "href": "modbus+tcp://127.0.0.1:60000/1",
+                                          "href": "modbus+tcp://127.0.0.1:60000/1/4",
                                           "op": "readproperty",
-                                          "modv:function": "readCoil",
-                                          "modv:address": 1
+                                          "modv:function": "readCoil"
                                       }
                                   </pre
                   >
@@ -4238,20 +4420,20 @@
             </li>
             <li>
               Right Example: To do a <code>readproperty</code> of the subject Property Affordance using the
-              <code>readCoil</code> function of Modbus at coil <code>1</code> of the device with the
-              <code>127.0.0.1</code> address at its port <code>60000</code>
+              <code>readCoil</code> function of Modbus at coil <code>4</code> of the device with the
+              <code>127.0.0.1</code> IP address and unitID <code>1</code> at its port <code>60000</code>
             </li>
           </ul>
           <p>
-            These bindings and their statements are possible for other operations and protocols as well. Below are
-            examples for <code>invokeaction</code> and <code>subscribeevent</code>:
+            These binding instances and their statements are possible for other operations and protocols as well. Below
+            are examples for <code>invokeaction</code> and <code>subscribeevent</code>:
           </p>
 
           <table>
             <tbody>
               <tr>
                 <td style="vertical-align: top; width: 50%">
-                  <pre class="example" title="Binding example of an invokeaction operation to HTTP">
+                  <pre class="example" title="Binding instance of an invokeaction operation to HTTP">
                                       {
                                           "op": "invokeaction",
                                           "href": "http://192.168.1.32:8081/example/levelaction",
@@ -4261,7 +4443,7 @@
                   >
                 </td>
                 <td style="vertical-align: top; width: 50%">
-                  <pre class="example" title="Binding example of a subscribeevent operation to MQTT">
+                  <pre class="example" title="Binding instance of a subscribeevent operation to MQTT">
                                       {
                                           "op": "subscribeevent",
                                           "href": "mqtt://iot.platform.com:8088",
@@ -4291,11 +4473,10 @@
 
           <p>
             In some cases, header options or other parameters of the protocols need to be included. Given that these are
-            highly protocol dependent, please refer to the bindings listed in [[[#protocol-bindings-table]]].
-            Additionally, protocols may have defined Subprotocols that can be used for some interaction types. For
-            example, to receive asynchronous notifications using HTTP, some servers may support long polling
-            (<code>longpoll</code>), WebSub [[WebSub]] (<code>websub</code>) and Server-Sent Events [[eventsource]]
-            (<code>sse</code>).
+            highly protocol dependent, please refer to the bindings listed in [[[WOT-BINDING-REGISTRY]]]. Additionally,
+            protocols may have defined Subprotocols that can be used for some interaction types. For example, to receive
+            asynchronous notifications using HTTP, some servers may support long polling (<code>longpoll</code>), WebSub
+            [[WebSub]] (<code>websub</code>) and Server-Sent Events [[eventsource]] (<code>sse</code>).
           </p>
 
           <section>
@@ -4326,169 +4507,20 @@
               protocol indicated in <code>href</code> of the forms (or the <code>base</code>). For WebSockets, the
               IANA-registered Websocket Subprotocols [[iana-web-socket-registry]] may be used. For CoAP,
               <code>"subprotocol":"cov:observe"</code> can be used to describe asynchronous observation operations as
-              defined by [[RFC6741]]. The subprotocols can be defined and explained as a part of a protocol or platform
-              binding subspecification.
+              defined by [[RFC6741]]. The subprotocols can be defined and explained as a part of a protocol
+              <a>binding specification</a>.
             </p>
           </section>
 
           <section>
-            <h6>Terms Specified by Protocol Binding Templates</h6>
-            <p>
-              Overall, a protocol binding template specifies the values and structure of certain vocabulary terms in a
-              TD. The table below lists the vocabulary term, the class it belongs to and whether the subspecification is
-              required to specify the values the term can take. In addition to these, additional terms for describing
-              protocol options are typically added.
-            </p>
-
-            <table class="def numbered" id="table-protocol-terms">
-              <caption>
-                Terms specified by Protocol Binding Templates
-              </caption>
-              <thead>
-                <tr>
-                  <th>Vocabulary Term</th>
-                  <th>Class</th>
-                  <th>Specification Requirement</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>@context</td>
-                  <td>Thing</td>
-                  <td>mandatory</td>
-                </tr>
-                <tr>
-                  <td>href</td>
-                  <td>Form</td>
-                  <td>mandatory</td>
-                </tr>
-                <tr>
-                  <td>subprotocol</td>
-                  <td>Form</td>
-                  <td>optional</td>
-                </tr>
-                <tr>
-                  <td>contentType</td>
-                  <td>Form</td>
-                  <td>optional</td>
-                </tr>
-                <tr>
-                  <td>contentType</td>
-                  <td>ExpectedResponse</td>
-                  <td>optional</td>
-                </tr>
-                <tr>
-                  <td>contentType</td>
-                  <td>AdditionalExpectedResponse</td>
-                  <td>optional</td>
-                </tr>
-                <tr>
-                  <td>contentCoding</td>
-                  <td>Form</td>
-                  <td>optional</td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
-
-          <section id="protocol-bindings-table">
-            <h6>Existing Protocol Binding Templates</h6>
-            <p>
-              The table below summarizes the currently specified protocols in their respective
-              <a>Binding Template Subspecification</a>.
-            </p>
-            <table class="def numbered">
-              <caption>
-                Existing Protocol Binding Templates
-              </caption>
-              <thead>
-                <tr>
-                  <th>Abbreviation</th>
-                  <th>Name</th>
-                  <th>Link to Binding Template</th>
-                  <th>Link to Ontology</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>HTTP</td>
-                  <td>Hypertext Transfer Protocol</td>
-                  <td>
-                    <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/http/index.html"
-                      >Binding Template</a
-                    >
-                  </td>
-                  <td><a href="https://www.w3.org/TR/HTTP-in-RDF10/">Ontology</a></td>
-                </tr>
-                <tr>
-                  <td>CoAP</td>
-                  <td>Constrained Application Protocol</td>
-                  <td>
-                    <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/coap/index.html"
-                      >Binding Template</a
-                    >
-                  </td>
-                  <td>
-                    <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/coap/ontology.html"
-                      >Ontology</a
-                    >
-                  </td>
-                </tr>
-                <tr>
-                  <td>MQTT</td>
-                  <td>Message Queuing Telemetry Transport</td>
-                  <td>
-                    <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/mqtt/index.html"
-                      >Binding Template</a
-                    >
-                  </td>
-                  <td>
-                    <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/mqtt/ontology.html"
-                      >Ontology</a
-                    >
-                  </td>
-                </tr>
-                <tr>
-                  <td>Modbus</td>
-                  <td>Modbus</td>
-                  <td>
-                    <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/modbus/index.html"
-                      >Binding Template</a
-                    >
-                  </td>
-                  <td>
-                    <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/modbus/ontology.html"
-                      >Ontology</a
-                    >
-                  </td>
-                </tr>
-                <tr>
-                  <td>BACnet</td>
-                  <td>Building Automation and Control Networks</td>
-                  <td>
-                    <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/bacnet/index.html"
-                      >Binding Template</a
-                    >
-                  </td>
-                  <td>
-                    <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/bacnet/bacnet-model.ttl"
-                      >Ontology</a
-                    >
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
-
-          <section>
-            <h6>Using a Thing Description with a Protocol Binding Template Subspecification</h6>
+            <h6>Using a Thing Description with a Protocol Binding</h6>
 
             <p>
-              Protocol Binding Templates contain vocabularies that extend the vocabulary found in the
+              Protocol Binding Specifications contain vocabularies that extend the vocabulary found in the
               [[WOT-THING-DESCRIPTION]]. This means that the way a TD is consumed and how the interactions happen with
               the Thing are adapted to such vocabularies. The steps below explain how this process typically looks like.
-              <!-- this text should be extended after the PR 262 is merged -->
             </p>
+            <!-- TODO: Add assertions and sync with other binding assertions -->
             <ol>
               <li>
                 <b>Detect the protocol:</b> Upon the activation of a form to execute the operation, the
@@ -4496,90 +4528,43 @@
                 identify the protocol.
               </li>
               <li>
-                <b>Choose the correct protocol stack:</b> The <a>Consumer</a> SHOULD use choose the correct protocol
-                from its protocol software stacks.
+                <b>Choose the correct protocol stack:</b> The <a>Consumer</a> SHOULD choose the correct protocol from
+                its protocol software stacks.
               </li>
               <li>
                 <b>Validate the forms part of the TD</b>: Using the JSON Schema instances provided in the respective
-                subspecification or through programmatically checking key value pairs, the <a>Consumer</a> MAY validate
-                the respective form terms in order to verify they are correctly specified in the TD instance.
+                binding specification or through programmatically checking key value pairs, the <a>Consumer</a> MAY
+                validate the respective form terms in order to verify they are correctly specified in the TD instance.
               </li>
               <li>
                 <b>Start communication:</b> The <a>Consumer</a> SHOULD send requests for the chosen operation as
                 specified by the form and additional behavior that is expected. These are specified using the different
                 form terms such as <code>subprotocol</code> or other vocabulary terms introduced by the protocol
                 binding. The interaction affordance data exchanged with the Thing SHOULD be according to the
-                <a>Data Schema</a> and <a>Content Type</a> present in the TD. The corresponding Data Schema to the
-                operation can be found in the [[WOT-THING-DESCRIPTION]], table called
-                <i>Mapping op Values to Data Schemas</i>.
+                <a>Data Schema</a> and <a>Content Type</a> present in the TD. The Data Schema corresponding to the
+                operation can be found in the Table [[[#table-mapping-op-values-to-data-schemas]]].
               </li>
             </ol>
-          </section>
-
-          <section>
-            <h6>Creating a new Protocol Binding Template Subspecification</h6>
-
-            <p>
-              When creating a new protocol binding template <a>subspecification</a>, e.g. based on a new communication
-              protocol, the proposed document should enable implementations of this binding in an interoperable way for
-              Consumer and Producer implementations. More specifically, each
-              <a>Binding Template Subspecification</a> MUST specify the following:
-            </p>
+            <p>Consequently, the following requirements apply to Things and Consumers:</p>
             <ul>
               <li>
-                <b>URI Scheme:</b> For identification of the used protocol, a standardized URI scheme [[RFC3986]] value
-                MUST be declared in the form of a string. This URI Scheme is used in TDs at top level
-                <code>base</code> or in the <code>href</code> term of the <code>forms</code>
-                container. These can be officially registered ones at IANA [[iana-uri-schemes]] (e.g.
-                <code>"https://"</code>, <code>"coap://"</code>) or they can be declared in the protocol
-                subspecification (e.g. <code>"mqtt://"</code>, <code>"modbus+tcp://"</code>). How the full URI can be
-                constructed for different affordances (or resources) MUST be specified as well.
+                <span class="rfc2119-assertion" id="td-bindings-requirements-scheme">
+                  Every form in a WoT Thing Description MUST follow the requirements of the
+                  <a>Protocol Binding</a> indicated by the URI scheme [[!RFC3986]] of its <code>href</code> member.
+                </span>
               </li>
               <li>
-                <b><code>@context</code> Usage and Ontology:</b> A vocabulary that allows adding protocol options to a
-                Thing Description forms SHOULD be provided to allow semantic annotations of the operations with protocol
-                specific information. The prefix and IRI to be used in the <code>@context</code> in order to link to the
-                vocabulary of the protocol SHOULD be also provided. The prefix SHOULD use the <code>v</code> suffix
-                notation in order to avoid confusion with the URI scheme of the protocol (e.g. <code>htv</code> for HTTP
-                and <code>mqv</code> for MQTT). For instructions on how to create a vocabulary, please refer to our
-                <a href="./VOCABULARY-CREATION-GUIDE.md"> Vocabulary Creation Guide</a>.
-              </li>
-              <li>
-                <b>Mapping to WoT Operations:</b> Most protocols have a set of methods or verbs that adds a meaning to
-                the messages of the protocol. A protocol binding template MUST be able to map WoT operation types
-                (<code>readproperty</code>, <code>invokeaction</code>, etc.) to concrete protocol message types or
-                methods. When specifying the mapping, the mapping SHOULD be bidirectional, i.e. it should be clear how
-                to do a <code>readproperty</code> operation with the given protocol and how an existing implementation's
-                endpoints can be mapped to a WoT operation should be also clear.
-              </li>
-              <li>
-                <b>JSON Schema:</b> A JSON Schema to validate the forms of a TD using the Protocol Binding SHOULD be
-                provided. This allows validation of the URI scheme and the vocabulary terms. The JSON Schema instance
-                SHOULD follow the template provided in
-                <a href="https://github.com/w3c/wot-binding-templates/blob/main/bindings/protocols/template.schema.json"
-                  >the Binding Templates GitHub Repository.</a
-                >
-              </li>
-              <li>
-                <b>Specification:</b> The official specification document of the protocol SHOULD be provided. This
-                SHOULD be a static version, i.e. the exact document used during the writing of the binding that is
-                guaranteed to not change. If this is not possible, the specification should be marked with a date of
-                access. When the specification is not publicly available and cannot be linked with a static version, an
-                editor's note should be provided in the introduction, explaining how to get access to the specification.
+                <span class="rfc2119-assertion" id="td-bindings-server-accept">
+                  Every form in a WoT Thing Description MUST accurately describe requests (including request headers, if
+                  present) accepted by the <a>Thing</a> in an interaction.
+                </span>
               </li>
             </ul>
-
-            <p>
-              A template is also provided for new protocol binding template specifications at
-              <a href="https://github.com/w3c/wot-binding-templates/blob/main/bindings/index.template.html"
-                >the GitHub Repository.</a
-              >
-            </p>
           </section>
         </section>
 
         <section id="payload-bindings">
-          <h5>Payload Binding Templates</h5>
+          <h5>Payload Bindings</h5>
           <p>
             [[WOT-THING-DESCRIPTION]] defines two mechanisms to describe how a payload of a message over any protocol
             can look like. Firstly, media types [[IANA-MEDIA-TYPES]] describe the serialization used for sending and
@@ -4592,9 +4577,7 @@
 
           <p>
             In the rest of this section at [[[#payload-bindings-contentType]]] and [[[#payload-bindings-dataschema]]],
-            you can find examples of how payload bindings can look like. At [[[#payload-bindings-table]]] you can find
-            the current payload binding templates and [[[#payload-bindings-creating]]] explains how new payload binding
-            templates can be created.
+            you can find examples of how payload bindings can look like.
           </p>
           <section id="payload-bindings-contentType">
             <h6>Content Types</h6>
@@ -4618,10 +4601,8 @@
               additional parameters. In this specific case, the forms describe that reading this property with
               <code>http</code> or <code>coap</code> result in different content types. For structured media types, a
               Data Schema is generally provided in the affordance level as explained in
-              [[[#payload-bindings-dataschema]]] and
-              <a data-cite="WOT-THING-DESCRIPTION#sec-data-schema-vocabulary-definition">
-                in the Data Schema section of the TD specification</a
-              >. However, for unstructured data such as images and videos, a Data Schema is typically not available.
+              [[[#payload-bindings-dataschema]]] and [[[#sec-data-schema-vocabulary-definition]]]. However, for
+              unstructured data such as images and videos, a Data Schema is typically not available.
             </p>
 
             <pre class="example" title="JSON and CBOR media types in forms" id="example-payload-binding">
@@ -4679,16 +4660,17 @@
             <h6>Data Schemas</h6>
 
             <p>
-              Data Schema, as explained in [[WOT-THING-DESCRIPTION]], describes the structure of the messages, which are
-              used together with media types. Even though it is largely inspired by JSON Schema [[json-schema]], it can
-              be used for describing other payload types such as [[XML]], string-encoded images, bit representations of
-              integers, etc. Data Schema SHOULD be used in addition to the media types.
+              Data Schema, as explained in [[[#sec-data-schema-vocabulary-definition]]], describes the structure of the
+              messages, which are used together with media types. Even though it is largely inspired by JSON Schema
+              [[json-schema]], it can be used for describing other payload types such as [[XML]], string-encoded images,
+              bit representations of integers, etc. Data Schema SHOULD be used in addition to the media types.
             </p>
             <p>
               Depending on the case, the structure of the messages can be anything from a simple number to arrays or
               objects with multiple levels of nesting. Existing IoT Platforms and Standards have certain payload formats
-              with variations on how the data is structured. As explained in [[WOT-THING-DESCRIPTION]], Data Schema can
-              be used in a TD in one of the following places:
+              with variations on how the data is structured. As explained in
+              [[[#sec-data-schema-vocabulary-definition]]], Data Schema can be used in a TD in one of the following
+              places:
             </p>
             <ul>
               <li>
@@ -4752,467 +4734,51 @@
               </tbody>
             </table>
           </section>
-          <section>
-            <h6>Terms Specified by Payload Binding Templates</h6>
-            <p>
-              Overall, a payload binding template specifies the values and structure of certain vocabulary terms in a
-              TD. The table below lists the vocabulary term, the class it belongs to and whether the subspecification is
-              required to specify the values the term can take. In addition to these, additional vocabulary terms can be
-              added and restrictions to Data Schema terms can be placed.
-            </p>
-
-            <table class="def numbered" id="table-payload-terms">
-              <caption>
-                Terms specified by Payload Binding Templates
-              </caption>
-              <thead>
-                <tr>
-                  <th>Term</th>
-                  <th>Class</th>
-                  <th>Specification Requirement</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>contentType</td>
-                  <td>Form</td>
-                  <td>mandatory</td>
-                </tr>
-                <tr>
-                  <td>contentType</td>
-                  <td>ExpectedResponse</td>
-                  <td>optional</td>
-                </tr>
-                <tr>
-                  <td>contentType</td>
-                  <td>AdditionalExpectedResponse</td>
-                  <td>optional</td>
-                </tr>
-                <tr>
-                  <td>contentCoding</td>
-                  <td>Form</td>
-                  <td>optional</td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
-
-          <section id="payload-bindings-table">
-            <h6>Existing Payload Binding Templates</h6>
-            The table below summarizes the currently specified payload binding templates.
-
-            <table class="def numbered">
-              <caption>
-                Existing Platform Binding Templates
-              </caption>
-              <thead>
-                <tr>
-                  <th>Abbreviation</th>
-                  <th>Name</th>
-                  <th>Media Type</th>
-                  <th>Link</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>JSON</td>
-                  <td>JavaScript Object Notation</td>
-                  <td><code>application/json</code></td>
-                  <td>Planned</td>
-                </tr>
-                <tr>
-                  <td>XML</td>
-                  <td>eXtensible Markup Language</td>
-                  <td><code>application/xml</code></td>
-                  <td>
-                    <a href="https://w3c.github.io/wot-binding-templates/bindings/payloads/xml/index.html">Link</a>
-                    (Work in Progress)
-                  </td>
-                </tr>
-                <tr>
-                  <td>text</td>
-                  <td>text</td>
-                  <td><code>text/plain</code></td>
-                  <td>Planned</td>
-                </tr>
-                <tr>
-                  <td>Unstructured Data</td>
-                  <td>Unstructured Data</td>
-                  <td>various</td>
-                  <td>Planned</td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
-
-          <section id="payload-bindings-creating">
-            <h6>Creating a new Payload Binding Template Subspecification</h6>
-
-            <p>
-              Each payload binding template <a>subspecification</a>, SHOULD contain the respective media type. Ideally
-              this media type has been registered at the IANA registry [[IANA-MEDIA-TYPES]] with a corresponding mime
-              type (e.g. <code>application/json</code>). If it is not registered, the binding document can propose a
-              mime type. Additionally, how that media type is represented in a Data Schema SHOULD be demonstrated with
-              examples. In all cases, the following information SHOULD be provided:
-            </p>
-
-            <ul>
-              <li>
-                <b>Specification:</b> The official specification document of the payload format SHOULD be provided. This
-                SHOULD be a static version, i.e. the exact document used during the writing of the binding that is
-                guaranteed to not change. If this is not possible, the specification should be marked with a date of
-                access. When the specification is not publicly available and cannot be linked with a static version, an
-                editor's note should be provided in the introduction, explaining how to get access to the specification.
-              </li>
-            </ul>
-          </section>
         </section>
 
-        <section id="platform-bindings">
-          <h5>Platform Binding Templates</h5>
+        <section id="bindings-combinations">
+          <h5>Protocol and Payload Bindings</h5>
           <p>
-            There are already various IoT platforms on the market that allows exposing physical and virtual Things to
-            the Internet. These platforms generally require a certain use of a protocol and payload. Thus, they can be
-            seen as a combination of the <a href="#protocol-bindings"></a> and <a href="#payload-bindings"></a>. In
-            these cases, the use of protocol and payload bindings needs to be supported with how they are related to
-            each other in the specific platform.
+            In cases like IoT platforms or standards like OPC-UA or BACnet, the protocol, media type, and data structure
+            can be specified. In these cases, their <a>binding specification</a> can either depend on a set of
+            <a href="#protocol-bindings"></a> and <a href="#payload-bindings"></a> or specify protocol, media type, and
+            data structure at the same time.
           </p>
 
           <p>
-            For example, Things of a certain platform can require the usage of HTTP and Websockets together with certain
-            JSON payload structures. Thus, Platform Binding <a>subspecification</a>s provide Thing Models and examples
-            of TDs that allow to semantically group multiple binding templates. This allows creation of TDs for these
-            platforms in a consistent manner and makes it easier to develop <a>Consumer</a>s for them.
+            In IoT platforms, there can be a requirement about the use of HTTP together with certain JSON payload
+            structures. Thus, the corresponding <a>binding specification</a> provides Thing Models and examples of TDs
+            that allow semantic grouping of multiple bindings. This requires having a <a>binding specification</a> for
+            HTTP and JSON in the first place.
           </p>
 
           <p>
-            Since Platform Binding Templates combine the usage of protocol and payload binding templates, the vocabulary
-            terms and values they can specify are the combination of vocabulary terms in [[[#table-protocol-terms]]] and
-            [[[#table-payload-terms]]]. Similarly, a Platform Binding subspecification SHOULD NOT introduce new protocol
-            binding templates or media types inside its own document. If a Platform Binding subspecification requires
-            the usage of protocol or media type, corresponding protocol or payload binding templates MUST be created
-            first.
+            In standards like OPC-UA or BACnet, the <a>binding specification</a> contains requirements on the protocol
+            and media type, and possibly also on data structure. Thus, the <a>binding specification</a> is enough on its
+            own to specify how a <a>binding instance</a> should look.
           </p>
-
-          <section id="platform-bindings-table">
-            <h6>Existing Platform Binding Templates</h6>
-            <p>
-              The table below summarizes the currently specified platform binding template <a>subspecification</a>s.
-            </p>
-
-            <table class="def">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Link</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Philips Hue</td>
-                  <td>Planned</td>
-                </tr>
-                <tr>
-                  <td>ECHONET</td>
-                  <td>Planned</td>
-                </tr>
-                <tr>
-                  <td>OPC-UA</td>
-                  <td>Planned</td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
-
-          <section>
-            <h6>Creating a new Platform Binding Template Subspecification</h6>
-
-            <p>
-              Depending on the platform and the variety of devices it proposes, each platform binding template
-              <a>subspecification</a> will be structured differently. When the platforms offer a <i>reasonable</i> set
-              of device types, a Thing Model for each device type SHOULD be provided. In other cases, possible devices
-              SHOULD be generalized by providing a set of example Thing Models or TDs. In all cases, the following
-              information SHOULD be provided:
-            </p>
-            <ul>
-              <li>
-                <b>Protocol:</b> The protocol used by the platform SHOULD be specified and linked to a protocol binding
-                template <a>subspecification</a> when a corresponding one exists.
-              </li>
-              <li>
-                <b>Media Type:</b> The media type used by the platform SHOULD be specified and linked to a payload
-                binding template <a>subspecification</a> when a corresponding one exists.
-              </li>
-              <li>
-                <b>API Documentation:</b> A static link pointing to the used API Documentation or Specification of the
-                platform SHOULD be provided. When the documentation is not publicly available and cannot be included in
-                a static version in the respective folder, an editor's note should be provided in the introduction,
-                explaining how to get access to the documentation.
-              </li>
-            </ul>
-          </section>
         </section>
       </section>
 
-      <section id="binding-examples" class="informative">
-        <h4>Examples of Thing Descriptions with Protocol Binding Templates</h4>
-
+      <section id="profile-relationship">
+        <h4>Relationship to Profiles</h4>
         <p>
-          The following TD examples uses HTTP, CoAP and MQTT Protocol Binding Templates. These TDs have Context
-          Extensions which assume that there is a CoAP and MQTT in RDF vocabulary similar to [[?HTTP-in-RDF10]] that is
-          accessible via the namespaces <code>http://www.example.org/coap-binding#</code> and
-          <code>http://www.example.org/mqtt-binding#</code>, respectively. Please note that the TD context at
-          <code>"https://www.w3.org/2019/wot/td/v1"</code> already includes the [[?HTTP-in-RDF10]], so HTTP context
-          extensions can be directly used and make sure to look at the Binding Template <a>subspecifications</a> to find
-          the most up-to-date vocabulary terms and examples.
+          The Web of Things also defines a profiling mechanism that allows the reduction of implementation effort.
+          Profiles are built on top of existing Bindings by constraining the flexibility of TDs. Such constraints can be
+          bindings, semantic contexts, link relations, security schemes, and discovery mechanisms. With these
+          constraints, they provide additional interoperability guarantees over bindings.
         </p>
-        <p>The context extensions we see below have the following instructions to the TD Consumer:</p>
-        <ul>
-          <li>
-            <code>"htv:methodName"</code> member instructs the Consumer which HTTP method has to be applied (e.g.,
-            <code>"GET"</code> for retrieving a resource or <code>"POST"</code> for sending data to a resource).
-          </li>
-          <li>
-            <code>"cov:method"</code> member instructs the Consumer which CoAP method has to be applied (e.g.,
-            <code>"GET"</code> for the CoAP Method Code 0.01, <code>"POST"</code> for the CoAP Method Code 0.02, or
-            <code>iPATCH</code> for CoAP Method Code 0.07).
-          </li>
-          <li>
-            <code>"mqv:controlPacket"</code> member instructs the Consumer which MQTT command has to be applied (e.g.,
-            <code>"subscribe"</code> for the subscribing to a topic and <code>"unsubscribe"</code> for unsubscribing).
-          </li>
-        </ul>
-
+        <p class="ednote">
+          The profiling mechanism currently specified in [[WOT-PROFILES]] does not exactly follow the above-mentioned
+          mechanism. However, there is agreement on the future of the profiling mechanism. Once the profiling mechanism
+          is updated, this section will be updated accordingly.
+        </p>
         <p>
-          First, a TD with multiple protocols is introduced where each interaction affordance has one form with one
-          protocol.
+          For example, a profile can constrain the usage of HTTP GET Method for <code>readproperty</code> operations and
+          require payloads to be always serialized in JSON. The usage of a profile is indicated by the
+          <code>profile</code> term in the TD, which is a URI that points to the profile definition. How a Consumer can
+          use a profile is explained in the <i>Profiling Mechanism</i> section of the [[WOT-PROFILES]] specification.
         </p>
-
-        <pre class="example" title="TD with one protocol per form">
-              {
-                  "@context": [
-                      "https://www.w3.org/2022/wot/td/v1.1",
-                      {
-                          "cov": "http://www.example.org/coap-binding#",
-                          "mqv": "http://www.example.org/mqtt-binding#"
-                      }
-                  ],
-                  "title": "Lamp",
-                  "id": "urn:dev:ops:32473-WoTLamp-1234",
-                  "securityDefinitions": {
-                      "nosec_sc": {
-                          "scheme": "nosec"
-                      }
-                  },
-                  "security": ["nosec_sc"],
-                  "properties": {
-                      "switchState": {
-                          "type": "boolean",
-                          "readOnly": true,
-                          "observable": false,
-                          "forms": [
-                              {
-                                  "href": "http://example.com/light/switchstate",
-                                  "op": "readproperty",
-                                  "contentType": "application/json",
-                                  "htv:methodName":"GET"
-                              }
-                          ]
-                      },
-                      "brightness": {
-                          "type": "number",
-                          "readOnly": true,
-                          "observable": false,
-                          "forms": [
-                              {
-                                  "href": "coap://example.com/light/brightness",
-                                  "op": "readproperty",
-                                  "contentType": "application/json",
-                                  "cov:method": "GET"
-                              }
-                          ]
-                      }
-                  },
-                  "actions": {
-                      "switchLight": {
-                          "input":  {
-                              "type": "boolean"
-                          },
-                          "forms": [
-                              {
-                                  "href": "http://example.com/switch/state",
-                                  "op": "invokeaction",
-                                  "contentType": "application/json",
-                                  "htv:methodName":"POST"
-                              }
-                          ]
-                      },
-                      "setBrightness": {
-                          "input":  {
-                              "type": "number",
-                              "maximum":255
-                          },
-                          "forms": [
-                              {
-                                  "href": "coap://example.com/light/brightness",
-                                  "op": "invokeaction",
-                                  "contentType": "application/json",
-                                  "cov:method": "POST"
-                              }
-                          ]
-                      }
-                  },
-                  "events":{
-                      "concentration": {
-                          "title": "Gas Concentration Event Stream",
-                          "data":{
-                              "type": "integer",
-                              "minimum": -1,
-                              "maximum": 65535
-                          },
-                          "forms": [
-                              {
-                                  "href": "mqtt://broker.com",
-                                  "contentType": "application/json",
-                                  "op": "subscribeevent",
-                                  "mqv:filter": "application/deviceid/sensor/concentration",
-                                  "mqv:controlPacket": "subscribe"
-                              }
-                          ]
-                      }
-                  }
-              }
-              </pre
-        >
-
-        <p>
-          Another version of the previous TD with multiple protocol options per form is shown below. Notably, the
-          <code>brightness</code> property can be read via HTTP and CoAP, and observed via MQTT;
-          <code>concentration</code> event can be subscribed to via CoAP and MQTT. In this case, the Consumer would pick
-          the form it can support based on its internal implementation, e.g. whether it has CoAP protocol stack or not.
-        </p>
-
-        <pre class="example" title="TD with protocol options and complex payload">
-              {
-                  "@context": [
-                      "https://www.w3.org/2022/wot/td/v1.1",
-                      {
-                          "cov": "http://www.example.org/coap-binding#",
-                          "mqv": "http://www.example.org/mqtt-binding#"
-                      }
-                  ],
-                  "title": "Lamp",
-                  "id": "urn:dev:ops:32473-WoTLamp-5678",
-                  "securityDefinitions": {
-                      "nosec_sc": {
-                          "scheme": "nosec"
-                      }
-                  },
-                  "security": ["nosec_sc"],
-                  "properties": {
-                      "switchState": {
-                          "type": "boolean",
-                          "readOnly": true,
-                          "observable": false,
-                          "forms": [
-                              {
-                                  "href": "http://example.com/light/switchstate",
-                                  "op": "readproperty",
-                                  "contentType": "application/json",
-                                  "htv:methodName":"GET"
-                              },
-                              {
-                                  "href": "coap://example.com/light/switchstate",
-                                  "op": "readproperty",
-                                  "contentType": "application/json",
-                                  "cov:method": "GET"
-                              }
-                          ]
-                      },
-                      "brightness": {
-                          "type": "number",
-                          "readOnly": true,
-                          "observable": true,
-                          "forms": [
-                              {
-                                  "href": "http://example.com/light/switchstate",
-                                  "op": "readproperty",
-                                  "contentType": "application/json",
-                                  "htv:methodName":"GET"
-                              },
-                              {
-                                  "href": "coap://example.com/light/switchstate",
-                                  "op": "readproperty",
-                                  "contentType": "application/json",
-                                  "cov:method": "GET"
-                              },
-                              {
-                                  "href": "mqtt://broker.com",
-                                  "mqv:filter": "application/deviceid/sensor/brightness",
-                                  "op": "observeproperty",
-                                  "mqv:controlPacket": "subscribe"
-                              }
-                          ]
-                      }
-                  },
-                  "actions": {
-                      "switchLight": {
-                          "input":  {
-                              "type": "boolean"
-                          },
-                          "forms": [
-                              {
-                                  "href": "http://example.com/switch/state",
-                                  "op": "invokeaction",
-                                  "contentType": "application/json",
-                                  "htv:methodName":"POST"
-                              }
-                          ]
-                      },
-                      "setBrightness": {
-                          "input":  {
-                              "type": "number",
-                              "maximum":255
-                          },
-                          "forms": [
-                              {
-                                  "href": "coap://example.com/light/brightness",
-                                  "op": "invokeaction",
-                                  "contentType": "application/json",
-                                  "cov:method": "POST"
-                              }
-                          ]
-                      }
-                  },
-                  "events":{
-                      "concentration": {
-                          "title": "Gas Concentration Event Stream",
-                          "data":{
-                              "type": "integer",
-                              "minimum": -1,
-                              "maximum": 65535
-                          },
-                          "forms": [
-                              {
-                                  "href": "mqtt://broker.com",
-                                  "contentType": "application/json",
-                                  "op": "subscribeevent",
-                                  "mqv:filter": "application/deviceid/sensor/concentration",
-                                  "mqv:controlPacket": "subscribe"
-                              },
-                              {
-                                  "cov:method": "GET",
-                                  "href": "coap://example.com/sensor/gasconcentration",
-                                  "contentType": "application/json",
-                                  "op": "subscribeevent",
-                                  "subprotocol": "cov:observe"
-                              }
-                          ]
-                      }
-                  }
-              }
-              </pre
-        >
       </section>
     </section>
 
@@ -5318,327 +4884,6 @@
         </ul>
       </section>
       <!-- end of id="behavior-data"-->
-
-      <section id="protocol-bindings">
-        <h3>Protocol Bindings</h3>
-
-        <p>
-          A <a>Protocol Binding</a> is the mapping from an <a>Interaction Affordance</a> to concrete messages of a
-          specific protocol such as HTTP [[?RFC7231]], CoAP [[?RFC7252]], or MQTT [[?MQTT]]. <a>Protocol Bindings</a> of
-          <a>Interaction Affordances</a> are serialized as <code>forms</code> as defined in
-          <a href="#form-serialization-json"></a>.
-        </p>
-
-        <p>
-          Every form in a WoT Thing Description needs to have a submission target, given by the
-          <code>href</code> member, as indicated in <a href="#form">Form</a>. The URI scheme [[!RFC3986]] of this
-          submission target indicates what <a>Protocol Binding</a> the <a>Thing</a> implements [[wot-architecture11]].
-          For instance, if the target starts with <code>http</code> or <code>https</code>, a <a>Consumer</a> can then
-          infer the <a>Thing</a> implements the <a>Protocol Binding</a> based on HTTP and it should expect HTTP-specific
-          terms in the form instance (see next section, <a href="#http-binding-assertions"></a>).
-        </p>
-        <ul>
-          <li>
-            <span class="rfc2119-assertion" id="td-bindings-requirements-scheme">
-              Every form in a WoT Thing Description MUST follow the requirements of the
-              <a>Protocol Binding</a> indicated by the URI scheme [[!RFC3986]] of its <code>href</code> member.
-            </span>
-          </li>
-          <li>
-            <span class="rfc2119-assertion" id="td-bindings-server-accept">
-              Every form in a WoT Thing Description MUST accurately describe requests (including request headers, if
-              present) accepted by the <a>Thing</a> in an interaction.
-            </span>
-          </li>
-        </ul>
-
-        <p class="note">
-          Optimally, the protocols used are listed as a scheme in the IANA registry [[?IANA-URI-SCHEMES]]). This
-          guarantees a unique <a>Protocol Binding</a> assignment. In case the desired protocol is not yet registered
-          with IANA, it is recommended to follow the scheme value of the protocol specifications, if available. In
-          principle, to avoid ambiguity in the identification of the protocol via the scheme, the
-          <a>Protocol Binding</a> document will provide a recommended scheme value to enable unique protocol
-          identification in the context of WoT.
-        </p>
-
-        <section id="http-binding-assertions">
-          <h4>Protocol Binding based on HTTP</h4>
-
-          <p>
-            Per default the Thing Description supports the <a>Protocol Binding</a> based on HTTP by including the HTTP
-            RDF vocabulary definitions from <em>HTTP Vocabulary in RDF 1.0</em> [[?HTTP-in-RDF10]]. This vocabulary can
-            be directly used within TD instances by the usage of the prefix <code>htv</code>, which points to
-            <code>http://www.w3.org/2011/http#</code>. Further details of <a>Protocol Binding</a> based on HTTP can be
-            found in [[?WOT-BINDING-TEMPLATES]].
-          </p>
-          <p>
-            To interact with a <a>Thing</a> that implements the <a>Protocol Binding</a> based on HTTP, a <a>Consumer</a>
-            needs to know what HTTP method to use when submitting a form. In the general case, a Thing Description can
-            explicitly include a term indicating the method, i.e.,
-            <code>htv:methodName</code>. For the sake of conciseness, the <a>Protocol Binding</a> based on HTTP defines
-            <a>Default Values</a> for the operation types listed below, which also aims at convergence of the methods
-            expected by <a>Things</a> (e.g., GET to read, PUT to write).
-            <span class="rfc2119-assertion" id="td-default-http-method">
-              When no method is indicated in a form representing an <a>Protocol Binding</a> based on HTTP, a
-              <a>Default Value</a> MUST be assumed as shown in the following table.
-            </span>
-          </p>
-
-          <table class="def numbered">
-            <caption>
-              Default values of vocabulary terms for HTTP that are used when the terms are not present in a form of a
-              TD, containing an HTTP URI Scheme
-            </caption>
-            <thead>
-              <tr>
-                <th><a>Vocabulary term</a></th>
-                <th>Default value</th>
-                <th>Context</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="rfc2119-default-assertion" id="td-default-http-method_get">
-                <td>
-                  <code>htv:methodName</code>
-                </td>
-                <td><code>GET</code></td>
-                <td>
-                  <code>Form</code> with operation type <code>readproperty</code>, <code>readallproperties</code>,
-                  <code>readmultipleproperties</code>
-                </td>
-              </tr>
-              <tr class="rfc2119-default-assertion" id="td-default-http-method_put">
-                <td>
-                  <code>htv:methodName</code>
-                </td>
-                <td><code>PUT</code></td>
-                <td>
-                  <code>Form</code> with operation type <code>writeproperty</code>, <code>writeallproperties</code>,
-                  <code>writemultipleproperties</code>
-                </td>
-              </tr>
-              <tr class="rfc2119-default-assertion" id="td-default-http-method_post">
-                <td>
-                  <code>htv:methodName</code>
-                </td>
-                <td><code>POST</code></td>
-                <td><code>Form</code> with operation type <code>invokeaction</code></td>
-              </tr>
-            </tbody>
-          </table>
-
-          <p>
-            For example, the <a href="#simple-thing-description-sample">Example 1</a> in
-            <a href="#introduction"></a> does not contain operation types and HTTP methods in the forms. The following
-            <a>Default Values</a> should be assumed for the forms in the
-            <a href="#simple-thing-description-sample">Example 1</a>:
-          </p>
-
-          <aside class="example with-default">
-            <div class="with-default-control">
-              <input type="checkbox" />
-              <span><i>with default values for Protocol Binding based on HTTP</i></span>
-            </div>
-            <pre class="json">
-{
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
-    "id": "urn:uuid:3a559b69-cbec-4e7b-b543-bd8e6e41fd8b",
-    "title": "MyLampThing",
-    "securityDefinitions": {
-        "basic_sc": {
-            "scheme": "basic",
-            "in": "header"
-        }
-    },
-    "security": [
-        "basic_sc"
-    ],
-    "properties": {
-        "status": {
-            "type": "string",
-            "readOnly": true,
-            "forms": [
-                {
-                    "op": "readproperty",
-                    "href": "https://mylamp.example.com/status"
-                }
-            ]
-        }
-    },
-    "actions": {
-        "toggle": {
-            "forms": [
-                {
-                    "href": "https://mylamp.example.com/toggle"
-                }
-            ]
-        }
-    },
-    "events": {
-        "overheating": {
-            "data": {
-                "type": "string"
-            },
-            "forms": [
-                {
-                    "href": "https://mylamp.example.com/oh",
-                    "subprotocol": "longpoll"
-                }
-            ]
-        }
-    }
-}</pre
-            >
-            <pre class="json">
-{
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
-    "id": "urn:uuid:3deca264-4f90-4321-a5ea-f197e6a1c7cf",
-    "title": "MyLampThing",
-    "securityDefinitions": {
-        "basic_sc": {
-            "scheme": "basic",
-            "in": "header"
-        }
-    },
-    "security": [
-        "basic_sc"
-    ],
-    "properties": {
-        "status": {
-            "type": "string",
-            "readOnly": true,
-            "forms": [
-                {
-                    "op": "readproperty",
-                    "href": "https://mylamp.example.com/status",
-                    "htv:methodName": "GET"
-                }
-            ]
-        }
-    },
-    "actions": {
-        "toggle": {
-            "forms": [
-                {
-                    "op": "invokeaction",
-                    "href": "https://mylamp.example.com/toggle",
-                    "htv:methodName": "POST"
-                }
-            ]
-        }
-    },
-    "events": {
-        "overheating": {
-            "data": {
-                "type": "string"
-            },
-            "forms": [
-                {
-                    "op": "subscribeevent",
-                    "href": "https://mylamp.example.com/oh",
-                    "subprotocol": "longpoll"
-                }
-            ]
-        }
-    }
-}</pre
-            >
-          </aside>
-
-          <p>
-            In the case of a <code>forms</code> entry that has multiple <code>op</code> values the usage of the
-            <code>htv:methodName</code> is not permitted. A <a>TD Processor</a> will extend the multiple
-            <code>op</code> values to separate <code>forms</code> entries and associates a single operation with the
-            default assumption. The address information (e.g. <code>href</code>) and other metadata are taken over in
-            the extended version.
-          </p>
-
-          <aside class="example with-default">
-            <div class="with-default-control">
-              <input type="checkbox" />
-              <span
-                ><i>extended <code>forms</code> in case of multiple values in <code>op</code></i></span
-              >
-            </div>
-            <pre class="json">
-{
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
-    "id": "urn:uuid:43e2081d-3fd9-41bf-803d-baaefb79c70f",
-    "title": "MyLampThing",
-    "securityDefinitions": {
-        "basic_sc": {
-            "scheme": "basic",
-            "in": "header"
-        }
-    },
-    "security": [
-        "basic_sc"
-    ],
-    "properties": {
-        "status": {
-            "type": "string",
-            "forms": [
-                {
-                    "op" : ["readproperty", "writeproperty"],
-                    "href": "https://mylamp.example.com/status"
-                }
-            ]
-        }
-    }
-}</pre
-            >
-            <pre class="json">
-{
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
-    "id": "urn:uuid:9cd44eef-0b3f-4566-94b0-1358af3d86bd",
-    "title": "MyLampThing",
-    "securityDefinitions": {
-        "basic_sc": {
-            "scheme": "basic",
-            "in": "header"
-        }
-    },
-    "security": [
-        "basic_sc"
-    ],
-    "properties": {
-        "status": {
-            "type": "string",
-            "forms": [
-                {
-                    "op": "readproperty",
-                    "href": "https://mylamp.example.com/status",
-                    "htv:methodName": "GET"
-                },
-                {
-                    "op": "writeproperty",
-                    "href": "https://mylamp.example.com/status",
-                    "htv:methodName": "PUT"
-                }
-            ]
-        }
-    }
-}</pre
-            >
-          </aside>
-        </section>
-
-        <section>
-          <h4>Other Protocol Bindings</h4>
-
-          <p>
-            The number of <a>Protocol Bindings</a> a <a>Thing</a> can implement is not restricted. Other
-            <a>Protocol Bindings</a> (e.g., for CoAP, MQTT, or OPC UA) are intended to be standardized in separate
-            documents such as a protocol <a>Vocabulary</a> similar to
-            <em>HTTP Vocabulary in RDF 1.0</em> [[?HTTP-in-RDF10]] or specifications including
-            <a>Default Value</a> definitions. Such protocols can be simply integrated into the TD by the usage of the
-            <a>TD Context Extension</a> mechanism (see <a href="#sec-context-extensions"></a>).
-          </p>
-          <p>
-            Please refer to [[?WOT-BINDING-TEMPLATES]] for information on how to describe IoT platforms and ecosystems.
-          </p>
-        </section>
-      </section>
     </section>
     <!-- end of id="behavior"-->
 
@@ -5684,8 +4929,8 @@
           <code>minimum</code> needs to be an <code>integer</code>, unless a placeholder is used.
         </p>
         <p>
-          You can use <a target="_blank" href="https://www.w3.org/2022/wot/tm-schema/v1.1">the JSON Schema</a> to
-          validate TM instances that are serialized as JSON.
+          You can use <a target="_blank" href="https://www.w3.org/ns/wot-next/tm-schema">the JSON Schema</a> to validate
+          TM instances that are serialized as JSON.
         </p>
       </section>
       <section id="thing-model-declaration" class="normative">
@@ -5807,7 +5052,7 @@
 
           <pre class="example" title="Basic On/Off Thing Model Definition" id="td-model-example-basic-on-off">
         {
-            "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+            "@context": ["https://www.w3.org/ns/wot-next/td"],
             "@type": "tm:ThingModel",
             "title": "Basic On/Off Thing Model",
             "properties": {
@@ -5831,7 +5076,7 @@
             id="td-model-example-smart-lamp-control"
           >
         {
-            "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+            "@context": ["https://www.w3.org/ns/wot-next/td"],
             "@type": "tm:ThingModel",
             "title": "Smart Lamp Control with Dimming",
             "links" : [{
@@ -5890,7 +5135,7 @@
           </p>
           <pre class="example" title="Smart Lamp Control imports existing definition" id="td-model-example-tmRef">
         {
-            "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+            "@context": ["https://www.w3.org/ns/wot-next/td"],
             "@type": "tm:ThingModel",
             "title": "Smart Lamp Control",
             "properties" : {
@@ -5914,7 +5159,7 @@
             id="td-model-example-relative-tmRef"
           >
         {
-            "@context": "https://www.w3.org/2022/wot/td/v1.1",
+            "@context": "https://www.w3.org/ns/wot-next/td",
             "@type": "tm:ThingModel",
             "title": "Multi Sensor",
             "properties": {
@@ -5979,7 +5224,7 @@
             id="td-model-example-tmRef2"
           >
         {
-            "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+            "@context": ["https://www.w3.org/ns/wot-next/td"],
             "@type": "tm:ThingModel",
             "title": "Smart Lamp Control",
             "properties" : {
@@ -6014,7 +5259,7 @@
             id="td-model-example-smart-lamp-control-extend-import"
           >
         {
-            "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+            "@context": ["https://www.w3.org/ns/wot-next/td"],
             "@type": "tm:ThingModel",
             "title": "Smart Lamp Control",
             "links" : [{
@@ -6091,7 +5336,7 @@
             </div>
             <pre class="SmartVentilator exampleTab1 selected json">
         {
-            "@context": "https://www.w3.org/2022/wot/td/v1.1",
+            "@context": "https://www.w3.org/ns/wot-next/td",
             "@type": "tm:ThingModel",
             "title": "Smart Ventilator Thing Model",
             "version" : { "model": "1.0.0" },
@@ -6117,7 +5362,7 @@
             >
             <pre class="Ventilation exampleTab1 json">
         {
-            "@context": "https://www.w3.org/2022/wot/td/v1.1",
+            "@context": "https://www.w3.org/ns/wot-next/td",
             "@type": "tm:ThingModel",
             "title": "Ventilator Thing Model",
             "version": {
@@ -6139,7 +5384,7 @@
             >
             <pre class="LED exampleTab1 json">
         {
-            "@context": "https://www.w3.org/2022/wot/td/v1.1",
+            "@context": "https://www.w3.org/ns/wot-next/td",
             "@type": "tm:ThingModel",
             "title": "LED Thing Model",
             "version": {
@@ -6220,7 +5465,7 @@
             </div>
             <pre class="SmartVentilator exampleTab1 selected json">
         {
-            "@context": "https://www.w3.org/2022/wot/td/v1.1",
+            "@context": "https://www.w3.org/ns/wot-next/td",
             "title": "Smart Ventilator",
             "securityDefinitions": {
                 "basic_sc": {
@@ -6266,7 +5511,7 @@
             >
             <pre class="Ventilation exampleTab1 json">
         {
-            "@context": "https://www.w3.org/2022/wot/td/v1.1",
+            "@context": "https://www.w3.org/ns/wot-next/td",
             "title": "Ventilator",
             "securityDefinitions": {
                 "basic_sc": {
@@ -6314,7 +5559,7 @@
             >
             <pre class="LED exampleTab1 json">
         {
-            "@context": "https://www.w3.org/2022/wot/td/v1.1",
+            "@context": "https://www.w3.org/ns/wot-next/td",
             "title": "LED Thing Model",
             "securityDefinitions": {
                 "basic_sc": {
@@ -6407,7 +5652,7 @@
 
           <pre class="example" title="Self-contained TD of the Smart Ventilator TM">
     {
-        "@context": "https://www.w3.org/2022/wot/td/v1.1",
+        "@context": "https://www.w3.org/ns/wot-next/td",
         "title": "Smart Ventilator",
         "securityDefinitions": {
             "basic_sc": {
@@ -6546,7 +5791,7 @@
 
           <pre class="example" title="Thing Model with the tm:optional term for interaction affordances.">
 {
-    "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
     "@type": "tm:ThingModel",
     "title": "Lamp Thing Model",
     "description": "Lamp Thing Model Description",
@@ -6588,7 +5833,7 @@
 
           <pre class="example" title="Thing Model overwrites tm:optional of the previous Thing Model example.">
     {
-        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+        "@context": ["https://www.w3.org/ns/wot-next/td"],
         "@type": "tm:ThingModel",
         "title": "Lamp Thing Model (All Mandatory)",
         "description": "Lamp Thing Model description expects all interaction affordances (status, toggle, and overheating)",
@@ -6637,7 +5882,7 @@
               typed as string.
             </span>
 
-            After replacing the placeholder, e.g. when creating a Thing Description instance, the original type is
+            After replacing the placeholder, e.g., when creating a Thing Description instance, the original type is
             applied with the corresponding replaced value.
           </p>
 
@@ -6663,7 +5908,7 @@
             </div>
             <pre class="selected thingmodel exampleTab1 json">
 {
-	"@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+	"@context": ["https://www.w3.org/ns/wot-next/td"],
 	"@type": "tm:ThingModel",
 	"title": "Thermostate No. {{THERMOSTATE_NUMBER}}",
 	"version": "{{VERSION_INFO}}",
@@ -6693,7 +5938,7 @@
             >
             <pre class="thingdescription exampleTab1 json">
 {
-	"@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+	"@context": ["https://www.w3.org/ns/wot-next/td"],
 	"@type": "Thing",
 	"title": "Thermostate No. 4",
 	"version": {"instance": "1.0.1", "model": "2.0.0"},
@@ -6860,7 +6105,7 @@
 
         <pre class="example" title="Extending Smart Control Lamp with a modified dim constrained">
     {
-        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+        "@context": ["https://www.w3.org/ns/wot-next/td"],
         "@type": "tm:ThingModel",
         "links" : [{
             "rel": "tm:extends",
@@ -6883,7 +6128,7 @@
 
         <pre class="example" title="Thing Description">
         {
-            "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+            "@context": ["https://www.w3.org/ns/wot-next/td"],
             "@type": "Thing",
             "title": "Smart Lamp Control",
             "securityDefinitions": {
@@ -6995,7 +6240,7 @@
           the garage door opener and car charger so A can use them. The scope however may be limited so that A cannot
           access certain administrative functions of these Things (for example, to change how long the garage door can
           remain open, or to change the charging rate). In addition, the access should expire after A is expected to
-          have left, e.g. after one week.
+          have left, e.g., after one week.
         </p>
         <dl>
           <dt>Mitigations:</dt>
@@ -7045,7 +6290,7 @@
           substitution, for example inserting the values of these strings into marked places in a HTML template to
           create final HTML, any HTML markup in the original string will be interpreted in the context of the browser
           displaying the dashboard. It is possible for an attacker to embed scripts in HTML in various ways and have
-          these scripts executed upon user interaction or even automatically (e.g. upon page load, or upon an error,
+          these scripts executed upon user interaction or even automatically (e.g., upon page load, or upon an error,
           which can be done intentionally). Since the string will be generated by the TD <a>producer</a> and the
           dashboard will be generated by a different origin, this is a form of cross-site-scripting (XSS) attack.
         </p>
@@ -7148,7 +6393,7 @@
           <dd>
             Implementations on resource-constrained devices are expected to perform raw JSON processing (as opposed to
             JSON-LD processing) and support only a limited set of domain-specific extensions. The set of supported
-            extensions can be established by a WoT Profile [[WOT-PROFILE]], for example.
+            extensions can be established by a WoT Profile [[WOT-PROFILES]], for example.
             <span class="rfc2119-assertion" id="td-security-static-context">
               Constrained implementations SHOULD use vetted versions of their supported context extensions managed
               statically or as part of a secure update process.</span
@@ -7269,7 +6514,7 @@
           <dt>Mitigation:</dt>
           <dd>
             The <code>id</code> field in TDs is intentionally not required to be globally unique. There are several
-            cryptographic mechanisms (e.g. random UUIDs) available to generate suitable IDs in a distributed fashion
+            cryptographic mechanisms (e.g., random UUIDs) available to generate suitable IDs in a distributed fashion
             that do not require a central registry. These mechanisms typically have a very low probability of generating
             duplicate identifiers, and this needs to be taken into account in the system design; for example, by
             detecting duplicates and regenerating IDs when necessary. The scope of IDs also does not need to be global:
@@ -7514,21 +6759,56 @@
       </section>
     </section>
 
-    <section id="example-serialization" class="appendix informative">
-      <h2>Example Thing Description Instances</h2>
+    <section id="example-tds-bindings" class="appendix informative">
+      <h2>Example Thing Description Instances with Protocol Bindings</h2>
 
-      <section id="myLampThing-example-serialization">
+      <p>
+        The following TD example uses HTTP, CoAP, and MQTT Protocol Bindings. These TDs have Context Extensions which
+        assume that there are CoAP-in-RDF and MQTT-in-RDF vocabularies similar to [[?HTTP-in-RDF10]] that are accessible
+        via the namespaces <code>http://www.example.org/coap-binding#</code> and
+        <code>http://www.example.org/mqtt-binding#</code>, respectively. Please note that the TD context at
+        <code>"https://www.w3.org/2022/wot/td/v1.1"</code> already includes the [[?HTTP-in-RDF10]], so HTTP context
+        extensions can be used directly. Note that each <a>Binding Specification</a> contains the most up-to-date
+        vocabulary terms and examples.
+      </p>
+
+      <p>The context extensions we see below have the following instructions to the TD Consumer:</p>
+      <ul>
+        <li>
+          <code>"htv:methodName"</code> member instructs the Consumer which HTTP method has to be applied (e.g.,
+          <code>"GET"</code> for retrieving a resource or <code>"POST"</code> for sending data to a resource).
+        </li>
+        <li>
+          <code>"cov:method"</code> member instructs the Consumer which CoAP method has to be applied (e.g.,
+          <code>"GET"</code> for the CoAP Method Code 0.01, <code>"POST"</code> for the CoAP Method Code 0.02, or
+          <code>iPATCH</code> for CoAP Method Code 0.07).
+        </li>
+        <li>
+          <code>"mqv:controlPacket"</code> member instructs the Consumer which MQTT command has to be applied (e.g.,
+          <code>"subscribe"</code> for the subscribing to a topic and <code>"unsubscribe"</code> for unsubscribing).
+        </li>
+      </ul>
+
+      <p>
+        First, TDs with a single protocol are shown. Then, TDs with multiple protocols are introduced where each
+        interaction affordance has one form with one protocol.
+      </p>
+
+      <section id="myLampThing-example-coap">
         <h3>MyLampThing Example with CoAP Protocol Binding</h3>
 
         <p>Feature list of the <a>Thing</a>:</p>
 
         <ul>
           <li>Title: MyLampThing</li>
-          <li>Context Extensions: none</li>
-          <li>Offered affordances: 1 Property, 1 Action, 1 Event</li>
+          <li>Context Extensions: CoAP Binding</li>
+          <li>Interaction Affordances: 1 Property, 1 Action, 1 Event</li>
           <li>Security: PSKSecurityScheme</li>
           <li>Protocol Binding: CoAP [[?RFC7252]] over TLS</li>
-          <li>Comment: Also see <a href="#adding-protocol-bindings"></a>.</li>
+          <li>
+            Comment: Also see
+            <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/coap/index.html">CoAP Binding</a>.
+          </li>
         </ul>
 
         <aside class="example with-default">
@@ -7542,7 +6822,7 @@
           <pre class="json">
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         {
             "cov": "http://www.example.org/coap-binding#"
         }
@@ -7601,7 +6881,7 @@
           <pre class="json">
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         {
             "cov": "http://www.example.org/coap-binding#"
         }
@@ -7673,21 +6953,22 @@
         </aside>
       </section>
 
-      <section id="myLightSensor-example-serialization">
+      <section id="myLightSensor-example-mqtt">
         <h3>MyIlluminanceSensor Example with MQTT Protocol Binding</h3>
 
         <p>Feature list of the <a>Thing</a>:</p>
 
         <ul>
           <li>Title: MyIlluminanceSensor</li>
-          <li>Context Extensions: none</li>
-          <li>Offered affordances: 1 Event</li>
+          <li>Context Extensions: MQTT Binding</li>
+          <li>Interaction Affordances: 1 Event</li>
           <li>Security: none</li>
           <li>Protocol Binding: MQTT [[?MQTT]]</li>
           <li>
-            Comment: An MQTT client frequently publishes the illuminance data (number is serialized in text format) to
-            the topic <code>/illuminance</code> by the MQTT broker running behind the address
-            <code>192.168.1.187:1883</code>.
+            Comment: An MQTT client (Thing) frequently publishes the illuminance data (number is serialized in text
+            format) to the topic <code>/illuminance</code> by the MQTT broker running behind the address
+            <code>192.168.1.187:1883</code>. Also see
+            <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/mqtt/index.html">MQTT Binding</a>
           </li>
         </ul>
         <aside class="example with-default">
@@ -7700,91 +6981,100 @@
           </div>
           <pre class="json">
 {
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
-    "title": "MyIlluminanceSensor",
-    "id": "urn:uuid:9489991a-7622-45b6-8437-f858b59835d4",
-    "securityDefinitions": {
-        "nosec_sc": {
-            "scheme": "nosec"
-        }
-    },
-    "security": [
-        "nosec_sc"
-    ],
-    "events": {
-        "illuminance": {
-            "data": {
-                "type": "integer"
-            },
-            "forms": [
-                {
-                    "href": "mqtt://192.168.1.187:1883/illuminance",
-                    "contentType": "text/plain"
-                }
-            ]
-        }
+  "@context": [
+    "https://www.w3.org/ns/wot-next/td",
+    {
+    "mqv": "http://www.example.org/mqtt-binding#"
     }
+  ],
+  "title": "MyIlluminanceSensor",
+  "id": "urn:uuid:9489991a-7622-45b6-8437-f858b59835d4",
+  "securityDefinitions": {
+      "nosec_sc": {
+          "scheme": "nosec"
+      }
+  },
+  "security": [
+      "nosec_sc"
+  ],
+  "events": {
+      "illuminance": {
+          "data": {
+              "type": "integer"
+          },
+          "forms": [
+              {
+                  "href": "mqtt://broker.com:1883/",
+                  "contentType": "text/plain",
+                  "mqv:filter": "mySensor/illuminance"
+              }
+          ]
+      }
+  }
 }
-  </pre
-          >
+          </pre>
           <pre class="json">
 {
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
-    "title": "MyIlluminanceSensor",
-    "id": "urn:uuid:9489991a-7622-45b6-8437-f858b59835d4",
-    "securityDefinitions": {
-        "nosec_sc": {
-            "scheme": "nosec"
-        }
-    },
-    "security": [
-        "nosec_sc"
-    ],
-    "events": {
-        "illuminance": {
-            "data": {
-                "type": "integer"
-            },
-            "forms": [
-                {
-                    "href": "mqtt://192.168.1.187:1883/illuminance",
-                    "contentType": "text/plain",
-                    "op":["subscribeevent","unsubscribeevent"]
-                }
-            ]
-        }
+  "@context": [
+    "https://www.w3.org/ns/wot-next/td",
+    {
+      "mqv": "http://www.example.org/mqtt-binding#"
     }
+  ],
+  "title": "MyIlluminanceSensor",
+  "id": "urn:uuid:9489991a-7622-45b6-8437-f858b59835d4",
+  "securityDefinitions": {
+      "nosec_sc": {
+          "scheme": "nosec"
+      }
+  },
+  "security": [
+      "nosec_sc"
+  ],
+  "events": {
+      "illuminance": {
+          "data": {
+              "type": "integer"
+          },
+          "forms": [
+              {
+                  "href": "mqtt://broker.com:1883/",
+                  "contentType": "text/plain",
+                  "op":["subscribeevent","unsubscribeevent"],
+                  "mqv:controlPacket": "subscribe",
+                  "mqv:filter": "mySensor/illuminance"
+              }
+          ]
+      }
+  }
 }
-  </pre
-          >
+          </pre>
         </aside>
       </section>
 
-      <section id="webhook-example-serialization">
+      <section id="sensor-example-webhook">
         <h3>Webhook Event Example</h3>
 
         <p>Feature list of the <a>Thing</a>:</p>
 
         <ul>
-          <li>Title: WebhookThing</li>
-          <li>
-            Context Extensions: use HTTP <a>Protocol Binding</a> supplements (htv prefix already included in TD context)
-          </li>
+          <li>Title: TemperatureSensor</li>
+          <li>Context Extensions: HTTP <a>Protocol Binding</a> (htv prefix already included in TD context)</li>
           <li>Offered affordances: 1 Event</li>
           <li>Security: none</li>
           <li>Protocol Binding: HTTP</li>
           <li>
-            Comment: <i>WebhookThing</i> provides an Event affordance <code>temperature</code> which periodically pushes
-            the latest temperature value to the <a>Consumer</a> using a Webhook mechanism, where the <a>Thing</a> sends
-            POST requests to a callback URI provided by the <a>Consumer</a>. To describe this, the
+            Comment: <i>TemperatureSensor</i> provides an Event affordance <code>temperature</code> which periodically
+            pushes the latest temperature value to the <a>Consumer</a> using a Webhook mechanism, where the
+            <a>Thing</a> sends POST requests to a callback URI provided by the <a>Consumer</a>. To describe this, the
             <code>subscription</code> member defines a write-only parameter <code>callbackURL</code>, which must be
             submitted through the <code>subscribeevent</code> form. The read-only parameter
-            <code>subscriptionID</code> is returned by the subscription. The <i>WebhookThing</i> will then periodically
-            POST to this callback URI with a payload defined by <code>data</code>. To unsubscribe, the
+            <code>subscriptionID</code> is returned by the subscription. The <i>TemperatureSensor</i> will then
+            periodically POST to this callback URI with a payload defined by <code>data</code>. To unsubscribe, the
             <a>Consumer</a> has to submit the <code>unsubscribeevent</code> form with the <code>subscriptionID</code> as
-            described in <code>cancellation</code>. Alternatively, <code>uriVariables</code> approache can be used that
-            informs the <a>Consumer</a> to include the <code>subscriptionID</code> string into the URI that have to be
-            called with the delete method (see tab 'With uriVariables'). In such setup, the
+            described in <code>cancellation</code>. Alternatively, a <code>uriVariables</code> approach, that informs
+            the <a>Consumer</a> to include the <code>subscriptionID</code> string in the URIs that have to be called
+            with the delete method (see tab 'With uriVariables'), can be used. In such setup, the
             <code>cancellation</code> container can be obmitted. In general, this example can be further automated by
             using a <a>TD Context Extension</a> to include proper <a>semantic annotations</a>.
           </li>
@@ -7792,7 +7082,9 @@
 
         <aside class="example ds-selector-tabs">
           <div class="marker">
-            <span class="example-title">Temperature Event with subscription and cancellation</span>
+            <span class="example-title"
+              >Temperature Sensor with a Temperature Event with subscription and cancellation</span
+            >
           </div>
           <div class="selectors">
             <button class="selected exampleTab1 without" onclick="openTab('exampleTab1', 'without')">
@@ -7801,116 +7093,119 @@
             <button class="exampleTab1 with" onclick="openTab('exampleTab1', 'with')">With uriVariables</button>
           </div>
           <pre class="selected without exampleTab1 json">
-    {
-        "@context": "https://www.w3.org/2022/wot/td/v1.1",
-        "id": "urn:uuid:4778f80a-4c78-4cbb-a0e4-fa37b7d748df",
-        "title": "WebhookThing",
-        "description": "Webhook-based Event with subscription and unsubscribe form.",
-        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
-        "security": ["nosec_sc"],
-        "events": {
-            "temperature": {
-                "description": "Provides periodic temperature value updates.",
-                "subscription": {
-                    "type": "object",
-                    "properties": {
-                        "callbackURL": {
-                            "type": "string",
-                            "format": "uri",
-                            "description": "Callback URL provided by subscriber for Webhook notifications.",
-                            "writeOnly": true
-                        },
-                        "subscriptionID": {
-                            "type": "string",
-                            "description": "Unique subscription ID for cancellation provided by WebhookThing.",
-                            "readOnly": true
-                        }
-                    }
-                },
-                "data": {
-                    "type": "number",
-                    "description": "Latest temperature value that is sent to the callback URL."
-                },
-                "cancellation": {
-                    "type": "object",
-                    "properties": {
-                        "subscriptionID": {
-                            "type": "integer",
-                            "description": "Required subscription ID to cancel subscription.",
-                            "writeOnly": true
-                        }
-                    }
-                },
-                "forms": [
-                    {
-                        "op": "subscribeevent",
-                        "href": "http://192.168.0.124:8080/events/temp/subscribe",
-                        "contentType": "application/json",
-                        "htv:methodName": "POST"
-                    },
-                    {
-                        "op": "unsubscribeevent",
-                        "href": "http://192.168.0.124:8080/events/temp/cancel",
-                        "htv:methodName": "POST"
-                    }
-                ]
-            }
-        }
-    }
-  </pre
-          >
+{
+  "@context": ["https://www.w3.org/ns/wot-next/td", {
+      "htv": "http://www.w3.org/2011/http#"
+  }],
+  "id": "urn:uuid:4778f80a-4c78-4cbb-a0e4-fa37b7d748df",
+  "title": "TemperatureSensor",
+  "description": "Webhook-based Event with subscription and unsubscribe form.",
+  "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+  "security": ["nosec_sc"],
+  "events": {
+      "temperature": {
+          "description": "Provides periodic temperature value updates.",
+          "subscription": {
+              "type": "object",
+              "properties": {
+                  "callbackURL": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Callback URL provided by subscriber for Webhook notifications.",
+                      "writeOnly": true
+                  },
+                  "subscriptionID": {
+                      "type": "string",
+                      "description": "Unique subscription ID for cancellation provided by WebhookThing.",
+                      "readOnly": true
+                  }
+              }
+          },
+          "data": {
+              "type": "number",
+              "description": "Latest temperature value that is sent to the callback URL."
+          },
+          "cancellation": {
+              "type": "object",
+              "properties": {
+                  "subscriptionID": {
+                      "type": "integer",
+                      "description": "Required subscription ID to cancel subscription.",
+                      "writeOnly": true
+                  }
+              },
+              "required": ["subscriptionID"]
+          },
+          "forms": [
+              {
+                  "op": "subscribeevent",
+                  "href": "http://192.168.0.124:8080/events/temp/subscribe",
+                  "contentType": "application/json",
+                  "htv:methodName": "POST"
+              },
+              {
+                  "op": "unsubscribeevent",
+                  "href": "http://192.168.0.124:8080/events/temp/cancel",
+                  "htv:methodName": "POST"
+              }
+          ]
+      }
+  }
+}
+          </pre>
           <pre class="with exampleTab1 json">
-    {
-        "@context": "https://www.w3.org/2022/wot/td/v1.1",
-        "id": "urn:uuid:3c1b4716-247f-4cda-ba53-d3307ac6feb0",
-        "title": "WebhookThing",
-        "description": "Webhook-based Event with subscription and unsubscribe form.",
-        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
-        "security": ["nosec_sc"],
-        "events": {
-            "temperature": {
-                "description": "Provides periodic temperature value updates.",
-                "subscription": {
-                    "type": "object",
-                    "properties": {
-                        "callbackURL": {
-                            "type": "string",
-                            "format": "uri",
-                            "description": "Callback URL provided by subscriber for Webhook notifications.",
-                            "writeOnly": true
-                        },
-                        "subscriptionID": {
-                            "type": "string",
-                            "description": "Unique subscription ID for cancellation provided by WebhookThing.",
-                            "readOnly": true
-                        }
-                    }
-                },
-                "data": {
-                    "type": "number",
-                    "description": "Latest temperature value that is sent to the callback URL."
-                },
-                "uriVariables": {
-                    "subscriptionID": { "type": "string" }
-                },
-                "forms": [
-                    {
-                        "op": "subscribeevent",
-                        "href": "http://192.168.0.124:8080/events/temp/subscribe",
-                        "contentType": "application/json",
-                        "htv:methodName": "POST"
-                    },
-                    {
-                        "op": "unsubscribeevent",
-                        "href": "http://192.168.0.124:8080/events/temp/{subscriptionID}",
-                        "htv:methodName": "DELETE"
-                    }
-                ]
-            }
-        }
-    }
-  </pre
-          >
+{
+  "@context": ["https://www.w3.org/ns/wot-next/td", {
+    "htv": "http://www.w3.org/2011/http#"
+  }],
+  "id": "urn:uuid:3c1b4716-247f-4cda-ba53-d3307ac6feb0",
+  "title": "WebhookThing",
+  "description": "Webhook-based Event with subscription and unsubscribe form.",
+  "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+  "security": ["nosec_sc"],
+  "events": {
+      "temperature": {
+          "description": "Provides periodic temperature value updates.",
+          "subscription": {
+              "type": "object",
+              "properties": {
+                  "callbackURL": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Callback URL provided by subscriber for Webhook notifications.",
+                      "writeOnly": true
+                  },
+                  "subscriptionID": {
+                      "type": "string",
+                      "description": "Unique subscription ID for cancellation provided by WebhookThing.",
+                      "readOnly": true
+                  }
+              }
+          },
+          "data": {
+              "type": "number",
+              "description": "Latest temperature value that is sent to the callback URL."
+          },
+          "uriVariables": {
+              "subscriptionID": { "type": "string" }
+          },
+          "forms": [
+              {
+                  "op": "subscribeevent",
+                  "href": "http://192.168.0.124:8080/events/temp/subscribe",
+                  "contentType": "application/json",
+                  "htv:methodName": "POST"
+              },
+              {
+                  "op": "unsubscribeevent",
+                  "href": "http://192.168.0.124:8080/events/temp/{subscriptionID}",
+                  "htv:methodName": "DELETE"
+              }
+          ]
+      }
+  }
+}
+          </pre>
         </aside>
 
         <p class="note">
@@ -7919,16 +7214,282 @@
           <code>dataResponse</code> field.
         </p>
       </section>
+
+      <section id="lamp-example-multiprotocol-simple">
+        <h3>Lamp Thing with HTTP, CoAP, and MQTT Protocol Bindings</h3>
+
+        <p>Feature list of the <a>Thing</a>:</p>
+
+        <ul>
+          <li>Title: LampThing</li>
+          <li>Context Extensions: HTTP (htv prefix already included in TD context), CoAP, MQTT Bindings</li>
+          <li>Interaction Affordances: 2 Properties, 2 Actions, 1 Event</li>
+          <li>Security: none</li>
+          <li>Protocol Binding: HTTP, CoAP [[?RFC7252]], and MQTT [[?MQTT]]</li>
+          <li>
+            Comment: Each interaction affordance has one form with one protocol. Also see
+            <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/http/index.html">HTTP Binding</a>,
+            <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/coap/index.html">CoAP Binding</a>,
+            and
+            <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/mqtt/index.html">MQTT Binding</a>.
+          </li>
+        </ul>
+
+        <pre class="example json" title="Multiprotocol TD of a Lamp with one Protocol per Form">
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "cov": "http://www.example.org/coap-binding#",
+            "mqv": "http://www.example.org/mqtt-binding#",
+            "htv": "http://www.w3.org/2011/http#"
+        }
+    ],
+    "title": "LampThing",
+    "id": "urn:dev:ops:32473-WoTLamp-1234",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": ["nosec_sc"],
+    "properties": {
+        "switchState": {
+            "type": "boolean",
+            "readOnly": true,
+            "observable": false,
+            "forms": [
+                {
+                    "href": "http://example.com/light/switchstate",
+                    "op": "readproperty",
+                    "contentType": "application/json",
+                    "htv:methodName":"GET"
+                }
+            ]
+        },
+        "brightness": {
+            "type": "number",
+            "readOnly": true,
+            "observable": false,
+            "forms": [
+                {
+                    "href": "coap://example.com/light/brightness",
+                    "op": "readproperty",
+                    "contentType": "application/json",
+                    "cov:method": "GET"
+                }
+            ]
+        }
+    },
+    "actions": {
+        "switchLight": {
+            "input":  {
+                "type": "boolean"
+            },
+            "forms": [
+                {
+                    "href": "http://example.com/switch/state",
+                    "op": "invokeaction",
+                    "contentType": "application/json",
+                    "htv:methodName":"POST"
+                }
+            ]
+        },
+        "setBrightness": {
+            "input":  {
+                "type": "number",
+                "maximum":255
+            },
+            "forms": [
+                {
+                    "href": "coap://example.com/light/brightness",
+                    "op": "invokeaction",
+                    "contentType": "application/json",
+                    "cov:method": "POST"
+                }
+            ]
+        }
+    },
+    "events":{
+        "concentration": {
+            "title": "Gas Concentration Event Stream",
+            "data":{
+                "type": "integer",
+                "minimum": -1,
+                "maximum": 65535
+            },
+            "forms": [
+                {
+                    "href": "mqtt://broker.com",
+                    "contentType": "application/json",
+                    "op": "subscribeevent",
+                    "mqv:filter": "application/deviceid/sensor/concentration",
+                    "mqv:controlPacket": "subscribe"
+                }
+            ]
+        }
+    }
+}
+        </pre>
+      </section>
+
+      <section id="lamp-example-multiprotocol-complex">
+        <h3>Lamp Thing with mixture of HTTP, CoAP, and MQTT Protocol Bindings</h3>
+
+        <p>Feature list of the <a>Thing</a>:</p>
+
+        <ul>
+          <li>Title: LampThing</li>
+          <li>Context Extensions: HTTP (htv prefix already included in TD context), CoAP, MQTT Bindings</li>
+          <li>Interaction Affordances: 2 Properties, 2 Actions, 1 Event</li>
+          <li>Security: none</li>
+          <li>Protocol Binding: HTTP, CoAP [[?RFC7252]], and MQTT [[?MQTT]]</li>
+          <li>
+            Comment: Another version of the previous TD with multiple protocol options per form is shown below. Notably,
+            the
+            <code>brightness</code> property can be read via HTTP and CoAP, and observed via MQTT;
+            <code>concentration</code> event can be subscribed to via CoAP and MQTT. In this case, the Consumer would
+            pick the form it can support based on its internal implementation, e.g., whether it has a CoAP protocol
+            stack or not. Also see
+            <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/http/index.html">HTTP Binding</a>,
+            <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/coap/index.html">CoAP Binding</a>,
+            and
+            <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/mqtt/index.html">MQTT Binding</a>.
+          </li>
+        </ul>
+
+        <pre class="example json" title="Multiprotocol TD of a Lamp with Multiple Protocols per Form">
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "cov": "http://www.example.org/coap-binding#",
+            "mqv": "http://www.example.org/mqtt-binding#",
+            "htv": "http://www.w3.org/2011/http#"
+        }
+    ],
+    "title": "Lamp",
+    "id": "urn:dev:ops:32473-WoTLamp-5678",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": ["nosec_sc"],
+    "properties": {
+        "switchState": {
+            "type": "boolean",
+            "readOnly": true,
+            "observable": false,
+            "forms": [
+                {
+                    "href": "http://example.com/light/switchstate",
+                    "op": "readproperty",
+                    "contentType": "application/json",
+                    "htv:methodName":"GET"
+                },
+                {
+                    "href": "coap://example.com/light/switchstate",
+                    "op": "readproperty",
+                    "contentType": "application/json",
+                    "cov:method": "GET"
+                }
+            ]
+        },
+        "brightness": {
+            "type": "number",
+            "readOnly": true,
+            "observable": true,
+            "forms": [
+                {
+                    "href": "http://example.com/light/switchstate",
+                    "op": "readproperty",
+                    "contentType": "application/json",
+                    "htv:methodName":"GET"
+                },
+                {
+                    "href": "coap://example.com/light/switchstate",
+                    "op": "readproperty",
+                    "contentType": "application/json",
+                    "cov:method": "GET"
+                },
+                {
+                    "href": "mqtt://broker.com",
+                    "mqv:filter": "application/deviceid/sensor/brightness",
+                    "op": "observeproperty",
+                    "mqv:controlPacket": "subscribe"
+                }
+            ]
+        }
+    },
+    "actions": {
+        "switchLight": {
+            "input":  {
+                "type": "boolean"
+            },
+            "forms": [
+                {
+                    "href": "http://example.com/switch/state",
+                    "op": "invokeaction",
+                    "contentType": "application/json",
+                    "htv:methodName":"POST"
+                }
+            ]
+        },
+        "setBrightness": {
+            "input":  {
+                "type": "number",
+                "maximum":255
+            },
+            "forms": [
+                {
+                    "href": "coap://example.com/light/brightness",
+                    "op": "invokeaction",
+                    "contentType": "application/json",
+                    "cov:method": "POST"
+                }
+            ]
+        }
+    },
+    "events":{
+        "concentration": {
+            "title": "Gas Concentration Event Stream",
+            "data":{
+                "type": "integer",
+                "minimum": -1,
+                "maximum": 65535
+            },
+            "forms": [
+                {
+                    "href": "mqtt://broker.com",
+                    "contentType": "application/json",
+                    "op": "subscribeevent",
+                    "mqv:filter": "application/deviceid/sensor/concentration",
+                    "mqv:controlPacket": "subscribe"
+                },
+                {
+                    "cov:method": "GET",
+                    "href": "coap://example.com/sensor/gasconcentration",
+                    "contentType": "application/json",
+                    "op": "subscribeevent",
+                    "subprotocol": "cov:observe"
+                }
+            ]
+        }
+    }
+}
+              </pre
+        >
+      </section>
     </section>
 
     <section id="json-schema-for-validation" class="appendix informative">
-      <h1>JSON Schema for TD Instance Validation</h1>
+      <h2>JSON Schema for TD Instance Validation</h2>
       <p>
         A JSON Schema [[?JSON-SCHEMA]] document for syntactically validating Thing Description instances serialized in
         JSON based format is available at
-        <a target="_blank" href="https://www.w3.org/2022/wot/td-schema/v1.1"
-          >https://www.w3.org/2022/wot/td-schema/v1.1</a
-        >. This JSON Schema does not require the terms with <a>Default Values</a> to be present. Thus, the terms with
+        <a target="_blank" href="https://www.w3.org/ns/wot-next/td-schema">https://www.w3.org/ns/wot-next/td-schema</a>.
+        This JSON Schema does not require the terms with <a>Default Values</a> to be present. Thus, the terms with
         <a>Default Values</a> are optional. (see also <a href="#sec-default-values"></a>)
       </p>
 
@@ -7943,7 +7504,7 @@
     </section>
 
     <section id="contentType-usage" class="appendix informative">
-      <h1>contentType usage in Thing Descriptions</h1>
+      <h2>contentType usage in Thing Descriptions</h2>
       <p>
         The different cases on the variation of request and response are explained at
         <a href="#sec-response-usage"></a>. The tables below summarize these cases in a concise manner. The tables start
@@ -8212,7 +7773,7 @@
     </section>
 
     <section id="json-ld-ctx-usage" class="appendix informative">
-      <h1>JSON-LD Context Usage</h1>
+      <h2>JSON-LD Context Usage</h2>
 
       <p>
         The present specification introduces the <a>TD Information Model</a> as a set of constraints over different
@@ -8237,7 +7798,7 @@
       </p>
 
       <p>
-        <code>https://www.w3.org/2022/wot/td/v1.1</code>
+        <code>https://www.w3.org/ns/wot-next/td</code>
       </p>
 
       <p>includes the following mappings (among others):</p>
@@ -8546,328 +8107,24 @@
     </section>
 
     <section id="changes" class="appendix">
-      <h1>Recent Specification Changes</h1>
+      <h2>Recent Specification Changes</h2>
       <section>
-        <h2 id="changes-from-pr-2023">Changes from the Proposed Recommendation 11 July 2023</h2>
-        <ul>
-          <li>Adjusted affiliations of former editors.</li>
-          <li>
-            Added informative sentence to explain that Data Schema can be parsed by conventional JSON Schema validators.
-          </li>
-          <li>Reworded an assertion by removing a double negation so that it is easier to understand.</li>
-          <li>Added stable links for JSON Schema resources.</li>
-          <li>Removed addressed editor's notes and converted notes for the readers to normal notes.</li>
-        </ul>
-      </section>
-      <section>
-        <h2 id="changes-from-cr-2023">Changes from the Candidate Recommendation 19 January 2023</h2>
+        <h2 id="changes-from-rec-2023">Changes from the Recommendation 05 December 2023</h2>
         <ul>
           <li>
-            At-risk assertions that did not receive sufficient implementations were removed or converted to informative
-            statements.
+            Added Bindings chapter, which includes the binding mechanism instead of the Binding Templates document.
+            Correspondingly, the reference to the [[WOT-BINDING-REGISTRY]] is added.
           </li>
-          <li>
-            <code>device</code> flow in <a href="#oauth2securityscheme"><code>OAuth2SecurityScheme</code></a> was
-            removed, together with its associated assertions.
-          </li>
-          <li>Remove introductory paragraphs about at risk assertions.</li>
-          <li>Add captions to all tables</li>
-          <li>Add definitions of different levels of TD such as <a>Thing Level</a></li>
-          <li>Convert editor's notes to normal notes.</li>
-          <li>Add default value alternatives to examples in the appendix.</li>
+          <li>Removed the HTTP Binding.</li>
+          <li>Added processing rules for adding the correct context extension for the identified bindings.</li>
+          <li>Changed the namespaces to use the temporary versions.</li>
+          <li>Made the <code>contentType</code> optional without defaults in all levels.</li>
         </ul>
-      </section>
-      <section>
-        <h2 id="changes-from-august-2022">Changes from Fourth Public Working Draft 3 August 2022</h2>
-        <ul>
-          <li>Status of the document Section: add list of at-risk features</li>
-          <li>All TD examples: fix highlighting problems and improve formatting</li>
-          <li>
-            add security scheme auto, provide definition what "satisfying" a securityDefinition means and new wording of
-            assertion (td-security-no-secrets) in Section <a href="#securityscheme"></a>
-          </li>
-          <li>Section <a href="#form-additionalResponses"></a> has been newly added.</li>
-          <li>Remove TD Context Extensions CoAP example in Section <a href="#adding-protocol-bindings"></a></li>
-          <li>
-            Remove reference to Binding Document in assertion (bindings-requirements-scheme) in Section
-            <a href="#protocol-bindings"></a>
-          </li>
-          <li>
-            Chapter <a href="#thing-model"></a> moved before <a href="#sec-security-consideration"></a> and
-            <a href="#sec-privacy-consideration"></a>
-          </li>
-          <li>The term <code>tm:required</code> changed to <a href="#thing-model-td-optional"></a></li>
-          <li>Section <a href="#content-format-section"></a>: add CoAP Content-Format ID for Thing Model</li>
-        </ul>
-      </section>
-      <section>
-        <h2 id="changes-from-march-2022">Changes from Third Public Working Draft 11 March 2022</h2>
-        <ul>
-          <li>
-            In section <a href="#class-definitions"></a> it was made clear that all vocabulary terms and values are case
-            sensitive.
-          </li>
-          <li>
-            In section <a href="#thing"></a> the rules for <code>@context</code> were clarified by stating that TD 1.1
-            consumers must accept TD 1.0 TDs.
-          </li>
-          <li>
-            In section <a href="#actionaffordance"></a> the term <code>synchronous</code>
-            was added.
-          </li>
-          <li>
-            In section <a href="#nullschema"></a> it was clarified that <code>null</code>
-            does not mean the absence of a value.
-          </li>
-          <li>
-            The section <a href="#autosecurityscheme"></a> with the corresponding <code>"scheme": "auto"</code> was
-            added to indicate that the security parameters are going to be negotiated by the underlying protocols at
-            runtime.
-          </li>
-          <li>
-            In section <a href="#link"></a> the vocabulary term <code>hreflang</code>
-            was added that to specify the language of a linked document.
-          </li>
-          <li>
-            The section <a href="#sec-op-data-schema-mapping"></a> was added which summarizes the available data schema
-            related terms with the <code>op</code>
-            keywords.
-          </li>
-          <li>
-            In section <a href="#sec-security-consideration"></a> and the according subsections the text has been
-            revised and improved following the latest security guidelines. Moreover, new sections about
-            <a href="#security-consideration-access-duration"></a>,
-            <a href="#sec-security-consideration-vulnerability-auditing"></a>,
-            <a href="#sec-security-consideration-script-injection"></a>,
-            <a href="#sec-security-consideration-execution"></a>, and
-            <a href="#sec-security-consideration-jsonld-expansion"></a> have been added.
-          </li>
-          <li>
-            In section <a href="#sec-privacy-consideration"></a> and the according subsections the text has been revised
-            and improved following the latest security guidelines. In addition, a new section about
-            <a href="#sec-privacy-consideration-id-metadata"></a> was added.
-          </li>
-          <li>
-            In section <a href="#thing-model-extension-import"></a> it was made explicit that
-            <code>tm:extends</code> and the import mechanism based on <code>tm:ref</code> supports transitive extension.
-          </li>
-          <li>
-            The section <a href="#media-type-section-tm"></a> was added to provide Thing Model registration information.
-          </li>
-          <li>
-            The section <a href="#content-format-section"></a> was split into <a href="#wot-thing-description"></a> and
-            <a href="#wot-thing-model"></a>.
-          </li>
-          <li>
-            In appendix <a href="#json-schema-for-validation"></a> the JSON Schema is now linked instead of being
-            included in the specification itself.
-          </li>
-        </ul>
-      </section>
-      <section>
-        <h2 id="changes-from-june-2021">Changes from Second Public Working Draft 7 June 2021</h2>
-        <ul>
-          <!-- section 4. Namespaces -->
-          <li>In section <a href="#namespaces"></a>, new namespace IRI is provided for Thing Description 1.1.</li>
-          <!-- section 5.3 Class Definitions -->
-          <li>
-            In section <a href="#class-definitions"></a>:
-            <ul>
-              <li>
-                The type definition of <code>titles</code> and <code>descriptions</code> members that appear in
-                sub-sections <a href="#thing"></a>, <a href="#interactionaffordance"></a>,
-                <a href="#dataschema"></a> and <a href="#securityscheme"></a> were clarified.
-              </li>
-              <!-- section 5.3.1 Core Vocabulary Definitions -->
-              <li>
-                In section <a href="#sec-core-vocabulary-definition"></a>:
-                <ul>
-                  <!-- section 5.3.1.1 Thing -->
-                  <li>
-                    In section <a href="#thing"></a>:
-                    <ul>
-                      <li>The allowed values for the <code>op</code> member of a <code>Form</code> were expanded.</li>
-                      <li>The description of the <code>forms</code> term was clarified.</li>
-                      <li>The value used for <code>@context</code> has changed in Thing Description 1.1.</li>
-                      <li>
-                        The rule in the use of <code>@context</code> for Thing Description 1.1 to be able to be consumed
-                        by TD 1.0 consumers are specified.
-                      </li>
-                    </ul>
-                  </li>
-                  <!-- section 5.3.1.3 PropertyAffordance -->
-                  <li>
-                    In section <a href="#propertyaffordance"></a>:
-                    <ul>
-                      <li>Clarifed that property can be retrieved and/or updated.</li>
-                      <li>An additional note was appended for clarification.</li>
-                    </ul>
-                  </li>
-                  <!-- section 5.3.1.4 ActionAffordance -->
-                  <li>
-                    In section <a href="#actionaffordance"></a>:
-                    <ul>
-                      <li>The allowed values of the <code>op</code> member of a <code>Form</code> were expanded.</li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-              <!-- section 5.3.2.1 DataSchema -->
-              <li>
-                In section <a href="#dataschema"></a>:
-                <ul>
-                  <li>The description of the <code>unit</code> term was clarified.</li>
-                  <li>
-                    The vocabulary terms <code>contentEncoding</code> and <code>contentMediaType</code> were moved to
-                    section <a href="#stringschema"></a>.
-                  </li>
-                </ul>
-              </li>
-              <!-- section 5.3.3 Security Vocabulary Definitions -->
-              <li>
-                In section <a href="#sec-security-vocabulary-definition"></a>:
-                <ul>
-                  <!-- section 5.3.3.4 BasicSecurityScheme -->
-                  <li>
-                    In section <a href="#basicsecurityscheme"></a>, the assignment of the <code>in</code> member was
-                    clarified.
-                  </li>
-                  <!-- section 5.3.3.5 DigestSecurityScheme -->
-                  <li>
-                    In section <a href="#digestsecurityscheme"></a>, the assignment of the <code>in</code> and
-                    <code>qop</code> member was clarified.
-                  </li>
-                  <!-- section 5.3.3.6 APIKeySecurityScheme -->
-                  <li>
-                    In section <a href="#apikeysecurityscheme"></a>, the assignment of the <code>in</code> member was
-                    clarified.
-                  </li>
-                  <!-- section 5.3.3.7 BearerSecurityScheme -->
-                  <li>
-                    In section <a href="#bearersecurityscheme"></a>, the assignment of the <code>alg</code>,
-                    <code>format</code> and <code>in</code> member was clarified.
-                  </li>
-                </ul>
-              </li>
-              <!-- section 5.3.4.1 Link -->
-              <li>
-                In section <a href="#link"></a>, a new value <code>tm:submodel</code> was added to the table describing
-                the values used for relation types.
-              </li>
-              <!-- section 5.3.4.2. Form -->
-              <li>
-                In section <a href="#form"></a>:
-                <ul>
-                  <li>The assignment of the <code>op</code> term was clarified.</li>
-                  <li>
-                    <code>Values subscribeallevents</code>, <code>unsubscribeallevents</code>,
-                    <code>queryallactions</code>, <code>queryaction</code> and <code>cancelaction</code> were added to
-                    the type definition of <code>op</code> term.
-                  </li>
-                  <li>
-                    A <a href="#table-operation-types">table</a> was added to describe the values of
-                    <code>op</code> term.
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          <!-- section 5.4 Default Value Definitions -->
-          <li>
-            In section <a href="#sec-default-values"></a>, default assignments were added to
-            <code>PropertyAffordance</code> class's <code>observable</code> member and
-            <code>AdditionalExpectedResponse</code> class's <code>contentType</code> member.
-          </li>
-          <!-- section 6. TD Representation Format -->
-          <li>
-            In section <a href="#sec-td-serialization"></a>:
-            <ul>
-              <!-- section 6.3.1 Thing Root Object -->
-              <li>
-                In section <a href="#sec-thing-as-a-whole-json"></a>, the value used for <code>@context</code> has
-                changed in Thing Description 1.1.
-              </li>
-              <!-- section 6.3.4 securityDefinitions and security -->
-              <li>
-                In section <a href="#security-serialization-json"></a>:
-                <ul>
-                  <li>
-                    Examples were reordered, then the section was partitioned into sub-sections to make the section
-                    easier to read.
-                  </li>
-                  <!-- section 6.3.4.4 OAuth 2.0 usage -->
-                  <li>
-                    In section <a href="#security-oauth2"></a>, the <code>flow</code> that appears in
-                    <a href="#example-18"></a> now uses <code>client</code> as a value.
-                  </li>
-                </ul>
-              </li>
-              <!-- section 6.3.9.1 uriVariables -->
-              <li>In section <a href="#form-uriVariables"></a>, more examples were added.</li>
-              <!-- section 6.6 -->
-              <li>A sub-section describing canonicalization was removed.</li>
-            </ul>
-          </li>
-          <!-- 7.1.1 Example I: Additional Basic Metadata -->
-          <li>
-            In section <a href="#semantic-annotations-example-version-units"></a>, additional terms are used in the
-            example.
-          </li>
-          <!-- 8.3 Protocol Bindings -->
-          <li>
-            In section <a href="#protocol-bindings"></a>:
-            <ul>
-              <li>Added a reference to the Binding Templates specification to clarify <code>href</code> semantics.</li>
-              <li>A note was appended for clarification.</li>
-            </ul>
-          </li>
-          <!-- 10.3 Modeling Tools -->
-          <li>
-            In section <a href="#thing-model-tools"></a>:
-            <ul>
-              <!-- section 10.3.1 Versioning -->
-              <li>
-                In section <a href="#thing-model-versioning"></a>, a paragraph was added to describe a consideration in
-                the use of versioning.
-              </li>
-              <!-- section 10.3.2 Extension and Import -->
-              <li>
-                In section <a href="#thing-model-extension-import"></a>:
-                <ul>
-                  <li>The syntax and processing rule of <code>tm:ref</code> was clarified.</li>
-                  <li><a href="#thing-model-overwriting"></a> was added.</li>
-                </ul>
-              </li>
-              <!-- section 10.3.3 Composition -->
-              <li>Section <a href="#thing-model-composition"></a> was added.</li>
-              <li>
-                Section <a href="#thing-model-td-placeholder"></a> is now after section
-                <a href="#thing-model-td-optional"></a>. (order reversed)
-              </li>
-            </ul>
-          </li>
-          <!-- appendix A.3 Webhook Event Example -->
-          <li>
-            In appendix <a href="#webhook-example-serialization"></a>, the example and its description were updated.
-          </li>
-          <!-- appendix B. JSON Schema for TD Instance Validation -->
-          <li>
-            In appendix <a href="#json-schema-for-validation"></a>, the text of the second note was updated for
-            clarification.
-          </li>
-        </ul>
-      </section>
-      <section>
-        <h2 id="changes-from-fpwd">Changes from First Public Working Draft 24 November 2020</h2>
-        <p>
-          Changes from First Public Working Draft 24 November 2020 are described in the
-          <a href="https://www.w3.org/TR/2021/WD-wot-thing-description11-20210607/">Second Public Working Draft</a>.
-        </p>
       </section>
     </section>
 
     <section id="acknowledgements" class="appendix normative">
-      <h1>Acknowledgements</h1>
+      <h2>Acknowledgements</h2>
       <p>
         The editors would like to specially thank Cristiano Aguzzi, Thomas Jäckle, Jan Romann, Elodie Thiéblin, Michael
         Koster, Michael Lagally, Kazuyuki Ashimura, Daniel Peintner, Toru Kawaguchi, María Poveda, Dave Raggett,
