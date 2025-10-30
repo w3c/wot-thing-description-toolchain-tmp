@@ -13,8 +13,7 @@ GENERATORS = ['jsonschema', 'shacl', 'jsonldcontext', 'owl', 'linkml']
 RESPEC_TEMPLATE_PATH = RESOURCES_PATH / 'index.template.html'
 RESPEC_FRAGMENT_PATH = GENS_PATH / 'schema_fragment.html'
 FINAL_SPEC_PATH = GENS_PATH / 'final-spec.html'
-CORE_SCHEMA_PLACEHOLDER = '<!-- LINKML_SCHEMA_PLACEHOLDER -->'
-RDF_DEFINITIONS_PLACEHOLDER_V1 = '<!-- rendered from RDF definitions --> %s'
+CORE_SCHEMA_PLACEHOLDER = '%s'
 
 from .postprocessors.jsonschema_postprocessor import post_process_jsonschema
 
