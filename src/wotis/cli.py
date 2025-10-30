@@ -23,13 +23,13 @@ input_option = click.option('-i', '--input_schema',
                             show_default=True,
                             help="Path to the input schema specified as LinkML yaml.",
                             default=YAML_SCHEMA_PATH)
-respec_option = click.option('-r',
-                             '--generate_spec',
+docs_option = click.option('-d',
+                             '--generate_docs',
                              type=bool,
                              is_flag=True,
                              default=False,
                              show_default=True,
-                             help="Boolean for generating the final Respec HTML specification.")
+                             help="Boolean for generating the final TD Respec-based HTML specification.")
 
 
 
@@ -56,8 +56,8 @@ def main(verbose: int, quiet: bool):
 
 @main.command()
 @input_option
-@respec_option
-def generate_wot_resources(input_schema: str, generate_spec: bool):
+@docs_option
+def generate_wot_resources(input_schema: str, generate_docs: bool):
     """
     Generating WoT resources (RDF, JSON-LD Context, SHACL Shapes, and JSON Schema)
     and the final Respec specification from LinkML schemas.
@@ -74,7 +74,7 @@ def generate_wot_resources(input_schema: str, generate_spec: bool):
             logging.info(f"Proceeding with WoT resource generation for {generator}")
             run_standard_generator(linkml_schema_view, generator, output_dir)
 
-        if generate_spec:
+        if generate_docs:
             logging.info("Starting Respec specification generation...")
             generate_respec_spec(
                 input_path,
