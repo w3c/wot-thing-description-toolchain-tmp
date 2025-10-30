@@ -2,9 +2,8 @@ import logging
 import yaml
 
 from jinja2 import Environment, FileSystemLoader, exceptions
-from pathlib import Path
-
 from linkml_runtime.utils.schemaview import SchemaView
+from pathlib import Path
 
 from src.wotis import JINJA_TEMPLATE_DIR
 
