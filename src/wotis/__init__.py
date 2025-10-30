@@ -13,6 +13,5 @@ CORE_SCHEMA_PLACEHOLDER = '%s'
 
 GENERATORS = ['jsonschema', 'shacl', 'jsonldcontext', 'owl', 'linkml']
 
-from .postprocessors.jsonschema_postprocessor import post_process_jsonschema
 
 __all__ = ['post_process_jsonschema']
