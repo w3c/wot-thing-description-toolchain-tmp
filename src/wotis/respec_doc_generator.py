@@ -20,20 +20,15 @@ def get_assignment(slot_name: str, class_def: object, slot_def: object) -> str:
     """
 
     slot_usage = class_def.slot_usage.get(slot_name) if class_def.slot_usage else None
-
-    # Check 'required' property on slot or slot_usage
     if slot_def.required or (slot_usage and slot_usage.required):
         return 'mandatory'
 
-    # Check for minimum_value requirement (cardinality 1..* etc.)
+    # Check (cardinality 1..* etc.)
     min_value = slot_def.minimum_value
     if slot_usage and slot_usage.minimum_value is not None:
         min_value = slot_usage.minimum_value
-
     if min_value is not None and min_value > 0:
         return 'mandatory'
-
-    # Default to optional for all others
     return 'optional'
 
 
@@ -87,13 +82,9 @@ def generate_respec_spec(input_path: Path, respec_template_path: Path, final_spe
         return
 
     slot_data = []
-
     for slot_name in class_def.slots:
         slot_def = linkml_schema_view.get_slot(slot_name)
-
         description = slot_def.description or ""
-
-        # Determine the Type text for the table, based on STTL
         if slot_name == '@context':
             range_text = 'anyURI or Array'
         elif slot_name == '@type':
