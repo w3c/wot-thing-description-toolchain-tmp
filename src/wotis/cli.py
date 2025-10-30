@@ -78,7 +78,6 @@ def generate_wot_resources(input_schema: str, generate_spec: bool):
             logging.info("Starting Respec specification generation...")
             generate_respec_spec(
                 input_path,
-                GENS_PATH,
                 RESPEC_TEMPLATE_PATH,
                 FINAL_SPEC_PATH,
                 CORE_SCHEMA_PLACEHOLDER
