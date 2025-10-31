@@ -147,17 +147,21 @@ slots:
     multivalued: true
 
   "@context":
-    description: JSON-LD @context
+    description: JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
     range: string
+    required: true
     exactly_one_of:
-      - range: string
+      - range: uri
         pattern: '^(https://www\.w3\.org/2019/wot/td/v1|https://www\.w3\.org/2022/wot/td/v1\.1|http://www\.w3\.org/ns/td)$'
       - range: string
         multivalued: true
         minimum_value: 1
 
   "@type":
-    description: JSON-LD @type
+    description: JSON-LD keyword to label the object with semantic tags (or types).
+    annotations:
+      spec_table_definition: >-
+        JSON-LD keyword to label the object with [[semantic tags]] (or types).
     exactly_one_of:
       - range: string
       - range: string
@@ -166,8 +170,12 @@ slots:
 
   id:
     description: >-
-      Identifier of the Thing in form of a URI [RFC3986] (e.g., stable URI, temporary and mutable URI, 
+      Identifier of the Thing in form of a URI (RFC3986) (e.g., stable URI, temporary and mutable URI, 
       URI with local IP address, URN, etc.).
+    todos: CHECK WHERE THE DEFINITION COMES FROM, IT IS NOT IN ONTOLOGY OR SHACL
+    annotations:
+      spec_table_definition: >-
+        Identifier of the Thing in form of a URI [RFC3986] (e.g., stable URI, temporary and mutable URI, URI with local IP address, URN, etc.).
     range: uri
 
   version:
@@ -302,12 +310,15 @@ slots:
     description: >-
       Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
     slot_uri: td:title
+    required: true
     range: string
 
   titles:
     description: >-
       Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
     slot_uri: td:titleInLanguage
+    inlined: true
+    multivalued: true
     range: MultiLanguage
 
   description:
@@ -432,10 +443,14 @@ classes:
     description: >-
       A Map providing a set of human-readable texts in different languages identified by language tags as defined in BCP47.
     attributes:
-      language_map:
+      language_tag:
         range: string
-        multivalued: true
+        identifier: true
+        required: true
         pattern: "^[a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2})?$"
+      language_value:
+        range: string
+        required: true
 
   Thing:
     class_uri: td:Thing
