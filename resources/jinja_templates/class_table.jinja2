@@ -1,0 +1,22 @@
+{# Generic vocabulary table used by class_section #}
+<table class="def numbered">
+  <caption>Vocabulary Terms in {{ class_name }} Level</caption>
+  <thead>
+    <tr>
+      <th>Vocabulary term</th>
+      <th>Description</th>
+      <th>Assignment</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for slot in slots %}
+    <tr class="rfc2119-table-assertion">
+      <td><code>{{ slot.slot_name }}</code></td>
+      <td>{{ slot.description | safe }}</td>
+      <td>{{ slot.assignment }}</td>
+      <td>{{ slot.range_text }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
