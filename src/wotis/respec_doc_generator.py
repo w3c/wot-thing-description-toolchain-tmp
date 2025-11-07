@@ -14,6 +14,9 @@ from .specgen.tables import collect_slot_rows
 from .specgen.respec import build_jinja_env, assemble
 
 
+cfg = Config.from_resources_dir(Path("resources"), placeholder="%s")
+
+
 def generate_respec_spec(input_path: Path,
                          respec_template_path: Path,
                          final_spec_path: Path,
@@ -25,7 +28,7 @@ def generate_respec_spec(input_path: Path,
         logging.error("Failed to load LinkML schema: %s", e)
         return
     try:
-        env = build_jinja_env(Config.jinja_templates)
+        env = build_jinja_env(cfg.jinja_templates)
         section_tpl = env.get_template("class_section.jinja2")
     except (exceptions.TemplateNotFound, FileNotFoundError) as e:
         logging.error("Template error: %s", e, exc_info=True)
@@ -35,8 +38,8 @@ def generate_respec_spec(input_path: Path,
     # class order: Thing first
     classes: List[str] = list(sv.all_classes().keys())
     classes = (["Thing"] + sorted(c for c in classes if c != "Thing")) if "Thing" in classes else sorted(classes)
-    _, _, phrase_to_id = load_glossary(Config.glossary_path)
-    biblio = load_bibliography(Config.biblio_path)
+    _, _, phrase_to_id = load_glossary(cfg.glossary_path)
+    biblio = load_bibliography(cfg.biblio_path)
 
     sections_html: List[str] = []
     for cls in classes:
