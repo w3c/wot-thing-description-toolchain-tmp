@@ -13,6 +13,8 @@ from linkml_runtime.utils.schemaview import SchemaView
 from src.wotis import (YAML_SCHEMA_PATH, GENS_PATH, GENERATORS,
                        RESPEC_TEMPLATE_PATH, FINAL_SPEC_PATH,
                        CORE_SCHEMA_PLACEHOLDER)
+from src.wotis.specgen.config import Config
+from src.wotis.respec_doc_generator import generate_respec_spec
 
 
 input_option = click.option('-i', '--input_schema',
