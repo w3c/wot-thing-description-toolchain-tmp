@@ -1,0 +1,13 @@
+<section id="{{ class_name | lower }}">
+  <h3>{{ class_name }}</h3>
+
+  {% if class_description %}
+  <p>{{ class_description }}</p>
+  {% endif %}
+
+  {% include "class_table.jinja2" %}
+
+  {% if spec_scope_note_html %}
+  {{ spec_scope_note_html | safe }}
+  {% endif %}
+</section>

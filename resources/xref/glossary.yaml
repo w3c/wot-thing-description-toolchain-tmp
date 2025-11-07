@@ -1,0 +1,133 @@
+terms:
+  Thing:
+    id: dfn-thing
+    aliases: ["thing", "Things"]
+  Consumer:
+    id: dfn-consumer
+    aliases: ["consumer", "Consumers"]
+  Producer:
+    id: dfn-producer
+    aliases: ["producer", "Producers"]
+  Thing Description:
+    id: dfn-td
+    aliases: ["TD", "Thing Descriptions", "TDs", "TD Document", "TD Documents"]
+  Partial TD:
+    id: dfn-partial-td
+    aliases: ["partial TD", "Partial TDs", "partial TDs"]
+  Thing Model:
+    id: dfn-tm
+    aliases: ["TM", "Thing Models", "TMs"]
+  Interaction Model:
+    id: dfn-interaction-model
+    aliases: ["interaction model"]
+  Interaction Affordance:
+    id: dfn-interaction-affordance
+    aliases: ["Interaction Affordances", "interaction affordance", "interaction affordances", "Affordance", "Affordances"]
+  IoT Platform:
+    id: dfn-iot-platform
+    aliases: ["IoT platform", "IoT Platforms", "IoT platforms"]
+  Property:
+    id: dfn-property
+    aliases: ["Properties", "property", "properties"]
+  Action:
+    id: dfn-action
+    aliases: ["Actions", "action", "actions"]
+  Event:
+    id: dfn-event
+    aliases: ["Events", "event", "events"]
+  Data Schema:
+    id: dfn-data-schema
+    aliases: ["Data Schemas", "data schema", "data schemas"]
+  Content Type:
+    id: dfn-content-type
+    aliases: ["Content Types", "content type", "content types", "media type", "media types"]
+  Protocol Binding:
+    id: dfn-protocol-binding
+    aliases: ["Binding", "Bindings", "protocol binding", "protocol bindings"]
+  Servient:
+    id: dfn-servient
+    aliases: ["Servients", "servient", "servients"]
+  Vocabulary:
+    id: dfn-vocabulary
+    aliases: ["Vocabularies", "vocabulary", "vocabularies"]
+  Term:
+    id: dfn-term
+    aliases: ["Terms", "term", "terms"]
+  Vocabulary Term:
+    id: dfn-vocab-term
+    aliases: ["Vocabulary Terms", "vocabulary term", "vocabulary terms", "Term", "Terms"]
+  WoT Interface:
+    id: dfn-wot-interface
+    aliases: ["WoT interface", "WoT Interfaces"]
+  WoT Runtime:
+    id: dfn-wot-runtime
+    aliases: ["WoT runtime", "WoT Runtimes", "runtime", "runtimes"]
+  Semantic Tag:
+    id: dfn-semantic-tag
+    aliases: ["semantic tag", "semantic tags", "Semantic Tags"]
+  Semantic Annotation:
+    id: dfn-semantic-annotation
+    aliases: ["semantic annotation", "semantic annotations", "Semantic Annotations"]
+  TD Context Extension:
+    id: dfn-context-ext
+    aliases: ["Context Extension", "context extension", "context extensions", "TD Context Extensions"]
+  TD Information Model:
+    id: dfn-inf-model
+    aliases: ["Information Model", "TD Info Model", "info model"]
+  TD Processor:
+    id: dfn-td-processor
+    aliases: ["TD Processors", "processor", "processors"]
+  TD Serialization:
+    id: dfn-td-serialization
+    aliases: ["serialization", "TD serializations"]
+  TD Document:
+    id: dfn-td-document
+    aliases: ["TD Documents", "TD doc", "TD docs"]
+  Levels of a TD:
+    id: dfn-td-level
+    aliases: ["TD Levels", "levels of a TD", "levels"]
+  Thing Level:
+    id: dfn-td-thing-level
+    aliases: ["thing level"]
+  Affordance Level:
+    id: dfn-td-affordance-level
+    aliases: ["affordance level"]
+  Data Schema Level:
+    id: dfn-td-data-schema-level
+    aliases: ["data schema level"]
+  Forms Level:
+    id: dfn-td-forms-level
+    aliases: ["forms level"]
+  Binding Specification:
+    id: dfn-binding-specification
+    aliases: ["binding specification", "binding specifications", "Binding Specifications"]
+  Binding Instance:
+    id: dfn-binding-instance
+    aliases: ["binding instance", "binding instances", "Binding Instances"]
+  Form:
+    id: dfn-form
+    aliases: ["Forms", "form", "forms"]
+  Class:
+    id: dfn-class
+    aliases: ["Classes", "class", "classes"]
+  Signature:
+    id: dfn-signature
+    aliases: ["signature", "signatures"]
+  Default Values:
+    id: dfn-default-values
+    aliases: ["default value", "default values", "Default Value"]
+  Instance Relation:
+    id: dfn-instance-relation
+    aliases: ["instance relation", "instance relations"]
+  Producer (role):
+    id: dfn-producer-role
+    aliases: ["TD producer", "producer role", "producers (role)"]
+  Consumer (role):
+    id: dfn-consumer-role
+    aliases: ["TD consumer", "consumer role", "consumers (role)"]
+  Hypermedia Controls:
+    id: dfn-hypermedia-controls
+    aliases: ["hypermedia controls", "Hypermedia Control", "hypermedia control"]
+  WoT Security:
+    id: dfn-wot-security
+    aliases: ["WoT security", "security vocabulary", "security vocabularies"]
