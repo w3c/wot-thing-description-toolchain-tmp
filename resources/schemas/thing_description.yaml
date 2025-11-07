@@ -504,39 +504,36 @@ classes:
     annotations:
       spec_scope_note: |
         :::NOTE
+        
         The exact value of `@context` URI will change upon the publication of the *W3C Recommendation* version.
         :::
         
-        For `@context` the following rules are defined for [[Thing Description]] instances:
+        For `@context` the following rules are defined for Thing Description instances:
         
-        * **MUST** The `@context` name-value pair *MUST* contain the 'anyURI' `https://www.w3.org/ns/wot-next/td` in order to identify the document as a TD 2.0 which would allow [[Consumers]] to use the newly introduced terms.
-        * **MAY** When `@context` is an [[Array]], the anyURI `https://www.w3.org/ns/wot-next/td` *MAY* be followed by elements of type `anyURI` or type [[Map]] in any order...
-        * **MAY** [[Maps]] contained in an `@context` [[Array]] *MAY* contain name-value pairs...
-        * **SHOULD** One [[Map]] contained in an `@context` [[Array]] *SHOULD* contain a name-value pair that defines the default language...
+        - The `@context` name-value pair *MUST* contain the 'anyURI' `https://www.w3.org/ns/wot-next/td` in order to identify the document as a TD 2.0 which would allow Consumers to use the newly introduced terms.
+        - When `@context` is an Array, the anyURI `https://www.w3.org/ns/wot-next/td` *MAY* be followed by elements of type `anyURI` or type Map in any order, while it is *RECOMMENDED* to include only one Map with all the name-value pairs in the @context Array.
+        - Maps contained in an `@context` Array *MAY* contain name-value pairs, where the value is a namespace identifier of type anyURI and the name a Term or prefix denoting that namespace.
+        - One Map contained in an `@context` Array *SHOULD* contain a name-value pair that defines the default language for the Thing Description, where the name is the Term @language and the value is a well-formed language tag as defined by BCP47 (e.g., en, de-AT, gsw-CH, zh-Hans, zh-Hant-HK, sl-nedis).
 
-        To determine the base direction of all human-readable text in [[Thing Description]] and [[Thing Model]] instances this specification recommends to follow the [[STRING-META]] guideline about [string-specific directional information](https://www.w3.org/TR/string-meta/#string_specific_direction) when no built-in mechanism for associating base direction metadata is available.
+        To determine the base direction of all human-readable text in Thing Description and Thing Model instances this specification recommends to follow the STRING-META guideline about [string-specific directional information](https://www.w3.org/TR/string-meta/#string_specific_direction) when no built-in mechanism for associating base direction metadata is available.
 
-        [[TD Processors]] should be aware of certain special cases when processing bidirectional text.
-
-        * **SHOULD** [[TD Processors]] SHOULD take care to use bidi isolation when presenting strings to users, particularly when embedding in surrounding text (e.g., for Web user interface).
-
+        TD Processors *SHOULD* be aware of certain special cases when processing bidirectional text. 
+        TD Processors *SHOULD* take care to use bidi isolation when presenting strings to users, particularly when embedding in surrounding text (e.g., for Web user interface).
         Mixed direction text can occur in any language, even when the language is properly identified.
 
-        * **SHOULD** TD [[producers]] SHOULD attempt to provide mixed direction strings in a way that can be displayed successfully by a naive user agent. 
-
+        TD producers *SHOULD* attempt to provide mixed direction strings in a way that can be displayed successfully by a naive user agent. 
         For example, if an RTL string begins with an LTR run (such as a number or a brand or trade name in Latin script), including an RLM character at the start of the string or wrapping opposite direction runs in bidi controls can assist in proper display.
 
         *Strings on the Web: Language and Direction Metadata* [[string-meta]] provides some guidance and illustrates a number of pitfalls when using bidirectional text.
 
-        In addition to the explicitly provided [[Interaction Affordances]] in the `properties`, `actions`, and `events` [[Maps]], a [[Thing]] can also provide meta-interactions, which are indicated by `Form` instances in its optional `forms` [[Array]].
+        In addition to the explicitly provided Interaction Affordances in the `properties`, `actions`, and `events` Maps, a Thing can also provide meta-interactions, which are indicated by `Form` instances in its optional `forms` Array.
+        When the `forms` Array of a Thing instance contains `Form` instances, it MUST contain `op` member with the string values assigned to the name `op`, either directly or within an [[Array]], MUST be one of the following *operation types*:
+        `readallproperties`, `writeallproperties`, `readmultipleproperties`, `writemultipleproperties`, `observeallproperties`, `unobserveallproperties`, `queryallactions`, `subscribeallevents`, or `unsubscribeallevents`. 
+        (See [an example](#td-forms-readall-example) for an usage of `form` in a Thing instance.)
 
-        * **MUST** When the `forms` [[Array]] of a [[Thing]] instance contains `Form` instances, it MUST contain `op` member with the string values assigned to the name `op`, either directly or within an [[Array]], MUST be one of the following *operation types*: `readallproperties`, `writeallproperties`, `readmultipleproperties`, `writemultipleproperties`, `observeallproperties`, `unobserveallproperties`, `queryallactions`, `subscribeallevents`, or `unsubscribeallevents`. 
+        The data schema for each of the property meta-interactions is constructed by combining the data schemas of each `PropertyAffordance` instance in a single `ObjectSchema` instance, where the `properties` Map of the `ObjectSchema` instance contains each data schema of the `PropertyAffordances` identified by the name of the corresponding `PropertyAffordances` instance.
 
-        (See [an example] for an usage of `form` in a Thing instance.)
-
-        The data schema for each of the property meta-interactions is constructed by combining the data schemas of each `PropertyAffordance` instance in a single `ObjectSchema` instance, where the `properties` [[Map]] of the `ObjectSchema` instance contains each data schema of the `PropertyAffordances` identified by the name of the corresponding `PropertyAffordances` instance.
-
-        If not specified otherwise (e.g., through a [[TD Context Extension]]), the request data of the `readmultipleproperties` operation is an [[Array]] that contains the intended `PropertyAffordances` instance names, which is serialized to the content type specified by the `Form` instance.
+        If not specified otherwise (e.g., through a TD Context Extension), the request data of the `readmultipleproperties` operation is an Array that contains the intended `PropertyAffordances` instance names, which is serialized to the content type specified by the `Form` instance.
     slots:
       - "@context"
       - "@type"
@@ -650,7 +647,7 @@ classes:
     class_uri: td:InteractionAffordance
     description: >-
       Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact with the Thing.
-      There are three types of Interaction Affordances: Properties, Actions, and Events.
+      There are many types of potential affordances, but W3C WoT defines three types of Interaction Affordances: Properties, Actions, and Events.
     abstract: true
     attributes:
       name:

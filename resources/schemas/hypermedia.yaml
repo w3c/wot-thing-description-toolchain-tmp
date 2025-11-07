@@ -121,8 +121,9 @@ classes:
   Link:
     class_uri: hctl:Link
     description: >-
-      A link can be viewed as a statement of the form "link context has a relation type resource at link target", 
-      where the optional target attributes may further describe the resource.
+      A link can be viewed as a statement of the form
+      "**_link context_** has a **_relation type_** resource at **_link target_**",
+      where the optional **_target attributes_** may further describe the resource.
     annotations:
       jsonschema_config:
         tag: jsonschema_config
