@@ -38,4 +38,3 @@ jobs:
         with:
           name: wotis-generated-docs
           path: ${{ env.DOCS_OUTPUT_PATH }}
-          
