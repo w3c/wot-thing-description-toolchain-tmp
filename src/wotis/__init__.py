@@ -10,6 +10,10 @@ RESPEC_TEMPLATE_PATH = RESOURCES_PATH / 'index.template.html'
 FINAL_SPEC_PATH = GENS_PATH / 'index.html'
 JINJA_TEMPLATE_DIR = RESOURCES_PATH / "jinja_templates"
 CORE_SCHEMA_PLACEHOLDER = '%s'
+TERMS_DIR = RESOURCES_PATH / "xref"
+GLOSSARY_PATH = TERMS_DIR / "glossary.yaml"
+BIBLIO_PATH = TERMS_DIR / "bibliography.yaml"
+
 
 GENERATORS = ['jsonschema', 'shacl', 'jsonldcontext', 'owl', 'linkml']
 
