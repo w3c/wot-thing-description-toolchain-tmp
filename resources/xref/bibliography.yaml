@@ -1,0 +1,22 @@
+bibliography:
+  BCP47:
+    href: https://www.rfc-editor.org/rfc/rfc5646.html
+    title: "Tags for Identifying Languages (BCP47)"
+  RFC3986:
+    href: https://www.rfc-editor.org/rfc/rfc3986.html
+    title: "Uniform Resource Identifier (URI): Generic Syntax"
+  RFC3987:
+    href: https://www.rfc-editor.org/rfc/rfc3987.html
+    title: "Internationalized Resource Identifiers (IRI)"
+  JSON-SCHEMA:
+    href: https://json-schema.org/draft/2020-12/json-schema-core.html
+    title: "JSON Schema: Core Specification"
+  WOT-ARCHITECTURE11:
+    href: https://www.w3.org/TR/wot-architecture11/
+    title: "Web of Things (WoT) Architecture 1.1"
+  WOT-BINDING-REGISTRY:
+    href: https://www.w3.org/TR/wot-binding-templates/
+    title: "WoT Binding Templates and Registry"
+  STRING-META:
+    href: https://www.w3.org/TR/string-meta/
+    title: "Strings on the Web: Language and Direction Metadata"
