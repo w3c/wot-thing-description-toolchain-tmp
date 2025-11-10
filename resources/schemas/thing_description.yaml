@@ -148,7 +148,6 @@ slots:
 
   "@context":
     description: JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
-    range: string
     required: true
     exactly_one_of:
       - range: uri
@@ -158,7 +157,8 @@ slots:
         minimum_value: 1
 
   "@type":
-    description: JSON-LD keyword to label the object with [[semantic tags]] (or types).
+    description: JSON-LD keyword to label the object with semantic tags (or types).
+    range: string
     exactly_one_of:
       - range: string
       - range: string
@@ -561,11 +561,19 @@ classes:
       "@context":    
         required: true
         exactly_one_of:
-          - range: string
+          - range: uri
             pattern: ^(https://www\.w3\.org/2019/wot/td/v1|https://www\.w3\.org/2022/wot/td/v1\.1|http://www\.w3\.org/ns/td)$
+          - multivalued: true
+            minimum_value: 1
+      "@type":
+        description: JSON-LD keyword to label the object with semantic tags (or types).
+        range: string
+        exactly_one_of:
+          - range: string
           - range: string
             multivalued: true
             minimum_value: 1
+
       title:
         required: true
       security:
