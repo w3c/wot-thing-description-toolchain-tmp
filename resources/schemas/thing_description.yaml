@@ -192,11 +192,11 @@ slots:
 
   support:
     description: >-
-      Provides information about the TD maintainer as URI scheme (e.g., mailto (RFC6068), tel (RFC3966), https (RFC9112)).
+      Provides information about the TD maintainer as URI scheme (e.g., mailto [RFC6068], tel [RFC3966], https [RFC9112]).
     annotations:
       spec_table_definition: >-
         Provides information about the TD maintainer as URI scheme 
-        (e.g., `mailto` [[RFC6068]], `tel` [[RFC3966]], `https` [[RFC9112]]).
+        (e.g., `mailto` [RFC6068], `tel` [RFC3966], `https` [RFC9112]).
     slot_uri: td:supportContact
     see_also: schema:contactPoint
     range: uri
@@ -210,21 +210,17 @@ slots:
       spec_table_definition: >-
         Define the base URI that is used for all relative URI references throughout a TD document.
         In TD instances, all relative URIs are resolved relative to the base URI using the algorithm
-        defined in [[RFC3986]](https://www.rfc-editor.org/rfc/rfc3986.html).
+        defined in RFC3986.
         
-        ---
 
         `base` does not affect the URIs used in `@context` and the IRIs used within Linked Data 
-        [[LINKED-DATA]](#bib-linked-data) graphs that are relevant when semantic processing is applied to TD instances.
+        LINKED-DATA graphs that are relevant when semantic processing is applied to TD instances.
     range: uri
 
   properties:
     slot_uri: td:hasPropertyAffordance
     description: >-
       All Property-based Interaction Affordances of the Thing.
-    annotations:
-      spec_table_definition: >-
-        All Property-based [Interaction Affordances](#dfn-interaction-affordance) of the Thing.
     range: PropertyAffordance
     multivalued: true
     inlined: true
@@ -232,9 +228,6 @@ slots:
   actions:
     description: >-
       All Action-based Interaction Affordances of the Thing.
-    annotations:
-      spec_table_definition: >-
-        All Action-based [Interaction Affordances](#dfn-interaction-affordance) of the Thing.
     slot_uri: td:hasActionAffordance
     range: ActionAffordance
     multivalued: true
@@ -244,9 +237,6 @@ slots:
     slot_uri: td:hasEventAffordance
     description: >-
       All Event-based Interaction Affordances of the Thing.
-    annotations:
-      spec_table_definition: >-
-        All Event-based [Interaction Affordances](#dfn-interaction-affordance) of the Thing.
     range: EventAffordance
     multivalued: true
     inlined: true
@@ -275,11 +265,11 @@ slots:
   security:
     slot_uri: td:hasSecurityConfiguration
     description: >-
-      Set of security configuration names, chosen from the SecurityScheme definitions.
+      Set of security definition names, chosen from those defined in securityDefinitions. 
       These must all be satisfied for access to resources.
     annotations:
       spec_table_definition: >-
-        Set of security configuration names, chosen from the `SecurityScheme` definitions.
+        Set of security definition names, chosen from those defined in `securityDefinitions`. 
         These must all be satisfied for access to resources.
     any_of:
       - range: string
@@ -349,10 +339,7 @@ slots:
   titles:
     description: >-
       Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
-    annotations:
-      spec_table_definition: >-
-        Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages). 
-        Also see [[MultiLanguage]](#multilanguage).
+      Also see MultiLanguage.
     slot_uri: td:titleInLanguage
     inlined: true
     multivalued: true
@@ -367,10 +354,7 @@ slots:
   descriptions:
     description: >-
       Can be used to support (human-readable) information in different languages.
-    annotations:
-      spec_table_definition: >-
-        Can be used to support (human-readable) information in different languages.
-        Also see [MultiLanguage](#multilanguage).
+      Also see MultiLanguage.
     slot_uri: td:descriptionInLanguage
     inlined: true
     multivalued: true
@@ -566,17 +550,20 @@ classes:
           - multivalued: true
             minimum_value: 1
       "@type":
-        description: JSON-LD keyword to label the object with semantic tags (or types).
         range: string
         exactly_one_of:
           - range: string
           - range: string
             multivalued: true
             minimum_value: 1
-
-      title:
-        required: true
       security:
+        required: true
+        exactly_one_of:
+          - range: string
+          - range: string
+            multivalued: true
+            minimum_value: 1
+      title:
         required: true
       securityDefinitions:
         range: SecurityScheme
