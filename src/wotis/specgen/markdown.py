@@ -80,10 +80,6 @@ def render_markdown_html(text: str, breaks: bool = False) -> str:
 
     # Normalize :::NOTE → :::note
     s = re.sub(r":::([A-Z]+)", lambda m: f":::{m.group(1).lower()}", s)
-
-    print("DEBUG - AFTER CASE NORMALIZATION:")
-    print(repr(s[:200]))
-
     html = None
     if html is None:
         try:
@@ -97,10 +93,8 @@ def render_markdown_html(text: str, breaks: bool = False) -> str:
                 output_format="html5",
             )
         except Exception as e:
-            logging.warning("Markdown conversion failed: %s", e)
-            print(f"DEBUG - Python-Markdown failed: {e}")
+            logging.warning("Python-Markdown conversion failed: %s", e)
             html = None
-
     if html is None:
         html = re.sub(
             r":::note\s*\n(.*?)\n\s*:::",
