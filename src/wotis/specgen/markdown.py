@@ -1,56 +1,112 @@
 from __future__ import annotations
-from markdown_it import MarkdownIt
-from mdit_py_plugins.admon import admon_plugin
-from mdit_py_plugins.anchors import anchors_plugin
-from mdit_py_plugins.attrs import attrs_plugin
-from mdit_py_plugins.deflist import deflist_plugin
+import re
+import logging
 from markdown import markdown as md_markdown
 
 
-import re
-
-
 def _convert_fenced_for_py_md(src: str) -> str:
+    """
+    Convert :::NOTE blocks (with optional blank lines and indentation)
+    into Python-Markdown admonitions of form:
+
+        !!! note
+            content...
+    """
+
     def repl(m: re.Match) -> str:
         kind = m.group("kind").lower()
-        body = m.group("body").rstrip()
-        indented = "\n".join(("    " + line if line.strip() else "") for line in body.splitlines())
-        return f"!!! {kind}\n{indented}\n"
-    pattern = re.compile(r"(?mi)^[ \t]*:::[ \t]*(?P<kind>[A-Za-z]+)[ \t]*\n(?P<body>.*?)[ \t]*\n[ \t]*:::[ \t]*$",
-                         re.DOTALL | re.MULTILINE)
-    return pattern.sub(repl, src)
+        body = m.group("body")
+        body = body.strip()
+        indented = "\n".join(
+            ("    " + line)
+            for line in body.splitlines()
+        )
+        return f"\n\n!!! {kind}\n{indented}\n\n"
 
-def _normalize_admonitions_for_respec(html: str) -> str:
-    html = re.sub(r'<div class="admonition\s+note">\s*<p class="admonition-title">.*?</p>\s*',
-                  '<div class="note">', html, flags=re.DOTALL | re.IGNORECASE)
-    html = re.sub(r'<div class="admonition\s+note">', '<div class="note">', html, flags=re.IGNORECASE)
+    # Match :::KIND on a line, capture everything until closing :::
+    pattern = re.compile(
+        r":::\s*(?P<kind>[A-Za-z]+)\s*\n(?P<body>.*?)\n\s*:::",
+        re.DOTALL
+    )
+    result = pattern.sub(repl, src)
+    return result
+
+
+def _normalize_and_wrap_notes(html: str) -> str:
+    """
+    Normalize Python-Markdown admonitions into simple
+    <div class="note"> ... </div> blocks, without adding
+    an extra rendered “Note” heading inside.
+    """
+    # 1) Remove the title paragraph Python-Markdown inserts
+    html = re.sub(
+        r'<p\s+class="admonition-title">.*?</p>\s*',
+        '',
+        html,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    # 2) Replace the outer container from "admonition note" to just "note"
+    html = re.sub(
+        r'<div\s+class="admonition\s+note">',
+        '<div class="note">',
+        html,
+        flags=re.IGNORECASE,
+    )
+    # 3) Safety: if there is a top-level <p>Note</p> immediately inside, drop it too
+    html = re.sub(
+        r'(<div class="note">\s*)<p>\s*Note\s*</p>\s*',
+        r'\1',
+        html,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
     return html
 
+
 def render_markdown_html(text: str, breaks: bool = False) -> str:
-    s = (text or "").strip()
+    """
+    Render Markdown with :::NOTE fenced blocks to HTML suitable for ReSpec.
+    """
+    s = text or ""
     if not s:
         return ""
+
+    lines = s.splitlines()
+    if lines:
+        min_indent = min(
+            (len(line) - len(line.lstrip()) for line in lines if line.strip()),
+            default=0
+        )
+        s = "\n".join(line[min_indent:] if len(line) >= min_indent else line for line in lines)
+
+    # Normalize :::NOTE → :::note
     s = re.sub(r":::([A-Z]+)", lambda m: f":::{m.group(1).lower()}", s)
 
-    # markdown-it library
-    html = None
-    try:
-        md = MarkdownIt("commonmark", {"linkify": True, "breaks": breaks})
-        md = md.use(admon_plugin).use(attrs_plugin).use(deflist_plugin).use(anchors_plugin)
-        html = md.render(s)
-    except Exception:
-        pass
+    print("DEBUG - AFTER CASE NORMALIZATION:")
+    print(repr(s[:200]))
 
+    html = None
     if html is None:
         try:
-            html = md_markdown(_convert_fenced_for_py_md(s),
-                               extensions=["extra", "admonition", "sane_lists"],
-                               output_format="html5")
-        except Exception:
-            # last resort: minimal
-            tmp = re.sub(r":::note\s*(.*?)\s*:::", lambda m: f'<div class="note">{m.group(1).strip()}</div>',
-                         s, flags=re.DOTALL)
-            tmp = re.sub(r"`([^`]+)`", lambda m: f"<code>{m.group(1)}</code>", tmp)
-            parts = [p.strip() for p in re.split(r"\n\s*\n", tmp) if p.strip()]
-            html = "".join(f"<p>{p}</p>" for p in parts) if parts else tmp
-    return _normalize_admonitions_for_respec(html)
+            converted = _convert_fenced_for_py_md(s)
+            # Ensure the converted text starts with a newline for proper parsing
+            if not converted.startswith('\n'):
+                converted = '\n' + converted
+            html = md_markdown(
+                converted,
+                extensions=["extra", "admonition", "sane_lists"],
+                output_format="html5",
+            )
+        except Exception as e:
+            logging.warning("Markdown conversion failed: %s", e)
+            print(f"DEBUG - Python-Markdown failed: {e}")
+            html = None
+
+    if html is None:
+        html = re.sub(
+            r":::note\s*\n(.*?)\n\s*:::",
+            lambda m: f'<div class="note"><p>{m.group(1).strip()}</p></div>',
+            s,
+            flags=re.DOTALL,
+        )
+    result = _normalize_and_wrap_notes(html)
+    return result
