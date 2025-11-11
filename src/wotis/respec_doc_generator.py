@@ -17,11 +17,28 @@ from .specgen.respec import build_jinja_env, assemble
 cfg = Config.from_resources_dir(Path("resources"), placeholder="%s")
 
 
-def generate_respec_spec(input_path: Path,
-                         respec_template_path: Path,
-                         final_spec_path: Path,
-                         core_schema_placeholder: str) -> None:
-    """Generate the Respec HTML from LinkML schema + Jinja templates."""
+def generate_respec_spec(
+    input_path: Path,
+    respec_template_path: Path,
+    final_spec_path: Path,
+    core_schema_placeholder: str,
+) -> None:
+    """
+    Generate the complete ReSpec-compatible HTML document from a LinkML schema.
+
+    This function:
+      • Loads the LinkML model via SchemaView
+      • Converts Markdown and annotations to HTML
+      • Applies glossary and bibliography linking
+      • Renders each class section with Jinja templates
+      • Injects the resulting HTML into the ReSpec index template
+
+    Args:
+        input_path: Path to the root LinkML YAML schema file.
+        respec_template_path: Path to the ReSpec HTML template (index.template.html).
+        final_spec_path: Path to write the final, assembled HTML output.
+        core_schema_placeholder: The placeholder string inside the ReSpec template to replace.
+    """
     try:
         sv = SchemaView(input_path, merge_imports=True)
     except yaml.YAMLError as e:
