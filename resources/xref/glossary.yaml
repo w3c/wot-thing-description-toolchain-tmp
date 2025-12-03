@@ -36,7 +36,7 @@ terms:
   Data Schema Level:
     id: dfn-td-data-schema-level
     aliases: [ "data schema level" ]
-  datetime:
+  dateTime:
     href: "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#dateTime"
     aliases: [ ]
   Default Values:
