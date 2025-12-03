@@ -81,17 +81,27 @@ def annotate_html(html: str, entries: Dict[str, GlossaryEntry], phrase_to_key: D
             return text
 
         href = entry.href
+        is_external = bool(href)
         if not href and entry.id:
             href = f"#{entry.id}"
-        if not href:
+            css_class = 'class="internalDFN" data-link-type="dfn"'
+        elif href:
+            css_class = ""
+        else:
             return text
 
-        return f'<a href="{href}">{text}</a>'
+        # Construct the link based on internal/external
+        if is_external:
+            # External link or explicit href: use <a><code>text</code></a>
+            return f'<a href="{href}" {css_class}><code translate="no">{text}</code></a>'
+        else:
+            # Internal link (dfn-): use <a class="internalDFN">text</a>
+            return f'<a href="{href}" {css_class}>{text}</a>'
 
     # Protect existing <a> and <code> blocks
     splitter = re.compile(r"(<a\b[^>]*>.*?</a>|<code>.*?</code>)", flags=re.DOTALL | re.IGNORECASE)
     parts = splitter.split(html)
-    for i in range(0, len(parts), 2):  # even indices are outside protected blocks
+    for i in range(0, len(parts), 2):
         parts[i] = token_re.sub(repl, parts[i])
 
     return "".join(parts)
