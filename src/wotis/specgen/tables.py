@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict, List
+from typing import Dict, List, Callable, Any
 from linkml_runtime.utils.schemaview import SchemaView
 
 def _normalize_range_name(rng: str) -> str:
@@ -68,16 +68,23 @@ def slot_type_text(slot_name: str, slot_def, class_def) -> str:
 
 
 
-def collect_slot_rows(sv: SchemaView, class_name: str) -> List[Dict[str, str]]:
+def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Callable[[str], str]) -> List[Dict[str, str]]:
     class_def = sv.get_class(class_name)
     rows: List[Dict[str, str]] = []
     for slot_name in class_def.slots or []:
         slot_def = sv.get_slot(slot_name)
-        desc = (getattr(slot_def, "description", "") or "").replace("'", "&#39;").replace('"', "&quot;")
-        rows.append({
-            "slot_name": slot_name,
-            "description": desc,
-            "assignment": get_assignment(slot_name, class_def, slot_def),
-            "range_text": slot_type_text(slot_name, slot_def, class_def),
-        })
+        # Determine the source text for the description in the tables
+        raw_desc = getattr(slot_def, "description", "")
+        ann = getattr(slot_def, "annotations", None) or {}
+        if "spec_table_definition" in ann:
+            spec_def = getattr(ann["spec_table_definition"], "value", None) or ann["spec_table_definition"]
+            raw_desc = str(spec_def) or raw_desc
+            desc_html = process_description(raw_desc)
+            desc = (desc_html or "").replace("'", "&#39;").replace('"', "&quot;")
+            rows.append({
+                "slot_name": slot_name,
+                "description": desc,
+                "assignment": get_assignment(slot_name, class_def, slot_def),
+                "range_text": slot_type_text(slot_name, slot_def, class_def),
+            })
     return rows
