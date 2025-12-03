@@ -71,18 +71,23 @@ def generate_respec_spec(
 
     biblio = load_bibliography(cfg.biblio_path)
 
+    def process_description(raw_text: str) -> str:
+        """Markdown rendering, bibliography linking, and glossary annotation."""
+        html = render_markdown_html(raw_text or "")
+        html = link_biblio_keys(html, biblio)
+        html = annotate_html(html, glossary_entries, phrase_to_key)
+        return html
+
     sections_html: List[str] = []
     for cls in classes:
         cdef = sv.get_class(cls)
         if not cdef:
             continue
 
-        rows = collect_slot_rows(sv, cls)
+        rows = collect_slot_rows(sv, cls, process_description)
 
         # Class description
-        desc_html = render_markdown_html(getattr(cdef, "description", "") or "")
-        desc_html = link_biblio_keys(desc_html, biblio)
-        desc_html = annotate_html(desc_html, glossary_entries, phrase_to_key)
+        desc_html = process_description(getattr(cdef, "description", "") or "")
 
         # Optional spec_scope_note
         note_html = ""
