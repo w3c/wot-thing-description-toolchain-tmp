@@ -75,16 +75,17 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
         slot_def = sv.get_slot(slot_name)
         # Determine the source text for the description in the tables
         raw_desc = getattr(slot_def, "description", "")
+        # Check for and prioritize 'spec_table_definition'
         ann = getattr(slot_def, "annotations", None) or {}
         if "spec_table_definition" in ann:
             spec_def = getattr(ann["spec_table_definition"], "value", None) or ann["spec_table_definition"]
             raw_desc = str(spec_def) or raw_desc
-            desc_html = process_description(raw_desc)
-            desc = (desc_html or "").replace("'", "&#39;").replace('"', "&quot;")
-            rows.append({
-                "slot_name": slot_name,
-                "description": desc,
-                "assignment": get_assignment(slot_name, class_def, slot_def),
-                "range_text": slot_type_text(slot_name, slot_def, class_def),
-            })
+        desc_html = process_description(raw_desc)
+        desc = (desc_html or "").replace("'", "&#39;").replace('"', "&quot;")
+        rows.append({
+            "slot_name": slot_name,
+            "description": desc,
+            "assignment": get_assignment(slot_name, class_def, slot_def),
+            "range_text": slot_type_text(slot_name, slot_def, class_def),
+        })
     return rows
