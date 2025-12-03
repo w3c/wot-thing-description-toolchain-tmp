@@ -39,8 +39,6 @@ classes:
           additionalProperties: true
     slots:
       - proxy
-      - description
-      - descriptions
       - scheme
     attributes:
       scheme:

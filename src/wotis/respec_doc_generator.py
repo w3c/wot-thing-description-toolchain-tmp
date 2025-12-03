@@ -13,7 +13,6 @@ from .specgen.markdown import render_markdown_html
 from .specgen.tables import collect_slot_rows
 from .specgen.respec import build_jinja_env, assemble
 
-
 cfg = Config.from_resources_dir(Path("resources"), placeholder="%s")
 
 
@@ -44,18 +43,32 @@ def generate_respec_spec(
     except yaml.YAMLError as e:
         logging.error("Failed to load LinkML schema: %s", e)
         return
+
     try:
         env = build_jinja_env(cfg.jinja_templates)
+
+        # Load glossary and expose annotate() to Jinja
+        glossary_entries, phrase_to_key = load_glossary(cfg.glossary_path)
+        env.filters["annotate"] = lambda s: annotate_html(s or "", glossary_entries, phrase_to_key)
+
         section_tpl = env.get_template("class_section.jinja2")
     except (exceptions.TemplateNotFound, FileNotFoundError) as e:
         logging.error("Template error: %s", e, exc_info=True)
-        assemble(respec_template_path, f"<!-- template error: {e} -->", final_spec_path, core_schema_placeholder)
+        assemble(
+            respec_template_path,
+            f"<!-- template error: {e} -->",
+            final_spec_path,
+            core_schema_placeholder,
+        )
         return
 
-    # class order: Thing first
+        # class order: Thing first
     classes: List[str] = list(sv.all_classes().keys())
-    classes = (["Thing"] + sorted(c for c in classes if c != "Thing")) if "Thing" in classes else sorted(classes)
-    _, _, phrase_to_id = load_glossary(cfg.glossary_path)
+    if "Thing" in classes:
+        classes = ["Thing"] + sorted(c for c in classes if c != "Thing")
+    else:
+        classes = sorted(classes)
+
     biblio = load_bibliography(cfg.biblio_path)
 
     sections_html: List[str] = []
@@ -63,21 +76,34 @@ def generate_respec_spec(
         cdef = sv.get_class(cls)
         if not cdef:
             continue
+
         rows = collect_slot_rows(sv, cls)
+
+        # Class description
         desc_html = render_markdown_html(getattr(cdef, "description", "") or "")
         desc_html = link_biblio_keys(desc_html, biblio)
-        desc_html = annotate_html(desc_html, phrase_to_id)
+        desc_html = annotate_html(desc_html, glossary_entries, phrase_to_key)
+
+        # Optional spec_scope_note
         note_html = ""
         ann = getattr(cdef, "annotations", None) or {}
         if "spec_scope_note" in ann:
             raw = getattr(ann["spec_scope_note"], "value", None) or ann["spec_scope_note"]
             note_html = render_markdown_html(str(raw))
             note_html = link_biblio_keys(note_html, biblio)
-            note_html = annotate_html(note_html, phrase_to_id)
-        sections_html.append(section_tpl.render(
-            class_name=cls,
-            class_description=desc_html,
-            slots=rows,
-            spec_scope_note_html=note_html,
-        ))
-    assemble(respec_template_path, "\n\n".join(sections_html), final_spec_path, core_schema_placeholder)
+            note_html = annotate_html(note_html, glossary_entries, phrase_to_key)
+
+        sections_html.append(
+            section_tpl.render(
+                class_name=cls,
+                class_description=desc_html,
+                slots=rows,
+                spec_scope_note_html=note_html,
+            )
+        )
+    assemble(
+        respec_template_path,
+        "\n\n".join(sections_html),
+        final_spec_path,
+        core_schema_placeholder,
+    )

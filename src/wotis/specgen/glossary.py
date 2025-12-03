@@ -1,51 +1,97 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-import re, yaml
-from typing import Iterable, Tuple, Pattern
+import re
+from typing import Dict, Tuple
 
 
 @dataclass(frozen=True)
-class GlossaryTerm:
-    name: str
-    id: str
+class GlossaryEntry:
+    key: str        # canonical key from YAML
+    id: str | None  # for internal fragments
+    href: str | None  # for external or explicit links
     aliases: list[str]
 
+
 @lru_cache(maxsize=1)
-def load_glossary(path: Path) -> tuple[list[GlossaryTerm], list[Tuple[Pattern[str], str]], dict[str, str]]:
+def load_glossary(path: Path) -> Tuple[Dict[str, GlossaryEntry], Dict[str, str]]:
+    """
+    Load glossary.yaml and return:
+      - entries:  canonical_key -> GlossaryEntry
+      - phrase_to_key: lowercase phrase -> canonical_key
+    """
     if not path.exists():
-        return [], [], {}
+        return {}, {}
+
+    import yaml
     data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    terms: list[GlossaryTerm] = []
-    phrase_to_id: dict[str, str] = {}
-    for canonical, payload in (data.get("terms") or {}).items():
-        gid = payload.get("id")
-        aliases = payload.get("aliases", []) or []
-        terms.append(GlossaryTerm(canonical, gid, aliases))
-        for p in [canonical, *aliases]:
-            phrase_to_id[p.lower()] = gid
+    terms = data.get("terms") or {}
 
-    # xref, single big alternation, longest-first
-    alternation = "|".join(re.escape(p) for p in sorted(phrase_to_id, key=len, reverse=True))
-    pattern = re.compile(rf"(?<![>/])\b(?:{alternation})\b(?![^<]*?>)", re.IGNORECASE) if alternation else None
-    patterns = [(pattern, "__all__")] if pattern else []
-    return terms, patterns, phrase_to_id
+    entries: Dict[str, GlossaryEntry] = {}
+    phrase_to_key: Dict[str, str] = {}
 
-def annotate_html(text: str, phrase_to_id: dict[str, str]) -> str:
-    """Longest-first, one-pass linker; skips inside <a>…</a> and <code>…</code>."""
-    if not text or "<table" in text or not phrase_to_id:
-        return text
-    alternation = "|".join(re.escape(p) for p in sorted(phrase_to_id, key=len, reverse=True))
-    pat = re.compile(rf"(?<![>/])\b(?:{alternation})\b(?![^<]*?>)", re.IGNORECASE)
-    splitter = re.compile(r"(<a\b[^>]*>.*?</a>|<code>.*?</code>)", re.DOTALL | re.IGNORECASE)
+    for canonical, payload in terms.items():
+        entry = GlossaryEntry(
+            key=canonical,
+            id=payload.get("id"),
+            href=payload.get("href"),
+            aliases=payload.get("aliases", []) or [],
+        )
+        entries[canonical] = entry
 
-    def repl(m: re.Match) -> str:
-        t = m.group(0)
-        gid = phrase_to_id.get(t.lower())
-        return f'<a href="#{gid}">{t}</a>' if gid else t
+        for phrase in [canonical] + entry.aliases:
+            phrase_to_key[phrase.lower()] = canonical
 
-    parts = splitter.split(text)
-    for i in range(0, len(parts), 2):
-        parts[i] = pat.sub(repl, parts[i])
+    return entries, phrase_to_key
+
+
+def annotate_html(html: str, entries: Dict[str, GlossaryEntry], phrase_to_key: Dict[str, str]) -> str:
+    """
+    Link phrases found in HTML based on glossary entries.
+
+    - Avoids touching existing <a>...</a> and <code>...</code> blocks.
+    - Longest-phrase-first matching via a combined regex.
+    - If entry.href is set, uses that.
+      Else if entry.id is set, uses '#id'.
+    """
+
+    if not html:
+        return html
+
+    # Build single alternation of all phrases (longest first)
+    phrases_sorted = sorted(phrase_to_key.keys(), key=len, reverse=True)
+    if not phrases_sorted:
+        return html
+
+    alternation = "|".join(re.escape(p) for p in phrases_sorted)
+    token_re = re.compile(
+        rf"(?<![>/])\b(?:{alternation})\b(?![^<]*?>)",
+        flags=re.IGNORECASE,
+    )
+
+    def repl(match: re.Match) -> str:
+        text = match.group(0)
+        key = phrase_to_key.get(text.lower())
+        if not key:
+            return text
+        entry = entries.get(key)
+        if not entry:
+            return text
+
+        href = entry.href
+        if not href and entry.id:
+            href = f"#{entry.id}"
+        if not href:
+            return text
+
+        return f'<a href="{href}">{text}</a>'
+
+    # Protect existing <a> and <code> blocks
+    splitter = re.compile(r"(<a\b[^>]*>.*?</a>|<code>.*?</code>)", flags=re.DOTALL | re.IGNORECASE)
+    parts = splitter.split(html)
+    for i in range(0, len(parts), 2):  # even indices are outside protected blocks
+        parts[i] = token_re.sub(repl, parts[i])
+
     return "".join(parts)

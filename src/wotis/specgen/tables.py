@@ -2,6 +2,28 @@ from __future__ import annotations
 from typing import Dict, List
 from linkml_runtime.utils.schemaview import SchemaView
 
+def _normalize_range_name(rng: str) -> str:
+    """
+    Map LinkML range names to the textual form expected in the TD spec.
+
+    Currently:
+      - LinkML 'uri' -> spec 'anyURI'
+      - everything else unchanged.
+    """
+    if rng == "uri":
+        return "anyURI"
+    if rng == "datetime":
+        return "dateTime"
+    return rng
+
+def _normalize_range_name(rng: str | None) -> str:
+    """Map LinkML range names to the text expected in the TD spec."""
+    if not rng:
+        return "any type"
+    if rng == "uri":
+        return "anyURI"
+    return rng
+
 def get_assignment(slot_name, class_def, slot_def) -> str:
     usage = (class_def.slot_usage or {}).get(slot_name)
     if getattr(slot_def, "required", False) or (usage and getattr(usage, "required", False)):
@@ -19,10 +41,12 @@ def get_assignment(slot_name, class_def, slot_def) -> str:
 def slot_type_text(slot_name: str, slot_def, class_def) -> str:
     usage = (getattr(class_def, "slot_usage", None) or {}).get(slot_name)
     xo = getattr(usage, "exactly_one_of", None) if usage else None
+
     if xo:
         alts = []
         for alt in xo:
-            rng = getattr(alt, "range", None) or getattr(slot_def, "range", None) or "any type"
+            raw_rng = getattr(alt, "range", None) or getattr(slot_def, "range", None) or "any type"
+            rng = _normalize_range_name(raw_rng)
             mv = bool(getattr(alt, "multivalued", False))
             alts.append((rng, mv))
         ranges = {r for r, _ in alts}
@@ -31,19 +55,23 @@ def slot_type_text(slot_name: str, slot_def, class_def) -> str:
             if flags == {False, True}:
                 return f"{r} or Array of {r}"
         pretty = [(f"{r} (Array)" if mv else r) for r, mv in alts]
-        # preserve order / dedupe
         seen, out = set(), []
         for p in pretty:
             if p not in seen:
-                seen.add(p); out.append(p)
+                seen.add(p)
+                out.append(p)
         return " | ".join(out)
 
-    rng = getattr(slot_def, "range", None) or "any type"
+    raw_rng = getattr(slot_def, "range", None) or "any type"
+    rng = _normalize_range_name(raw_rng)
+
     if getattr(slot_def, "inlined", False):
         return f"Map of {rng}"
     if getattr(slot_def, "multivalued", False):
         return f"{rng} (Array)"
     return rng
+
+
 
 def collect_slot_rows(sv: SchemaView, class_name: str) -> List[Dict[str, str]]:
     class_def = sv.get_class(class_name)
