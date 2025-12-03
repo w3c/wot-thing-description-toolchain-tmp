@@ -19,7 +19,7 @@ def _normalize_range_name(rng: str) -> str:
 def _normalize_range_name(rng: str | None) -> str:
     """Map LinkML range names to the text expected in the TD spec."""
     if not rng:
-        return "any type"
+        return ""
     if rng == "uri":
         return "anyURI"
     return rng
@@ -45,7 +45,7 @@ def slot_type_text(slot_name: str, slot_def, class_def) -> str:
     if xo:
         alts = []
         for alt in xo:
-            raw_rng = getattr(alt, "range", None) or getattr(slot_def, "range", None) or "any type"
+            raw_rng = getattr(alt, "range", None) or getattr(slot_def, "range", None)
             rng = _normalize_range_name(raw_rng)
             mv = bool(getattr(alt, "multivalued", False))
             alts.append((rng, mv))
@@ -54,21 +54,22 @@ def slot_type_text(slot_name: str, slot_def, class_def) -> str:
             flags = {mv for rr, mv in alts if rr == r}
             if flags == {False, True}:
                 return f"{r} or Array of {r}"
-        pretty = [(f"{r} (Array)" if mv else r) for r, mv in alts]
+        pretty = [(f"{r} or Array" if mv else r) for r, mv in alts]
         seen, out = set(), []
         for p in pretty:
             if p not in seen:
                 seen.add(p)
                 out.append(p)
-        return " | ".join(out)
+        return "".join(out)
 
-    raw_rng = getattr(slot_def, "range", None) or "any type"
+    raw_rng = getattr(slot_def, "range", None)
     rng = _normalize_range_name(raw_rng)
-
+    if not rng:
+        return ""
     if getattr(slot_def, "inlined", False):
         return f"Map of {rng}"
     if getattr(slot_def, "multivalued", False):
-        return f"{rng} (Array)"
+        return f"{rng} or Array"
     return rng
 
 
