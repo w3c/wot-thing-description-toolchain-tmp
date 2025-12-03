@@ -10,18 +10,12 @@ def _normalize_range_name(rng: str) -> str:
       - LinkML 'uri' -> spec 'anyURI'
       - everything else unchanged.
     """
-    if rng == "uri":
-        return "anyURI"
-    if rng == "datetime":
-        return "dateTime"
-    return rng
-
-def _normalize_range_name(rng: str | None) -> str:
-    """Map LinkML range names to the text expected in the TD spec."""
     if not rng:
         return ""
     if rng == "uri":
         return "anyURI"
+    if rng == "datetime":
+        return "dateTime"
     return rng
 
 def get_assignment(slot_name, class_def, slot_def) -> str:
