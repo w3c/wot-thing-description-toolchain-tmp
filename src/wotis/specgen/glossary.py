@@ -42,7 +42,7 @@ def load_glossary(path: Path) -> Tuple[Dict[str, GlossaryEntry], Dict[str, str]]
         entries[canonical] = entry
 
         for phrase in [canonical] + entry.aliases:
-            phrase_to_key[phrase.lower()] = canonical
+            phrase_to_key[phrase] = canonical
 
     return entries, phrase_to_key
 
@@ -67,13 +67,12 @@ def annotate_html(html: str, entries: Dict[str, GlossaryEntry], phrase_to_key: D
 
     alternation = "|".join(re.escape(p) for p in phrases_sorted)
     token_re = re.compile(
-        rf"(?<![>/])\b(?:{alternation})\b(?![^<]*?>)",
-        flags=re.IGNORECASE,
+        rf"(?<![>/])\b(?:{alternation})\b(?![^<]*?>)"
     )
 
     def repl(match: re.Match) -> str:
         text = match.group(0)
-        key = phrase_to_key.get(text.lower())
+        key = phrase_to_key.get(text)
         if not key:
             return text
         entry = entries.get(key)
