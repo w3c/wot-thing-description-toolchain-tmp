@@ -6,6 +6,9 @@ terms:
     # external link example
     href: "https://www.w3.org/TR/xmlschema11-2/#anyURI"
     aliases: [ ]
+  ActionAffordance:
+    id: actionaffordance
+    aliases: [ ]
   Affordance Level:
     id: dfn-td-affordance-level
     aliases: [ "affordance level" ]
@@ -48,9 +51,12 @@ terms:
   Event:
     id: dfn-event
     aliases: [ "Events", "event", "events" ]
+  EventAffordance:
+    id: eventaffordance
+    aliases: [ ]
   Form:
-    id: dfn-form
-    aliases: [ "Forms" ]
+    id: form
+    aliases: [  ]
   Forms Level:
     id: dfn-td-forms-level
     aliases: [ "forms level" ]
@@ -65,7 +71,7 @@ terms:
     aliases: [ "interaction model" ]
   Interaction Affordance:
     id: dfn-interaction-affordance
-    aliases: [ "Interaction Affordances", "interaction affordance", "interaction affordances", "Affordance", "Affordances" ]
+    aliases: [ "Interaction Affordances", "Affordance", "Affordances" ]
   IoT Platform:
     id: dfn-iot-platform
     aliases: [ "IoT platform", "IoT Platforms", "IoT platforms" ]
@@ -90,9 +96,15 @@ terms:
   Property:
     id: dfn-property
     aliases: [ "Properties", "property", "properties" ]
+  PropertyAffordance:
+    id: propertyaffordance
+    aliases: [ ]
   Protocol Binding:
     id: dfn-protocol-binding
     aliases: [ "Binding", "Bindings", "protocol binding", "protocol bindings" ]
+  SecurityScheme:
+    id: securityscheme
+    aliases: [ ]
   Semantic Annotation:
     id: dfn-semantic-annotation
     aliases: [ "semantic annotation", "semantic annotations", "Semantic Annotations" ]
@@ -138,6 +150,9 @@ terms:
   Thing Model:
     id: dfn-tm
     aliases: ["TM", "Thing Models", "TMs"]
+  VersionInfo:
+    id: versioninfo
+    aliases: [ ]
   Vocabulary:
     id: dfn-vocabulary
     aliases: ["Vocabularies", "vocabulary", "vocabularies"]
