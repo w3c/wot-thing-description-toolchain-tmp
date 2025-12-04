@@ -62,12 +62,14 @@ def generate_respec_spec(
         )
         return
 
-        # class order: Thing first
-    classes: List[str] = list(sv.all_classes().keys())
-    if "Thing" in classes:
-        classes = ["Thing"] + sorted(c for c in classes if c != "Thing")
+    # class order: Thing first
+    classes_in_order: List[str] = list(sv.all_classes().keys())
+    classes: List[str] = []
+    if "Thing" in classes_in_order:
+        classes.append("Thing")
+        classes.extend(c for c in classes_in_order if c != "Thing")
     else:
-        classes = sorted(classes)
+        classes = classes_in_order
 
     biblio = load_bibliography(cfg.biblio_path)
 
