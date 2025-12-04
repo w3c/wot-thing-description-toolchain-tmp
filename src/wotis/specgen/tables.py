@@ -72,26 +72,47 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
     Dict[str, str]]:
     class_def = sv.get_class(class_name)
     rows: List[Dict[str, str]] = []
-
+    # Get ordered slot names
     slot_names: List[str] = class_def.slots or []
+    # Get attribute names
     attribute_names: List[str] = list(class_def.attributes.keys()) if class_def.attributes else []
-    # Combine slots and attributes, prioritizing the defined slots order, then attributes
-    unique_slot_names = slot_names + attribute_names
-    for slot_name in unique_slot_names:
+    # unique list, prioritizing explicit slots first, followed by attributes
+    ordered_unique_names: List[str] = []
+    seen = set()
+    for name in slot_names + attribute_names:
+        if name not in seen:
+            ordered_unique_names.append(name)
+            seen.add(name)
+
+    for slot_name in ordered_unique_names:
         slot_def: Optional[SlotDefinition] = sv.get_slot(slot_name, class_name)
         if not slot_def:
             continue
-
-        # Get annotations from the resolved slot_def to determine if an attribute needs to be excluded from spec
+        # Get annotations from the resolved slot_def
         ann = getattr(slot_def, "annotations", None) or {}
-        spec_exclude_ann = ann.get("spec_exclude")
-        if spec_exclude_ann and getattr(spec_exclude_ann, 'value', str(spec_exclude_ann)).lower() == 'true':
-            continue
+        # Check raw attribute definition for annotations
+        if slot_name in class_def.attributes:
+            raw_attribute_def = class_def.attributes[slot_name]
+            # Merge raw attribute annotations into 'ann' for exclusion check
+            raw_ann = getattr(raw_attribute_def, "annotations", None) or {}
+            ann.update(raw_ann)
 
+        spec_exclude_ann = ann.get("spec_exclude")
+        if spec_exclude_ann:
+            ann_value = getattr(spec_exclude_ann, 'value', None)
+            if ann_value is None:
+                ann_value = spec_exclude_ann
+
+            if str(ann_value).lower() == 'true':
+                continue
+        # Determine the source text for the description in the tables
         raw_desc = getattr(slot_def, "description", "")
+
+        # prioritize 'spec_table_definition' for the description of the specification generation
         if "spec_table_definition" in ann:
             spec_def = getattr(ann["spec_table_definition"], "value", None) or ann["spec_table_definition"]
             raw_desc = str(spec_def) or raw_desc
+
         desc_html = process_description(raw_desc)
         desc = (desc_html or "").replace("'", "&#39;")
         rows.append({
