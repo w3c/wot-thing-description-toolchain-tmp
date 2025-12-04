@@ -128,7 +128,7 @@ terms:
     aliases: ["thing", "Things"]
   Thing Description:
     id: dfn-td
-    aliases: ["TD", "Thing Descriptions", "TDs", "TD Document", "TD Documents"]
+    aliases: ["Thing Descriptions", "TDs", "TD Document", "TD Documents"]
   Thing Level:
     id: dfn-td-thing-level
     aliases: [ "thing level" ]
