@@ -81,7 +81,7 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
             spec_def = getattr(ann["spec_table_definition"], "value", None) or ann["spec_table_definition"]
             raw_desc = str(spec_def) or raw_desc
         desc_html = process_description(raw_desc)
-        desc = (desc_html or "").replace("'", "&#39;").replace('"', "&quot;")
+        desc = (desc_html or "").replace("'", "&#39;")
         rows.append({
             "slot_name": slot_name,
             "description": desc,
