@@ -475,19 +475,6 @@ types:
     pattern: "^(((([A-Za-z]{2,3}(-([A-Za-z]{3}(-[A-Za-z]{3}){0,2}))?)|[A-Za-z]{4}|[A-Za-z]{5,8})(-([A-Za-z]{4}))?(-([A-Za-z]{2}|[0-9]{3}))?(-([A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*(-([0-9A-WY-Za-wy-z](-[A-Za-z0-9]{2,8})+))*(-(x(-[A-Za-z0-9]{1,8})+))?)|(x(-[A-Za-z0-9]{1,8})+)|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
 
 classes:
-  MultiLanguage:
-    description: >-
-      A Map providing a set of human-readable texts in different languages identified by language tags as defined in BCP47.
-    attributes:
-      language_tag:
-        range: string
-        identifier: true
-        required: true
-        pattern: "^[a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2})?$"
-      language_value:
-        range: string
-        required: true
-
   Thing:
     class_uri: td:Thing
     tree_root: true
@@ -498,16 +485,17 @@ classes:
       spec_scope_note: |
         :::NOTE
         
-        The exact value of `@context` URI will change upon the publication of the *W3C Recommendation* version.
+        The following list items about the `@context` URL rules will go through major changes.
         :::
         
         For `@context` the following rules are defined for Thing Description instances:
         
         - The `@context` name-value pair *MUST* contain the anyURI `https://www.w3.org/ns/wot-next/td` in order 
         to identify the document as a TD 2.0 which would allow Consumers to use the newly introduced terms.
-        - When `@context` is an Array, the anyURI `https://www.w3.org/ns/wot-next/td` *MAY* be followed by elements of 
-        type `anyURI` or type Map in any order, while it is *RECOMMENDED* to include only one Map with all the name-value 
-        pairs in the @context Array.
+        - When there are possibly TD 1.0 consumers the anyURI `https://www.w3.org/ns/wot-next/td` *MUST* be the first entry and the
+        `https://www.w3.org/2022/wot/td/v1.1` *MUST* be the second entry.
+        - When `@context` is an Array, the anyURI `https://www.w3.org/2022/wot/td/v1.1` *MAY* be followed by elements of type 
+        `anyURI` or type Map in any order, while it is *RECOMMENDED* to include only one Map with all the name-value pairs in the `@context` Array.
         - Maps contained in an `@context` Array *MAY* contain name-value pairs, where the value is a namespace 
         identifier of type anyURI and the name a Term or prefix denoting that namespace.
         - One Map contained in an `@context` Array *SHOULD* contain a name-value pair that defines the default language 
@@ -625,39 +613,6 @@ classes:
               type: object
               additionalProperties:
                 $ref: "#/$defs/EventAffordance"
-
-  VersionInfo:
-    class_uri: td:versionInfo
-    #A. CLEAN DESCRIPTION FOR SHACL/RDF
-    description: >-
-      Metadata of a Thing that provides version information about the TD document. 
-      If required, additional version information such as firmware and hardware version 
-      (term definitions outside of the TD namespace) can be extended via the TD Context Extension mechanism.
-    #B. FORMATTED DESCRIPTION FOR SPEC
-    annotations:
-      # FORMATTED DESCRIPTION (PRE-TABLE)
-      spec_description: >-
-        Metadata of a Thing that provides version information about the TD document. 
-        If required, additional version information such as firmware and hardware version 
-        (term definitions outside of the TD namespace) can be extended via the 
-        [TD Context Extension](#dfn-context-ext) mechanism.
-      # FORMATTED SCOPE NOTE (POST-TABLE)
-      spec_scope_note: >-
-        It is recommended that the values within `instances` and `model` of the `VersionInfo` [Class](#dfn-class) 
-        follow the semantic versioning pattern, where a sequence of three numbers separated by a dot indicates the 
-        major version, minor version, and patch version, respectively. See [SEMVER](#bib-semver) for details.
-    attributes:
-      instance:
-        description: >-
-          Provides a version identifier of this TD.
-        slot_uri: td:instance
-        range: string
-        required: true
-      model:
-        description: >-
-          Provides a version indicator of the underlying TM.
-        slot_uri: td:model
-        range: string
 
   InteractionAffordance:
     class_uri: td:InteractionAffordance
@@ -833,6 +788,52 @@ classes:
           e.g., a specific message to remove a Webhook.
         slot_uri: td:hasCancellationSchema
         range: DataSchema
+
+  VersionInfo:
+    class_uri: td:versionInfo
+    #A. CLEAN DESCRIPTION FOR SHACL/RDF
+    description: >-
+      Metadata of a Thing that provides version information about the TD document. 
+      If required, additional version information such as firmware and hardware version 
+      (term definitions outside of the TD namespace) can be extended via the TD Context Extension mechanism.
+    #B. FORMATTED DESCRIPTION FOR SPEC
+    annotations:
+      # FORMATTED DESCRIPTION (PRE-TABLE)
+      spec_description: >-
+        Metadata of a Thing that provides version information about the TD document. 
+        If required, additional version information such as firmware and hardware version 
+        (term definitions outside of the TD namespace) can be extended via the 
+        [TD Context Extension](#dfn-context-ext) mechanism.
+      # FORMATTED SCOPE NOTE (POST-TABLE)
+      spec_scope_note: >-
+        It is recommended that the values within `instances` and `model` of the `VersionInfo` [Class](#dfn-class) 
+        follow the semantic versioning pattern, where a sequence of three numbers separated by a dot indicates the 
+        major version, minor version, and patch version, respectively. See [SEMVER](#bib-semver) for details.
+    attributes:
+      instance:
+        description: >-
+          Provides a version identifier of this TD.
+        slot_uri: td:instance
+        range: string
+        required: true
+      model:
+        description: >-
+          Provides a version indicator of the underlying TM.
+        slot_uri: td:model
+        range: string
+
+  MultiLanguage:
+    description: >-
+      A Map providing a set of human-readable texts in different languages identified by language tags as defined in BCP47.
+    attributes:
+      language_tag:
+        range: string
+        identifier: true
+        required: true
+        pattern: "^[a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2})?$"
+      language_value:
+        range: string
+        required: true
 
   AdditionalExpectedResponse:
     description: >-
