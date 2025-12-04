@@ -76,8 +76,25 @@ def render_markdown_html(text: str, breaks: bool = False) -> str:
             (len(line) - len(line.lstrip()) for line in lines if line.strip()),
             default=0
         )
-        s = "\n".join(line[min_indent:] if len(line) >= min_indent else line for line in lines)
+        # deals with the blank lines between paragraphs in LinkML
+        s = "\n".join(
+            (line[min_indent:] if len(line) >= min_indent else line)
+            if line.strip()
+            else ""
+            for line in lines
+        )
+        # replaces single newlines with multiple blanks lines
+        s = re.sub(r"\n\s*\n", "\n\n", s)
+        s = s.strip()
+        s = "\n" + s + "\n"
 
+    # forces a paragraph break
+    s = re.sub(
+        r"(\S)\n(\s*\S)",
+        r"\1\n\n\2",
+        s,
+        flags=re.DOTALL
+    )
     # Normalize :::NOTE → :::note
     s = re.sub(r":::([A-Z]+)", lambda m: f":::{m.group(1).lower()}", s)
     html = None
