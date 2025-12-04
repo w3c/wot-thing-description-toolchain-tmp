@@ -63,7 +63,7 @@ def slot_type_text(slot_name: str, slot_def, class_def) -> str:
     if getattr(slot_def, "inlined", False):
         return f"Map of {rng}"
     if getattr(slot_def, "multivalued", False):
-        return f"{rng} or Array"
+        return f"Array of {rng}"
     return rng
 
 
