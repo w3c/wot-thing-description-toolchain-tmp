@@ -30,6 +30,9 @@ terms:
   Content Type:
     id: dfn-content-type
     aliases: [ "Content Types", "content type", "content types", "media type", "media types" ]
+  DataSchema:
+    id: dataschema
+    aliases: [ ]
   Data Schema:
     id: dfn-data-schema
     aliases: [ "Data Schemas", "data schema", "data schemas" ]
@@ -52,8 +55,8 @@ terms:
     id: dfn-td-forms-level
     aliases: [ "forms level" ]
   Hypermedia Controls:
-    id: dfn-hypermedia-controls
-    aliases: [ "hypermedia controls", "Hypermedia Control", "hypermedia control" ]
+    href: "https://www.w3.org/TR/wot-architecture11/#sec-hypermedia-controls"
+    aliases: [ "Hypermedia Control", "Hypermedia Controls" ]
   Instance Relation:
     id: dfn-instance-relation
     aliases: [ "instance relation", "instance relations" ]
