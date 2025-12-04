@@ -1,6 +1,7 @@
 from __future__ import annotations
-from typing import Dict, List, Callable, Any
+from typing import Any, Dict, List, Callable, Optional
 from linkml_runtime.utils.schemaview import SchemaView
+from linkml_runtime.linkml_model.meta import SlotDefinition
 
 def _normalize_range_name(rng: str) -> str:
     """
@@ -67,16 +68,27 @@ def slot_type_text(slot_name: str, slot_def, class_def) -> str:
     return rng
 
 
-
-def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Callable[[str], str]) -> List[Dict[str, str]]:
+def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Callable[[str], str]) -> List[
+    Dict[str, str]]:
     class_def = sv.get_class(class_name)
     rows: List[Dict[str, str]] = []
-    for slot_name in class_def.slots or []:
-        slot_def = sv.get_slot(slot_name)
-        # Determine the source text for the description in the tables
-        raw_desc = getattr(slot_def, "description", "")
-        # Check for and prioritize 'spec_table_definition'
+
+    slot_names: List[str] = class_def.slots or []
+    attribute_names: List[str] = list(class_def.attributes.keys()) if class_def.attributes else []
+    # Combine slots and attributes, prioritizing the defined slots order, then attributes
+    unique_slot_names = slot_names + attribute_names
+    for slot_name in unique_slot_names:
+        slot_def: Optional[SlotDefinition] = sv.get_slot(slot_name, class_name)
+        if not slot_def:
+            continue
+
+        # Get annotations from the resolved slot_def to determine if an attribute needs to be excluded from spec
         ann = getattr(slot_def, "annotations", None) or {}
+        spec_exclude_ann = ann.get("spec_exclude")
+        if spec_exclude_ann and getattr(spec_exclude_ann, 'value', str(spec_exclude_ann)).lower() == 'true':
+            continue
+
+        raw_desc = getattr(slot_def, "description", "")
         if "spec_table_definition" in ann:
             spec_def = getattr(ann["spec_table_definition"], "value", None) or ann["spec_table_definition"]
             raw_desc = str(spec_def) or raw_desc
