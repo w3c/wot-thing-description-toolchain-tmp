@@ -627,6 +627,8 @@ classes:
         slot_uri: td:name
         range: string
         identifier: true
+        annotations:
+          spec_exclude: true
       forms:
         description: >-
           Set of form hypermedia controls that describe how an operation can be performed.
@@ -645,12 +647,13 @@ classes:
                 $ref: "#/$defs/Form"
               minItems: 1
     slots:
+      - "@type"
       - title
       - titles
       - description
       - descriptions
       - uriVariables
-      - "@type"
+
 
   PropertyAffordance:
     is_a: InteractionAffordance
