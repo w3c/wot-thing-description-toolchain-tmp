@@ -294,7 +294,7 @@ slots:
     slot_uri: td:followsProfile
     description: >-
       Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.
-    any_of:
+    exactly_one_of:
       - range: uri
       - range: uri
         multivalued: true
@@ -579,6 +579,11 @@ classes:
           - range: string
             multivalued: true
             minimum_value: 1
+      profile:
+        exactly_one_of:
+          - range: uri
+          - range: uri
+            multivalued: true
       title:
         required: true
       securityDefinitions:
