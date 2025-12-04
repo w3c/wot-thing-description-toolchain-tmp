@@ -196,7 +196,7 @@ slots:
     annotations:
       spec_table_definition: >-
         Provides information about the TD maintainer as URI scheme 
-        (e.g., `mailto` [RFC6068], `tel` [RFC3966], `https` [RFC9112]).
+        (e.g., `mailto` [[RFC6068]], `tel` [[RFC3966]], `https` [[RFC9112]]).
     slot_uri: td:supportContact
     see_also: schema:contactPoint
     range: uri
@@ -210,10 +210,10 @@ slots:
       spec_table_definition: >-
         Define the base URI that is used for all relative URI references throughout a TD document.
         In TD instances, all relative URIs are resolved relative to the base URI using the algorithm
-        defined in RFC3986.
+        defined in [[RFC3986]].
 
         `base` does not affect the URIs used in `@context` and the IRIs used within Linked Data 
-        LINKED-DATA graphs that are relevant when semantic processing is applied to TD instances.
+        [[LINKED-DATA]] graphs that are relevant when semantic processing is applied to TD instances.
     range: uri
 
   properties:
@@ -339,6 +339,10 @@ slots:
     description: >-
       Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
       Also see MultiLanguage.
+    annotations:
+      spec_table_definition: >-
+        Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
+        Also see MultiLanguage.
     slot_uri: td:titleInLanguage
     inlined: true
     multivalued: true
@@ -353,7 +357,11 @@ slots:
   descriptions:
     description: >-
       Can be used to support (human-readable) information in different languages.
-      Also see MultiLanguage.
+      Also see MultiLanguage*.
+    annotations:
+      spec_table_definition: >-
+        Can be used to support (human-readable) information in different languages.
+        Also see MultiLanguage.
     slot_uri: td:descriptionInLanguage
     inlined: true
     multivalued: true
