@@ -629,30 +629,19 @@ classes:
         identifier: true
         annotations:
           spec_exclude: true
-      forms:
-        description: >-
-          Set of form hypermedia controls that describe how an operation can be performed.
-          The array cannot be empty.
-        slot_uri: td:hasForm
-        range: Form
-        multivalued: true
-        required: true
-        minimum_cardinality: 1
-        annotations:
-          jsonschema_config:
-            tag: jsonschema_config
-            value:
-              type: array
-              items:
-                $ref: "#/$defs/Form"
-              minItems: 1
     slots:
       - "@type"
       - title
       - titles
       - description
       - descriptions
+      - forms
       - uriVariables
+
+    slot_usage:
+      forms:
+        required: true
+
 
 
   PropertyAffordance:
