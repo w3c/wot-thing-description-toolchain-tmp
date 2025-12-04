@@ -313,17 +313,19 @@ slots:
   uriVariables:
     description: >-
       Define URI template variables according to RFC6570 as collection based on DataSchema declarations.
+      The Thing level uriVariables can be used in Thing level forms or in Interaction Affordances.
       The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable 
       needs to be serialized to a string inside the href upon the execution of the operation.
       If the same variable is both declared in Thing level uriVariables and in Interaction Affordance
       level, the Interaction Affordance level variable takes precedence.
     annotations:
       spec_table_definition: >-
-        Define URI template variables according to [[RFC6570]] as collection based on **DataSchema** declarations. 
-        The individual variables **DataSchema** cannot be an **ObjectSchema** or an **ArraySchema** since each variable 
+        Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations.
+        The Thing level `uriVariables` can be used in Thing level forms or in Interaction Affordances.
+        The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable 
         needs to be serialized to a string inside the `href` upon the execution of the operation. 
-        If the same variable is both declared in [Thing level](#) `uriVariables` and in **Interaction Affordance** 
-        level, the **Interaction Affordance** level variable takes precedence.
+        If the same variable is both declared in Thing level `uriVariables` and in Interaction Affordance 
+        level, the Interaction Affordance level variable takes precedence.
     slot_uri: td:hasUriTemplateSchema
     range: DataSchema
     multivalued: true
