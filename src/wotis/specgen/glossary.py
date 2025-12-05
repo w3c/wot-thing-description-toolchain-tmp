@@ -111,7 +111,7 @@ def annotate_html(html: str, entries: Dict[str, GlossaryEntry], phrase_to_key: D
             return f'<a href="{href_value}" {class_attr} {data_attr}>{text}</a>'
 
      # Protect existing <a> and <code> blocks
-    splitter = re.compile(r"(<a\b[^>]*>.*?</a>|<code>.*?</code>)", flags=re.DOTALL | re.IGNORECASE)
+    splitter = re.compile(r"(<a\b[^>]*>.*?</a>|<code>.*?</code>|<div\s+class=\"note\">.*?</div>)", flags=re.DOTALL | re.IGNORECASE)
     parts = splitter.split(html)
 
     for i in range(0, len(parts), 2):
