@@ -71,14 +71,15 @@ def annotate_html(html: str, entries: Dict[str, GlossaryEntry], phrase_to_key: D
     if not sorted_phrases:
         return html
     alternation = "|".join(re.escape(p) for p in sorted_phrases)
+    # handles the ! at the start for exclusion of cross-referencing and cross-references embedded in html tags
     token_re = re.compile(
-        rf"(?<![>/])(!?)\b({alternation})\b(?![\w-])(?![^<]*?>)",
-        flags=re.IGNORECASE  # Assuming matching is case-insensitive
+        rf"(?<!/)(!?)(\b)({alternation})\b(?![\w-])",
+        flags=re.IGNORECASE
     )
 
     def repl(match: re.Match) -> str:
         exclusion_char = match.group(1)
-        text = match.group(2)
+        text = match.group(3)
         # Check for exclusion
         if exclusion_char == '!':
             return text
@@ -115,5 +116,4 @@ def annotate_html(html: str, entries: Dict[str, GlossaryEntry], phrase_to_key: D
 
     for i in range(0, len(parts), 2):
         parts[i] = token_re.sub(repl, parts[i])
-
     return "".join(parts)
