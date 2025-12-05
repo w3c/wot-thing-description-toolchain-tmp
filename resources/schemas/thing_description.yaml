@@ -167,7 +167,7 @@ slots:
 
   id:
     description: >-
-      Identifier of the Thing in form of a URI [[RFC3986]] (e.g., stable URI, temporary and mutable URI, 
+      Identifier of the Thing in form of a URI RFC3986 (e.g., stable URI, temporary and mutable URI, 
       URI with local IP address, URN, etc.).
     todos: CHECK WHERE THE DEFINITION COMES FROM, IT IS NOT IN ONTOLOGY OR SHACL
     range: uri
@@ -344,7 +344,7 @@ slots:
     annotations:
       spec_table_definition: >-
         Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
-        Also see MultiLanguage.
+        Also see *MultiLanguage*.
     slot_uri: td:titleInLanguage
     inlined: true
     multivalued: true
@@ -363,7 +363,7 @@ slots:
     annotations:
       spec_table_definition: >-
         Can be used to support (human-readable) information in different languages.
-        Also see MultiLanguage.
+        Also see *MultiLanguage*.
     slot_uri: td:descriptionInLanguage
     inlined: true
     multivalued: true
@@ -492,8 +492,7 @@ classes:
         
         - The `@context` name-value pair *MUST* contain the anyURI `https://www.w3.org/ns/wot-next/td` in order 
         to identify the document as a TD 2.0 which would allow Consumers to use the newly introduced terms.
-        - When there are possibly TD 1.0 consumers the anyURI `https://www.w3.org/ns/wot-next/td` *MUST* be the first entry and the
-        `https://www.w3.org/2022/wot/td/v1.1` *MUST* be the second entry.
+        - When there are possibly TD 1.0 consumers the anyURI `https://www.w3.org/ns/wot-next/td` *MUST* be the first entry and the `https://www.w3.org/2022/wot/td/v1.1` *MUST* be the second entry.
         - When `@context` is an Array, the anyURI `https://www.w3.org/2022/wot/td/v1.1` *MAY* be followed by elements of type 
         `anyURI` or type Map in any order, while it is *RECOMMENDED* to include only one Map with all the name-value pairs in the `@context` Array.
         - Maps contained in an `@context` Array *MAY* contain name-value pairs, where the value is a namespace 
@@ -619,6 +618,14 @@ classes:
     description: >-
       Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact with the Thing.
       There are many types of potential affordances, but W3C WoT defines three types of Interaction Affordances: Properties, Actions, and Events.
+    annotations:
+      spec_scope_note: |
+        The !class InteractionAffordance has the following subclasses:
+
+        - PropertyAffordance
+        - ActionAffordance
+        - EventAffordance
+
     abstract: true
     attributes:
       name:
@@ -639,10 +646,18 @@ classes:
       - uriVariables
 
     slot_usage:
+      "@type":
+        range: string
+        exactly_one_of:
+          - range: string
+          - range: string
+            multivalued: true
+            minimum_value: 1
       forms:
+        description: >-
+          Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. 
+          The array cannot be empty.
         required: true
-
-
 
   PropertyAffordance:
     is_a: InteractionAffordance
@@ -688,7 +703,6 @@ classes:
       forms:
         description: >-
           Set of form hypermedia controls that describe how an operation can be performed.
-          The array cannot be empty.
         slot_uri: td:hasForm
         range: Form
         multivalued: true
