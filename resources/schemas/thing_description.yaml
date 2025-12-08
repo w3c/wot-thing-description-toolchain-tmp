@@ -281,11 +281,6 @@ slots:
       Content coding values indicate an encoding transformation that has been applied to a representation
     range: string
 
-  contentMediaType:
-    description: >-
-      Media type of the content
-    range: string
-
   additionalResponses:
     description: >-
       This field indicates additional expected responses
@@ -305,11 +300,6 @@ slots:
       - value: longpoll
       - value: websub
       - value: sse
-
-  contentEncoding:
-    description: >-
-      Content encoding values indicate an encoding transformation that has been applied to a representation
-    range: string
 
   schema:
     slot_uri: hctl:hasAdditionalOutputSchema
@@ -584,28 +574,6 @@ classes:
         tag: jsonschema_config
         value:
           additionalProperties: true
-#    slots:
-#      - type
-#      - writeOnly
-#      - readOnly
-#      - oneOf
-#      - unit
-#      - enum
-#      - format
-#      - const
-#      - default
-#      - items
-#      - maxItems
-#      - minItems
-#      - minimum
-#      - maximum
-#      - exclusiveMinimum
-#      - exclusiveMaximum
-#      - minLength
-#      - maxLength
-#      - multipleOf
-#      - properties
-#      - required
     attributes:
       observable:
         description: >-
