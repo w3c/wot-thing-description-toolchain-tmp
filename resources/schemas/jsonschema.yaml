@@ -34,7 +34,6 @@ types:
     description: A decimal number
 
 
-
 enums:
   DataSchemaType:
     description: Assignment of JSON-based data types compatible with JSON Schema
@@ -111,20 +110,9 @@ classes:
             minimum_value: 1
       type:
         range: DataSchemaType
-      writeOnly:
-        range: boolean
-      readOnly:
-        range: boolean
-      oneOf:
-        range: DataSchema
-        multivalued: true
-      unit:
-        range: string
-      enum:
-        multivalued: true
-        minimum_value: 1
-      format:
-        range: string
+      # It is not possible to have here range:DataSchema, because probably creates a circular ref
+#      oneOf:
+#        range: DataSchema
       items:
         range: DataSchema
         multivalued: true
@@ -370,81 +358,49 @@ slots:
     range: decimal
     pattern: ^[+]?[0-9]*\.?[0-9]+$
 
+  oneOf:
+    description: >-
+      Used to ensure that the data is valid against one of the specified schemas in the array. This can be used to describe multiple input or output schemas.
+    multivalued: true
+    range: DataSchema
+
 # from here all moved from td:
   type:
     description: >-
-      JSON Schema type (e.g., object, array, string, number, or integer)
+      Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null).
     range: DataSchemaType
     slot_uri: jsonschema:type
 
-  title:
-    description: >-
-      Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
-    slot_uri: td:title
-    range: string
-
-  titles:
-    description: >-
-      Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
-    annotations:
-      spec_table_definition: >-
-        Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages). 
-        Also see [[MultiLanguage]](#multilanguage).
-    slot_uri: td:titleInLanguage
-    inlined: true
-    multivalued: true
-    range: MultiLanguage
-
-  description:
-    description: >-
-      Provides additional (human-readable) information based on a default language.
-    slot_uri: td:description
-    range: string
-
-  descriptions:
-    description: >-
-      Can be used to support (human-readable) information in different languages.
-    annotations:
-      spec_table_definition: >-
-        Can be used to support (human-readable) information in different languages.
-        Also see [MultiLanguage](#multilanguage).
-    slot_uri: td:descriptionInLanguage
-    inlined: true
-    multivalued: true
-    range: MultiLanguage
-
-
   writeOnly:
     description: >-
-      If true, indicates the value can only be written but not read.
+      Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false).
     range: boolean
 
   readOnly:
     description: >-
-      If true, indicates the value can only be read but not written.
+      Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false).
     range: boolean
-
-  oneOf:
-    description: >-
-      Used to ensure the data is valid against exactly one of the specified schemas.
-    range: DataSchema
-    multivalued: true
 
   unit:
     description: >-
-      Unit of the value
+      Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition.
+    annotations:
+      spec_table_definition: >-
+        Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition (also see Section [Semantic Annotations](#semantic-annotations-example-version-units)).
     range: string
 
   enum:
     description: >-
       Restricted set of values provided as an array.
-    range: string
+    range: Any
     multivalued: true
-    minimum_value: 1
 
   format:
     description: >-
-      Provides a hint indicating how the data should be formatted
+      Allows validation based on a format pattern such as "date-time", "email", "uri", etc.
+    annotations:
+      spec_table_definition: >-
+        Allows validation based on a format pattern such as "date-time", "email", "uri", etc. (Also see below.)
     range: string
 
   const:
@@ -454,8 +410,11 @@ slots:
 
   default:
     description: >-
-      Default value.
-    range: string
+      Supply a default value. The value SHOULD validate against the data schema in which it resides.
+    annotations:
+      spec_table_definition: >-
+        Supply a default value. The value *SHOULD* validate against the data schema in which it resides.
+    range: Any
 
   items:
     description: >-
