@@ -88,8 +88,10 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
         slot_def: Optional[SlotDefinition] = sv.get_slot(slot_name, class_name)
         if not slot_def:
             continue
-        # Get annotations from the resolved slot_def
+        # Get annotations from the resolved slot_def (includes merged global and local annotations)
         ann = getattr(slot_def, "annotations", None) or {}
+        # Get raw slot_usage object for explicit local override
+        usage = (class_def.slot_usage or {}).get(slot_name)
         # Check raw attribute definition for annotations
         if slot_name in class_def.attributes:
             raw_attribute_def = class_def.attributes[slot_name]
@@ -108,8 +110,20 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
         # Determine the source text for the description in the tables
         raw_desc = getattr(slot_def, "description", "")
 
-        # prioritize 'spec_table_definition' for the description of the specification generation
-        if "spec_table_definition" in ann:
+        if usage:
+            # Check for local 'spec_table_definition' override in slot_usage
+            usage_ann = getattr(usage, "annotations", None) or {}
+            if "spec_table_definition" in usage_ann:
+                spec_def = getattr(usage_ann["spec_table_definition"], "value", None) or usage_ann[
+                    "spec_table_definition"]
+                # Prioritize local annotation
+                raw_desc = str(spec_def)
+            # If no spec_table_definition, check for local 'description' override in slot_usage
+            elif getattr(usage, "description", None):
+                raw_desc = getattr(usage, "description")
+
+            # Prioritize resolved slot's 'spec_table_definition' (from global/merged annotations)
+        elif "spec_table_definition" in ann:  # Only check resolved annotations if no slot_usage override was found
             spec_def = getattr(ann["spec_table_definition"], "value", None) or ann["spec_table_definition"]
             raw_desc = str(spec_def) or raw_desc
 
