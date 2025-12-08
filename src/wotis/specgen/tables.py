@@ -19,6 +19,8 @@ def _normalize_range_name(rng: str) -> str:
         return "anyURI"
     if rng == "datetime":
         return "dateTime"
+    if rng == "NonNegativeInteger":
+        return "unsignedInt"
     return rng
 
 def get_assignment(slot_name, class_def, slot_def) -> str:
