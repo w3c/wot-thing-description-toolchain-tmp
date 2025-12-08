@@ -20,6 +20,7 @@ prefixes:
 imports:
   - linkml:types
 
+
 types:
   NonNegativeInteger:
     uri: xsd:nonNegativeInteger
@@ -31,6 +32,8 @@ types:
     uri: xsd:decimal
     base: float
     description: A decimal number
+
+
 
 enums:
   DataSchemaType:
@@ -52,44 +55,60 @@ enums:
         description: Represents a null type
 
 classes:
+  Any:
+    class_uri: linkml:Any
+    annotations:
+      spec_exclude: true
   DataSchema:
     class_uri: jsonschema:DataSchema
     description: >-
       A data schema describes the data format used. It can be used for validation.
     annotations:
+      spec_table_definition: >-
+        Metadata that describes the data format used. It can be used for validation.
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
     slots:
-      - type
+      - "@type"
       - title
       - titles
       - description
       - descriptions
-      - writeOnly
-      - readOnly
-      - oneOf
-      - unit
-      - enum
-      - format
       - const
       - default
-      - contentEncoding
-      - contentMediaType
-      - items
-      - maxItems
-      - minItems
-      - minimum
-      - maximum
-      - exclusiveMinimum
-      - exclusiveMaximum
-      - minLength
-      - maxLength
-      - multipleOf
-      - properties
-      - required
+      - unit
+      - oneOf
+      - enum
+      - readOnly
+      - writeOnly
+      - format
+      - type
+#      - const
+#      - default
+#      - contentEncoding
+#      - contentMediaType
+#      - items
+#      - maxItems
+#      - minItems
+#      - minimum
+#      - maximum
+#      - exclusiveMinimum
+#      - exclusiveMaximum
+#      - minLength
+#      - maxLength
+#      - multipleOf
+#      - properties
+#      - required
     slot_usage:
+      "@type":
+        range: string
+        exactly_one_of:
+          - range: string
+          - range: string
+            multivalued: true
+            minimum_value: 1
       type:
         range: DataSchemaType
       writeOnly:
@@ -397,17 +416,17 @@ slots:
 
   writeOnly:
     description: >-
-      If true, indicates the value can only be written but not read
+      If true, indicates the value can only be written but not read.
     range: boolean
 
   readOnly:
     description: >-
-      If true, indicates the value can only be read but not written
+      If true, indicates the value can only be read but not written.
     range: boolean
 
   oneOf:
     description: >-
-      Used to ensure the data is valid against exactly one of the specified schemas
+      Used to ensure the data is valid against exactly one of the specified schemas.
     range: DataSchema
     multivalued: true
 
@@ -418,7 +437,7 @@ slots:
 
   enum:
     description: >-
-      Restricted set of values provided as an array
+      Restricted set of values provided as an array.
     range: string
     multivalued: true
     minimum_value: 1
@@ -430,51 +449,51 @@ slots:
 
   const:
     description: >-
-      Provides a constant value
-    range: string
+      Provides a constant value.
+    range: Any
 
   default:
     description: >-
-      Default value
+      Default value.
     range: string
 
   items:
     description: >-
-      Used to define the characteristics of an array
+      Used to define the characteristics of an array.
     range: DataSchema
 
   maxItems:
     description: >-
-      Maximum number of items in array
+      Maximum number of items in array.
     range: integer
     minimum_value: 0
 
   minItems:
     description: >-
-      Minimum number of items in array
+      Minimum number of items in array.
     range: integer
     minimum_value: 0
 
   minLength:
     description: >-
-      Minimum length of string
+      Minimum length of string.
     range: integer
     minimum_value: 0
 
   maxLength:
     description: >-
-      Maximum length of string
+      Maximum length of string.
     range: integer
     minimum_value: 0
 
   required:
     description: >-
-      Required properties
+      Required properties.
     range: string
     multivalued: true
 
   contentEncoding:
     description: >-
-      Content encoding values indicate an encoding transformation that has been applied to a representation
+      Content encoding values indicate an encoding transformation that has been applied to a representation.
     range: string
  
