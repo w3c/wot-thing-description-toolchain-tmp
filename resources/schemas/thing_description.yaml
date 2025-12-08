@@ -3,7 +3,7 @@ name: things_description
 title: Thing Description Schema
 description: |-
   This schema models the Web of Things domain according to the W3C Web of Things information model.
-version: "1.1-22-October-2025"
+version: "1.12-08-December-2025"
 license: MIT
 contributors: Mahda_Noura
 see_also:
@@ -36,110 +36,6 @@ imports:
   - jsonschema
 
 slots:
-#  writeOnly:
-#    description: >-
-#      If true, indicates the value can only be written but not read
-#    range: boolean
-#
-#  readOnly:
-#    description: >-
-#      If true, indicates the value can only be read but not written
-#    range: boolean
-#
-#  oneOf:
-#    description: >-
-#      Used to ensure the data is valid against exactly one of the specified schemas
-#    range: DataSchema
-#    multivalued: true
-#
-#  unit:
-#    description: >-
-#      Unit of the value
-#    range: string
-#
-#  enum:
-#    description: >-
-#      Restricted set of values provided as an array
-#    range: string
-#    multivalued: true
-#    minimum_value: 1
-#
-#  format:
-#    description: >-
-#      Provides a hint indicating how the data should be formatted
-#    range: string
-#
-#  const:
-#    description: >-
-#      Provides a constant value
-#    range: string
-#
-#  default:
-#    description: >-
-#      Default value
-#    range: string
-#
-#  items:
-#    description: >-
-#      Used to define the characteristics of an array
-#    range: DataSchema
-#
-#  maxItems:
-#    description: >-
-#      Maximum number of items in array
-#    range: integer
-#    minimum_value: 0
-#
-#  minItems:
-#    description: >-
-#      Minimum number of items in array
-#    range: integer
-#    minimum_value: 0
-#
-#  minimum:
-#    description: >-
-#      Minimum value
-#    range: number
-#
-#  maximum:
-#    description: >-
-#      Maximum value
-#    range: number
-#
-#  exclusiveMinimum:
-#    description: >-
-#      Exclusive minimum value
-#    range: number
-#
-#  exclusiveMaximum:
-#    description: >-
-#      Exclusive maximum value
-#    range: number
-#
-#  minLength:
-#    description: >-
-#      Minimum length of string
-#    range: integer
-#    minimum_value: 0
-#
-#  maxLength:
-#    description: >-
-#      Maximum length of string
-#    range: integer
-#    minimum_value: 0
-#
-#  multipleOf:
-#    description: >-
-#      A number that divides the value with no remainder
-#    range: number
-#    minimum_value: 0.000001
-#
-#  required:
-#    description: >-
-#      Required properties
-#    range: string
-#    multivalued: true
-
   "@context":
     description: JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
     required: true
