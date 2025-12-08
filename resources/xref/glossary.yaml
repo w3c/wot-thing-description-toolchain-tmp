@@ -174,6 +174,9 @@ terms:
   Thing Model:
     id: dfn-tm
     aliases: ["TM", "Thing Models", "TMs"]
+  unsignedInt:
+    href: "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#unsignedInt"
+    aliases: [ ]
   VersionInfo:
     id: versioninfo
     aliases: [ ]
