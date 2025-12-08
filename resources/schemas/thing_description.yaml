@@ -786,6 +786,12 @@ classes:
           Indicates whether the action is synchronous (=true) or not.
           A synchronous action means that the response contains all information about the result
           and no further querying about the status is needed.
+        annotations:
+          spec_table_definition: >-
+            Indicates whether the action is synchronous (=true) or not.
+            A synchronous action means that the response contains all information about the result
+            and no further querying about the status is needed.
+            Lack of this keyword means that no claim on the synchronicity of the action can be made.
         slot_uri: td:isSynchronous
         range: boolean
 
