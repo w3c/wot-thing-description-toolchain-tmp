@@ -15,12 +15,21 @@ terms:
   Array:
     id: dfn-array
     aliases: [ "Array", "Arrays" ]
+  ArraySchema:
+    id: arrayschema
+    aliases: [ ]
   Binding Specification:
     id: dfn-binding-specification
     aliases: [ "binding specification", "binding specifications", "Binding Specifications" ]
   Binding Instance:
     id: dfn-binding-instance
     aliases: [ "binding instance", "binding instances", "Binding Instances" ]
+  Boolean:
+    href: "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#boolean"
+    aliases: [ "boolean" ]
+  BooleanSchema:
+    id: booleanschema
+    aliases: [ ]
   Class:
     id: dfn-class
     aliases: [ "Classes", "class", "classes" ]
@@ -47,7 +56,7 @@ terms:
     aliases: [ ]
   Default Values:
     id: dfn-default-values
-    aliases: [ "default value", "default values", "Default Value" ]
+    aliases: [ "Default Value" ]
   Event:
     id: dfn-event
     aliases: [ "Events", "event", "events" ]
@@ -72,6 +81,9 @@ terms:
   Interaction Affordance:
     id: dfn-interaction-affordance
     aliases: [ "Interaction Affordances", "Affordance", "Affordances" ]
+  IntegerSchema:
+    id: integerschema
+    aliases: [ ]
   IoT Platform:
     id: dfn-iot-platform
     aliases: [ "IoT platform", "IoT Platforms", "IoT platforms" ]
@@ -83,6 +95,15 @@ terms:
     aliases: [ ]
   MultiLanguage:
     id: multilanguage
+    aliases: [ ]
+  NumberSchema:
+    id: numberschema
+    aliases: [ ]
+  NullSchema:
+    id: nullschema
+    aliases: [ ]
+  ObjectSchema:
+    id: objectschema
     aliases: [ ]
   Partial TD:
     id: dfn-partial-td
@@ -119,6 +140,9 @@ terms:
     aliases: [ "signature", "signatures" ]
   string:
     href: "https://www.w3.org/TR/xmlschema11-2/#string"
+    aliases: [ ]
+  StringSchema:
+    id: stringschema
     aliases: [ ]
   Term:
     id: dfn-term
