@@ -36,11 +36,12 @@ imports:
   - jsonschema
 
 slots:
-  type:
-    description: >-
-      JSON Schema type (e.g., object, array, string, number, or integer)
-    range: DataSchemaType
-    slot_uri: jsonschema:type
+#  type:
+#    description: >-
+# todo: commented due to the spec generation, this was importing the json schema.
+#      JSON Schema type (e.g., object, array, string, number, or integer)
+#    range: DataSchemaType
+#    slot_uri: jsonschema:type
 
   writeOnly:
     description: >-
