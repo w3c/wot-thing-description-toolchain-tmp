@@ -250,13 +250,13 @@ slots:
   forms:
     slot_uri: td:hasForm
     description: >-
-      Set of form hypermedia controls that describe how an operation can be performed. 
-      Forms are serializations of Protocol Bindings. 
+      Set of form hypermedia controls that describe how an operation can be performed.
+      Forms are serializations of Protocol Bindings.
       Thing level forms are used to describe endpoints for a group of interaction affordances.
     annotations:
       spec_table_definition: >-
-        Set of form hypermedia controls that describe how an operation can be performed. 
-        Forms are serializations of Protocol Bindings. 
+        Set of form hypermedia controls that describe how an operation can be performed.
+        Forms are serializations of Protocol Bindings.
         [Thing level](#dfn-td-thing-level) forms are used to describe endpoints for a group of interaction affordances.
     range: Form
     multivalued: true
@@ -493,28 +493,26 @@ classes:
         - The `@context` name-value pair *MUST* contain the anyURI `https://www.w3.org/ns/wot-next/td` in order 
         to identify the document as a TD 2.0 which would allow Consumers to use the newly introduced terms.
         - When there are possibly TD 1.0 consumers the anyURI `https://www.w3.org/ns/wot-next/td` *MUST* be the first entry and the `https://www.w3.org/2022/wot/td/v1.1` *MUST* be the second entry.
+        - TD 1.1 consumers *MUST* accept TDs satisfying the W3C WoT Thing Description 1.0 [[wot-thing-description10]] specification.
         - When `@context` is an Array, the anyURI `https://www.w3.org/2022/wot/td/v1.1` *MAY* be followed by elements of type 
         `anyURI` or type Map in any order, while it is *RECOMMENDED* to include only one Map with all the name-value pairs in the `@context` Array.
         - Maps contained in an `@context` Array *MAY* contain name-value pairs, where the value is a namespace 
         identifier of type anyURI and the name a Term or prefix denoting that namespace.
         - One Map contained in an `@context` Array *SHOULD* contain a name-value pair that defines the default language 
         for the Thing Description, where the name is the Term @language and the value is a well-formed language tag as 
-        defined by BCP47 (e.g., en, de-AT, gsw-CH, zh-Hans, zh-Hant-HK, sl-nedis).
+        defined by [[BCP47]] (e.g., en, de-AT, gsw-CH, zh-Hans, zh-Hant-HK, sl-nedis).
 
-        To determine the base direction of all human-readable text in Thing Description and Thing Model instances this specification recommends to follow the STRING-META guideline about [string-specific directional information](https://www.w3.org/TR/string-meta/#string_specific_direction) when no built-in mechanism for associating base direction metadata is available.
+        To determine the base direction of all human-readable text in Thing Description and Thing Model instances this specification recommends to follow the [[STRING-META]] guideline about [string-specific directional information](https://www.w3.org/TR/string-meta/#string_specific_direction) when no built-in mechanism for associating base direction metadata is available.
 
         TD Processors *SHOULD* be aware of certain special cases when processing bidirectional text. 
-        TD Processors *SHOULD* take care to use bidi isolation when presenting strings to users, particularly when embedding in surrounding text (e.g., for Web user interface).
-        Mixed direction text can occur in any language, even when the language is properly identified.
+        TD Processors *SHOULD* take care to use bidi isolation when presenting strings to users, particularly when embedding in surrounding text (e.g., for Web user interface). Mixed direction text can occur in any language, even when the language is properly identified.
 
         TD producers *SHOULD* attempt to provide mixed direction strings in a way that can be displayed successfully by a naive user agent. 
         For example, if an RTL string begins with an LTR run (such as a number or a brand or trade name in Latin script), including an RLM character at the start of the string or wrapping opposite direction runs in bidi controls can assist in proper display.
 
         *Strings on the Web: Language and Direction Metadata* string-meta provides some guidance and illustrates a number of pitfalls when using bidirectional text.
 
-        In addition to the explicitly provided Interaction Affordances in the `properties`, `actions`, and `events` Maps, a Thing can also provide meta-interactions, which are indicated by `Form` instances in its optional `forms` Array.
-        When the `forms` Array of a Thing instance contains `Form` instances, it MUST contain `op` member with the string values assigned to the name `op`, either directly or within an Array, MUST be one of the following *operation types*:
-        `readallproperties`, `writeallproperties`, `readmultipleproperties`, `writemultipleproperties`, `observeallproperties`, `unobserveallproperties`, `queryallactions`, `subscribeallevents`, or `unsubscribeallevents`. 
+        In addition to the explicitly provided Interaction Affordances in the `properties`, `actions`, and `events` Maps, a Thing can also provide meta-interactions, which are indicated by `Form` instances in its optional `forms` Array. When the `forms` Array of a Thing instance contains `Form` instances, it MUST contain `op` member with the string values assigned to the name `op`, either directly or within an Array, MUST be one of the following *operation types*: `readallproperties`, `writeallproperties`, `readmultipleproperties`, `writemultipleproperties`, `observeallproperties`, `unobserveallproperties`, `queryallactions`, `subscribeallevents`, or `unsubscribeallevents`. 
         (See [an example](#td-forms-readall-example) for an usage of `form` in a Thing instance.)
 
         The data schema for each of the property meta-interactions is constructed by combining the data schemas of each `PropertyAffordance` instance in a single `ObjectSchema` instance, where the `properties` Map of the `ObjectSchema` instance contains each data schema of the `PropertyAffordances` identified by the name of the corresponding `PropertyAffordances` instance.
@@ -620,7 +618,7 @@ classes:
       There are many types of potential affordances, but W3C WoT defines three types of Interaction Affordances: Properties, Actions, and Events.
     annotations:
       spec_scope_note: |
-        The !class InteractionAffordance has the following subclasses:
+        The !class `InteractionAffordance` has the following subclasses:
 
         - PropertyAffordance
         - ActionAffordance
@@ -654,10 +652,17 @@ classes:
             multivalued: true
             minimum_value: 1
       forms:
-        description: >-
-          Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. 
-          The array cannot be empty.
+        annotations:
+          spec_table_definition: >-
+            Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. The array cannot be empty.
         required: true
+      uriVariables:
+        description: >-
+          Define URI template variables according to RFC6570 as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the href upon the execution of the operation. If the same variable is both declared in Thing level uriVariables and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
+        annotations:
+          spec_table_definition: >-
+            Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the `href` upon the execution of the operation. If the same variable is both declared in Thing level `uriVariables` and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
+
 
   PropertyAffordance:
     is_a: InteractionAffordance
@@ -667,37 +672,58 @@ classes:
       This state can be retrieved (read) and/or updated (write).
       Things can also choose to make Properties observable by pushing the new state after a change.
     annotations:
+      spec_scope_note: |
+        :::NOTE
+
+        Property instances are also instances of the class DataSchema. Therefore, it can contain the `type`, `unit`, `readOnly` and `writeOnly` members, among others.
+        :::
+        
+        `PropertyAffordance` is a Subclass of the `InteractionAffordance` Class and the DataSchema Class. When a Form instance is within a `PropertyAffordance` instance, the value assigned to op MUST be one of readproperty, writeproperty, observeproperty, unobserveproperty or an Array containing a combination of these terms.
+        
+        :::NOTE
+
+        It is considered to be good practice that each observeproperty has a corresponding unobserveproperty unless the protocol supports implicit unsubscription mechanisms (e.g., heartbeat to detect connection loss).
+        :::
+        
+        :::NOTE
+
+        The observation mechanism depends on the underlying protocol or sub-protocol. Having said that, it is not guaranteed that the current Property value will be provided once the subscription is initiated. Hence, it may be necessary to read the current Property value before/after the subscription to get a first value.
+        :::
+
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
-    slots:
-      - type
-      - writeOnly
-      - readOnly
-      - oneOf
-      - unit
-      - enum
-      - format
-      - const
-      - default
-      - items
-      - maxItems
-      - minItems
-      - minimum
-      - maximum
-      - exclusiveMinimum
-      - exclusiveMaximum
-      - minLength
-      - maxLength
-      - multipleOf
-      - properties
-      - required
+#    slots:
+#      - type
+#      - writeOnly
+#      - readOnly
+#      - oneOf
+#      - unit
+#      - enum
+#      - format
+#      - const
+#      - default
+#      - items
+#      - maxItems
+#      - minItems
+#      - minimum
+#      - maximum
+#      - exclusiveMinimum
+#      - exclusiveMaximum
+#      - minLength
+#      - maxLength
+#      - multipleOf
+#      - properties
+#      - required
     attributes:
       observable:
         description: >-
           A hint that indicates whether Servients hosting the Thing and Intermediaries should provide a Protocol Binding
           that supports the observeproperty and unobserveproperty operations for this Property.
+        annotations:
+          spec_table_definition: >-
+            A hint that indicates whether Servients hosting the Thing and Intermediaries should provide a Protocol Binding that supports the `observeproperty` and `unobserveproperty` operations for this Property.
         slot_uri: td:isObservable
         range: boolean
       forms:
@@ -709,6 +735,7 @@ classes:
         required: true
         minimum_cardinality: 1
         annotations:
+          spec_exclude: true
           jsonschema_config:
             tag: jsonschema_config
             value:
@@ -724,6 +751,8 @@ classes:
       An Interaction Affordance that allows to invoke a function of the Thing,
       which manipulates state (e.g., toggling a lamp on or off) or triggers a process on the Thing (e.g., dim a lamp over time).
     annotations:
+      spec_scope_note: |
+        `ActionAffordance` is a Subclass of the `InteractionAffordance` Class. When a Form instance is within an `ActionAffordance` instance, the value assigned to op *MUST* either be `invokeaction`, `queryaction`, `cancelaction` or an Array containing a combination of these terms.
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -767,6 +796,19 @@ classes:
       An Interaction Affordance that describes an event source,
       which asynchronously pushes event data to Consumers (e.g., overheating alerts).
     annotations:
+      spec_scope_note: |
+        `EventAffordance` is a Subclass of the `InteractionAffordance` Class. When a Form instance is within an EventAffordance instance, the value assigned to op *MUST* be either `subscribeevent`, `unsubscribeevent`, or both terms within an Array.
+        
+        :::NOTE
+
+        It is considered to be good practice that each `subscribeevent` has a corresponding `unsubscribeevent` unless the protocol supports implicit unsubscription mechanisms (e.g., heartbeat to detect connection loss).
+        :::
+        
+        EventAffordances are similar to observable PropertyAffordances in the sense that the Thing itself informs interested Consumers about state changes. 
+        However, a main difference of EventAffordances is that not every change of the associated resource needs to trigger an event message to be emitted, e.g. a critical threshold for a numeric value. 
+        Furthermore, EventAffordances allow for more complex subscribing and unsubscribing mechanisms via the definition of subscription, dataResponse, and cancellation DataSchema definitions. 
+        Not all protocols might support these more advanced mechanisms, however, which is why in some scenarios, events may be very similar to observable PropertyAffordances. 
+        In these cases, the choice between a Property and a Event for modelling the Affordance should be made based on the semantics of the underlying resource; for example, if the state of the affordance is also supposed to be read or written by a Consumer, then a Property is most likely the appropriate choice.
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -804,17 +846,11 @@ classes:
       (term definitions outside of the TD namespace) can be extended via the TD Context Extension mechanism.
     #B. FORMATTED DESCRIPTION FOR SPEC
     annotations:
-      # FORMATTED DESCRIPTION (PRE-TABLE)
-      spec_description: >-
-        Metadata of a Thing that provides version information about the TD document. 
-        If required, additional version information such as firmware and hardware version 
-        (term definitions outside of the TD namespace) can be extended via the 
-        [TD Context Extension](#dfn-context-ext) mechanism.
       # FORMATTED SCOPE NOTE (POST-TABLE)
       spec_scope_note: >-
         It is recommended that the values within `instances` and `model` of the `VersionInfo` [Class](#dfn-class) 
         follow the semantic versioning pattern, where a sequence of three numbers separated by a dot indicates the 
-        major version, minor version, and patch version, respectively. See [SEMVER](#bib-semver) for details.
+        major version, minor version, and patch version, respectively. See [[SEMVER]] for details.
     attributes:
       instance:
         description: >-
@@ -831,15 +867,27 @@ classes:
   MultiLanguage:
     description: >-
       A Map providing a set of human-readable texts in different languages identified by language tags as defined in BCP47.
+    annotations:
+      spec_table_definition: >-
+        A Map providing a set of human-readable texts in different languages identified by language tags as defined in [[BCP47]].
+        See [6.3.2 Human-Readable Metadata](#titles-descriptions-serialization-json) for example usages of this container in a Thing Description instance.
+
+      spec_scope_note: |
+        Each name of the `MultiLanguage` Map *MUST* be a language tag as defined in [[BCP47]]. Each value of the `MultiLanguage` Map *MUST* be of type string.
+
     attributes:
       language_tag:
         range: string
         identifier: true
         required: true
         pattern: "^[a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2})?$"
+        annotations:
+          spec_exclude: true
       language_value:
         range: string
         required: true
+        annotations:
+          spec_exclude: true
 
   AdditionalExpectedResponse:
     description: >-
