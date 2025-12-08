@@ -13,6 +13,8 @@ def _normalize_range_name(rng: str) -> str:
     """
     if not rng:
         return ""
+    if rng in ["Any", "linkml:Any"]:
+        return "any type"
     if rng == "uri":
         return "anyURI"
     if rng == "datetime":
@@ -129,10 +131,12 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
 
         desc_html = process_description(raw_desc)
         desc = (desc_html or "").replace("'", "&#39;")
+        raw_range_name = getattr(slot_def, "range", None)
         rows.append({
             "slot_name": slot_name,
             "description": desc,
             "assignment": get_assignment(slot_name, class_def, slot_def),
             "range_text": slot_type_text(slot_name, slot_def, class_def),
+            "range_original": raw_range_name,
         })
     return rows
