@@ -17,15 +17,6 @@ imports:
   - linkml:types
 
 classes:
-  MultiLanguage:
-    description: >-
-      A Map providing a set of human-readable texts in different languages identified by language tags as defined in BCP47.
-    attributes:
-      language_map:
-        range: string
-        multivalued: true
-        pattern: "^[a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2})?$"
-
   SecurityScheme:
     description: >-
       Metadata describing the configuration of a security mechanism. The value assigned to the name scheme MUST be defined 
