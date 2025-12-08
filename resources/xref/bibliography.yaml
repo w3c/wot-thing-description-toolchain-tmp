@@ -6,6 +6,9 @@ bibliography:
     BCP47:
       href: https://www.rfc-editor.org/rfc/rfc5646.html
       title: "Tags for Identifying Languages (BCP47)"
+    ECMA-262:
+      href: https://tc39.es/ecma262/multipage/
+      title: "ECMAScript Language Specification"
     RFC3986:
       href: https://www.rfc-editor.org/rfc/rfc3986.html
       title: "Uniform Resource Identifier (URI): Generic Syntax"
