@@ -43,25 +43,18 @@ classes:
         description: Can be used to support (human-readable) information in different languages
         range: MultiLanguage
 
-  APIKeySecurityScheme:
+  NoSecurityScheme:
     is_a: SecurityScheme
     description: >-
-      API key authentication security configuration identified by the term apikey. This scheme is to be used when the 
-      access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.
+      A security configuration indicating there is no authentication or other mechanism required to access the resource.
     annotations:
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
-    slots:
-      - in
-      - name
     slot_usage:
       scheme:
-        pattern: ^apikey$
-      in:
-        required: true
-        range: SecurityLocationType
+        pattern: ^nosec$
 
   AutoSecurityScheme:
     is_a: SecurityScheme
@@ -89,22 +82,6 @@ classes:
     slots:
       - in
       - name
-
-  BearerSecurityScheme:
-    is_a: SecurityScheme
-    description: >-
-      Bearer Token security configuration for situations where bearer tokens are used independently of OAuth2.
-    annotations:
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
-    slots:
-      - alg
-      - format
-      - in
-      - name
-      - authorization
 
   ComboSecurityScheme:
     is_a: SecurityScheme
@@ -145,18 +122,56 @@ classes:
       - name
       - qop
 
-  NoSecurityScheme:
+
+  APIKeySecurityScheme:
     is_a: SecurityScheme
     description: >-
-      A security configuration indicating there is no authentication or other mechanism required to access the resource.
+      API key authentication security configuration identified by the term apikey. This scheme is to be used when the 
+      access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.
     annotations:
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
+    slots:
+      - in
+      - name
     slot_usage:
       scheme:
-        pattern: ^nosec$
+        pattern: ^apikey$
+      in:
+        required: true
+        range: SecurityLocationType
+
+  BearerSecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      Bearer Token security configuration for situations where bearer tokens are used independently of OAuth2.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
+    slots:
+      - alg
+      - format
+      - in
+      - name
+      - authorization
+
+  PSKSecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      Pre-shared key authentication security configuration. This is meant to identify that a standard is used for 
+      pre-shared keys such as TLS-PSK.
+    annotations:
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
+    slots:
+      - identity
+
 
   OAuth2SecurityScheme:
     is_a: SecurityScheme
@@ -184,19 +199,6 @@ classes:
         required: true
         comments:
           - Mandatory for both code and client flows
-
-  PSKSecurityScheme:
-    is_a: SecurityScheme
-    description: >-
-      Pre-shared key authentication security configuration. This is meant to identify that a standard is used for 
-      pre-shared keys such as TLS-PSK.
-    annotations:
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
-    slots:
-      - identity
 
 enums:
   SecurityLocationType:
@@ -257,7 +259,7 @@ slots:
     description: Authorization flow.
     range: OAuth2Flow
 
-  format:
+  TODO_format:
     description: Specifies format of security authentication information.
     range: BearerFormat
 
@@ -311,13 +313,6 @@ slots:
     description: URI of the token server.
     range: uriorcurie
 
-  oneOf:
-    description: >-
-      Array of two or more strings identifying other named security scheme definitions, any one of which, when 
-      satisfied, will allow access. Only one may be chosen for use.
-    range: SecurityScheme
-    multivalued: true
-    minimum_value: 2
 
   allOf:
     description: >-
