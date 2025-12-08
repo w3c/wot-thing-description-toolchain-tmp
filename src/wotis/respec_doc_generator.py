@@ -121,6 +121,16 @@ def generate_respec_spec(
             cdef = sv.get_class(cls)
             if not cdef:
                 continue
+            ann = getattr(cdef, "annotations", None) or {}
+            spec_exclude_ann = ann.get("spec_exclude")
+            if spec_exclude_ann:
+                ann_value = getattr(spec_exclude_ann, 'value', None)
+                if ann_value is None:
+                    ann_value = spec_exclude_ann
+
+                if str(ann_value).lower() == 'true':
+                    logging.debug(f"Skipping rendering of class '{cls}' due to spec_exclude=true annotation.")
+                    continue
 
             rows = collect_slot_rows(sv, cls, process_description)
             # Class description

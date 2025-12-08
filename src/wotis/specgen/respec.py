@@ -32,6 +32,7 @@ def assemble(template_path: Path, *fragments_html: str, out_path: Path, placehol
         logging.warning(
             f"Warning: {final_content.count(placeholder)} placeholders were not replaced."
         )
+
     logging.info(
         "Wrote multi-section spec to %s (%d total chars injected)",
         out_path,
