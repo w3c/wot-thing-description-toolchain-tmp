@@ -65,6 +65,25 @@ classes:
     annotations:
       spec_table_definition: >-
         Metadata that describes the data format used. It can be used for validation.
+      spec_scope_note: |
+        The class DataSchema has the following subclasses:
+
+        - ArraySchema
+        - BooleanSchema
+        - NumberSchema
+        - IntegerSchema
+        - ObjectSchema
+        - StringSchema
+        - NullSchema
+        
+        The format string values are known from a fixed set of values and their corresponding format rules defined in [[JSON-SCHEMA]] (Section 7.3 Defined Formats in particular). Servients *MAY* use the `format` value to perform additional validation accordingly. When a value that is not found in the known set of values is assigned to `format`, such a validation *SHOULD* succeed.
+
+        Vocabulary terms typed as any `type` (e.g., `const`, `default`) follow data types compatible with JSON Schema (boolean, integer, number, string, object, array, or null).
+        
+        :::NOTE
+
+        The format term is not widely implemented by JSON Schema tools. In addition, the term `format` is being discussed by the JSON Schema standardisation community and may be replaced by another mechanism or removed in a future JSON Schema version.
+        :::
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -88,7 +107,6 @@ classes:
 #      - default
 #      - contentEncoding
 #      - contentMediaType
-#      - items
 #      - maxItems
 #      - minItems
 #      - minimum
@@ -113,13 +131,6 @@ classes:
       # It is not possible to have here range:DataSchema, because probably creates a circular ref
 #      oneOf:
 #        range: DataSchema
-      items:
-        range: DataSchema
-        multivalued: true
-      maxItems:
-        range: NonNegativeInteger
-      minItems:
-        range: NonNegativeInteger
       minimum:
         range: decimal
       maximum:
@@ -154,10 +165,6 @@ classes:
         value:
           additionalProperties: true
     attributes:
-      items:
-        slot_uri: jsonschema:items
-        description: Used to define the characteristics of an array
-        range: DataSchema
       minItems:
         slot_uri: jsonschema:minItems
         description: Defines the minimum number of items that have to be in the array
@@ -166,6 +173,19 @@ classes:
         slot_uri: jsonschema:maxItems
         description: Defines the maximum number of items that have to be in the array
         range: NonNegativeInteger
+
+    slots:
+      - items
+
+    slot_usage:
+      items:
+        slot_uri: jsonschema:items
+        description: Used to define the characteristics of an array
+        range: DataSchema
+        exactly_one_of:
+          - range: DataSchema
+          - range: DataSchema
+            multivalued: true
 
   BooleanSchema:
     class_uri: jsonschema:BooleanSchema
@@ -417,20 +437,20 @@ slots:
     range: Any
 
   items:
-    description: >-
-      Used to define the characteristics of an array.
-    range: DataSchema
+    slot_uri: jsonschema:items
+    description: Used to define the characteristics of an array
+
 
   maxItems:
     description: >-
-      Maximum number of items in array.
-    range: integer
+      Defines the maximum number of items that have to be in the array.
+    range: NonNegativeInteger
     minimum_value: 0
 
   minItems:
     description: >-
-      Minimum number of items in array.
-    range: integer
+      Defines the minimum number of items that have to be in the array.
+    range: NonNegativeInteger
     minimum_value: 0
 
   minLength:
