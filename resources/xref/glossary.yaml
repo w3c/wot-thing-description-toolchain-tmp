@@ -57,6 +57,9 @@ terms:
   Default Values:
     id: dfn-default-values
     aliases: [ "Default Value" ]
+  double:
+    href: "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#double"
+    aliases: [ ]
   Event:
     id: dfn-event
     aliases: [ "Events", "event", "events" ]
