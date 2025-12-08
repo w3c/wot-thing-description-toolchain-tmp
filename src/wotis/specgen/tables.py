@@ -21,6 +21,8 @@ def _normalize_range_name(rng: str) -> str:
         return "dateTime"
     if rng == "NonNegativeInteger":
         return "unsignedInt"
+    if rng == "decimal":
+        return "double"
     return rng
 
 def get_assignment(slot_name, class_def, slot_def) -> str:
@@ -37,14 +39,16 @@ def get_assignment(slot_name, class_def, slot_def) -> str:
         pass
     return "optional"
 
-def slot_type_text(slot_name: str, slot_def, class_def) -> str:
+
+def slot_type_text(slot_name: str, slot_def, class_def, effective_range: Optional[str] = None) -> str:
     usage = (getattr(class_def, "slot_usage", None) or {}).get(slot_name)
     xo = getattr(usage, "exactly_one_of", None) if usage else None
-
     if xo:
         alts = []
         for alt in xo:
-            raw_rng = getattr(alt, "range", None) or getattr(slot_def, "range", None)
+            # Prioritize effective_range if provided, otherwise check alt, then slot_def
+            raw_rng = effective_range if effective_range else getattr(alt, "range", None) or getattr(slot_def, "range",
+                                                                                                     None)
             rng = _normalize_range_name(raw_rng)
             mv = bool(getattr(alt, "multivalued", False))
             alts.append((rng, mv))
@@ -61,7 +65,7 @@ def slot_type_text(slot_name: str, slot_def, class_def) -> str:
                 out.append(p)
         return "".join(out)
 
-    raw_rng = getattr(slot_def, "range", None)
+    raw_rng = effective_range if effective_range else getattr(slot_def, "range", None)
     rng = _normalize_range_name(raw_rng)
     if not rng:
         return ""
@@ -92,17 +96,21 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
         slot_def: Optional[SlotDefinition] = sv.get_slot(slot_name, class_name)
         if not slot_def:
             continue
+
         # Get annotations from the resolved slot_def (includes merged global and local annotations)
         ann = getattr(slot_def, "annotations", None) or {}
         # Get raw slot_usage object for explicit local override
         usage = (class_def.slot_usage or {}).get(slot_name)
+        # Determine effective_range_name 🛑
+        effective_range_name = getattr(usage, "range", None)
+        if not effective_range_name:
+            effective_range_name = getattr(slot_def, "range", None)
         # Check raw attribute definition for annotations
         if slot_name in class_def.attributes:
             raw_attribute_def = class_def.attributes[slot_name]
             # Merge raw attribute annotations into 'ann' for exclusion check
             raw_ann = getattr(raw_attribute_def, "annotations", None) or {}
             ann.update(raw_ann)
-
         spec_exclude_ann = ann.get("spec_exclude")
         if spec_exclude_ann:
             ann_value = getattr(spec_exclude_ann, 'value', None)
@@ -133,12 +141,16 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
 
         desc_html = process_description(raw_desc)
         desc = (desc_html or "").replace("'", "&#39;")
-        raw_range_name = getattr(slot_def, "range", None)
         rows.append({
             "slot_name": slot_name,
             "description": desc,
             "assignment": get_assignment(slot_name, class_def, slot_def),
-            "range_text": slot_type_text(slot_name, slot_def, class_def),
-            "range_original": raw_range_name,
+            "range_text": slot_type_text(
+                slot_name,
+                slot_def,
+                class_def,
+                effective_range=effective_range_name
+            ),
+            "range_original": effective_range_name,
         })
     return rows
