@@ -2,7 +2,7 @@ from __future__ import annotations
 from jinja2 import exceptions
 import logging, yaml
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from linkml_runtime.utils.schemaview import SchemaView
 
@@ -17,10 +17,10 @@ cfg = Config.from_resources_dir(Path("resources"), placeholder="%s")
 
 
 def generate_respec_spec(
-    input_path: Path,
-    respec_template_path: Path,
-    final_spec_path: Path,
-    core_schema_placeholder: str,
+        input_path: Path,
+        respec_template_path: Path,
+        final_spec_path: Path,
+        core_schema_placeholder: str,
 ) -> None:
     """
     Generate the complete ReSpec-compatible HTML document from a LinkML schema.
@@ -46,7 +46,6 @@ def generate_respec_spec(
 
     try:
         env = build_jinja_env(cfg.jinja_templates)
-
         # Load glossary and expose annotate() to Jinja
         glossary_entries, phrase_to_key = load_glossary(cfg.glossary_path)
         env.filters["annotate"] = lambda s: annotate_html(s or "", glossary_entries, phrase_to_key)
@@ -56,20 +55,14 @@ def generate_respec_spec(
         logging.error("Template error: %s", e, exc_info=True)
         assemble(
             respec_template_path,
-            f"<!-- template error: {e} -->",
-            final_spec_path,
-            core_schema_placeholder,
+            f"",
+            "",
+            "",
+            "",
+            out_path=final_spec_path,
+            placeholder=core_schema_placeholder,
         )
         return
-
-    # class order: Thing first
-    classes_in_order: List[str] = list(sv.all_classes().keys())
-    classes: List[str] = []
-    if "Thing" in classes_in_order:
-        classes.append("Thing")
-        classes.extend(c for c in classes_in_order if c != "Thing")
-    else:
-        classes = classes_in_order
 
     biblio = load_bibliography(cfg.biblio_path)
 
@@ -80,37 +73,90 @@ def generate_respec_spec(
         html = annotate_html(html, glossary_entries, phrase_to_key)
         return html
 
-    sections_html: List[str] = []
-    for cls in classes:
-        cdef = sv.get_class(cls)
-        if not cdef:
-            continue
+    file_to_classes: Dict[str, List[str]] = {}
+    for section_path in cfg.section_schemas.values():
+        try:
+            if not section_path.exists():
+                logging.error(f"Missing schema file: {section_path.name}. Cannot render this section.")
+                file_to_classes[section_path.name] = []
+                continue
+            # Load each section schema without merging imports to see its classes
+            section_sv = SchemaView(section_path, merge_imports=False)
+            file_to_classes[section_path.name] = list(section_sv.all_classes().keys())
+        except (yaml.YAMLError, IOError) as e:
+            logging.error(f"Failed to load section schema {section_path.name} due to: {e}. Skipping section.")
+            file_to_classes[section_path.name] = []
 
-        rows = collect_slot_rows(sv, cls, process_description)
+    # Identify all non-core classes (defined outside the primary TD schema)
+    non_core_classes: set[str] = set()
+    try:
+        core_section_id = next(iter(cfg.section_schemas.keys()))
+    except StopIteration:
+        core_section_id = None
 
-        # Class description
-        desc_html = process_description(getattr(cdef, "description", "") or "")
+    for section_id, section_path in cfg.section_schemas.items():
+        if section_id != core_section_id:
+            # add all classes from non-core schemas to the exclusion set
+            non_core_classes.update(file_to_classes.get(section_path.name, []))
 
-        # Optional spec_scope_note
-        note_html = ""
-        ann = getattr(cdef, "annotations", None) or {}
-        if "spec_scope_note" in ann:
-            raw = getattr(ann["spec_scope_note"], "value", None) or ann["spec_scope_note"]
-            note_html = render_markdown_html(str(raw))
-            note_html = link_biblio_keys(note_html, biblio)
-            note_html = annotate_html(note_html, glossary_entries, phrase_to_key)
+    # extract classes order and build content
+    sections_content: List[str] = []
 
-        sections_html.append(
-            section_tpl.render(
-                class_name=cls,
-                class_description=desc_html,
-                slots=rows,
-                spec_scope_note_html=note_html,
+    for section_id, section_path in cfg.section_schemas.items():
+        # Get the classes defined in the current section's file
+        section_classes_to_render = file_to_classes.get(section_path.name, [])
+        sections_html: List[str] = []
+        # filter the core vocabulary section
+        if section_id == core_section_id and core_section_id is not None:
+            # Exclude any class that is defined in one of the other schema files
+            section_classes_to_render = [
+                cls for cls in section_classes_to_render if cls not in non_core_classes
+            ]
+        # Enforce 'Thing' first
+        if 'Thing' in section_classes_to_render:
+            section_classes_to_render.remove('Thing')
+            section_classes_to_render.insert(0, 'Thing')
+        # Generate HTML for classes belonging ONLY to this section
+        for cls in section_classes_to_render:
+            cdef = sv.get_class(cls)
+            if not cdef:
+                continue
+
+            rows = collect_slot_rows(sv, cls, process_description)
+            # Class description
+            raw_desc = getattr(cdef, "description", "") or ""
+            ann = getattr(cdef, "annotations", None) or {}
+            if "spec_table_definition" in ann:
+                spec_def = getattr(ann["spec_table_definition"], "value", None) or ann["spec_table_definition"]
+                raw_desc = str(spec_def) or raw_desc
+
+            desc_html = process_description(raw_desc)
+
+            # Optional spec_scope_note
+            note_html = ""
+            if "spec_scope_note" in ann:
+                raw = getattr(ann["spec_scope_note"], "value", None) or ann["spec_scope_note"]
+                note_html = render_markdown_html(str(raw))
+                note_html = link_biblio_keys(note_html, biblio)
+                note_html = annotate_html(note_html, glossary_entries, phrase_to_key)
+
+            sections_html.append(
+                section_tpl.render(
+                    class_name=cls,
+                    class_description=desc_html,
+                    slots=rows,
+                    spec_scope_note_html=note_html,
+                )
             )
-        )
+
+        section_html_fragment = "\n\n".join(sections_html)
+        # Escape all literal percent signs in the fragment content.
+        escaped_fragment = section_html_fragment.replace('%', '%%')
+        sections_content.append(escaped_fragment)
+
     assemble(
         respec_template_path,
-        "\n\n".join(sections_html),
-        final_spec_path,
-        core_schema_placeholder,
+        *sections_content,
+        out_path=final_spec_path,
+        placeholder=core_schema_placeholder,
     )
