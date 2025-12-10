@@ -12,11 +12,23 @@ terms:
   Affordance Level:
     id: dfn-td-affordance-level
     aliases: [ "affordance level" ]
+  APIKeySecurityScheme:
+    id: apikeysecurityscheme
+    aliases: [ ]
+  AutoSecurityScheme:
+    id: autosecurityscheme
+    aliases: [ ]
   Array:
     id: dfn-array
     aliases: [ "Array", "Arrays" ]
   ArraySchema:
     id: arrayschema
+    aliases: [ ]
+  BasicSecurityScheme:
+    id: basicsecurityscheme
+    aliases: [ ]
+  BearerSecurityScheme:
+    id: bearersecurityscheme
     aliases: [ ]
   Binding Specification:
     id: dfn-binding-specification
@@ -29,6 +41,9 @@ terms:
     aliases: [ "boolean" ]
   BooleanSchema:
     id: booleanschema
+    aliases: [ ]
+  ComboSecurityScheme:
+    id: combosecurityscheme
     aliases: [ ]
   Class:
     id: dfn-class
@@ -57,6 +72,9 @@ terms:
   Default Values:
     id: dfn-default-values
     aliases: [ "Default Value" ]
+  DigestSecurityScheme:
+    id: digestsecurityscheme
+    aliases: [ ]
   double:
     href: "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#double"
     aliases: [ ]
@@ -99,11 +117,17 @@ terms:
   MultiLanguage:
     id: multilanguage
     aliases: [ ]
+  NoSecurityScheme:
+    id: nosecurityscheme
+    aliases: [ ]
   NumberSchema:
     id: numberschema
     aliases: [ ]
   NullSchema:
     id: nullschema
+    aliases: [ ]
+  OAuth2SecurityScheme:
+    id: oauth2securityscheme
     aliases: [ ]
   ObjectSchema:
     id: objectschema
@@ -126,6 +150,9 @@ terms:
   Protocol Binding:
     id: dfn-protocol-binding
     aliases: [ "Binding", "Bindings", "protocol binding", "protocol bindings" ]
+  PSKSecurityScheme:
+    id: psksecurityscheme
+    aliases: [ ]
   SecurityScheme:
     id: securityscheme
     aliases: [ ]
