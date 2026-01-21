@@ -607,7 +607,7 @@ classes:
       which manipulates state (e.g., toggling a lamp on or off) or triggers a process on the Thing (e.g., dim a lamp over time).
     annotations:
       spec_scope_note: |
-        `ActionAffordance` is a Subclass of the `InteractionAffordance` Class. When a Form instance is within an `ActionAffordance` instance, the value assigned to op *MUST* either be `invokeaction`, `queryaction`, `cancelaction` or an Array containing a combination of these terms.
+        `ActionAffordance` is a Subclass of the `InteractionAffordance` Class. When a Form instance is within an `ActionAffordance` instance, the value assigned to `op` *MUST* either be `invokeaction`, `queryaction`, `cancelaction` or an Array containing a combination of these terms.
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -626,7 +626,7 @@ classes:
       safe:
         description: >-
           Signals if the Action is safe (=true) or not.
-          Used to signal if there is no internal state is changed when invoking an Action.
+          Used to signal if there is no internal state (cf. resource state) is changed when invoking an Action.
           In that case responses can be cached as example.
         slot_uri: td:isSafe
         range: boolean
@@ -658,7 +658,7 @@ classes:
       which asynchronously pushes event data to Consumers (e.g., overheating alerts).
     annotations:
       spec_scope_note: |
-        `EventAffordance` is a Subclass of the `InteractionAffordance` Class. When a Form instance is within an EventAffordance instance, the value assigned to op *MUST* be either `subscribeevent`, `unsubscribeevent`, or both terms within an Array.
+        `EventAffordance` is a Subclass of the `InteractionAffordance` Class. When a Form instance is within an EventAffordance instance, the value assigned to `op` *MUST* be either `subscribeevent`, `unsubscribeevent`, or both terms within an Array.
         
         :::NOTE
 
@@ -666,7 +666,7 @@ classes:
         :::
         
         EventAffordances are similar to observable PropertyAffordances in the sense that the Thing itself informs interested Consumers about state changes. 
-        However, a main difference of EventAffordances is that not every change of the associated resource needs to trigger an event message to be emitted, e.g. a critical threshold for a numeric value. 
+        However, a main difference of EventAffordances is that not every change of the associated resource needs to trigger an !event message to be emitted, e.g. a critical threshold for a numeric value. 
         Furthermore, EventAffordances allow for more complex subscribing and unsubscribing mechanisms via the definition of subscription, dataResponse, and cancellation DataSchema definitions. 
         Not all protocols might support these more advanced mechanisms, however, which is why in some scenarios, events may be very similar to observable PropertyAffordances. 
         In these cases, the choice between a Property and a Event for modelling the Affordance should be made based on the semantics of the underlying resource; for example, if the state of the affordance is also supposed to be read or written by a Consumer, then a Property is most likely the appropriate choice.
