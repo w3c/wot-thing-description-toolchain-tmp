@@ -3,7 +3,7 @@ name: things_description
 title: Thing Description Schema
 description: |-
   This schema models the Web of Things domain according to the W3C Web of Things information model.
-version: "1.12-08-December-2025"
+version: "21.01-21-December-2026"
 license: MIT
 contributors: Mahda_Noura
 see_also:
@@ -459,13 +459,11 @@ classes:
       properties:
         slot_uri: td:hasPropertyAffordance
         description: >-
-          All Property-based Interaction Affordances of the Thing. Each key is a unique property name
-          and its value is a PropertyAffordance object.
+          All Property-based Interaction Affordances of the Thing.
         range: PropertyAffordance
       actions:
         description: >-
-          All Action-based Interaction Affordances of the Thing. Each key is a unique action name
-          and its value is an ActionAffordance object.
+          All Action-based Interaction Affordances of the Thing.
         range: ActionAffordance
         multivalued: true
         inlined: true
@@ -478,8 +476,7 @@ classes:
                 $ref: "#/$defs/ActionAffordance"
       events:
         description: >-
-          All Event-based Interaction Affordances of the Thing. Each key is a unique event name
-          and its value is an EventAffordance object.
+          All Event-based Interaction Affordances of the Thing.
         range: EventAffordance
         multivalued: true
         inlined: true
@@ -558,11 +555,11 @@ classes:
         Property instances are also instances of the class DataSchema. Therefore, it can contain the `type`, `unit`, `readOnly` and `writeOnly` members, among others.
         :::
         
-        `PropertyAffordance` is a Subclass of the `InteractionAffordance` Class and the DataSchema Class. When a Form instance is within a `PropertyAffordance` instance, the value assigned to op MUST be one of readproperty, writeproperty, observeproperty, unobserveproperty or an Array containing a combination of these terms.
+        `PropertyAffordance` is a Subclass of the `InteractionAffordance` Class and the DataSchema Class. When a Form instance is within a `PropertyAffordance` instance, the value assigned to `op` MUST be one of `readproperty`, `writeproperty`, `observeproperty`, `unobserveproperty` or an Array containing a combination of these terms.
         
         :::NOTE
 
-        It is considered to be good practice that each observeproperty has a corresponding unobserveproperty unless the protocol supports implicit unsubscription mechanisms (e.g., heartbeat to detect connection loss).
+        It is considered to be good practice that each `observeproperty` has a corresponding `unobserveproperty` unless the protocol supports implicit unsubscription mechanisms (e.g., heartbeat to detect connection loss).
         :::
         
         :::NOTE
