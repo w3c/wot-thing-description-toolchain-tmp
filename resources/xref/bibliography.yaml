@@ -33,12 +33,15 @@ bibliography:
     XMLSCHEMA11-2-20120405:
       href: https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/
       title: "W3C XML Schema Definition Language (XSD) 1.1 Part 2: Datatypes"
-    RFC6068:
-      href: https://www.rfc-editor.org/rfc/rfc6068.html
-      title: "The mailto URI Scheme"
     RFC3966:
       href: https://www.rfc-editor.org/rfc/rfc3966.html
       title: "The tel URI Scheme for Telephone Numbers"
+    RFC6068:
+      href: https://www.rfc-editor.org/rfc/rfc6068.html
+      title: "The mailto URI Scheme"
+    RFC8259:
+      href: https://www.w3.org/TR/wot-thing-description-2.0/#bib-rfc8259
+      title: "The JavaScript Object Notation (JSON) Data Interchange Format"
     RFC9112:
       href: https://www.rfc-editor.org/rfc/rfc9112.html
       title: "HTTP/1.1"
