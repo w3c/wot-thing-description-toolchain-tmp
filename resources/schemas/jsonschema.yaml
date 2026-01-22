@@ -34,25 +34,6 @@ types:
     description: A decimal number
 
 
-enums:
-  DataSchemaType:
-    description: Assignment of JSON-based data types compatible with JSON Schema
-    permissible_values:
-      object:
-        description: Represents an object type
-      array:
-        description: Represents an array type
-      string:
-        description: Represents a string type
-      number:
-        description: Represents a number type
-      integer:
-        description: Represents an integer type
-      boolean:
-        description: Represents a boolean type
-      "null":
-        description: Represents a null type
-
 classes:
   Any:
     class_uri: linkml:Any
@@ -257,7 +238,7 @@ classes:
       spec_scope_note: |
         :::NOTE
 
-        The length of a string (i.e., `minLength` and `maxLength`) is defined as the number of Unicode code points, as defined by [[RFC8259]]. Note that some [user-perceived characters](#dfn-grapheme) are composed of more than one Unicode code point. Arbitrary index values might not fall on these grapheme boundaries, so truncation according to `maxLength` might alter the appearance or meaning of the string.
+        The length of a string (i.e., `minLength` and `maxLength`) is defined as the number of Unicode code points, as defined by [[RFC8259]]. Note that some [user-perceived characters](https://www.w3.org/TR/i18n-glossary/#dfn-grapheme) are composed of more than one Unicode code point. Arbitrary index values might not fall on these grapheme boundaries, so truncation according to `maxLength` might alter the appearance or meaning of the string.
         :::
       jsonschema_config:
         tag: jsonschema_config
@@ -288,18 +269,14 @@ classes:
         annotations:
           spec_table_definition: >-
             Specifies the encoding used to store the contents, as specified in [[RFC2045]] (Section 6.1) and [[RFC4648]].
-        range: string
-        comments:
-          - e.g., 7bit, 8bit, binary, quoted-printable, base16, base32, or base64
+        range: contentEncodingList
       contentMediaType:
         slot_uri: jsonschema:contentMediaType
         description: Specifies the MIME type of the contents of a string value, as described in RFC 2046.
         annotations:
           spec_table_definition: >-
             Specifies the MIME type of the contents of a string value, as described in [[RFC2046]].
-        range: string
-        comments:
-          - e.g., image/png, or audio/mpeg
+        range: contentMediaTypeList
 
   NullSchema:
     class_uri: jsonschema:NullSchema
@@ -370,7 +347,7 @@ slots:
       Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false).
     annotations:
       spec_table_definition: >-
-        !Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false).
+        Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false).
     range: boolean
 
   readOnly:
@@ -441,4 +418,49 @@ slots:
         Defines which members of the object type are mandatory, i.e. which members are mandatory in the payload that is to be sent (e.g. input of `invokeaction`, `writeproperty`) and what members will be definitely delivered in the payload that is being received (e.g. output of `invokeaction`, `readproperty`)
     range: string
     multivalued: true
+
+
+enums:
+  contentEncodingList:
+    description: Specifies the encoding used to store the contents.
+    permissible_values:
+      7bit:
+        description:
+      8bit:
+        description:
+      binary:
+        description:
+      quoted-printable:
+        description:
+      base16:
+        description:
+      base32:
+        description:
+      base64:
+        description:
+  contentMediaTypeList:
+    description: Specifies the MIME type of the contents of a string value
+    permissible_values:
+      image/png:
+        description:
+      audio/mpeg:
+        description:
+  DataSchemaType:
+    description: Assignment of JSON-based data types compatible with JSON Schema
+    enum_uri: linkml:uri
+    permissible_values:
+      object:
+        description: Represents an object type
+      array:
+        description: Represents an array type
+      string:
+        description: Represents a string type
+      number:
+        description: Represents a number type
+      integer:
+        description: Represents an integer type
+      boolean:
+        description: Represents a boolean type
+      "null":
+        description: Represents a null type
  
