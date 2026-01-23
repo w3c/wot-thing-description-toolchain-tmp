@@ -140,8 +140,13 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
             raw_desc = str(getattr(ann["spec_table_definition"], "value", ann["spec_table_definition"]))
         desc_html = process_description(raw_desc)
         desc = (desc_html or "").replace("'", "&#39;")
+        # special case for the name defined in wot_security.yaml, name is a reserved keyword.
+        if slot_name == "@name":
+            display_name = "name"
+        else:
+            display_name = slot_name
         rows.append({
-            "slot_name": slot_name,
+            "slot_name": display_name,
             "description": desc,
             "assignment": get_assignment(slot_name, class_def, slot_def),
             "range_text": slot_type_text(
