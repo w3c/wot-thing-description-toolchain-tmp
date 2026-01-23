@@ -16,6 +16,95 @@ default_prefix: wot
 imports:
   - linkml:types
 
+
+slots:
+  scheme:
+    description: Identification of the security mechanism being configured.
+    required: true
+    range: SecuritySchemeList
+
+  alg:
+    description: Encoding, encryption, or digest algorithm (e.g., ES256, ES512-256).
+    range: string
+
+  flow:
+    description: Authorization flow.
+    range: OAuth2Flow
+
+  TODO_format:
+    description: Specifies format of security authentication information.
+    range: BearerFormat
+
+  identity:
+    description: Identifier providing information which can be used for selection or confirmation.
+    range: string
+
+  in:
+    description: Specifies the location of security authentication information.
+    range: SecurityLocationType
+    comments:
+      - Default value should be provided by implementations
+
+  "@name":
+    description: >-
+      Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.
+    annotations:
+      spec_table_definition: >-
+        Name for query, header, cookie, or uri parameters.
+    range: string
+
+  qop:
+    description: Quality of protection.
+    range: QoPType
+    comments:
+      - This feature is at risk.
+
+  scopes:
+    description: >-
+      Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an 
+      authorization server and associated with forms in order to identify what resources a client may access and how.
+    annotations:
+      spec_table_definition: >-
+        Set of authorization scope identifiers provided as an array. 
+        These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources 
+        a client may access and how. The values associated with a form SHOULD be chosen from those defined in an `OAuth2SecurityScheme` active on that form.
+    any_of:
+      - range: string
+      - range: string
+        multivalued: true
+    comments:
+      - This feature is at risk.
+
+  proxy:
+    description: >-
+      URI of the proxy server this security configuration provides access to. If not given, the corresponding 
+      security configuration is for the endpoint.
+    range: uri
+    comments:
+      - This feature is at risk.
+
+  authorization:
+    description: URI of the authorization server.
+    range: uri
+
+  refresh:
+    description: URI of the refresh server.
+    range: uri
+
+  token:
+    description: URI of the token server.
+    range: uri
+
+
+  allOf:
+    description: >-
+      Array of two or more strings identifying other named security scheme definitions, all of which must be 
+      satisfied for access.
+    range: SecurityScheme
+    multivalued: true
+    minimum_value: 2
+
+
 classes:
   SecurityScheme:
     description: >-
@@ -25,13 +114,13 @@ classes:
       stored out-of-band via other mechanisms.
     annotations:
       spec_table_definition: >-
-        Metadata describing the configuration of a security mechanism. The value assigned to the name scheme *MUST* be defined 
-        within a Vocabulary included in the Thing Description. 
+        Metadata describing the configuration of a security mechanism. The value assigned to the name `scheme` MUST be defined 
+        within a Vocabulary included in the Thing Description, either in the standard Vocabulary defined in [TD Information Model](#sec-vocabulary-definition) or in a [TD Context Extension](#sec-vocabulary-definition).
         
         For all security schemes, any keys, passwords, or other sensitive information directly providing access *MUST NOT* be stored in the TD and should instead be shared and stored out-of-band via other mechanisms.
         The purpose of a TD is to describe how to access a Thing if and only if a Consumer already has authorization, and is not meant be used to grant that authorization.
         
-        Each security scheme object used in a TD defines a set of requirements to be met before access can be granted. We say a security scheme is *satisfied8 when all its requirements are met. In some cases requirements from multiple security schemes will have to be met before access can be granted.
+        Each security scheme object used in a TD defines a set of requirements to be met before access can be granted. We say a security scheme is *satisfied* when all its requirements are met. In some cases requirements from multiple security schemes will have to be met before access can be granted.
 
         Security schemes generally may require additional authentication parameters, such as a password or key. The location of this information is indicated by the value associated with the name `in`, often in combination with the value associated with `name`. The value associated with `in` can take one of the following values:
         
@@ -119,6 +208,42 @@ classes:
       scheme:
         pattern: ^auto$
 
+  ComboSecurityScheme:
+    is_a: SecurityScheme
+    description: >-
+      A combination of other security schemes. Exactly one of either oneOf or allOf vocabulary terms MUST be included.
+    annotations:
+      spec_table_definition: >-
+        A combination of other security schemes identified by the Vocabulary Term `combo` (i.e., "scheme": "combo"). 
+        Elements of this scheme define various ways in which other named schemes defined in `securityDefinitions`, 
+        including other ComboSecurityScheme definitions, are to be combined to create a new scheme definition. Exactly 
+        one of either `oneOf` or `allOf` vocabulary terms MUST be included. Only security scheme definitions which can 
+        be used together can be combined with `allOf`. For example, it is not possible in general to combine different 
+        OAuth 2.0 flows together using `allOf` unless one applies to a proxy and one to the endpoint. Note that when 
+        multiple named security scheme definitions are listed in a `security` field the same semantics apply as in an `allOf` 
+        combination (and the same limitations on allowable combinations). The `oneOf` combination is equivalent to using different 
+        security schemes on forms that are otherwise identical. In this sense a `oneOf` scheme is not an essential feature but it does avoid redundancy in such cases.
+      jsonschema_config:
+        tag: jsonschema_config
+        value:
+          additionalProperties: true
+    slots:
+      - oneOf
+      - allOf
+    slot_usage:
+      scheme:
+        pattern: ^combo$
+      oneOf:
+        description: >-
+          Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, will allow access. Only one may be chosen for use.
+        range: string
+        multivalued: true
+        minimum_value: 2
+      allOf:
+        range: string
+        multivalued: true
+        minimum_value: 2
+
   BasicSecurityScheme:
     is_a: SecurityScheme
     description: >-
@@ -131,32 +256,8 @@ classes:
         value:
           additionalProperties: true
     slots:
-      - name
+      - "@name"
       - in
-
-  ComboSecurityScheme:
-    is_a: SecurityScheme
-    description: >-
-      A combination of other security schemes. Exactly one of either oneOf or allOf vocabulary terms MUST be included.
-    annotations:
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
-    slots:
-      - oneOf
-      - allOf
-    slot_usage:
-      scheme:
-        pattern: ^combo$
-      oneOf:
-        range: string
-        multivalued: true
-        minimum_value: 2
-      allOf:
-        range: string
-        multivalued: true
-        minimum_value: 2
 
   DigestSecurityScheme:
     is_a: SecurityScheme
@@ -164,15 +265,17 @@ classes:
       Digest Access Authentication security configuration. This scheme is similar to basic authentication but with 
       added features to avoid man-in-the-middle attacks.
     annotations:
+      spec_table_definition: >-
+        Digest Access Authentication [[RFC7616]] security configuration identified by the Vocabulary Term `digest` (i.e., "scheme": "digest").
+        This scheme is similar to basic authentication but with added features to avoid man-in-the-middle attacks.
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
     slots:
+      - "@name"
       - in
-      - name
       - qop
-
 
   APIKeySecurityScheme:
     is_a: SecurityScheme
@@ -180,13 +283,18 @@ classes:
       API key authentication security configuration identified by the term apikey. This scheme is to be used when the 
       access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.
     annotations:
+      spec_table_definition: >-
+        API key authentication security configuration identified by the Vocabulary Term `apikey` (i.e., "scheme": "apikey"). 
+        This scheme is to be used when the access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider. 
+        In this case the key may not be using a standard token format. 
+        This scheme indicates that the key provided by the service provider needs to be supplied as part of service requests using the mechanism indicated by the `in` field.
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
     slots:
+      - "@name"
       - in
-      - name
     slot_usage:
       scheme:
         pattern: ^apikey$
@@ -199,16 +307,23 @@ classes:
     description: >-
       Bearer Token security configuration for situations where bearer tokens are used independently of OAuth2.
     annotations:
+      spec_table_definition: >-
+        Bearer Token [[RFC6750]] security configuration identified by the Vocabulary Term `bearer` (i.e., "scheme": "bearer") 
+        for situations where bearer tokens are used independently of OAuth2. If the `oauth2` scheme is specified it is not 
+        generally necessary to specify this scheme as well as it is implied. For `format`, the value `jwt` indicates conformance 
+        with [[RFC7519]], `jws` indicates conformance with [[RFC7797]], `cwt` indicates conformance with [[RFC8392]], 
+        and `jwe` indicates conformance with [[RFC7516]], with values for `alg` interpreted consistently with those standards. 
+        Other formats and algorithms for bearer tokens MAY be specified in vocabulary extensions.
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
     slots:
+      - authorization
+      - "@name"
+      - in
       - alg
       - format
-      - in
-      - name
-      - authorization
 
   PSKSecurityScheme:
     is_a: SecurityScheme
@@ -216,6 +331,10 @@ classes:
       Pre-shared key authentication security configuration. This is meant to identify that a standard is used for 
       pre-shared keys such as TLS-PSK.
     annotations:
+      spec_table_definition: >-
+        Pre-shared key authentication security configuration identified by the Vocabulary Term `psk` (i.e., "scheme": "psk"). 
+        This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[RFC4279]], 
+        and that the ciphersuite used for keys will be established during protocol negotiation.
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -223,35 +342,55 @@ classes:
     slots:
       - identity
 
-
   OAuth2SecurityScheme:
     is_a: SecurityScheme
     description: >-
       OAuth 2.0 authentication security configuration for systems conformant with RFC6749 and RFC8252.
     annotations:
+      spec_table_definition: >-
+        OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]], 
+        identified by the Vocabulary Term `oauth2` (i.e., "scheme": "oauth2").
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
     slots:
-      - flow
-      - scopes
       - authorization
       - token
       - refresh
+      - scopes
+      - flow
     slot_usage:
+      scopes:
+        exactly_one_of:
+          - range: string
+          - range: string
+            multivalued: true
       flow:
         required: true
-      authorization:
-        required: true
-        comments:
-          - Mandatory for code flow, must be omitted for client flow
-      token:
-        required: true
-        comments:
-          - Mandatory for both code and client flows
 
 enums:
+  SecuritySchemeList:
+    description: Identification of the security mechanism being configured.
+    permissible_values:
+      nosec:
+        description:
+      combo:
+        description:
+      basic:
+        description:
+      digest:
+        description:
+      bearer:
+        description:
+      psk:
+        description:
+      oauth2:
+        description:
+      apikey:
+        description:
+      auto:
+        description:
   SecurityLocationType:
     description: Specifies the location where security authentication information should be provided
     permissible_values:
@@ -295,80 +434,3 @@ enums:
         description: Authorization code flow
       client:
         description: Client credentials flow
-
-slots:
-  scheme:
-    description: Identification of the security mechanism being configured.
-    required: true
-    range: string
-
-  alg:
-    description: Encoding, encryption, or digest algorithm (e.g., ES256, ES512-256).
-    range: string
-
-  flow:
-    description: Authorization flow.
-    range: OAuth2Flow
-
-  TODO_format:
-    description: Specifies format of security authentication information.
-    range: BearerFormat
-
-  identity:
-    description: Identifier providing information which can be used for selection or confirmation.
-    range: string
-
-  in:
-    description: Specifies the location of security authentication information.
-    range: SecurityLocationType
-    comments:
-      - Default value should be provided by implementations
-
-  name:
-    description: >-
-      Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.
-    range: string
-
-  qop:
-    description: Quality of protection.
-    range: QoPType
-    comments:
-      - This feature is at risk.
-
-  scopes:
-    description: >-
-      Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an 
-      authorization server and associated with forms in order to identify what resources a client may access and how.
-    range: string
-    multivalued: true
-    comments:
-      - This feature is at risk.
-
-  proxy:
-    description: >-
-      URI of the proxy server this security configuration provides access to. If not given, the corresponding 
-      security configuration is for the endpoint.
-    range: uri
-    comments:
-      - This feature is at risk.
-
-  authorization:
-    description: URI of the authorization server.
-    range: uriorcurie
-
-  refresh:
-    description: URI of the refresh server.
-    range: uriorcurie
-
-  token:
-    description: URI of the token server.
-    range: uriorcurie
-
-
-  allOf:
-    description: >-
-      Array of two or more strings identifying other named security scheme definitions, all of which must be 
-      satisfied for access.
-    range: SecurityScheme
-    multivalued: true
-    minimum_value: 2 
