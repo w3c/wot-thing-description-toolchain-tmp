@@ -42,8 +42,7 @@ slots:
     exactly_one_of:
       - range: uri
         pattern: '^(https://www\.w3\.org/2019/wot/td/v1|https://www\.w3\.org/2022/wot/td/v1\.1|http://www\.w3\.org/ns/td)$'
-      - range: string
-        multivalued: true
+      - multivalued: true
         minimum_value: 1
 
   "@type":
@@ -371,7 +370,7 @@ classes:
         For `@context` the following rules are defined for Thing Description instances:
         
         - The `@context` name-value pair *MUST* contain the anyURI `https://www.w3.org/ns/wot-next/td` in order 
-        to identify the document as a TD 2.0 which would allow Consumers to use the newly introduced terms.
+        to identify the document as a TD 1.1 which would allow Consumers to use the newly introduced terms.
         - When there are possibly TD 1.0 consumers the anyURI `https://www.w3.org/ns/wot-next/td` *MUST* be the first entry and the `https://www.w3.org/2022/wot/td/v1.1` *MUST* be the second entry.
         - TD 1.1 consumers *MUST* accept TDs satisfying the W3C WoT Thing Description 1.0 [[wot-thing-description10]] specification.
         - When `@context` is an Array, the anyURI `https://www.w3.org/2022/wot/td/v1.1` *MAY* be followed by elements of type 

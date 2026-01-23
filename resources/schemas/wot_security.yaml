@@ -45,6 +45,7 @@ slots:
     comments:
       - Default value should be provided by implementations
 
+  #this is the name in wot_Security, however it is modelled like this because in LinkML name is a reserved key!
   "@name":
     description: >-
       Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.

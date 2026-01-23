@@ -117,6 +117,36 @@ enums:
           Identifies the unsubscribeallevents operation on Events to unsubscribe from notifications from all Events 
           in a single interaction
 
+slots:
+  #all moved from td to resolve error
+  op:
+    description: >-
+      Indicates the operation type (e.g., readproperty, writeproperty, observeproperty, etc.)
+    range: string
+    multivalued: true
+  href:
+    description: >-
+      URI of the endpoint where an interaction can be initiated
+    range: uri
+    required: true
+  contentType:
+    description: >-
+      Media type of the interaction
+    range: string
+  contentCoding:
+    description: >-
+      Content coding values indicate an encoding transformation that has been applied to a representation
+    range: string
+
+  subprotocol:
+    description: >-
+      Indicates the exact protocol that should be used for additional notifications
+    range: string
+    examples:
+      - value: longpoll
+      - value: websub
+      - value: sse
+
 classes:
   Link:
     class_uri: hctl:Link
