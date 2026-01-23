@@ -39,50 +39,49 @@ def get_assignment(slot_name, class_def, slot_def) -> str:
         pass
     return "optional"
 
-def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView,effective_range: Optional[str] = None) -> str:
+
+def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effective_range: Optional[str] = None) -> str:
+    # Determine the base range
     raw_rng = effective_range if effective_range else getattr(slot_def, "range", None)
-    # ENUM LOGIC: string (e.g., a, b, or c)
+    # 2. Choice Logic (exactly_one_of or any_of)
+    usage = (getattr(class_def, "slot_usage", None) or {}).get(slot_name)
+    choices = None
+    if usage:
+        choices = getattr(usage, "exactly_one_of", None) or getattr(usage, "any_of", None)
+    if choices:
+        pretty = []
+        seen = set()
+        for alt in choices:
+            # Check local alt range first, then fallback to effective/global range
+            alt_rng_raw = getattr(alt, "range", None)
+            if not alt_rng_raw:
+                alt_rng_raw = raw_rng
+            rng = _normalize_range_name(alt_rng_raw)
+            mv = bool(getattr(alt, "multivalued", False))
+            # --- SPECIAL HANDLING FOR @CONTEXT where we do not want to specify the range in the table---
+            # If multivalued and range is empty or not provided in the alt, just return "Array"
+            if mv:
+                if not getattr(alt, "range", None) and slot_name == "@context":
+                    p = "Array"
+                else:
+                    p = f"Array of {rng}" if rng else "Array"
+            else:
+                p = rng if rng else ""
+            if p and p not in seen:
+                seen.add(p)
+                pretty.append(p)
+        return " or ".join(pretty)
+    # ENUM LOGIC
     all_enums = sv.all_enums()
     if raw_rng in all_enums:
         enum_def = all_enums[raw_rng]
         pv_names = list(enum_def.permissible_values.keys())
         if pv_names:
-            if len(pv_names) > 1:
-                formatted_pvs = f"{', '.join(pv_names[:-1])}, or {pv_names[-1]}"
-            else:
-                formatted_pvs = pv_names[0]
-            is_uri_enum = (
-                    enum_def.enum_uri == "linkml:uri" or
-                    enum_def.enum_uri == "anyURI" or
-                    raw_rng.lower() == "uri"
-            )
-            if is_uri_enum:
-                return f"anyURI (one of {formatted_pvs})"
-            else:
-                return f"string (e.g., {formatted_pvs})"
+            formatted_pvs = f"{', '.join(pv_names[:-1])}, or {pv_names[-1]}" if len(pv_names) > 1 else pv_names[0]
+            is_uri_enum = (enum_def.enum_uri in ["linkml:uri", "anyURI"] or raw_rng.lower() == "uri")
+            return f"anyURI (one of {formatted_pvs})" if is_uri_enum else f"string (e.g., {formatted_pvs})"
         return "string"
-
-    # Exactly One Of (XO) Logic
-    usage = (getattr(class_def, "slot_usage", None) or {}).get(slot_name)
-    xo = getattr(usage, "exactly_one_of", None) if usage else None
-    if xo:
-        alts = []
-        for alt in xo:
-            alt_rng_raw = getattr(alt, "range", None) or raw_rng
-            rng = _normalize_range_name(alt_rng_raw)
-            mv = bool(getattr(alt, "multivalued", False))
-            alts.append((rng, mv))
-
-        pretty = []
-        seen = set()
-        for r, mv in alts:
-            p = f"{r} or Array" if mv else r
-            if p not in seen:
-                seen.add(p)
-                pretty.append(p)
-        return " or ".join(pretty)
-
-    # Standard Fallback
+    # 4. STANDARD FALLBACK
     rng = _normalize_range_name(raw_rng)
     if not rng:
         return ""
