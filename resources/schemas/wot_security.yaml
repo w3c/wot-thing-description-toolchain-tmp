@@ -25,13 +25,16 @@ slots:
 
   alg:
     description: Encoding, encryption, or digest algorithm (e.g., ES256, ES512-256).
-    range: string
+    annotations:
+      spec_table_definition: >-
+        Encoding, encryption, or digest algorithm.
+    range: algList
 
   flow:
     description: Authorization flow.
     range: OAuth2Flow
 
-  TODO_format:
+  format:
     description: Specifies format of security authentication information.
     range: BearerFormat
 
@@ -351,6 +354,10 @@ classes:
       spec_table_definition: >-
         OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]], 
         identified by the Vocabulary Term `oauth2` (i.e., "scheme": "oauth2").
+      spec_scope_note: |
+        For the code flow both `authorization` and token vocabulary terms MUST be included. 
+        For the `client` flow token vocabulary term MUST be included. For the `client` flow `authorization` vocabulary 
+        term MUST NOT be included. The mandatory elements for each flow are summarized in the following table:
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -407,6 +414,13 @@ enums:
         description: The parameter is embedded in the URI itself using a URI template variable
       auto:
         description: The location is determined as part of the protocol, or negotiated
+  algList:
+    description: TODO
+    permissible_values:
+      ES256:
+        description: TODO
+      ES512-256:
+        description: TODO
 
   QoPType:
     description: Quality of protection options for digest security
