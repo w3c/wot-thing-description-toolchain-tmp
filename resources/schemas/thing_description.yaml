@@ -258,58 +258,6 @@ slots:
     multivalued: true
     range: MultiLanguage
 
-  op:
-    description: >-
-      Indicates the operation type (e.g., readproperty, writeproperty, observeproperty, etc.)
-    range: string
-    multivalued: true
-
-  contentType:
-    description: >-
-      Media type of the interaction
-    range: string
-
-  href:
-    description: >-
-      URI of the endpoint where an interaction can be initiated
-    range: uri
-    required: true
-
-  contentCoding:
-    description: >-
-      Content coding values indicate an encoding transformation that has been applied to a representation
-    range: string
-
-  additionalResponses:
-    description: >-
-      This field indicates additional expected responses
-    range: AdditionalExpectedResponse
-    multivalued: true
-
-  response:
-    description: >-
-      This field indicates the expected response media type
-    range: ExpectedResponse
-
-  subprotocol:
-    description: >-
-      Indicates the exact protocol that should be used for additional notifications
-    range: string
-    examples:
-      - value: longpoll
-      - value: websub
-      - value: sse
-
-  schema:
-    slot_uri: hctl:hasAdditionalOutputSchema
-    description: >-
-      Schema of the response
-    range: string
-
-  success:
-    description: >-
-      Indicates whether the response represents a successful interaction
-    range: boolean
 
 types:
   number:
