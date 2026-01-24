@@ -15,12 +15,21 @@ bibliography:
     RFC3987:
       href: https://www.rfc-editor.org/rfc/rfc3987.html
       title: "Internationalized Resource Identifiers (IRI)"
+    RFC2046:
+      href: https://www.w3.org/TR/wot-thing-description-2.0/#bib-rfc2046
+      title: "Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types"
+    IANA HTTP content coding registry:
+      href: https://www.iana.org/assignments/http-parameters/http-parameters.xhtml#content-coding
+      title: "HTTP Content Coding Registry"
     JSON-SCHEMA:
       href: https://json-schema.org/draft/2020-12/json-schema-core.html
       title: "JSON Schema: Core Specification"
     JSON-LD:
       href: https://www.w3.org/TR/json-ld11/
       title: "JSON-LD 1.1"
+    Link Relation definitions from IANA:
+      href: https://www.iana.org/assignments/link-relations/link-relations.xhtml
+      title: "Link Relations"
     WOT-ARCHITECTURE11:
       href: https://www.w3.org/TR/wot-architecture11/
       title: "Web of Things (WoT) Architecture 1.1"
