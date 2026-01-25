@@ -554,7 +554,7 @@ classes:
       which manipulates state (e.g., toggling a lamp on or off) or triggers a process on the Thing (e.g., dim a lamp over time).
     annotations:
       spec_scope_note: |
-        `ActionAffordance` is a Subclass of the `InteractionAffordance` Class. When a Form instance is within an `ActionAffordance` instance, the value assigned to `op` *MUST* either be `invokeaction`, `queryaction`, `cancelaction` or an Array containing a combination of these terms.
+        `ActionAffordance` is a Subclass of the `InteractionAffordance` Class. When a Form instance is within an `ActionAffordance` instance, the value assigned to `op` *MUST* either be `invokeaction`, `queryaction`, `cancelaction`, or an Array containing a combination of these terms.
       jsonschema_config:
         tag: jsonschema_config
         value:
