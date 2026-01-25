@@ -5,7 +5,7 @@ import yaml
 
 from pathlib import Path
 
-from .generators import run_generator as run_standard_generator
+from .generators import run_generator as run_standard_generator, generate_visualizations
 from .respec_doc_generator import generate_respec_spec
 
 from linkml_runtime.utils.schemaview import SchemaView
@@ -72,7 +72,8 @@ def generate_wot_resources(input_schema: str, generate_docs: bool):
             output_dir = GENS_PATH / generator
             logging.info(f"Proceeding with WoT resource generation for {generator}")
             run_standard_generator(linkml_schema_view, generator, output_dir)
-
+            run_standard_generator(linkml_schema_view, generator, output_dir)
+        generate_visualizations(YAML_SCHEMA_PATH, GENS_PATH / "visualization")
         if generate_docs:
             logging.info("Starting Respec specification generation...")
             generate_respec_spec(

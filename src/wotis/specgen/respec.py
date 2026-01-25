@@ -13,11 +13,28 @@ def build_jinja_env(templates_dir: Path) -> Environment:
         lstrip_blocks=True,
     )
 
-def assemble(template_path: Path, fragment_html: str, out_path: Path, placeholder: str) -> None:
+
+def assemble(template_path: Path, *fragments_html: str, out_path: Path, placeholder: str) -> None:
+    """
+    Assembles the final HTML spec by injecting multiple vocabulary fragments
+    into the ReSpec template using sequential string replacement.
+    """
     if not template_path.exists():
         raise FileNotFoundError(f"Respec template not found at {template_path}")
+
     tpl = template_path.read_text(encoding="utf-8")
-    if placeholder not in tpl:
-        raise ValueError(f"Placeholder '{placeholder}' not found in {template_path}")
-    out_path.write_text(tpl.replace(placeholder, fragment_html), encoding="utf-8")
-    logging.info("Wrote spec to %s (%d chars injected)", out_path, len(fragment_html))
+    final_content = tpl
+    for fragment in fragments_html:
+        # We replace the placeholder with the fragment, only once (count=1).
+        final_content = final_content.replace(placeholder, fragment, 1)
+    out_path.write_text(final_content, encoding="utf-8")
+    if final_content.count(placeholder) > 0:
+        logging.warning(
+            f"Warning: {final_content.count(placeholder)} placeholders were not replaced."
+        )
+
+    logging.info(
+        "Wrote multi-section spec to %s (%d total chars injected)",
+        out_path,
+        sum(len(f) for f in fragments_html)
+    )
