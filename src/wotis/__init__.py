@@ -14,6 +14,7 @@ YAML_SCHEMA_PATH = SCHEMA_PATH / 'thing_description.yaml'
 GENERATED_LINKML_SCHEMA = GENS_PATH / 'linkml/linkml.yaml'
 RESPEC_TEMPLATE_PATH = RESOURCES_PATH / 'index.template.html'
 FINAL_SPEC_PATH = GENS_PATH / 'index.html'
+#add 'visualization'
 GENERATORS = ['jsonschema', 'shacl', 'jsonldcontext', 'owl', 'linkml']
 
 JINJA_TEMPLATE_DIR = CONFIG.jinja_templates

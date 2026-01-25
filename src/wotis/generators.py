@@ -1,13 +1,19 @@
 import json
 import logging
+
 from pathlib import Path
+import shutil
+import subprocess
 
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.shaclgen import ShaclGenerator
 from linkml.generators.owlgen import OwlSchemaGenerator
 from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
+from linkml.generators import dotgen
 from linkml_runtime.utils.schemaview import SchemaView
+
+from . import SCHEMA_PATH
 
 
 def run_generator(schema_view: SchemaView, generator: str, output_dir: Path):
@@ -54,5 +60,66 @@ def run_generator(schema_view: SchemaView, generator: str, output_dir: Path):
         (output_dir / 'linkml.yaml').write_text(linkml_generator.serialize())
         logging.info(f"Merged LinkML schema saved to {output_dir / 'linkml.yaml'}")
 
+    elif generator == "visualization":
+        logging.info("Proceeding with UML visualization generation")
+        generate_visualizations(SCHEMA_PATH, output_dir)
+
     else:
         logging.warning(f"Unknown generator: {generator}")
+
+
+def _require_dot() -> bool:
+    """Return True if Graphviz 'dot' is available; otherwise warn once."""
+    if shutil.which("dot"):
+        return True
+    logging.warning("Graphviz 'dot' not found on PATH. Skipping UML diagram generation.")
+    return False
+
+
+def _dot_to_svg(dot_source: str, out_svg: Path) -> None:
+    """Write DOT source to a temporary file and convert to SVG via Graphviz."""
+    out_svg.parent.mkdir(parents=True, exist_ok=True)
+    tmp_dot = out_svg.with_suffix(out_svg.suffix + ".dot")
+    tmp_dot.write_text(dot_source, encoding="utf-8")
+    subprocess.run(["dot", "-Tsvg", str(tmp_dot), "-o", str(out_svg)], check=True)
+
+
+def generate_visualizations(schemas_dir: Path, visualization_dir: Path) -> None:
+    """
+    Generate one SVG figure per LinkML schema file:
+
+      schemas/thing_description.yaml -> gens/visualization/td.svg
+      schemas/jsonschema.yaml       -> gens/visualization/jsonschema.svg
+      schemas/wot_security.yaml     -> gens/visualization/wotsec.svg
+      schemas/hypermedia.yaml       -> gens/visualization/hctl.svg
+    """
+
+    if not _require_dot():
+        return
+
+    mapping = {
+        "thing_description.yaml": ("td.svg", "TD core vocabulary"),
+        "jsonschema.yaml": ("jsonschema.svg", "Data schema vocabulary"),
+        "wot_security.yaml": ("wotsec.svg", "WoT security vocabulary"),
+        "hypermedia.yaml": ("hctl.svg", "Hypermedia controls vocabulary"),
+    }
+
+    visualization_dir.mkdir(parents=True, exist_ok=True)
+
+    for filename, (target_svg, label) in mapping.items():
+        schema_path = schemas_dir / filename
+        out_svg = visualization_dir / target_svg
+
+        if not schema_path.exists():
+            logging.warning("Schema not found for diagram (%s). Skipping %s.", schema_path, target_svg)
+            continue
+
+        try:
+            logging.info("Generating UML diagram for %s → %s (%s)", filename, out_svg.name, label)
+            sv = SchemaView(str(schema_path), merge_imports=True)
+            dot = dotgen.DotGenerator(sv.schema, mergeimports=True)
+            dot_source = dot.serialize()
+            _dot_to_svg(dot_source, out_svg)
+            logging.info("Saved %s", out_svg)
+        except Exception as e:
+            logging.error("Failed to generate %s from %s: %s", out_svg.name, schema_path, e, exc_info=True)
