@@ -355,8 +355,8 @@ classes:
         OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]], 
         identified by the Vocabulary Term `oauth2` (i.e., "scheme": "oauth2").
       spec_scope_note: |
-        For the code flow both `authorization` and token vocabulary terms MUST be included. 
-        For the `client` flow token vocabulary term MUST be included. For the `client` flow `authorization` vocabulary 
+        For the code flow, both `authorization` and token vocabulary terms MUST be included. 
+        For the `client` flow, token vocabulary term MUST be included. For the `client` flow, `authorization` vocabulary 
         term MUST NOT be included. The mandatory elements for each flow are summarized in the following table:
       jsonschema_config:
         tag: jsonschema_config
