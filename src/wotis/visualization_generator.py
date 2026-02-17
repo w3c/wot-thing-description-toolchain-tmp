@@ -75,6 +75,9 @@ def _build_dot_from_schema_view(sv: SchemaView) -> str:
                 slot = sv.get_slot(sname) or sv.get_class(class_name).attributes.get(sname)
                 if slot is None:
                     continue
+                # Slots whose range is another class are shown as edges, not table rows
+                if slot.range and slot.range in all_classes:
+                    continue
                 range_str = _range_label(slot.range)
                 required_marker = " <I>(mandatory)</I>" if slot.required else ""
                 multivalued_marker = "(Array of) " if slot.multivalued else ""
