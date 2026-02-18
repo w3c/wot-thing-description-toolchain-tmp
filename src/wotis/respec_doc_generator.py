@@ -2,7 +2,7 @@ from __future__ import annotations
 from jinja2 import exceptions
 import logging, yaml
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from linkml_runtime.utils.schemaview import SchemaView
 
@@ -12,6 +12,11 @@ from .specgen.bibliography import load_bibliography, link_biblio_keys
 from .specgen.markdown import render_markdown_html
 from .specgen.tables import collect_slot_rows
 from .specgen.respec import build_jinja_env, assemble
+from .specgen.assertions import (
+    extract_all_assertions,
+    assertions_to_csv,
+    DEFAULT_PREFIX_MAP
+)
 
 cfg = Config.from_resources_dir(Path("resources"), placeholder="%s")
 
@@ -21,6 +26,7 @@ def generate_respec_spec(
         respec_template_path: Path,
         final_spec_path: Path,
         core_schema_placeholder: str,
+        assertions_csv_path: Optional[Path] = None,
 ) -> None:
     """
     Generate the complete ReSpec-compatible HTML document from a LinkML schema.
@@ -37,6 +43,7 @@ def generate_respec_spec(
         respec_template_path: Path to the ReSpec HTML template (index.template.html).
         final_spec_path: Path to write the final, assembled HTML output.
         core_schema_placeholder: The placeholder string inside the ReSpec template to replace.
+        assertions_csv_path: If provided, also write an assertions.csv compatible with the WoT TD Test suite (extractFile.js output)
     """
     try:
         sv = SchemaView(input_path, merge_imports=True)
@@ -73,6 +80,13 @@ def generate_respec_spec(
         html = annotate_html(html, glossary_entries, phrase_to_key)
         return html
 
+    if assertions_csv_path is not None:
+        try:
+            all_assertions = extract_all_assertions(cfg.section_schemas, DEFAULT_PREFIX_MAP)
+            assertions_to_csv(all_assertions, assertions_csv_path)
+        except Exception as exc:
+            logging.error("Assertion CSV generation failed: %s", exc, exc_info=True)
+
     file_to_classes: Dict[str, List[str]] = {}
     for section_path in cfg.section_schemas.values():
         try:
@@ -105,6 +119,7 @@ def generate_respec_spec(
     for section_id, section_path in cfg.section_schemas.items():
         # Get the classes defined in the current section's file
         section_classes_to_render = file_to_classes.get(section_path.name, [])
+        schema_prefix = DEFAULT_PREFIX_MAP.get(section_path.stem, section_path.stem)
         sections_html: List[str] = []
         # filter the core vocabulary section
         if section_id == core_section_id and core_section_id is not None:
@@ -127,15 +142,13 @@ def generate_respec_spec(
                 ann_value = getattr(spec_exclude_ann, 'value', None)
                 if ann_value is None:
                     ann_value = spec_exclude_ann
-
                 if str(ann_value).lower() == 'true':
                     logging.debug(f"Skipping rendering of class '{cls}' due to spec_exclude=true annotation.")
                     continue
 
-            rows = collect_slot_rows(sv, cls, process_description)
+            rows = collect_slot_rows(sv, cls, process_description, schema_prefix)
             # Class description
             raw_desc = getattr(cdef, "description", "") or ""
-            ann = getattr(cdef, "annotations", None) or {}
             if "spec_table_definition" in ann:
                 spec_def = getattr(ann["spec_table_definition"], "value", None) or ann["spec_table_definition"]
                 raw_desc = str(spec_def) or raw_desc
