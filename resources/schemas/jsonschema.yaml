@@ -172,7 +172,7 @@ classes:
 
   IntegerSchema:
     class_uri: jsonschema:IntegerSchema
-    is_a: NumberSchema
+    is_a: DataSchema
     description: >-
       Metadata describing data of type integer. This subclass is indicated by the value integer assigned to type in 
       DataSchema instances.
