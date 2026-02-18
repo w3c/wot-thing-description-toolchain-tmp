@@ -12,7 +12,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 
 from src.wotis import (YAML_SCHEMA_PATH, GENS_PATH, GENERATORS,
                        RESPEC_TEMPLATE_PATH, FINAL_SPEC_PATH,
-                       CORE_SCHEMA_PLACEHOLDER)
+                       CORE_SCHEMA_PLACEHOLDER, SCHEMA_PATH)
 from src.wotis.specgen.config import Config
 from src.wotis.respec_doc_generator import generate_respec_spec
 
@@ -73,7 +73,7 @@ def generate_wot_resources(input_schema: str, generate_docs: bool):
             logging.info(f"Proceeding with WoT resource generation for {generator}")
             run_standard_generator(linkml_schema_view, generator, output_dir)
             run_standard_generator(linkml_schema_view, generator, output_dir)
-        generate_visualizations(YAML_SCHEMA_PATH, GENS_PATH / "visualization")
+        generate_visualizations(SCHEMA_PATH, GENS_PATH / "visualization")
         if generate_docs:
             logging.info("Starting Respec specification generation...")
             generate_respec_spec(
