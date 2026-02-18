@@ -20,6 +20,7 @@ prefixes:
 imports:
   - linkml:types
 
+
 types:
   NonNegativeInteger:
     uri: xsd:nonNegativeInteger
@@ -32,117 +33,72 @@ types:
     base: float
     description: A decimal number
 
-enums:
-  DataSchemaType:
-    description: Assignment of JSON-based data types compatible with JSON Schema
-    permissible_values:
-      object:
-        description: Represents an object type
-      array:
-        description: Represents an array type
-      string:
-        description: Represents a string type
-      number:
-        description: Represents a number type
-      integer:
-        description: Represents an integer type
-      boolean:
-        description: Represents a boolean type
-      "null":
-        description: Represents a null type
 
 classes:
-  MultiLanguage:
-    description: >-
-      A Map providing a set of human-readable texts in different languages identified by language tags as defined in BCP47.
-    attributes:
-      language_map:
-        range: string
-        multivalued: true
-        pattern: "^[a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2})?$"
-
+  Any:
+    class_uri: linkml:Any
+    annotations:
+      spec_exclude: true
   DataSchema:
     class_uri: jsonschema:DataSchema
     description: >-
       A data schema describes the data format used. It can be used for validation.
     annotations:
+      spec_table_definition: >-
+        Metadata that describes the data format used. It can be used for validation.
+      spec_scope_note: |
+        The class DataSchema has the following subclasses:
+
+        - ArraySchema
+        - BooleanSchema
+        - NumberSchema
+        - IntegerSchema
+        - ObjectSchema
+        - StringSchema
+        - NullSchema
+        
+        The format string values are known from a fixed set of values and their corresponding format rules defined in [[JSON-SCHEMA]] (Section 7.3 Defined Formats in particular). Servients *MAY* use the `format` value to perform additional validation accordingly. When a value that is not found in the known set of values is assigned to `format`, such a validation *SHOULD* succeed.
+
+        Vocabulary terms typed as any `type` (e.g., `const`, `default`) follow data types compatible with JSON Schema (boolean, integer, number, string, object, array, or null).
+        
+        :::NOTE
+
+        The format term is not widely implemented by JSON Schema tools. In addition, the term `format` is being discussed by the JSON Schema standardisation community and may be replaced by another mechanism or removed in a future JSON Schema version.
+        :::
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
     slots:
-      - type
+      - "@type"
       - title
       - titles
       - description
       - descriptions
-      - writeOnly
-      - readOnly
-      - oneOf
-      - unit
-      - enum
-      - format
       - const
       - default
-      - contentEncoding
-      - contentMediaType
-      - items
-      - maxItems
-      - minItems
-      - minimum
-      - maximum
-      - exclusiveMinimum
-      - exclusiveMaximum
-      - minLength
-      - maxLength
-      - multipleOf
-      - properties
-      - required
+      - unit
+      - oneOf
+      - enum
+      - readOnly
+      - writeOnly
+      - format
+      - type
+
     slot_usage:
+      "@type":
+        range: string
+        exactly_one_of:
+          - range: string
+          - range: string
+            multivalued: true
+            minimum_value: 1
       type:
         range: DataSchemaType
-      writeOnly:
-        range: boolean
-      readOnly:
-        range: boolean
-      oneOf:
-        range: DataSchema
-        multivalued: true
-      unit:
-        range: string
-      enum:
-        multivalued: true
-        minimum_value: 1
-      format:
-        range: string
-      items:
-        range: DataSchema
-        multivalued: true
-      maxItems:
-        range: NonNegativeInteger
-      minItems:
-        range: NonNegativeInteger
-      minimum:
-        range: decimal
-      maximum:
-        range: decimal
-      exclusiveMinimum:
-        range: decimal
-      exclusiveMaximum:
-        range: decimal
-      minLength:
-        range: NonNegativeInteger
-      maxLength:
-        range: NonNegativeInteger
-      multipleOf:
-        range: decimal
-        pattern: ^[+]?[0-9]*\.?[0-9]+$
-      properties:
-        range: DataSchema
-        multivalued: true
-      required:
-        range: string
-        multivalued: true
+      # It is not possible to have here range:DataSchema, because probably creates a circular ref
+#      oneOf:
+#        range: DataSchema
+
 
   ArraySchema:
     class_uri: jsonschema:ArraySchema
@@ -151,15 +107,13 @@ classes:
       Metadata describing data of type array. This subclass is indicated by the value array assigned to type in 
       DataSchema instances.
     annotations:
+      spec_table_definition: >-
+        Metadata describing data of type array. This subclass is indicated by the value `array` assigned to type in DataSchema instances.
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
     attributes:
-      items:
-        slot_uri: jsonschema:items
-        description: Used to define the characteristics of an array
-        range: DataSchema
       minItems:
         slot_uri: jsonschema:minItems
         description: Defines the minimum number of items that have to be in the array
@@ -169,6 +123,19 @@ classes:
         description: Defines the maximum number of items that have to be in the array
         range: NonNegativeInteger
 
+    slots:
+      - items
+
+    slot_usage:
+      items:
+        slot_uri: jsonschema:items
+        description: Used to define the characteristics of an array
+        range: DataSchema
+        exactly_one_of:
+          - range: DataSchema
+          - range: DataSchema
+            multivalued: true
+
   BooleanSchema:
     class_uri: jsonschema:BooleanSchema
     is_a: DataSchema
@@ -176,6 +143,8 @@ classes:
       Metadata describing data of type boolean. This subclass is indicated by the value boolean assigned to type in 
       DataSchema instances.
     annotations:
+      spec_table_definition: >-
+        Metadata describing data of type `boolean`. This subclass is indicated by the value `boolean` assigned to type in `DataSchema` instances.
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -188,54 +157,39 @@ classes:
       Metadata describing data of type number. This subclass is indicated by the value number assigned to type in 
       DataSchema instances.
     annotations:
+      spec_table_definition: >-
+        Metadata describing data of type `number`. This subclass is indicated by the value `number` assigned to type in `DataSchema` instances.
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
-    attributes:
-      minimum:
-        slot_uri: jsonschema:minimum
-        description: >-
-          Specifies a minimum numeric value, representing an inclusive lower limit. 
-          Only applicable for associated number or integer types
-        range: decimal
-      maximum:
-        slot_uri: jsonschema:maximum
-        description: >-
-          Specifies a maximum numeric value, representing an inclusive upper limit. 
-          Only applicable for associated number or integer types
-        range: decimal
-      exclusiveMinimum:
-        slot_uri: jsonschema:exclusiveMinimum
-        description: >-
-          Specifies a minimum numeric value, representing an exclusive lower limit. 
-          Only applicable for associated number or integer types
-        range: decimal
-      exclusiveMaximum:
-        slot_uri: jsonschema:exclusiveMaximum
-        description: >-
-          Specifies a maximum numeric value, representing an exclusive upper limit. 
-          Only applicable for associated number or integer types
-        range: decimal
-      multipleOf:
-        slot_uri: jsonschema:multipleOf
-        description: >-
-          Specifies the multipleOf value number. The value must strictly greater than 0. 
-          Only applicable for associated number or integer types
-        range: decimal
-        pattern: '^(0*[1-9][0-9]*(\\.[0-9]+)?|0+\\.[0-9]*[1-9][0-9]*)$'  # Matches any positive decimal number
+    slots:
+      - minimum
+      - exclusiveMinimum
+      - maximum
+      - exclusiveMaximum
+      - multipleOf
 
   IntegerSchema:
     class_uri: jsonschema:IntegerSchema
-    is_a: NumberSchema
+    is_a: DataSchema
     description: >-
       Metadata describing data of type integer. This subclass is indicated by the value integer assigned to type in 
       DataSchema instances.
     annotations:
+      spec_table_definition: >-
+        Metadata describing data of type `integer`. This Subclass is indicated by the value `integer` assigned to `type` in `DataSchema` instances.
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
+    slots:
+      - minimum
+      - exclusiveMinimum
+      - maximum
+      - exclusiveMaximum
+      - multipleOf
+
     slot_usage:
       minimum:
         range: integer
@@ -255,23 +209,22 @@ classes:
       Metadata describing data of type object. This subclass is indicated by the value object assigned to type in 
       DataSchema instances.
     annotations:
+      spec_table_definition: >-
+        Metadata describing data of type Object. This Subclass is indicated by the value `object` assigned to `type` in `DataSchema` instances.
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
-    attributes:
+    slots:
+      - properties
+      - required
+    slot_usage:
       properties:
         slot_uri: jsonschema:properties
-        description: Data schema nested definitions
+        description: Data schema nested definitions.
         range: DataSchema
-        multivalued: true
-      required:
-        slot_uri: jsonschema:required
-        description: >-
-          Defines which members of the object type are mandatory, i.e. which members are mandatory in the payload 
-          that is to be sent and what members will be definitely delivered in the payload that is being received
-        range: string
-        multivalued: true
+        inlined: true
+
 
   StringSchema:
     class_uri: jsonschema:StringSchema
@@ -280,6 +233,13 @@ classes:
       Metadata describing data of type string. This subclass is indicated by the value string assigned to type in 
       DataSchema instances.
     annotations:
+      spec_table_definition: >-
+        Metadata describing data of type `string`. This Subclass is indicated by the value `string` assigned to `type` in `DataSchema` instances.
+      spec_scope_note: |
+        :::NOTE
+
+        The length of a string (i.e., `minLength` and `maxLength`) is defined as the number of Unicode code points, as defined by [[RFC8259]]. Note that some [user-perceived characters](https://www.w3.org/TR/i18n-glossary/#dfn-grapheme) are composed of more than one Unicode code point. Arbitrary index values might not fall on these grapheme boundaries, so truncation according to `maxLength` might alter the appearance or meaning of the string.
+        :::
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -287,31 +247,36 @@ classes:
     attributes:
       minLength:
         slot_uri: jsonschema:minLength
-        description: Specifies the minimum length of a string. Only applicable for associated string types
+        description: Specifies the minimum length of a string. Only applicable for associated string types.
         range: NonNegativeInteger
       maxLength:
         slot_uri: jsonschema:maxLength
-        description: Specifies the maximum length of a string. Only applicable for associated string types
+        description: Specifies the maximum length of a string. Only applicable for associated string types.
         range: NonNegativeInteger
       pattern:
         slot_uri: jsonschema:pattern
         description: >-
           Provides a regular expression to express constraints of the string value. 
-          The regular expression must follow the ECMA 262 dialect
+          The regular expression must follow the ECMA 262 dialect.
+        annotations:
+          spec_table_definition: >-
+            Provides a regular expression to express constraints of the string value. The regular expression must follow the [[ECMA-262]] dialect.
         range: string
       contentEncoding:
         slot_uri: jsonschema:contentEncoding
         description: >-
-          Specifies the encoding used to store the contents, as specified in RFC 2045 (Section 6.1) and RFC 4648
-        range: string
-        comments:
-          - e.g., 7bit, 8bit, binary, quoted-printable, base16, base32, or base64
+          Specifies the encoding used to store the contents, as specified in RFC 2045 (Section 6.1) and RFC 4648.
+        annotations:
+          spec_table_definition: >-
+            Specifies the encoding used to store the contents, as specified in [[RFC2045]] (Section 6.1) and [[RFC4648]].
+        range: contentEncodingList
       contentMediaType:
         slot_uri: jsonschema:contentMediaType
-        description: Specifies the MIME type of the contents of a string value, as described in RFC 2046
-        range: string
-        comments:
-          - e.g., image/png, or audio/mpeg
+        description: Specifies the MIME type of the contents of a string value, as described in RFC 2046.
+        annotations:
+          spec_table_definition: >-
+            Specifies the MIME type of the contents of a string value, as described in [[RFC2046]].
+        range: contentMediaTypeList
 
   NullSchema:
     class_uri: jsonschema:NullSchema
@@ -321,8 +286,14 @@ classes:
       DataSchema instances. This Subclass describes only one acceptable value, namely null. It is important to note 
       that null does not mean the absence of a value. It is analogous to null in JavaScript, None in Python, null 
       in Java and nil in Ruby programming languages. It can be used as part of a oneOf declaration, where it is 
-      used to indicate, that the data can also be null. 
+      used to indicate, that the data can also be null.
     annotations:
+      spec_table_definition: >-
+        Metadata describing data of type `null`. This subclass is indicated by the value `null` assigned to `type` in 
+        `DataSchema` instances. This Subclass describes only one acceptable value, namely `null`. It is important to note 
+        that `null` does not mean the absence of a value. It is analogous to `null` in JavaScript, `None` in Python, `null` 
+        in Java and `nil` in Ruby programming languages. It can be used as part of a `oneOf` declaration, where it is 
+        used to indicate, that the data can also be `null`.
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -331,8 +302,7 @@ classes:
 slots:
   minimum:
     description: >-
-      Specifies a minimum numeric value, representing an inclusive lower limit. 
-      Only applicable for associated number or integer types.
+      Specifies a minimum numeric value, representing an inclusive lower limit. Only applicable for associated number or integer types.
     range: decimal
 
   maximum:
@@ -359,4 +329,138 @@ slots:
       Only applicable for associated number or integer types.
     range: decimal
     pattern: ^[+]?[0-9]*\.?[0-9]+$
+
+  oneOf:
+    description: >-
+      Used to ensure that the data is valid against one of the specified schemas in the array. This can be used to describe multiple input or output schemas.
+    multivalued: true
+    range: DataSchema
+
+  type:
+    description: >-
+      Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null).
+    range: DataSchemaType
+    slot_uri: jsonschema:type
+
+  writeOnly:
+    description: >-
+      Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false).
+    annotations:
+      spec_table_definition: >-
+        Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false).
+    range: boolean
+
+  readOnly:
+    description: >-
+      Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false).
+    annotations:
+      spec_table_definition: >-
+        !Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false).
+    range: boolean
+
+  unit:
+    description: >-
+      Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition.
+    annotations:
+      spec_table_definition: >-
+        Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition (also see Section [Semantic Annotations](#semantic-annotations-example-version-units)).
+    range: string
+
+  enum:
+    description: >-
+      Restricted set of values provided as an array.
+    range: Any
+    multivalued: true
+
+  format:
+    description: >-
+      Allows validation based on a format pattern such as "date-time", "email", "uri", etc.
+    annotations:
+      spec_table_definition: >-
+        Allows validation based on a format pattern such as "date-time", "email", "uri", etc. (Also see below.)
+    range: string
+
+  const:
+    description: >-
+      Provides a constant value.
+    range: Any
+
+  default:
+    description: >-
+      Supply a default value. The value SHOULD validate against the data schema in which it resides.
+    annotations:
+      spec_table_definition: >-
+        Supply a default value. The value *SHOULD* validate against the data schema in which it resides.
+    range: Any
+
+  items:
+    slot_uri: jsonschema:items
+    description: Used to define the characteristics of an array
+
+  maxItems:
+    description: >-
+      Defines the maximum number of items that have to be in the array.
+    range: NonNegativeInteger
+    minimum_value: 0
+
+  minItems:
+    description: >-
+      Defines the minimum number of items that have to be in the array.
+    range: NonNegativeInteger
+    minimum_value: 0
+
+  required:
+    slot_uri: jsonschema:required
+    description: >-
+      Defines which members of the object type are mandatory, i.e. which members are mandatory in the payload that is to be sent (e.g. input of invokeaction, writeproperty) and what members will be definitely delivered in the payload that is being received (e.g. output of invokeaction, readproperty)
+    annotations:
+      spec_table_definition: >-
+        Defines which members of the object type are mandatory, i.e. which members are mandatory in the payload that is to be sent (e.g. input of `invokeaction`, `writeproperty`) and what members will be definitely delivered in the payload that is being received (e.g. output of `invokeaction`, `readproperty`)
+    range: string
+    multivalued: true
+
+
+enums:
+  contentEncodingList:
+    description: Specifies the encoding used to store the contents.
+    permissible_values:
+      7bit:
+        description:
+      8bit:
+        description:
+      binary:
+        description:
+      quoted-printable:
+        description:
+      base16:
+        description:
+      base32:
+        description:
+      base64:
+        description:
+  contentMediaTypeList:
+    description: Specifies the MIME type of the contents of a string value
+    permissible_values:
+      image/png:
+        description:
+      audio/mpeg:
+        description:
+  DataSchemaType:
+    description: Assignment of JSON-based data types compatible with JSON Schema
+    enum_uri: linkml:uri
+    permissible_values:
+      object:
+        description: Represents an object type
+      array:
+        description: Represents an array type
+      string:
+        description: Represents a string type
+      number:
+        description: Represents a number type
+      integer:
+        description: Represents an integer type
+      boolean:
+        description: Represents a boolean type
+      "null":
+        description: Represents a null type
  
