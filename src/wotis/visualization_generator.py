@@ -5,12 +5,18 @@ import shutil
 import subprocess
 import textwrap
 from pathlib import Path
+from collections import defaultdict
 from typing import Dict, Iterable, Optional, Set, Tuple
 
 from linkml_runtime.utils.schemaview import SchemaView
 
 # Always render these classes as header-only (no attribute/slot rows) even if they are local to the schema.
 HIDE_DETAILS_FOR: Set[str] = {"MultiLanguage"}
+
+HEADER_BLUE = "#8ECBF0"
+ROW_BLUE = "#DDEEFE"
+EXTERNAL_GRAY = "#f2f2f2"
+TYPE_ORANGE = "#CE7B63"
 
 
 def _normalize_range(rng: Optional[str]) -> str:
@@ -29,7 +35,7 @@ def _normalize_range(rng: Optional[str]) -> str:
 
 
 def _slot_assignment(slot_name: str, class_def, slot_def) -> str:
-    """Return 'mandatory' or 'optional' following the same rules as spec generatorion"""
+    """Return 'mandatory' or 'optional' following the same rules as spec generation."""
     usage = (class_def.slot_usage or {}).get(slot_name)
     if getattr(slot_def, "required", False) or (usage and getattr(usage, "required", False)):
         return "mandatory"
@@ -62,6 +68,7 @@ def _slot_type_text(
     choices = None
     if usage:
         choices = getattr(usage, "exactly_one_of", None) or getattr(usage, "any_of", None)
+
     if choices:
         pretty, seen = [], set()
         for alt in choices:
@@ -69,8 +76,11 @@ def _slot_type_text(
             rng = _normalize_range(alt_rng_raw)
             mv = bool(getattr(alt, "multivalued", False))
             if mv:
-                p = ("Array" if (not getattr(alt, "range", None) and slot_name == "@context")
-                     else (f"Array of {rng}" if rng else "Array"))
+                p = (
+                    "Array"
+                    if (not getattr(alt, "range", None) and slot_name == "@context")
+                    else (f"Array of {rng}" if rng else "Array")
+                )
             else:
                 p = rng or ""
             if p and p not in seen:
@@ -84,14 +94,20 @@ def _slot_type_text(
         enum_def = all_enums[raw_rng]
         pv_names = list(enum_def.permissible_values.keys())
         if pv_names:
-            formatted = (f"{', '.join(pv_names[:-1])}, or {pv_names[-1]}"
-                         if len(pv_names) > 1 else pv_names[0])
+            formatted = (
+                f"{', '.join(pv_names[:-1])}, or {pv_names[-1]}"
+                if len(pv_names) > 1
+                else pv_names[0]
+            )
             is_uri_enum = (
                 getattr(enum_def, "enum_uri", None) in ["linkml:uri", "anyURI"]
                 or (raw_rng or "").lower() == "uri"
             )
-            return (f"anyURI (one of {formatted})" if is_uri_enum
-                    else f"string (e.g., {formatted})")
+            return (
+                f"anyURI (one of {formatted})"
+                if is_uri_enum
+                else f"string (e.g., {formatted})"
+            )
         return "string"
 
     # Standard fallback
@@ -123,11 +139,12 @@ def _dot_to_svg(dot_source: str, out_svg: Path) -> None:
 
 def _escape_dot(text: str) -> str:
     """Escape characters that are special in DOT HTML-like labels."""
-    return (text
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            .replace('"', "&quot;"))
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
 
 
 def _build_children_index(all_classes: Dict[str, object]) -> Dict[str, Set[str]]:
@@ -207,7 +224,9 @@ def _detect_kept_external_bases(
     for cname, cdef in all_classes.items():
         if cname not in local_classes:
             continue
-        slot_names = list(getattr(cdef, "slots", None) or []) + list((getattr(cdef, "attributes", None) or {}).keys())
+        slot_names = list(getattr(cdef, "slots", None) or []) + list(
+            (getattr(cdef, "attributes", None) or {}).keys()
+        )
         for sname in slot_names:
             try:
                 if sname in (getattr(cdef, "attributes", None) or {}):
@@ -237,6 +256,7 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
       - Slot ranges to classes: edges only.
       - If an edge target is hidden descendant: collapse to nearest visible ancestor.
       - Exception: MultiLanguage is ALWAYS header-only (no rows) even if local.
+      - NEW: merge multiple edges between same src/dst with same cardinality into one edge with merged labels.
     """
     all_classes = sv.all_classes()
 
@@ -254,13 +274,20 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
 
     lines = [
         "digraph schema {",
-        '  graph [rankdir=BT, fontname="Helvetica", fontsize=11, bgcolor="white"];',
+        # layout
+        '  graph [rankdir=BT, bgcolor="white", fontname="Helvetica", fontsize=11,',
+        "         overlap=false, splines=true, concentrate=true,",
+        "         nodesep=0.35, ranksep=0.65];",
+        # nodes
         '  node  [fontname="Helvetica", fontsize=10, shape=none, margin=0];',
-        '  edge  [fontname="Helvetica", fontsize=9, color="#555555"];',
+        # edges
+        f'  edge  [fontname="Helvetica", fontsize=9, color="#555555", fontcolor="{TYPE_ORANGE}"];',
         "",
     ]
 
+    # -------------------------
     # Nodes
+    # -------------------------
     for class_name, class_def0 in all_classes.items():
         if class_name in hidden:
             continue
@@ -274,12 +301,11 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
 
         is_external = class_name not in local_classes
         force_header_only = class_name in HIDE_DETAILS_FOR
-
         is_abstract = getattr(class_def, "abstract", False)
 
         attr_rows = ""
 
-        # header-only classes (external OR forced)
+        # Only local + not forced header-only get their rows
         if (not is_external) and (not force_header_only):
             attr_names = list((class_def.attributes or {}).keys())
             if not attr_names:
@@ -291,12 +317,14 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
                         slot = class_def.attributes[sname]
                     else:
                         slot = sv.get_slot(sname)
+
                     if slot is None:
                         continue
 
                     usage = (class_def.slot_usage or {}).get(sname)
                     effective_range = getattr(usage, "range", None) or getattr(slot, "range", None)
 
+                    # class-to-class relations are edges, not rows
                     if effective_range and effective_range in all_classes:
                         continue
 
@@ -305,21 +333,25 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
                     if spec_exclude and str(getattr(spec_exclude, "value", spec_exclude)).lower() == "true":
                         continue
 
-                    type_text = _escape_dot(_slot_type_text(
-                        slot_name=sname,
-                        slot_def=slot,
-                        class_def=class_def,
-                        sv=sv,
-                        effective_range=effective_range,
-                    ))
+                    type_text = _escape_dot(
+                        _slot_type_text(
+                            slot_name=sname,
+                            slot_def=slot,
+                            class_def=class_def,
+                            sv=sv,
+                            effective_range=effective_range,
+                        )
+                    )
 
                     assignment = _slot_assignment(sname, class_def, slot)
                     mandatory_marker = " <I>(mandatory)</I>" if assignment == "mandatory" else ""
                     display_name = "name" if sname == "@name" else sname
 
+                    # NOTE: CELLBORDER=1 gives visible row separators
                     attr_rows += (
-                        f'<TR><TD ALIGN="LEFT">'
-                        f'{_escape_dot(display_name)}&nbsp;:&nbsp;{type_text}'
+                        f'<TR><TD ALIGN="LEFT" BGCOLOR="{ROW_BLUE}">'
+                        f'{_escape_dot(display_name)}&nbsp;:&nbsp;'
+                        f'<FONT COLOR="{TYPE_ORANGE}">{type_text}</FONT>'
                         f'{mandatory_marker}'
                         f"</TD></TR>\n"
                     )
@@ -329,27 +361,31 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
 
         # Styling
         if is_external:
-            header_bg = "#f2f2f2"
+            header_bg = EXTERNAL_GRAY
         else:
-            header_bg = "white" if is_abstract else "#add8e6"
+            header_bg = "white" if is_abstract else HEADER_BLUE
 
         header_text = _escape_dot(class_name)
         if is_external:
             header_text = f"<I>{header_text}</I>"
 
-        label = textwrap.dedent(f"""\
-            <<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2" BGCOLOR="white">
+        label = textwrap.dedent(
+            f"""\
+            <<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="3" BGCOLOR="white">
               <TR><TD BGCOLOR="{header_bg}"><B><FONT COLOR="black">{header_text}</FONT></B></TD></TR>
-              {attr_rows}</TABLE>>""")
+              {attr_rows}</TABLE>>"""
+        )
 
         lines.append(f'  "{class_name}" [label={label}];')
 
     lines.append("")
 
-    # 2) Edges
-    # External classes emit NO outgoing edges.
+    # -------------------------
+    # Edges
+    # -------------------------
 
-    # Inheritance edges (is_a) — only from local sources
+    # Inheritance edges (is_a)
+    # NOTE: You previously allowed kept_external_bases here; keeping your behavior.
     for class_name, class_def in all_classes.items():
         if class_name in hidden:
             continue
@@ -379,15 +415,19 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
             '[arrowhead=empty, style=solid, color="#555555"];'
         )
 
-    # Association edges — only from local sources
-    emitted_edges: Set[Tuple[str, str, str]] = set()
+    # Association edges — only from local sources, merged by (src, dst, mult)
+    edge_groups: Dict[Tuple[str, str, str], list[str]] = defaultdict(list)
+
     for class_name, class_def in all_classes.items():
         if class_name in hidden:
             continue
         if class_name not in local_classes:
             continue
 
-        slot_names = list(getattr(class_def, "slots", None) or []) + list((getattr(class_def, "attributes", None) or {}).keys())
+        slot_names = list(getattr(class_def, "slots", None) or []) + list(
+            (getattr(class_def, "attributes", None) or {}).keys()
+        )
+
         for sname in slot_names:
             try:
                 if sname in (getattr(class_def, "attributes", None) or {}):
@@ -400,32 +440,46 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
                 usage = (class_def.slot_usage or {}).get(sname)
                 effective_range = getattr(usage, "range", None) or getattr(slot, "range", None)
 
-                if effective_range and effective_range in all_classes:
-                    if effective_range in hidden:
-                        collapsed = _collapse_to_visible_ancestor(
-                            effective_range,
-                            all_classes,
-                            hidden=hidden,
-                            stop_at=kept_external_bases,
-                        )
-                        if not collapsed:
-                            continue
-                        effective_range = collapsed
+                # only class-to-class edges
+                if not (effective_range and effective_range in all_classes):
+                    continue
 
-                    if effective_range in hidden:
+                # collapse hidden descendants to visible base
+                if effective_range in hidden:
+                    collapsed = _collapse_to_visible_ancestor(
+                        effective_range,
+                        all_classes,
+                        hidden=hidden,
+                        stop_at=kept_external_bases,
+                    )
+                    if not collapsed:
                         continue
+                    effective_range = collapsed
 
-                    mult = "0..*" if getattr(slot, "multivalued", False) else "0..1"
-                    edge_key = (class_name, effective_range, sname)
-                    if edge_key not in emitted_edges:
-                        emitted_edges.add(edge_key)
-                        lines.append(
-                            f'  "{class_name}" -> "{effective_range}" '
-                            f'[label="{_escape_dot(sname)} {mult}", '
-                            'arrowhead=open, style=solid, color="#cc6600"];'
-                        )
+                if effective_range in hidden:
+                    continue
+
+                mult = "0..*" if getattr(slot, "multivalued", False) else "0..1"
+                edge_groups[(class_name, effective_range, mult)].append(sname)
+
             except Exception:
                 continue
+
+    # Emit merged association edges (AFTER collecting)
+    for (src, dst, mult), labels in edge_groups.items():
+        seen: Set[str] = set()
+        uniq: list[str] = []
+        for l in labels:
+            if l not in seen:
+                seen.add(l)
+                uniq.append(l)
+
+        merged_label = ", ".join(uniq)
+        lines.append(
+            f'  "{src}" -> "{dst}" '
+            f'[label="{_escape_dot(merged_label)} {mult}", '
+            f'arrowhead=open, style=solid, color="{TYPE_ORANGE}", fontcolor="{TYPE_ORANGE}"];'
+        )
 
     lines.append("}")
     return "\n".join(lines)
