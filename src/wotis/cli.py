@@ -1,19 +1,17 @@
 import click
 import logging
-import subprocess
 import yaml
 
 from pathlib import Path
 
 from .generators import run_generator as run_standard_generator, generate_visualizations
-from .respec_doc_generator import generate_respec_spec
 
 from linkml_runtime.utils.schemaview import SchemaView
 
 from src.wotis import (YAML_SCHEMA_PATH, GENS_PATH, GENERATORS,
                        RESPEC_TEMPLATE_PATH, FINAL_SPEC_PATH,
-                       CORE_SCHEMA_PLACEHOLDER, SCHEMA_PATH)
-from src.wotis.specgen.config import Config
+                       CORE_SCHEMA_PLACEHOLDER, SCHEMA_PATH,
+                       ASSERTION_PATH)
 from src.wotis.respec_doc_generator import generate_respec_spec
 
 
@@ -29,6 +27,13 @@ docs_option = click.option('-d',
                              default=False,
                              show_default=True,
                              help="Boolean for generating the final TD Respec-based HTML specification.")
+assertions_csv_option = click.option('--assertions-csv',
+                             type=click.Path(path_type=Path, dir_okay=False),
+                             default=ASSERTION_PATH,
+                             show_default=True,
+                             help="Path for the storing assertion inventory CSV. "
+                                  "Defaults to resources/gens/assertions.csv.")
+
 
 
 
@@ -56,7 +61,8 @@ def main(verbose: int, quiet: bool):
 @main.command()
 @input_option
 @docs_option
-def generate_wot_resources(input_schema: str, generate_docs: bool):
+@assertions_csv_option
+def generate_wot_resources(input_schema: str, generate_docs: bool, assertions_csv: Path):
     """
     Generating WoT resources (RDF, JSON-LD Context, SHACL Shapes, and JSON Schema)
     and the final Respec specification from LinkML schemas.
@@ -80,7 +86,8 @@ def generate_wot_resources(input_schema: str, generate_docs: bool):
                 input_path,
                 RESPEC_TEMPLATE_PATH,
                 FINAL_SPEC_PATH,
-                CORE_SCHEMA_PLACEHOLDER
+                CORE_SCHEMA_PLACEHOLDER,
+                assertions_csv_path=assertions_csv,
             )
             logging.info("Respec specification generation complete.")
 

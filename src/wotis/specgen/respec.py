@@ -1,7 +1,10 @@
 from __future__ import annotations
-from pathlib import Path
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+
 import logging
+
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from pathlib import Path
+
 
 def build_jinja_env(templates_dir: Path) -> Environment:
     if not templates_dir.is_dir():

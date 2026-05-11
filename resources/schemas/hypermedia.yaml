@@ -3,7 +3,7 @@ name: hypermedia
 title: Hypermedia Controls Ontology
 description: >-
   LinkML schema for modelling the TD Hypermedia Control information model, in particular links and forms.
-version: "1.1-2-June-2025"
+version: "1.1-11-May-2026"
 license: MIT
 contributors: Mahda_Noura
 see_also:
@@ -147,7 +147,6 @@ slots:
         Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
     slot_uri: hctl:forContentType
     range: string
-    required: true
   response:
     description: >-
       This optional term can be used if, e.g., the output communication metadata differ from input metadata (e.g., output contentType differ from the input contentType). The response name contains metadata that is only valid for the primary response messages.
@@ -179,21 +178,38 @@ classes:
     annotations:
       spec_table_definition: >-
         A link can be viewed as a statement of the form **"link context** has a **relation type** resource at **link target**", where the optional **target attributes** may further describe the resource.
-      spec_scope_note: |
-        :::NOTE
-        
-        The hreflang attribute is allowed to be a `string` or `array` in this version of the spec. Depending on the result of [[LINKSET-MEDIA-TYPES]] the values of `hrefLang` can be restricted to `array` only.
-        :::
-        
-        Link relations can be used to describe relations such as to other Things (e.g., a Switch Thing controls a Lamp Thing), to a specific kind of Thing Models (e.g., a Thing Description is an instance of a specific Thing Model), or to further documentations information (e.g., device manual of a Thing). It is recommended to reuse existing and established Link Relation definitions from IANA.
+      spec_content:
+        value:
+          - type: note
+            text: |
+              The hreflang attribute is allowed to be a `string` or `array` in this version of the spec. Depending on the result of [[LINKSET-MEDIA-TYPES]] the values of `hrefLang` can be restricted to `array` only.
+          - type: markdown
+            text: |
+              Link relations can be used to describe relations such as to other Things (e.g., a Switch Thing controls a Lamp Thing), to a specific kind of Thing Models (e.g., a Thing Description is an instance of a specific Thing Model), or to further documentations information (e.g., device manual of a Thing). It is recommended to reuse existing and established Link Relation definitions from IANA.
 
-        In the following a best practice relation type table is introduced that is recommended to use within WoT Thing Description or Thing Model instances.
+              The link relation types follow Web Linking [[RFC8288]], meaning:
+          - type: list
+            items:
+              - id: td-rel-type-case-insensitive
+                text: |
+                  Relation types *MUST* be compared as strings using case-insensitive comparison.
+              - id: td-rel-type-lowercase
+                text: |
+                  All-lowercase URIs *SHOULD* be used for extension relation types.
+          - type: markdown
+            text: |
+              In the following a best practice relation type table is introduced that is recommended to use within WoT Thing Description or Thing Model instances.
 
       jsonschema_config:
         tag: jsonschema_config
         value:
           additionalProperties: true
     attributes:
+      href:
+        description: Target URI of a link.
+        slot_uri: hctl:hasTarget
+        range: uri
+        required: true
       type:
         description: >-
           Target attribute providing a hint indicating what the media type [RFC2046] of the result of 
@@ -237,6 +253,12 @@ classes:
         comments:
           - The hreflang attribute is allowed to be a string or array in this version of the spec
     slot_usage:
+      href:
+        required: true
+        range: uri
+        annotations:
+          spec_table_definition: >-
+            Target URI of a link.
       hreflang:
         exactly_one_of:
           - range: string
@@ -252,10 +274,38 @@ classes:
       spec_table_definition: >-
         A form can be viewed as a statement of "To perform an **operation type** operation on **form context**, make a **request method** request to **submission target**" where the optional **form fields** may further describe the required request. 
         In Thing Descriptions, the **form context** is the surrounding Object, such as Properties, Actions, and Events or the Thing itself for meta-interactions.
-      spec_scope_note: |
-        Possible values for the `contentCoding` property can be found, e.g., in the IANA HTTP content coding registry.
-
-        The list of possible operation types of a form is fixed. As of this version of the specification, it only includes the well-known types necessary to implement the WoT interaction model described in [[wot-architecture11]]. Future versions of the standard may extend this list but operations types MUST be restricted to the values in the table below.
+      spec_content:
+        value:
+          - type: note
+            text: |
+              The value of the `href` property in a Form instance can be a relative URI or an absolute URI.
+          - type: assertion
+            id: td-form-href-relative
+            text: |
+              To properly build the target URI, if base is present in the Thing level, the `href` value *MUST* be resolved using the base URI.
+          - type: paragraph
+            segments:
+              - text: |
+                  While this table defines the terms available in a form,
+              - id: td-form-additional-mediatype-metadata
+                text: |
+                  Bindings *MAY* have additional information that specifies representation formats in more detail than the media type alone.
+              - text: |
+                  For example, in a TD with the Modbus Binding, `modv:mostSignificantByte` in a form describes the endianness of the payload. Please see [Bindings](#bindings) for further information. Furthermore, possible values for the `contentCoding` property can be found, e.g., in the IANA HTTP content coding registry.
+          - type: paragraph
+            segments:
+              - text: |
+                  The list of possible operation types of a form is fixed. As of this version of the specification, it only includes the well-known types necessary to implement the WoT interaction model described in [[wot-architecture11]]. Future versions of the standard may extend this list but
+              - id: well-known-operation-types-only
+                text: |
+                  operations types *MUST* be restricted to the values in the table below.
+          - type: paragraph
+            segments:
+              - id: td-form-context-submission-target
+                text: |
+                  As a Form but not just the `href` defines how to execute the interaction, `href` of multiple Forms *MAY* point to the same resource, where the different Forms represent different operations on that resource.
+              - text: |
+                  For example, in a TD with the HTTP Binding, two Forms with HTTP GET and PUT methods can point to the same resource but represent different operations such as `readproperty` and `writeproperty`.
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -281,6 +331,9 @@ classes:
       href:
         required: true
         range: uri
+        annotations:
+          spec_table_definition: >-
+            Target URI of a submission target of a Form. See the [note on URI/IRI](#note-uri-iri).
       contentCoding:
         range: string
       subprotocol:
@@ -296,13 +349,44 @@ classes:
   ExpectedResponse:
     class_uri: hctl:ExpectedResponse
     description: Communication metadata describing the expected response message for the primary response.
+    annotations:
+      spec_content:
+        value:
+          - type: paragraph
+            segments:
+              - id: td-expectedResponse-default-contentType
+                text: |
+                  If no response name-value pair is provided, it *MUST* be assumed that the content type of the response is equal to the content type assigned to the Form instance.
+              - id: td-expectedResponse-missing-contentType
+                text: |
+                  If there is no `contentType` value defined in a `response` object within a form, a Consumer *MUST* expect that the respective response does not contain any payload.
+              - id: td-expectedResponse-defined-contentType
+                text: |
+                  If a content type is defined in the `response` object within a form, a Consumer *MUST* expect a response containing a payload in the respective format, e.g., an image in the case of `image/jpeg`.
     slots:
-      - contentCoding
+      - contentType
 
 
   AdditionalExpectedResponse:
     class_uri: hctl:AdditionalExpectedResponse
     description: Communication metadata describing the expected response message for additional responses.
+    annotations:
+      spec_content:
+        value:
+          - type: paragraph
+            segments:
+              - id: td-additionalExpectedResponse-contentType
+                text: |
+                  If the content type of an additional expected response differs from the content type of the form, the `Form` instance *MUST* include an entry in the array associated with the name `additionalResponses`.
+              - id: td-additionalExpectedResponse-missing-contentType
+                text: |
+                  If there is no `contentType` value defined in an additional expected response object, a Consumer *MUST* expect that the respective response does not contain any payload.
+              - id: td-additionalExpectedResponse-schema
+                text: |
+                  If the data schema of an additional expected response differs from the output data schema of the interaction, the `Form` *MUST* include an entry in the array associated with the name `additionalResponses` that includes a value for the name `schema`.
+              - id: td-additionalExpectedResponse-noSchemaWithoutPayload
+                text: |
+                  The `schema` of an additional expected response object *MUST NOT* be defined when there is no `contentType` present.
     attributes:
       success:
         description: Signals if an additional response should not be considered an error.
@@ -318,5 +402,12 @@ classes:
             Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a `DataSchema` object, the name of a previous definition given in a `schemaDefinitions` map must be used.
         slot_uri: hctl:hasAdditionalOutputSchema
         range: string
-    slots:
-      - contentType
+      contentType:
+        description: >-
+          Assign a content type based on a media type (e.g., text/plain) and potential parameters
+          (e.g., charset=utf-8) for the media type [RFC2046].
+        annotations:
+          spec_table_definition: >-
+            Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
+        slot_uri: hctl:forContentType
+        range: string
