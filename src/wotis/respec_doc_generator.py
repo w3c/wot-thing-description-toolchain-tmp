@@ -63,6 +63,160 @@ def _inline_html(html: str) -> str:
     return html or ""
 
 
+def _as_block_list(value) -> list[dict]:
+    value = getattr(value, "value", value)
+    if isinstance(value, dict) and "value" in value:
+        value = value["value"]
+    if isinstance(value, list):
+        return [block for block in value if isinstance(block, dict)]
+    if isinstance(value, dict):
+        return [value]
+    return []
+
+
+def _render_inline_markdown(
+    text: str,
+    process_description: Callable[[str], str],
+) -> str:
+    return _inline_html(process_description(str(text or "")))
+
+
+def _render_assertion_span(
+    record: dict,
+    process_description: Callable[[str], str],
+) -> str:
+    assertion_id = _record_value(record, "id") or _record_value(record, "assertion_id")
+    assertion_text = _record_value(record, "text") or _record_value(
+        record,
+        "assertion_text",
+    )
+    assertion_type = _record_value(record, "assertion_type") or "rfc2119-assertion"
+
+    if not assertion_id or not assertion_text:
+        logging.warning(
+            "Ignoring incomplete assertion block: id=%r text=%r",
+            assertion_id,
+            assertion_text,
+        )
+        return ""
+
+    allowed_types = {
+        "rfc2119-assertion",
+        "rfc2119-default-assertion",
+        "rfc2119-table-assertion",
+    }
+    if str(assertion_type) not in allowed_types:
+        logging.warning(
+            "Unsupported assertion type %r; using rfc2119-assertion",
+            assertion_type,
+        )
+        assertion_type = "rfc2119-assertion"
+
+    text_html = _render_inline_markdown(str(assertion_text), process_description)
+    return (
+        f'<span class="{escape(str(assertion_type), quote=True)}" '
+        f'id="{escape(str(assertion_id), quote=True)}">{text_html}</span>'
+    )
+
+
+def _render_list_block(
+    block: dict,
+    process_description: Callable[[str], str],
+) -> str:
+    items = _record_value(block, "items") or []
+    if not isinstance(items, list):
+        logging.warning("Ignoring spec_content list block with non-list items: %r", items)
+        return ""
+
+    rendered_items: list[str] = []
+    for item in items:
+        if not isinstance(item, dict):
+            rendered = _render_inline_markdown(str(item), process_description)
+        elif _record_value(item, "id") or _record_value(item, "assertion_id"):
+            rendered = _render_assertion_span(item, process_description)
+        else:
+            rendered = _render_inline_markdown(
+                str(_record_value(item, "text") or ""),
+                process_description,
+            )
+        if rendered:
+            rendered_items.append(f"<li>{rendered}</li>")
+
+    if not rendered_items:
+        return ""
+    return "<ul>\n" + "\n".join(rendered_items) + "\n</ul>"
+
+
+def _render_paragraph_block(
+    block: dict,
+    process_description: Callable[[str], str],
+) -> str:
+    segments = _record_value(block, "segments") or []
+    if not isinstance(segments, list):
+        logging.warning(
+            "Ignoring spec_content paragraph block with non-list segments: %r",
+            segments,
+        )
+        return ""
+
+    rendered_segments: list[str] = []
+    for segment in segments:
+        if not isinstance(segment, dict):
+            rendered_segments.append(
+                _render_inline_markdown(str(segment), process_description)
+            )
+            continue
+        if _record_value(segment, "id") or _record_value(segment, "assertion_id"):
+            rendered_segments.append(_render_assertion_span(segment, process_description))
+        else:
+            rendered_segments.append(
+                _render_inline_markdown(
+                    str(_record_value(segment, "text") or ""),
+                    process_description,
+                )
+            )
+
+    content = " ".join(part.strip() for part in rendered_segments if part.strip())
+    if not content:
+        return ""
+    return f"<p>{content}</p>"
+
+
+def render_spec_content_annotation(
+    annotations: dict,
+    process_description: Callable[[str], str],
+    annotation_key: str = "spec_content",
+) -> str:
+    blocks = _as_block_list(_annotation_value(annotations, annotation_key))
+    if not blocks:
+        return ""
+
+    rendered_blocks: list[str] = []
+    for block in blocks:
+        block_type = str(_record_value(block, "type") or "markdown")
+        text = _record_value(block, "text") or ""
+
+        if block_type == "markdown":
+            rendered = process_description(str(text))
+        elif block_type == "note":
+            rendered = process_description(f":::NOTE\n\n{text}\n:::")
+        elif block_type == "assertion":
+            span = _render_assertion_span(block, process_description)
+            rendered = f"<p>{span}</p>" if span else ""
+        elif block_type in {"list", "assertion_list"}:
+            rendered = _render_list_block(block, process_description)
+        elif block_type == "paragraph":
+            rendered = _render_paragraph_block(block, process_description)
+        else:
+            logging.warning("Ignoring unsupported spec_content block type: %s", block_type)
+            rendered = ""
+
+        if rendered:
+            rendered_blocks.append(rendered)
+
+    return "\n".join(rendered_blocks)
+
+
 def render_explicit_assertion_annotation(
     annotations: dict,
     process_description: Callable[[str], str],
@@ -256,8 +410,17 @@ def generate_respec_spec(
                 raw_desc = str(spec_def) or raw_desc
 
             desc_html = process_description(raw_desc)
+            intro_html = ""
+            if "spec_intro_content" in ann:
+                intro_html = render_spec_content_annotation(
+                    ann,
+                    process_description,
+                    annotation_key="spec_intro_content",
+                )
             note_html = ""
-            if "spec_scope_note" in ann:
+            if "spec_content" in ann:
+                note_html = render_spec_content_annotation(ann, process_description)
+            elif "spec_scope_note" in ann:
                 raw = (
                     getattr(ann["spec_scope_note"], "value", None)
                     or ann["spec_scope_note"]
@@ -279,6 +442,7 @@ def generate_respec_spec(
                     class_name=cls,
                     class_description=desc_html,
                     slots=rows,
+                    spec_intro_html=intro_html,
                     spec_scope_note_html=note_html,
                 )
             )
