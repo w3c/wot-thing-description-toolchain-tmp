@@ -571,7 +571,7 @@
           communication protocols declared in the <code>forms</code> field.
           <a href="#thing-description-full-serialization">Example 2</a> extends the TD sample from Example 1 by
           introducing a second definition in the <code>@context</code> to declare the prefix <code>saref</code> as
-          referring to <a href="https://ontology.tno.nl/saref.ttl">SAREF</a>, the Smart Appliance Reference Ontology
+          referring to <a href="https://ontology.tno.nl/saref.ttl">SAREF</a>, the Smart Appliance Reference Ontology
           [[SMARTM2M]]. This IoT ontology includes terms interpreted as semantic labels that can be set as values of the
           <code>@type</code> field, giving the semantics of <a>Things</a> and their <a>Interaction Affordances</a>. In
           the example below, the <a>Thing</a> is labelled with <code>saref:LightSwitch</code>, the <code>status</code>
@@ -742,12 +742,43 @@
           Data Schemas.
         </dd>
         <dt>
+          <dfn id="dfn-base-uri">Base URI</dfn>
+        </dt>
+        <dd>
+          A base URI, as defined by [[RFC3986]], section 5.1. It is used to resolve <a>Relative URIs</a>. It can be
+          found in the <code>base</code> member in a Thing Description.
+        </dd>
+        <dt>
+          <dfn id="dfn-relative-uri">Relative URI</dfn>
+        </dt>
+        <dd>
+          A relative URI as defined by [[RFC3986]], section 4.2, which is resolved against a <a>base URI</a> to obtain
+          an <a>Absolute URI</a>, which is the target meant by the relative URI. It can be found in the
+          <code>href</code> member of a <a href="#form">Form</a> in a Thing Description.
+        </dd>
+        <dt>
+          <dfn id="dfn-absolute-uri">Absolute URI</dfn>
+        </dt>
+        <dd>
+          A URI, as defined by [[RFC3986]], section 5.1. It can be found in the <code>base</code> member or
+          <code>href</code> member of a <a href="#form">Form</a> in a Thing Description or obtained by resolving a
+          <a>Relative URI</a> against a <a>Base URI</a>.
+        </dd>
+        <dt><dfn id="dfn-target-uri">Target URI</dfn></dt>
+        <dd>
+          A URI conforming to the absolute URI definition by [[RFC3986]], section 4.3, that locates a resource on the
+          network and can be directly used to send the correct protocol message. It can be found in the
+          <code>href</code> member of a <a href="#form">Form</a> in a Thing Description or obtained by resolving a
+          <a>Relative URI</a> against a <a>Base URI</a>. A <a>Base URI</a> on its own is not a valid
+          <a>Target URI</a> as it may not point to a specific resource.
+        </dd>
+        <dt>
           <dfn id="dfn-inf-model">TD Information Model</dfn>
         </dt>
         <dd>
           Set of <a>Class</a> definitions constructed from pre-defined <a>Vocabularies</a> on which constraints apply,
           thus defining the semantics of these <a>Vocabularies</a>. Class definitions are typically expressed in terms
-          of a <a>Signature</a> (a set of <a>Vocabulary Terms</a>) and functions over that <a>Signature</a>. The
+          of a <a>Signature</a> (a set of <a>Vocabulary Terms</a>) and functions over that <a>Signature</a>. The
           <a>TD Information Model</a> also includes <a>Default Values</a>, defined as a global function over
           <a>Classes</a>.
         </dd>
@@ -755,19 +786,19 @@
           <dfn id="dfn-td-processor">TD Processor</dfn>
         </dt>
         <dd>
-          A system that can serialize some internal representation of a <a>Thing Description</a> in a given format
+          A system that can serialize some internal representation of a <a>Thing Description</a> in a given format
           and/or deserialize it from that format. A <a>TD Processor</a> can follow validation steps to detect
           semantically inconsistent <a>Thing Descriptions</a>, that is, <a>Thing Descriptions</a> that cannot satisfy
           constraints on the <a>Instance Relation</a> of the <code>Thing</code> class. For that purpose, a
-          <a>TD Processor</a> can compute fill in the forms of <a>Thing Descriptions</a> in which all possible
+          <a>TD Processor</a> can compute fill in the forms of <a>Thing Descriptions</a> in which all possible
           <a>Default Values</a> are assigned. A <a>TD Processor</a> is typically a sub-system of a <a>WoT Runtime</a>.
           Implementations of a TD Processor can be a TD <a>producer</a> (able to serialize to TD Documents) or a TD
           consumer (able to deserialize from TD Documents) or both.
         </dd>
         <dt>
-          <dfn id="dfn-td-serialization">TD Serialization</dfn>
+          <dfn id="dfn-td-serialization">TD Serialization</dfn>
           or
-          <dfn id="dfn-td-document">TD Document</dfn>
+          <dfn id="dfn-td-document">TD Document</dfn>
         </dt>
         <dd>
           Textual or binary representation of <a>Thing Descriptions</a> that can be stored and exchanged between
@@ -820,7 +851,7 @@
         <a href="https://www.w3.org/ns/wot-next/td">JSON-LD context file</a> [[?json-ld11]], allowing the compact
         strings in <a>TD Documents</a> to be expanded to full IRI-based <a>Vocabulary Terms</a>. However, this
         processing is only required when transforming JSON-based <a>TD Documents</a> to RDF, an optional feature of
-        <a>TD Processor</a>
+        <a>TD Processor</a>
         implementations.
       </p>
 
@@ -834,7 +865,7 @@
         In the present specification, <a>Vocabulary Terms</a> are always presented in their compact form. Their expanded
         form can be accessed under the namespace IRI of the <a>Vocabulary</a> they belong to. These namespaces follow
         the structure of <a href="#class-definitions"></a>. Each <a>Vocabulary</a> used in the
-        <a>TD Information Model</a> has its own namespace IRI, as follows:
+        <a>TD Information Model</a> has its own namespace IRI, as follows:
       </p>
 
       <table class="def numbered">
@@ -961,7 +992,7 @@
         <!--<p><a href="http://visualdataweb.de/webvowl/#iri=https://rawgit.com/w3c/wot-thing-description/TD-JSON-LD-1.1/ontology/td.ttl">Click here for the visualization</a></p>-->
 
         <figure id="td-core-model">
-          <img src="visualization/td.svg" alt="UML diagram of the TD information model for the TD core vocabulary" />
+          <img src="visualization/td.svg" alt="UML diagram of the TD information model for the TD core vocabulary" />
           <figcaption>TD core vocabulary</figcaption>
         </figure>
 
@@ -970,7 +1001,7 @@
         <figure id="td-data-schema-model">
           <img
             src="visualization/jsonschema.svg"
-            alt="UML diagram of the TD information model for the Data schema vocabulary"
+            alt="UML diagram of the TD information model for the Data schema vocabulary"
           />
           <figcaption>Data schema vocabulary</figcaption>
         </figure>
@@ -980,7 +1011,7 @@
         <figure id="td-security-model">
           <img
             src="visualization/wotsec.svg"
-            alt="UML diagram of the TD information model for the WoT security vocabulary"
+            alt="UML diagram of the TD information model for the WoT security vocabulary"
           />
           <figcaption>WoT security vocabulary</figcaption>
         </figure>
@@ -990,7 +1021,7 @@
         <figure id="hypermedia-model">
           <img
             src="visualization/hctl.svg"
-            alt="UML diagram of the TD information model for the hypermedia controls vocabulary"
+            alt="UML diagram of the TD information model for the hypermedia controls vocabulary"
           />
           <figcaption>Hypermedia controls vocabulary</figcaption>
         </figure>
@@ -1095,12 +1126,23 @@
 
         <p>
           By convention, <a>Simple Types</a> are denoted by names starting with lowercase. The
-          <a>TD Information Model</a> references the following <a>Simple Types</a>
+          <a>TD Information Model</a> references the following <a>Simple Types</a>
           defined in XML Schema [[XMLSCHEMA11-2-20120405]]:
           <code>string</code>, <code>anyURI</code>, <code>dateTime</code>, <code>integer</code>,
           <code>unsignedInt</code>, <code>double</code>, and <code>boolean</code>. Their definition (i.e., the
           specification of their lexical form) is outside of the scope of the <a>TD Information Model</a>.
         </p>
+
+        <p class="note" id="note-uri-iri" title="Usage of anyURI Type">
+          We note one important distinction on the usage of the <code>anyURI</code> type. Any vocabulary term typed as
+          <code>anyURI</code> is intended to be interpreted as a URI per [[RFC3986]].
+          <span id="td-uri-unicode-usage">
+            When Universal Character Set (Unicode) [[ISO10646]] characters are used to represent the resource and are to
+            be sent in the protocol message, they MUST be converted to a URI following Section 3.1 of [[RFC3987]] before
+            placing it in a Thing Description.
+          </span>
+        </p>
+
         <p>
           In addition, the <a>TD Information Model</a> defines a global function on pairs of <a>Vocabulary Terms</a>.
           The function takes a <a>Class</a> name and another <a>Vocabulary Term</a> as input and returns an
@@ -1858,7 +1900,7 @@
 
           <p>
             <span class="rfc2119-assertion" id="td-context">
-              The root element of a <a>TD Serialization</a> MUST be a JSON object that includes a member with the name
+              The root element of a <a>TD Serialization</a> MUST be a JSON object that includes a member with the name
               <code>@context</code> and a value of type string or array that equals or respectively contains
               <code>https://www.w3.org/ns/wot-next/td</code>.
             </span>
@@ -1932,7 +1974,7 @@
               <code>forms</code>
               in an instance of the <a>Class</a> <code>Thing</code> MUST be serialized as JSON arrays containing JSON
               objects as defined in <a href="#link-serialization-json"></a> and
-              <a href="#form-serialization-json"></a>, respectively.
+              <a href="#form-serialization-json"></a>, respectively.
             </span>
           </p>
 
@@ -1941,7 +1983,7 @@
               The value assigned to
               <code>security</code>
               in an instance of <a>Class</a> <code>Thing</code>
-              MUST be serialized as JSON string or as JSON array whose elements are JSON strings.
+              MUST be serialized as JSON string or as JSON array whose elements are JSON strings.
             </span>
           </p>
         </section>
@@ -2082,7 +2124,7 @@
             The JSON members named <code>titles</code> and <code>descriptions</code> are used within the TD document to
             provide human-readable metadata in multiple languages within a single TD document.
             <span class="rfc2119-assertion" id="td-multi-languages">
-              All name-value pairs of a <code>MultiLanguage</code> <a>Map</a> MUST be serialized as members of a JSON
+              All name-value pairs of a <code>MultiLanguage</code> <a>Map</a> MUST be serialized as members of a JSON
               object, where the name is a valid language tag as defined by [[!BCP47]] (also see
               <a href="https://www.w3.org/TR/i18n-glossary/#dfn-valid">W3C I18N Glossary</a>) and the value is a
               human-readable string in the language indicated by the tag.
@@ -2281,8 +2323,8 @@
             In a <code>Thing</code> instance, the value assigned to <code>securityDefinitions</code> is a <a>Map</a> of
             instances of <code>SecurityScheme</code>.
             <span class="rfc2119-assertion" id="td-security">
-              All name-value pairs of a <a>Map</a> of <code>SecurityScheme</code> instances MUST be serialized as
-              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
+              All name-value pairs of a <a>Map</a> of <code>SecurityScheme</code> instances MUST be serialized as
+              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
               serialized as a JSON string and the value of the pair, an instance of <code>SecurityScheme</code>, MUST be
               serialized as a JSON object.
             </span>
@@ -2864,8 +2906,8 @@
             The value assigned to <code>properties</code> in a <code>Thing</code> instance is a <a>Map</a> of instances
             of <code>PropertyAffordance</code>.
             <span class="rfc2119-assertion" id="td-properties">
-              All name-value pairs of a <a>Map</a> of <code>PropertyAffordance</code> instances MUST be serialized as
-              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
+              All name-value pairs of a <a>Map</a> of <code>PropertyAffordance</code> instances MUST be serialized as
+              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
               serialized as a JSON string and the value of the pair, an instance of <code>PropertyAffordance</code>,
               MUST be serialized as a JSON object.
             </span>
@@ -2940,8 +2982,8 @@
             In a <code>Thing</code> instance, the value assigned to <code>actions</code> is a <a>Map</a> of instances of
             <code>ActionAffordance</code>.
             <span class="rfc2119-assertion" id="td-actions">
-              All name-value pairs of a <a>Map</a> of <code>ActionAffordance</code> instances MUST be serialized as
-              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
+              All name-value pairs of a <a>Map</a> of <code>ActionAffordance</code> instances MUST be serialized as
+              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
               serialized as a JSON string and the value of the pair, an instance of <code>ActionAffordance</code>, MUST
               be serialized as a JSON object.
             </span>
@@ -3020,8 +3062,8 @@
             In a <code>Thing</code> instance, the value assigned to <code>events</code> is a map of instances of
             <code>EventAffordance</code>.
             <span class="rfc2119-assertion" id="td-events">
-              All name-value pairs of a <a>Map</a> of <code>EventAffordance</code> instances MUST be serialized as
-              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
+              All name-value pairs of a <a>Map</a> of <code>EventAffordance</code> instances MUST be serialized as
+              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
               serialized as a JSON string and the value of the pair, an instance of <code>EventAffordance</code>, MUST
               be serialized as a JSON object.
             </span>
@@ -4050,7 +4092,7 @@
     "@type": "saref:LightSwitch",
     "saref:hasState": {
         "@id": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4/state",
-        "@type": "saref:OnOffState"
+        "@type": "saref:OnOffState"
     },
     // ...
     "properties": {
@@ -4559,6 +4601,14 @@
                   present) accepted by the <a>Thing</a> in an interaction.
                 </span>
               </li>
+              <li>
+                <!-- https://www.w3.org/TR/wot-architecture11/#arch-op-request-method -->
+                <span class="rfc2119-assertion" id="td-bindings-correct-methods">
+                  Every operation MUST be unambiguously mapped to a method or message type from the standard set of the
+                  protocol identified by the URI scheme found in <code>href</code> or <code>base</code> in the Thing
+                  level.
+                </span>
+              </li>
             </ul>
           </section>
         </section>
@@ -4599,10 +4649,14 @@
             <p>
               In the example below, you can find the form elements with content types for JSON and plain text with
               additional parameters. In this specific case, the forms describe that reading this property with
-              <code>http</code> or <code>coap</code> result in different content types. For structured media types, a
-              Data Schema is generally provided in the affordance level as explained in
-              [[[#payload-bindings-dataschema]]] and [[[#sec-data-schema-vocabulary-definition]]]. However, for
-              unstructured data such as images and videos, a Data Schema is typically not available.
+              <code>http</code> or <code>coap</code> result in different content types.
+              <!-- arch-schema -->
+              <span class="rfc2119-assertion" id="td-structured-data-schema"
+                >For structured media types, the Interaction Affordance SHOULD be associated with a Data Schema to
+                provide more detailed syntactic metadata for the data exchanged, as explained in
+                [[[#payload-bindings-dataschema]]] and [[[#sec-data-schema-vocabulary-definition]]].
+              </span>
+              However, for unstructured data such as images and videos, a Data Schema is typically not available.
             </p>
 
             <pre class="example" title="JSON and CBOR media types in forms" id="example-payload-binding">
@@ -4791,6 +4845,13 @@
         of such pre-existing interfaces. Instead, the assertions are to be interpreted as constraints on the TD to
         accurately represent such interfaces.
       </p>
+      <p>
+        <!-- 1. arch-td-metadata, 3. arch-td-mandatory -->
+        <span class="rfc2119-assertion" id="td-metadata-mandatory">
+          Accordingly, to be considered a Thing, an instance MUST be represented by at least one available WoT Thing
+          Description (TD).
+        </span>
+      </p>
       <section id="behavior-security">
         <h3>Security Configurations</h3>
         <p>
@@ -4812,10 +4873,60 @@
           </li>
         </ul>
         <p>
+          <!-- 29. arch-security-consideration-no-private-security-data, 27. arch-security-consideration-separate-security-data -->
+          <span class="rfc2119-assertion" id="td-security-no-private-security-data">
+            Producers of TDs MUST ensure that no Private Security Data is included in TDs, maintaining a strict
+            separation from Public Security Metadata.
+          </span>
+          <!-- 28. arch-security-consideration-auth-private-data -->
+          <span class="rfc2119-assertion" id="td-security-auth-private-data">
+            Instead, authentication and authorization SHOULD be established based on separately managed Private Security
+            Data.
+          </span>
+        </p>
+        <p>
           Some security protocols may ask for authentication information dynamically, including required encoding or
           encryption schemes. One consequence of the above is that if a protocol asks for a form of security credentials
           or an encoding or encryption scheme not declared in the Thing Description then the Thing Description is to be
           considered invalid.
+        </p>
+        <p>
+          Furthermore, regarding the underlying implementation of these secure transport mechanisms, the most secure
+          version or security policy defined by the respective protocol specification should be used:
+        </p>
+        <ul>
+          <li>
+            For TLS/DTLS:
+            <span class="rfc2119-assertion" id="td-security-tls-1-3">
+              <!-- 46. arch-security-consideration-tls-1-3 -->
+              When using TLS, then at least TLS 1.3 [[RFC8446]] SHOULD be used.
+            </span>
+            <span class="rfc2119-assertion" id="td-security-tls-1-2">
+              <!-- 47. arch-security-consideration-tls-1-2 -->
+              If TLS 1.3 cannot be used for compatibility reasons when using TLS, TLS 1.2 [[RFC5246]] MAY be used.
+            </span>
+            When using DTLS, then at least DTLS 1.3 [[RFC9147]] is recommended, if possible.
+            <span class="rfc2119-assertion" id="td-security-dtls-1-2">
+              <!-- 48. arch-security-consideration-dtls-1-2 -->
+              If DTLS 1.3 cannot be used for compatibility reasons when using DTLS, DTLS 1.2 [[RFC6347]] MAY be used.
+            </span>
+          </li>
+          <li>
+            <span class="rfc2119-assertion" id="td-security-other-protocol">
+              For protocols with integrated security or alternative security mechanisms (e.g., QUIC [[RFC9000]], OPC
+              UA), the configuration SHOULD adhere to the current security recommendations of the relevant specification
+              (e.g., strictly using secure OPC UA Security Policies).
+            </span>
+          </li>
+        </ul>
+        <p>
+          <span class="rfc2119-assertion" id="td-security-no-earlier-tls-or-dtls">
+            <!-- 49. arch-security-consideration-no-earlier-tls-or-dtls -->
+            Versions of protocols or security policies earlier than the current standards (including TLS/DTLS earlier
+            than 1.2) MUST NOT be used for new development.
+          </span>
+          Existing Things using earlier versions of TLS or DTLS can be described by Thing Description, but should be
+          considered insecure.
         </p>
       </section>
       <!-- end of id="behavior-security"-->
@@ -5868,11 +5979,18 @@
               The placeholder labeling MUST be substituted with a concrete value (e.g., as JSON number, JSON string,
               JSON object, etc) when TD instance is created from the Thing Model.
             </span>
-            <span class="rfc2119-assertion" id="tm-placeholder">
-              The string-based pattern of the placeholder MUST follow a valid pattern based on the regular expression
-              <code>{{2}[ -~]+}{2}</code> (e.g., <code>{{</code><code>PLACEHOLDER_IDENTIFIER</code><code>}}</code>). The
-              characters between <code>{{</code> and <code>}}</code> are used as identifier name of the placeholder. The
-              identifier name can be used to identify the placeholder for the substitution process.
+            <span class="rfc2119-assertion" id="tm-placeholder-pattern">
+              The string-based pattern of the placeholder MUST be defined with double curly braces to clearly
+              distinguish the placeholder from the rest of the value content (e.g., <code>{{</code>
+              <code>PLACEHOLDER_IDENTIFIER</code><code>}}</code>).
+            </span>
+            The characters between <code>{{</code> and <code>}}</code> are used as identifier name of the placeholder.
+            The identifier name can be used to identify the placeholder for the substitution process.
+
+            <span class="rfc2119-assertion" id="tm-placeholder-multiple-placeholders">
+              Within a single value, there MAY be multiple placeholders, e.g.,
+              <code>"mqtt://</code><code>{{</code><code>MQTT_BROKER_ADDRESS</code><code>}}</code><code>:{{</code
+              ><code>PORT</code><code>}}</code><code>"</code>
             </span>
             <span class="rfc2119-assertion" id="tm-placeholder-value">
               A placeholder MUST be applied within the value of the JSON name-value pair.
@@ -5881,9 +5999,19 @@
               If a non string-based value of a JSON name-value pair has a placeholder, the value MUST be (temporarily)
               typed as string.
             </span>
-
+            <span class="rfc2119-assertion" id="tm-placeholder-object-serialization">
+              If a string-based value of a JSON name-value pair has a placeholder and the value replacement is a Map
+              (JSON Object), it MUST be replaced by the stringified version of the Map and MUST NOT contain any
+              whitespace character (e.g., space, tab, etc).
+            </span>
             After replacing the placeholder, e.g., when creating a Thing Description instance, the original type is
             applied with the corresponding replaced value.
+          </p>
+
+          <p class="note">
+            The regex <code>\{{2}[ -~]+}{2}</code> can be used to identify the placeholder pattern. However, as
+            different regex engines can behave differently, the regex pattern can be adapted to the specific regex
+            engine.
           </p>
 
           <p>
@@ -6545,6 +6673,10 @@
           <dd>
             As a matter of policy, it is strongly suggested that Thing Descriptions associated with personal devices be
             treated as if they contained personally identifiable information, even if this information is not explicit.
+            <span class="rfc2119-assertion" id="td-privacy-consideration-min-explicit-pii">
+              <!-- arch-privacy-consideration-min-explicit-pii -->
+              Storage of explicit personally identifiable information in TDs SHOULD be minimized as much as possible.
+            </span>
             As an example application of this principle, consider how to obtain user consent. Consent for usage of
             personally identifiable data generated by a <a>Thing</a> is often obtained when a <a>Thing</a> is paired
             with system consuming the data, which is frequently also when the Thing Description is registered with a
@@ -6552,7 +6684,12 @@
             consent for using data from a <a>Thing</a> can be combined with consent for accessing the Thing Description
             of the <a>Thing</a>. As a second example, if we consider a TD to contain personally identifiable
             information, then it should not be retained indefinitely or used for purposes other than those for which
-            consent was given.
+            consent was given. Furthermore,
+            <span class="rfc2119-assertion" id="td-privacy-consideration-access-control-mandatory-person">
+              <!-- arch-privacy-consideration-access-control-mandatory-person -->
+              Things returning data or metadata (such as TDs) associated with a person SHOULD use some form of access
+              control.
+            </span>
           </dd>
         </dl>
       </section>

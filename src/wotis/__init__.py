@@ -6,6 +6,7 @@ from .specgen.config import Config
 RESOURCES_PATH = Path('resources')
 SCHEMA_PATH = RESOURCES_PATH / 'schemas'
 GENS_PATH = RESOURCES_PATH / 'gens'
+ASSERTION_PATH = GENS_PATH / 'assertions'
 
 CONFIG = Config.from_resources_dir(RESOURCES_PATH, placeholder="%s")
 
@@ -28,5 +29,5 @@ __all__ = [
     "JINJA_TEMPLATE_DIR", "GLOSSARY_PATH", "BIBLIO_PATH",
     "CORE_SCHEMA_PLACEHOLDER", "YAML_SCHEMA_PATH",
     "GENERATED_LINKML_SCHEMA", "RESPEC_TEMPLATE_PATH", "FINAL_SPEC_PATH",
-    "GENERATORS",
+    "GENERATORS", "ASSERTION_PATH",
 ]
