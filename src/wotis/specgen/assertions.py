@@ -3,46 +3,33 @@ assertions.py – Generate stable assertion IDs from LinkML schemas and
 produce assertions.csv, mirroring what extractFile.js does for the
 SPARQL/STTL-based WoT TD pipeline.
 
-How assertions work in the WoT TD spec HTML
-────────────────────────────────────────────
-The spec has three assertion CSS classes that extractFile.js selects:
+How assertions work in the WoT TD spec HTML:
+    The spec has three assertion CSS classes that extractFile.js selects:
 
-  .rfc2119-assertion          – standalone paragraphs / spans
-  .rfc2119-default-assertion  – standalone paragraphs / spans (default values)
-  .rfc2119-table-assertion    – <tr> rows in vocabulary tables
+      .rfc2119-assertion          – standalone paragraphs / spans
+      .rfc2119-default-assertion  – standalone paragraphs / spans (default values)
+      .rfc2119-table-assertion    – <tr> rows in vocabulary tables
 
 Every vocabulary-term row in every generated <table class="def numbered">
-already carries class="rfc2119-table-assertion".  What was missing is the
+already carries class="rfc2119-table-assertion".  What is missing is the
 stable `id` attribute on those <tr> elements.
 
 Stable ID convention (table rows)
-───────────────────────────────────
-  <schema-prefix>-<ClassName-kebab>-<slot-name-kebab>
+──────────────────────────────────
+  td-vocab-<slot-name>--<ClassName>
 
-Special characters in slot names are stripped:
-  @context  →  context
-  @type     →  type
+Special LinkML escape names are normalized to the historical TD anchors:
+  @context  →  at-context
+  @type     →  at-type
+  @name     →  name
 
-Examples (thing_description.yaml, prefix "td"):
-  Thing.@context   →  td-thing-context
-  Thing.@type      →  td-thing-type
-  Thing.id         →  td-thing-id
-  Thing.title      →  td-thing-title
+Examples:
+  Thing.@context                 →  td-vocab-at-context--Thing
+  Thing.@type                    →  td-vocab-at-type--Thing
+  DataSchema.type                →  td-vocab-type--DataSchema
 
 The IDs are guaranteed stable as long as the schema class/slot names
 do not change – the same contract the SPARQL pipeline gave via ontology IRIs.
-
-Public API
-──────────
-  make_slot_assertion_id(prefix, class_name, slot_name) -> str
-      Pure function; used by tables.py when rendering each <tr>.
-
-  extract_all_table_assertions(section_schemas, prefix_map) -> list[Assertion]
-      Walks all section schemas and returns every (class, slot) pair as an
-      Assertion, regardless of RFC 2119 keywords in the description.
-
-  assertions_to_csv(assertions, out_path)
-      Writes "ID","Status","Assertion" CSV compatible with extractFile.js output.
 """
 
 from __future__ import annotations
@@ -50,11 +37,12 @@ from __future__ import annotations
 import csv
 import re
 import logging
+
 from dataclasses import dataclass
+from linkml_runtime.utils.schemaview import SchemaView
+from lxml import html
 from pathlib import Path
 from typing import Dict, List, Optional
-
-from linkml_runtime.utils.schemaview import SchemaView
 
 
 ASSERTION_TABLE   = "rfc2119-table-assertion"
@@ -65,7 +53,6 @@ ASSERTION_DEFAULT = "rfc2119-default-assertion"
 @dataclass
 class Assertion:
     """One assertion extracted from a LinkML schema element."""
-
     id: str                          # stable HTML id, e.g. "td-thing-id"
     source_class: str                # LinkML class name
     source_slot: Optional[str]       # slot name (None → class-level inline assertion)
@@ -75,30 +62,21 @@ class Assertion:
 
     @property
     def clean_text(self) -> str:
-        """CSV-safe, whitespace-normalised assertion text (mirrors cleanAssertionText in JS)."""
+        """Whitespace-normalised assertion text (mirrors cleanAssertionText in JS)."""
         t = re.sub(r"<[^>]+>", " ", self.text)
         t = re.sub(r"[\r\n]+", " ", t)
         t = re.sub(r"[ \t]+", " ", t).strip()
-        t = t.replace('"', '""')
         return t
 
 
-# ID generation
 def _normalize_slot_name(slot_name: str) -> str:
     """
     Normalize a slot name for use in an assertion ID.
-
-    Rules:
-      - Leading '@' → 'at-'   (@type → at-type, @context → at-context)
-      - All other characters left as-is (camelCase preserved, no kebab conversion)
-
-    Examples:
-      @type            → at-type
-      @context         → at-context
-      uriVariables     → uriVariables
-      securityDefinitions → securityDefinitions
     """
-    if slot_name.startswith("@"):
+
+    if slot_name == "@name":
+        return "name"
+    if slot_name in {"@context", "@type"}:
         return "at-" + slot_name[1:]
     return slot_name
 
@@ -107,22 +85,13 @@ def make_slot_assertion_id(prefix: str, class_name: str, slot_name: str) -> str:
     """
     Return the stable assertion ID for a vocabulary-term table row.
 
-    Format:  <prefix>-vocab-<slot-normalized>--<ClassName>
-
-    e.g.:
-      make_slot_assertion_id("td", "Thing", "uriVariables")
-          → "td-vocab-uriVariables--Thing"
-      make_slot_assertion_id("td", "InteractionAffordance", "@type")
-          → "td-vocab-at-type--InteractionAffordance"
-      make_slot_assertion_id("td", "Thing", "@context")
-          → "td-vocab-at-context--Thing"
-      make_slot_assertion_id("wotsec", "SecurityScheme", "scheme")
-          → "wotsec-vocab-scheme--SecurityScheme"
+    Format:  td-vocab-<slot-normalized>--<ClassName>
 
     This is the single source of truth called by both tables.py (emitting <tr>)
     and extract_all_table_assertions() (building the CSV).
     """
-    return f"{prefix}-vocab-{_normalize_slot_name(slot_name)}--{class_name}"
+
+    return f"td-vocab-{_normalize_slot_name(slot_name)}--{class_name}"
 
 
 def make_class_assertion_id(prefix: str, class_name: str) -> str:
@@ -131,7 +100,6 @@ def make_class_assertion_id(prefix: str, class_name: str) -> str:
 
 
 # RFC 2119 detection (inline/paragraph assertions only)
-
 _RFC2119_RE = re.compile(
     r"\b(MUST(?:\s+NOT)?|SHALL(?:\s+NOT)?|SHOULD(?:\s+NOT)?|"
     r"REQUIRED|RECOMMENDED|MAY|OPTIONAL)\b"
@@ -173,11 +141,8 @@ def extract_all_table_assertions(
     i.e. one per vocabulary-term table row.
 
     ALL table rows are assertions regardless of whether their description
-    contains RFC 2119 keywords.  This matches how extractFile.js works:
-    it selects ALL .rfc2119-table-assertion elements unconditionally.
+    contains RFC 2119 keywords.
 
-    Parameters
-    ----------
     section_schemas:
         Ordered dict of section_id → schema Path (from Config.section_schemas).
     prefix_map:
@@ -201,8 +166,15 @@ def extract_all_table_assertions(
             logging.error("Cannot load %s for assertion extraction: %s", schema_path, exc)
             continue
 
-        for class_name in sv.all_classes():
-            for slot_name in (sv.all_slots(class_name) or {}):
+        for class_name, class_def in sv.all_classes().items():
+            slot_names = list(getattr(class_def, "slots", None) or [])
+            slot_names.extend((getattr(class_def, "attributes", None) or {}).keys())
+
+            seen_slots: set[str] = set()
+            for slot_name in slot_names:
+                if slot_name in seen_slots:
+                    continue
+                seen_slots.add(slot_name)
                 aid = make_slot_assertion_id(prefix, class_name, slot_name)
                 if aid in seen:
                     continue
@@ -289,12 +261,111 @@ def extract_all_assertions(
     return unique
 
 
-# CSV output
+def extract_html_assertions(html_path: Path) -> List[Assertion]:
+    """
+    Extract the assertion inventory from final generated index.html.
+    """
+    doc = html.fromstring(html_path.read_text(encoding="utf-8", errors="replace"))
+    selectors = [
+        f".{ASSERTION_INLINE}",
+        f"tr.{ASSERTION_DEFAULT}",
+        f"tr.{ASSERTION_TABLE}",
+    ]
+    assertions: List[Assertion] = []
+    seen: set[str] = set()
+
+    for selector in selectors:
+        for element in doc.cssselect(selector):
+            assertion_id = element.get("id")
+            if not assertion_id:
+                logging.warning("Skipping assertion without id in %s: %s", html_path, selector)
+                continue
+            if assertion_id in seen:
+                logging.warning("Skipping duplicate assertion id %s in %s", assertion_id, html_path)
+                continue
+            seen.add(assertion_id)
+            assertion_type = element.get("class") or selector.lstrip(".")
+            assertions.append(
+                Assertion(
+                    id=assertion_id,
+                    source_class="",
+                    source_slot=None,
+                    text=element.text_content(),
+                    assertion_type=assertion_type,
+                    schema_prefix="",
+                )
+            )
+
+    assertions.sort(key=lambda a: a.id)
+    logging.info("Extracted %d HTML assertions from %s", len(assertions), html_path)
+    return assertions
+
+
+def html_assertions_to_csv(html_path: Path, out_path: Path) -> None:
+    """Extract assertions from final HTML and write the extractFile.js-compatible CSV."""
+    assertions_to_csv(extract_html_assertions(html_path), out_path)
+    problems = validate_html_assertion_inventory(html_path, out_path)
+    if problems:
+        raise ValueError("Assertion inventory compatibility failed:\n" + "\n".join(problems))
+
+
+def _assertion_elements(doc) -> list:
+    selectors = [
+        f".{ASSERTION_INLINE}",
+        f"tr.{ASSERTION_DEFAULT}",
+        f"tr.{ASSERTION_TABLE}",
+    ]
+    elements = []
+    for selector in selectors:
+        elements.extend(doc.cssselect(selector))
+    return elements
+
+
+def _csv_assertion_ids(csv_path: Path) -> set[str]:
+    with csv_path.open(newline="", encoding="utf-8") as fh:
+        return {row["ID"] for row in csv.DictReader(fh) if row.get("ID")}
+
+
+def validate_html_assertion_inventory(html_path: Path, csv_path: Optional[Path] = None) -> List[str]:
+    """Return compatibility problems for the final HTML assertion inventory."""
+    doc = html.fromstring(html_path.read_text(encoding="utf-8", errors="replace"))
+    elements = _assertion_elements(doc)
+    ids = [element.get("id") for element in elements if element.get("id")]
+    problems: List[str] = []
+
+    missing = len(elements) - len(ids)
+    if missing:
+        problems.append(f"{missing} assertion element(s) are missing id attributes")
+
+    duplicate_ids = sorted({assertion_id for assertion_id in ids if ids.count(assertion_id) > 1})
+    if duplicate_ids:
+        problems.append(f"duplicate assertion ids: {', '.join(duplicate_ids[:20])}")
+
+    foreign_prefix_ids = sorted(
+        assertion_id
+        for assertion_id in ids
+        if assertion_id.startswith(("jsonschema-vocab-", "wotsec-vocab-", "hctl-vocab-"))
+    )
+    if foreign_prefix_ids:
+        problems.append(f"foreign table assertion prefixes: {', '.join(foreign_prefix_ids[:20])}")
+
+    if csv_path is not None:
+        html_ids = set(ids)
+        csv_ids = _csv_assertion_ids(csv_path)
+        missing_from_csv = sorted(html_ids - csv_ids)
+        extra_in_csv = sorted(csv_ids - html_ids)
+        if missing_from_csv:
+            problems.append(f"csv missing html assertion ids: {', '.join(missing_from_csv[:20])}")
+        if extra_in_csv:
+            problems.append(f"csv has ids not present in html: {', '.join(extra_in_csv[:20])}")
+
+    return problems
+
 
 def assertions_to_csv(assertions: List[Assertion], out_path: Path) -> None:
     """
     Write assertions.csv with columns "ID","Status","Assertion".
-    Matches the format produced by extractFile.js exactly.
+    Matches the format produced by extractFile.js.
     """
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", newline="", encoding="utf-8") as fh:
@@ -303,14 +374,3 @@ def assertions_to_csv(assertions: List[Assertion], out_path: Path) -> None:
         for a in assertions:
             writer.writerow([a.id, "null", a.clean_text])
     logging.info("Wrote %d assertions to %s", len(assertions), out_path)
-
-
-# ── Schema prefix map
-
-DEFAULT_PREFIX_MAP: Dict[str, str] = {
-    "thing_description": "td",
-    "hypermedia":        "hctl",
-    "jsonschema":        "jsonschema",
-    "wot_security":      "wotsec",
-    "tm":                "tm",
-}
