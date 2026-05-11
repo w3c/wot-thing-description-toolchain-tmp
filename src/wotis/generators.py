@@ -2,15 +2,12 @@ import json
 import logging
 
 from pathlib import Path
-import shutil
-import subprocess
 
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.shaclgen import ShaclGenerator
 from linkml.generators.owlgen import OwlSchemaGenerator
 from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
-from linkml.generators import dotgen
 from linkml_runtime.utils.schemaview import SchemaView
 
 from . import SCHEMA_PATH
