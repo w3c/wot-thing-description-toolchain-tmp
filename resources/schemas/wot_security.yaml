@@ -2,7 +2,7 @@ id: https://www.w3.org/2019/wot/security
 name: wot_security
 title: WoT Security Schema
 description: LinkML Schema for modelling the Thing Description security mechanisms .
-version: "1.1-2-June-2025"
+version: "1.1-11-May-2026"
 license: MIT
 contributors: Mahda_Noura
 see_also:
@@ -196,18 +196,21 @@ classes:
             id: td-security-uri-variables-distinct
             text: |
               The names of URI variables declared in a `SecurityScheme` *MUST* be distinct from all other URI variables declared in the TD.
-      spec_scope_note: |
-        The !class SecurityScheme has the following subclasses:
+      spec_content:
+        value:
+          - type: markdown
+            text: |
+              The !class SecurityScheme has the following subclasses:
 
-        - NoSecurityScheme
-        - AutoSecurityScheme
-        - ComboSecurityScheme
-        - BasicSecurityScheme
-        - DigestSecurityScheme
-        - APIKeySecurityScheme
-        - BearerSecurityScheme
-        - PSKSecurityScheme
-        - OAuth2SecurityScheme
+              - NoSecurityScheme
+              - AutoSecurityScheme
+              - ComboSecurityScheme
+              - BasicSecurityScheme
+              - DigestSecurityScheme
+              - APIKeySecurityScheme
+              - BearerSecurityScheme
+              - PSKSecurityScheme
+              - OAuth2SecurityScheme
       jsonschema_config:
         tag: jsonschema_config
         value:

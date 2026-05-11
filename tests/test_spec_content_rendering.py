@@ -62,3 +62,21 @@ def test_spec_content_renders_assertion_inside_paragraph() -> None:
     assert '<span class="rfc2119-assertion" id="td-processor-bidi-isolation">' in html
     assert "<a>TD Processors</a> <em>MUST</em> isolate text." in html
     assert html.endswith(" After.</p>")
+
+
+def test_spec_content_renders_note_block_directly() -> None:
+    annotations = {
+        "spec_content": {
+            "value": [
+                {
+                    "type": "note",
+                    "text": "Thing Description note.",
+                }
+            ],
+        }
+    }
+
+    html = render_spec_content_annotation(annotations, _process_description)
+
+    assert html == '<div class="note">\n<p><a>Thing Description</a> note.</p>\n</div>'
+    assert ":::NOTE" not in html

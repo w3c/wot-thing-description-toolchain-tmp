@@ -128,11 +128,9 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
 
         usage = (class_def.slot_usage or {}).get(slot_name)
         ann = getattr(slot_def, "annotations", None) or {}
-        # Determine effective_range_name
         effective_range_name = getattr(usage, "range", None) or getattr(slot_def, "range", None)
         if not effective_range_name:
             effective_range_name = getattr(slot_def, "range", None)
-        # Merge raw attribute annotations into 'ann' for exclusion check
         if slot_name in class_def.attributes:
             raw_attribute_def = class_def.attributes[slot_name]
             raw_ann = getattr(raw_attribute_def, "annotations", None) or {}
@@ -142,7 +140,6 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
             val = getattr(spec_exclude_ann, 'value', spec_exclude_ann)
             if str(val).lower() == 'true':
                 continue
-        # Determine the source text for the description in the tables
         raw_desc = getattr(slot_def, "description", "")
         usage_ann = getattr(usage, "annotations", None) or {} if usage else {}
         if "spec_table_definition" in usage_ann:
@@ -153,7 +150,7 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
             raw_desc = str(getattr(ann["spec_table_definition"], "value", ann["spec_table_definition"]))
         desc_html = process_description(raw_desc)
         desc = (desc_html or "").replace("'", "&#39;")
-        # special case for the name defined in wot_security.yaml, name is a reserved keyword.
+        # special case for the name defined in wot_security.yaml, name is a reserved keyword in LinkML.
         if slot_name == "@name":
             display_name = "name"
         else:

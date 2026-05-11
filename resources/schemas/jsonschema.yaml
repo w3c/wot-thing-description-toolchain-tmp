@@ -4,7 +4,7 @@ title: JSON Schema in RDF
 description: >-
   LinkML schema for modelling the TD module for data schema specifications. A data schema is an abstract notation for data contained in data formats. The data schema vocabulary definition
   reflects a very common subset of the terms defined by JSON Schema.
-version: "1.1-2-June-2025"
+version: "1.1-11-May-2026"
 license: MIT
 contributors: Mahda_Noura
 see_also:
@@ -245,11 +245,11 @@ classes:
     annotations:
       spec_table_definition: >-
         Metadata describing data of type `string`. This Subclass is indicated by the value `string` assigned to `type` in `DataSchema` instances.
-      spec_scope_note: |
-        :::NOTE
-
-        The length of a string (i.e., `minLength` and `maxLength`) is defined as the number of Unicode code points, as defined by [[RFC8259]]. Note that some [user-perceived characters](https://www.w3.org/TR/i18n-glossary/#dfn-grapheme) are composed of more than one Unicode code point. Arbitrary index values might not fall on these grapheme boundaries, so truncation according to `maxLength` might alter the appearance or meaning of the string.
-        :::
+      spec_content:
+        value:
+          - type: note
+            text: |
+              The length of a string (i.e., `minLength` and `maxLength`) is defined as the number of Unicode code points, as defined by [[RFC8259]]. Note that some [user-perceived characters](https://www.w3.org/TR/i18n-glossary/#dfn-grapheme) are composed of more than one Unicode code point. Arbitrary index values might not fall on these grapheme boundaries, so truncation according to `maxLength` might alter the appearance or meaning of the string.
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -473,4 +473,3 @@ enums:
         description: Represents a boolean type
       "null":
         description: Represents a null type
-

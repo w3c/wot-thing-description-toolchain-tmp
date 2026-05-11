@@ -3,7 +3,7 @@ name: things_description
 title: Thing Description Schema
 description: |-
   This schema models the Web of Things domain according to the W3C Web of Things information model.
-version: "21.01-21-December-2026"
+version: "1.1-11-May-2026"
 license: MIT
 contributors: Mahda_Noura
 see_also:
@@ -472,12 +472,15 @@ classes:
       Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact with the Thing.
       There are many types of potential affordances, but W3C WoT defines three types of Interaction Affordances: Properties, Actions, and Events.
     annotations:
-      spec_scope_note: |
-        The !class `InteractionAffordance` has the following subclasses:
+      spec_content:
+        value:
+          - type: markdown
+            text: |
+              The !class `InteractionAffordance` has the following subclasses:
 
-        - PropertyAffordance
-        - ActionAffordance
-        - EventAffordance
+              - PropertyAffordance
+              - ActionAffordance
+              - EventAffordance
 
     abstract: true
     attributes:
@@ -700,11 +703,13 @@ classes:
       If required, additional version information such as firmware and hardware version
       (term definitions outside of the TD namespace) can be extended via the TD Context Extension mechanism.
     annotations:
-      # FORMATTED SCOPE NOTE (POST-TABLE)
-      spec_scope_note: >-
-        It is recommended that the values within `instances` and `model` of the `VersionInfo` [Class](#dfn-class)
-        follow the semantic versioning pattern, where a sequence of three numbers separated by a dot indicates the
-        major version, minor version, and patch version, respectively. See [[SEMVER]] for details.
+      spec_content:
+        value:
+          - type: markdown
+            text: >-
+              It is recommended that the values within `instances` and `model` of the `VersionInfo` [Class](#dfn-class)
+              follow the semantic versioning pattern, where a sequence of three numbers separated by a dot indicates the
+              major version, minor version, and patch version, respectively. See [[SEMVER]] for details.
     attributes:
       instance:
         description: >-

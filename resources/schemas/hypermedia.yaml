@@ -3,7 +3,7 @@ name: hypermedia
 title: Hypermedia Controls Ontology
 description: >-
   LinkML schema for modelling the TD Hypermedia Control information model, in particular links and forms.
-version: "1.1-2-June-2025"
+version: "1.1-11-May-2026"
 license: MIT
 contributors: Mahda_Noura
 see_also:
@@ -402,5 +402,12 @@ classes:
             Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a `DataSchema` object, the name of a previous definition given in a `schemaDefinitions` map must be used.
         slot_uri: hctl:hasAdditionalOutputSchema
         range: string
-    slots:
-      - contentType
+      contentType:
+        description: >-
+          Assign a content type based on a media type (e.g., text/plain) and potential parameters
+          (e.g., charset=utf-8) for the media type [RFC2046].
+        annotations:
+          spec_table_definition: >-
+            Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
+        slot_uri: hctl:forContentType
+        range: string

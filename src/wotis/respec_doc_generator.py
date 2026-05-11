@@ -81,6 +81,16 @@ def _render_inline_markdown(
     return _inline_html(process_description(str(text or "")))
 
 
+def _render_note_block(
+    text: str,
+    process_description: Callable[[str], str],
+) -> str:
+    body = process_description(str(text or ""))
+    if not body:
+        return ""
+    return f'<div class="note">\n{body}\n</div>'
+
+
 def _render_assertion_span(
     record: dict,
     process_description: Callable[[str], str],
@@ -199,7 +209,7 @@ def render_spec_content_annotation(
         if block_type == "markdown":
             rendered = process_description(str(text))
         elif block_type == "note":
-            rendered = process_description(f":::NOTE\n\n{text}\n:::")
+            rendered = _render_note_block(str(text), process_description)
         elif block_type == "assertion":
             span = _render_assertion_span(block, process_description)
             rendered = f"<p>{span}</p>" if span else ""
@@ -417,24 +427,19 @@ def generate_respec_spec(
                     process_description,
                     annotation_key="spec_intro_content",
                 )
-            note_html = ""
+            spec_content_html = ""
             if "spec_content" in ann:
-                note_html = render_spec_content_annotation(ann, process_description)
-            elif "spec_scope_note" in ann:
-                raw = (
-                    getattr(ann["spec_scope_note"], "value", None)
-                    or ann["spec_scope_note"]
+                spec_content_html = render_spec_content_annotation(
+                    ann,
+                    process_description,
                 )
-                note_html = render_markdown_html(str(raw))
-                note_html = link_biblio_keys(note_html, biblio)
-                note_html = annotate_html(note_html, glossary_entries, phrase_to_key)
             assertion_html = render_explicit_assertion_annotation(
                 ann,
                 process_description,
             )
             if assertion_html:
-                note_html = "\n".join(
-                    part for part in [note_html, assertion_html] if part
+                spec_content_html = "\n".join(
+                    part for part in [spec_content_html, assertion_html] if part
                 )
 
             sections_html.append(
@@ -443,7 +448,7 @@ def generate_respec_spec(
                     class_description=desc_html,
                     slots=rows,
                     spec_intro_html=intro_html,
-                    spec_scope_note_html=note_html,
+                    spec_content_html=spec_content_html,
                 )
             )
 
