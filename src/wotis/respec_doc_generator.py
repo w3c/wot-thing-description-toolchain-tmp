@@ -1,38 +1,138 @@
 from __future__ import annotations
+
+from html import escape
+import logging
+import re
+import yaml
+
 from jinja2 import exceptions
-import logging, yaml
-from pathlib import Path
-from typing import Dict, List, Optional
-
 from linkml_runtime.utils.schemaview import SchemaView
+from pathlib import Path
+from typing import Callable, Dict, List, Optional
 
-from .specgen.config import Config
-from .specgen.glossary import load_glossary, annotate_html
 from .specgen.bibliography import load_bibliography, link_biblio_keys
+from .specgen.config import Config
+from .specgen.glossary import annotate_html, load_glossary
 from .specgen.markdown import render_markdown_html
-from .specgen.tables import collect_slot_rows
 from .specgen.respec import build_jinja_env, assemble
-from .specgen.assertions import (
-    extract_all_assertions,
-    assertions_to_csv,
-    DEFAULT_PREFIX_MAP
-)
+from .specgen.tables import collect_slot_rows
+from .specgen.assertions import html_assertions_to_csv
 
 cfg = Config.from_resources_dir(Path("resources"), placeholder="%s")
 
 
+def _annotation_value(annotations: dict, key: str):
+    ann = annotations.get(key)
+    if ann is None:
+        return None
+    return getattr(ann, "value", ann)
+
+
+def _record_value(record: dict, key: str):
+    value = record.get(key)
+    return getattr(value, "value", value)
+
+
+def _assertion_annotation_records(annotations: dict) -> list[dict]:
+    records: list[dict] = []
+    grouped = _annotation_value(annotations, "assertions")
+    grouped = getattr(grouped, "value", grouped)
+    if isinstance(grouped, dict) and "value" in grouped:
+        grouped = grouped["value"]
+    if isinstance(grouped, dict):
+        records.append(grouped)
+    elif isinstance(grouped, list):
+        records.extend(record for record in grouped if isinstance(record, dict))
+
+    direct = {}
+    for key in ("assertion_id", "assertion_text", "assertion_type"):
+        value = _annotation_value(annotations, key)
+        if value is not None:
+            direct[key] = value
+    if direct:
+        records.append(direct)
+
+    return records
+
+
+def _inline_html(html: str) -> str:
+    """Use Markdown rendering for assertion text, but keep the assertion span inline."""
+    match = re.fullmatch(r"\s*<p>(?P<body>.*)</p>\s*", html or "", flags=re.DOTALL)
+    if match:
+        return match.group("body")
+    return html or ""
+
+
+def render_explicit_assertion_annotation(
+    annotations: dict,
+    process_description: Callable[[str], str],
+) -> str:
+    """
+    Render LinkML assertion annotations.
+
+    annotation keys:
+      assertion_id: stable assertion ID
+      assertion_text: assertion prose
+      assertion_type: CSS class, defaults to rfc2119-assertion
+
+    Multiple prose assertions can be supplied as:
+      assertions:
+        value:
+          - assertion_id: ...
+            assertion_text: ...
+            assertion_type: rfc2119-assertion
+    """
+    records = _assertion_annotation_records(annotations)
+    if not records:
+        return ""
+
+    allowed_types = {
+        "rfc2119-assertion",
+        "rfc2119-default-assertion",
+        "rfc2119-table-assertion",
+    }
+    rendered: list[str] = []
+    for record in records:
+        assertion_id = _record_value(record, "assertion_id")
+        assertion_text = _record_value(record, "assertion_text")
+        assertion_type = _record_value(record, "assertion_type") or "rfc2119-assertion"
+
+        if not assertion_id or not assertion_text:
+            logging.warning(
+                "Ignoring incomplete assertion annotation: id=%r text=%r",
+                assertion_id,
+                assertion_text,
+            )
+            continue
+
+        if str(assertion_type) not in allowed_types:
+            logging.warning(
+                "Unsupported assertion_type %r; using rfc2119-assertion",
+                assertion_type,
+            )
+            assertion_type = "rfc2119-assertion"
+
+        text_html = _inline_html(process_description(str(assertion_text)))
+        rendered.append(
+            f'<p><span class="{escape(str(assertion_type), quote=True)}" '
+            f'id="{escape(str(assertion_id), quote=True)}">{text_html}</span></p>'
+        )
+
+    return "\n".join(rendered)
+
+
 def generate_respec_spec(
-        input_path: Path,
-        respec_template_path: Path,
-        final_spec_path: Path,
-        core_schema_placeholder: str,
-        assertions_csv_path: Optional[Path] = None,
+    input_path: Path,
+    respec_template_path: Path,
+    final_spec_path: Path,
+    core_schema_placeholder: str,
+    assertions_csv_path: Optional[Path] = None,
 ) -> None:
     """
-    Generate the complete ReSpec-compatible HTML document from a LinkML schema.
+    Generate the ReSpec-compatible HTML document from the LinkML schema.
 
     This function:
-      • Loads the LinkML model via SchemaView
+      • Loads the LinkML model
       • Converts Markdown and annotations to HTML
       • Applies glossary and bibliography linking
       • Renders each class section with Jinja templates
@@ -42,8 +142,10 @@ def generate_respec_spec(
         input_path: Path to the root LinkML YAML schema file.
         respec_template_path: Path to the ReSpec HTML template (index.template.html).
         final_spec_path: Path to write the final, assembled HTML output.
-        core_schema_placeholder: The placeholder string inside the ReSpec template to replace.
-        assertions_csv_path: If provided, also write an assertions.csv compatible with the WoT TD Test suite (extractFile.js output)
+        core_schema_placeholder: The placeholder string inside the ReSpec
+            template to replace.
+        assertions_csv_path: If provided, write an assertions.csv compatible
+            with the WoT TD Test suite (extractFile.js output).
     """
     try:
         sv = SchemaView(input_path, merge_imports=True)
@@ -53,9 +155,12 @@ def generate_respec_spec(
 
     try:
         env = build_jinja_env(cfg.jinja_templates)
-        # Load glossary and expose annotate() to Jinja
         glossary_entries, phrase_to_key = load_glossary(cfg.glossary_path)
-        env.filters["annotate"] = lambda s: annotate_html(s or "", glossary_entries, phrase_to_key)
+        env.filters["annotate"] = lambda s: annotate_html(
+            s or "",
+            glossary_entries,
+            phrase_to_key,
+        )
 
         section_tpl = env.get_template("class_section.jinja2")
     except (exceptions.TemplateNotFound, FileNotFoundError) as e:
@@ -80,25 +185,24 @@ def generate_respec_spec(
         html = annotate_html(html, glossary_entries, phrase_to_key)
         return html
 
-    if assertions_csv_path is not None:
-        try:
-            all_assertions = extract_all_assertions(cfg.section_schemas, DEFAULT_PREFIX_MAP)
-            assertions_to_csv(all_assertions, assertions_csv_path)
-        except Exception as exc:
-            logging.error("Assertion CSV generation failed: %s", exc, exc_info=True)
-
     file_to_classes: Dict[str, List[str]] = {}
     for section_path in cfg.section_schemas.values():
         try:
             if not section_path.exists():
-                logging.error(f"Missing schema file: {section_path.name}. Cannot render this section.")
+                logging.error(
+                    "Missing schema file: %s. Cannot render this section.",
+                    section_path.name,
+                )
                 file_to_classes[section_path.name] = []
                 continue
-            # Load each section schema without merging imports to see its classes
             section_sv = SchemaView(section_path, merge_imports=False)
             file_to_classes[section_path.name] = list(section_sv.all_classes().keys())
         except (yaml.YAMLError, IOError) as e:
-            logging.error(f"Failed to load section schema {section_path.name} due to: {e}. Skipping section.")
+            logging.error(
+                "Failed to load section schema %s due to: %s. Skipping section.",
+                section_path.name,
+                e,
+            )
             file_to_classes[section_path.name] = []
 
     # Identify all non-core classes (defined outside the primary TD schema)
@@ -110,20 +214,13 @@ def generate_respec_spec(
 
     for section_id, section_path in cfg.section_schemas.items():
         if section_id != core_section_id:
-            # add all classes from non-core schemas to the exclusion set
             non_core_classes.update(file_to_classes.get(section_path.name, []))
-
-    # extract classes order and build content
     sections_content: List[str] = []
-
     for section_id, section_path in cfg.section_schemas.items():
-        # Get the classes defined in the current section's file
         section_classes_to_render = file_to_classes.get(section_path.name, [])
-        schema_prefix = DEFAULT_PREFIX_MAP.get(section_path.stem, section_path.stem)
+        schema_prefix = cfg.schema_prefixes.get(section_path.stem, section_path.stem)
         sections_html: List[str] = []
-        # filter the core vocabulary section
         if section_id == core_section_id and core_section_id is not None:
-            # Exclude any class that is defined in one of the other schema files
             section_classes_to_render = [
                 cls for cls in section_classes_to_render if cls not in non_core_classes
             ]
@@ -131,7 +228,6 @@ def generate_respec_spec(
         if 'Thing' in section_classes_to_render:
             section_classes_to_render.remove('Thing')
             section_classes_to_render.insert(0, 'Thing')
-        # Generate HTML for classes belonging ONLY to this section
         for cls in section_classes_to_render:
             cdef = sv.get_class(cls)
             if not cdef:
@@ -139,29 +235,44 @@ def generate_respec_spec(
             ann = getattr(cdef, "annotations", None) or {}
             spec_exclude_ann = ann.get("spec_exclude")
             if spec_exclude_ann:
-                ann_value = getattr(spec_exclude_ann, 'value', None)
+                ann_value = getattr(spec_exclude_ann, "value", None)
                 if ann_value is None:
                     ann_value = spec_exclude_ann
-                if str(ann_value).lower() == 'true':
-                    logging.debug(f"Skipping rendering of class '{cls}' due to spec_exclude=true annotation.")
+                if str(ann_value).lower() == "true":
+                    logging.debug(
+                        "Skipping rendering of class %r due to "
+                        "spec_exclude=true annotation.",
+                        cls,
+                    )
                     continue
 
             rows = collect_slot_rows(sv, cls, process_description, schema_prefix)
-            # Class description
             raw_desc = getattr(cdef, "description", "") or ""
             if "spec_table_definition" in ann:
-                spec_def = getattr(ann["spec_table_definition"], "value", None) or ann["spec_table_definition"]
+                spec_def = (
+                    getattr(ann["spec_table_definition"], "value", None)
+                    or ann["spec_table_definition"]
+                )
                 raw_desc = str(spec_def) or raw_desc
 
             desc_html = process_description(raw_desc)
-
-            # Optional spec_scope_note
             note_html = ""
             if "spec_scope_note" in ann:
-                raw = getattr(ann["spec_scope_note"], "value", None) or ann["spec_scope_note"]
+                raw = (
+                    getattr(ann["spec_scope_note"], "value", None)
+                    or ann["spec_scope_note"]
+                )
                 note_html = render_markdown_html(str(raw))
                 note_html = link_biblio_keys(note_html, biblio)
                 note_html = annotate_html(note_html, glossary_entries, phrase_to_key)
+            assertion_html = render_explicit_assertion_annotation(
+                ann,
+                process_description,
+            )
+            if assertion_html:
+                note_html = "\n".join(
+                    part for part in [note_html, assertion_html] if part
+                )
 
             sections_html.append(
                 section_tpl.render(
@@ -183,3 +294,9 @@ def generate_respec_spec(
         out_path=final_spec_path,
         placeholder=core_schema_placeholder,
     )
+
+    if assertions_csv_path is not None:
+        try:
+            html_assertions_to_csv(final_spec_path, assertions_csv_path)
+        except Exception as exc:
+            logging.error("Assertion CSV generation failed: %s", exc, exc_info=True)
