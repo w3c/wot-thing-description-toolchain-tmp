@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Any, Dict, List, Callable, Optional
 from linkml_runtime.utils.schemaview import SchemaView
-from linkml_runtime.linkml_model.meta import SlotDefinition
 
 from .assertions import make_slot_assertion_id
 
@@ -27,8 +26,86 @@ def _normalize_range_name(rng: str) -> str:
         return "double"
     return rng
 
+
+def _annotation_value(annotations: dict, key: str):
+    ann = annotations.get(key)
+    if ann is None:
+        return None
+    return getattr(ann, "value", ann)
+
+
+def _is_truthy_annotation(value) -> bool:
+    value = getattr(value, "value", value)
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"true", "yes", "1", "with default"}
+    return value is not None
+
+
+def _has_default_assignment(slot_name: str, class_def, slot_def) -> bool:
+    return any(
+        _is_truthy_annotation(_annotation_value(annotations, "spec_default"))
+        for annotations in _annotation_candidates(slot_name, class_def, slot_def)
+    )
+
+
+def _annotation_candidates(slot_name: str, class_def, slot_def) -> List[dict]:
+    candidates = [getattr(slot_def, "annotations", None) or {}]
+    usage = (class_def.slot_usage or {}).get(slot_name)
+    if usage:
+        candidates.append(getattr(usage, "annotations", None) or {})
+    if slot_name in (class_def.attributes or {}):
+        candidates.append(
+            getattr(class_def.attributes[slot_name], "annotations", None) or {}
+        )
+    return candidates
+
+
+def _get_type_values_annotation(slot_name: str, class_def, slot_def):
+    for annotations in reversed(_annotation_candidates(slot_name, class_def, slot_def)):
+        value = _annotation_value(annotations, "spec_type_values")
+        if value is not None:
+            return value
+    return None
+
+
+def _format_value_list(values: List[str]) -> str:
+    values = [str(value) for value in values if str(value)]
+    if not values:
+        return ""
+    if len(values) == 1:
+        return values[0]
+    return f"{', '.join(values[:-1])}, or {values[-1]}"
+
+
+def _append_type_values(type_text: str, slot_name: str, class_def, slot_def) -> str:
+    value_config = _get_type_values_annotation(slot_name, class_def, slot_def)
+    if isinstance(value_config, dict):
+        values = value_config.get("values") or []
+        mode = value_config.get("mode")
+    else:
+        values = getattr(value_config, "values", None) or []
+        mode = getattr(value_config, "mode", None)
+    if not isinstance(values, list):
+        return type_text
+
+    formatted_values = _format_value_list(values)
+    if not formatted_values:
+        return type_text
+
+    mode = str(mode or "examples").strip().lower()
+    if mode in {"one_of", "one-of", "one of", "closed"}:
+        label = "one of"
+    else:
+        label = "e.g.,"
+    return f"{type_text} ({label} {formatted_values})"
+
+
 def get_assignment(slot_name, class_def, slot_def) -> str:
     usage = (class_def.slot_usage or {}).get(slot_name)
+    if _has_default_assignment(slot_name, class_def, slot_def):
+        return '<a href="#sec-default-values">with default</a>'
     if getattr(slot_def, "required", False) or (usage and getattr(usage, "required", False)):
         return "mandatory"
     min_value = getattr(slot_def, "minimum_value", None)
@@ -43,9 +120,8 @@ def get_assignment(slot_name, class_def, slot_def) -> str:
 
 
 def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effective_range: Optional[str] = None) -> str:
-    # Determine the base range
     raw_rng = effective_range if effective_range else getattr(slot_def, "range", None)
-    # 2. Choice Logic (exactly_one_of or any_of)
+    # Choice Logic (exactly_one_of or any_of)
     usage = (getattr(class_def, "slot_usage", None) or {}).get(slot_name)
     choices = None
     if usage:
@@ -72,26 +148,34 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
             if p and p not in seen:
                 seen.add(p)
                 pretty.append(p)
-        return " or ".join(pretty)
+        return _append_type_values(
+            " or ".join(pretty),
+            slot_name,
+            class_def,
+            slot_def,
+        )
     # ENUM LOGIC
     all_enums = sv.all_enums()
     if raw_rng in all_enums:
         enum_def = all_enums[raw_rng]
+        is_uri_enum = (enum_def.enum_uri in ["linkml:uri", "anyURI"] or raw_rng.lower() == "uri")
+        enum_base = "anyURI" if is_uri_enum else "string"
+        if _get_type_values_annotation(slot_name, class_def, slot_def) is not None:
+            return _append_type_values(enum_base, slot_name, class_def, slot_def)
         pv_names = list(enum_def.permissible_values.keys())
         if pv_names:
             formatted_pvs = f"{', '.join(pv_names[:-1])}, or {pv_names[-1]}" if len(pv_names) > 1 else pv_names[0]
-            is_uri_enum = (enum_def.enum_uri in ["linkml:uri", "anyURI"] or raw_rng.lower() == "uri")
             return f"anyURI (one of {formatted_pvs})" if is_uri_enum else f"string (e.g., {formatted_pvs})"
         return "string"
-    # 4. STANDARD FALLBACK
+    # STANDARD FALLBACK
     rng = _normalize_range_name(raw_rng)
     if not rng:
         return ""
     if getattr(slot_def, "inlined", False):
-        return f"Map of {rng}"
+        return _append_type_values(f"Map of {rng}", slot_name, class_def, slot_def)
     if getattr(slot_def, "multivalued", False):
-        return f"Array of {rng}"
-    return rng
+        return _append_type_values(f"Array of {rng}", slot_name, class_def, slot_def)
+    return _append_type_values(rng, slot_name, class_def, slot_def)
 
 
 def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Callable[[str], str], schema_prefix: str = "",

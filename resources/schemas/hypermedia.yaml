@@ -323,6 +323,30 @@ classes:
 
     slot_usage:
       op:
+        annotations:
+          spec_default: true
+          spec_type_values:
+            value:
+              mode: one_of
+              values:
+                - readproperty
+                - writeproperty
+                - observeproperty
+                - unobserveproperty
+                - invokeaction
+                - queryaction
+                - cancelaction
+                - subscribeevent
+                - unsubscribeevent
+                - readallproperties
+                - writeallproperties
+                - readmultipleproperties
+                - writemultipleproperties
+                - observeallproperties
+                - unobserveallproperties
+                - subscribeallevents
+                - unsubscribeallevents
+                - queryallactions
         exactly_one_of:
           - range: string
           - range: string
@@ -339,6 +363,14 @@ classes:
       subprotocol:
         range: string
         pattern: ^(longpoll|websub|sse)$
+        annotations:
+          spec_type_values:
+            value:
+              mode: examples
+              values:
+                - longpoll
+                - websub
+                - sse
       security:
         range: string
         multivalued: true
@@ -390,6 +422,8 @@ classes:
     attributes:
       success:
         description: Signals if an additional response should not be considered an error.
+        annotations:
+          spec_default: true
         slot_uri: hctl:isSuccess
         range: boolean
       schema:
