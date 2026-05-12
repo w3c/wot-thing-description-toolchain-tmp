@@ -21,6 +21,70 @@ imports:
 
 
 enums:
+  LinkRelationType:
+    description: >-
+      Best practice relation type values recommended for use within WoT Thing Description or Thing Model instances.
+    permissible_values:
+      icon:
+        description: Imports an icon associated to the Thing
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - IANA Link Relation"
+      service-doc:
+        description: Relation to resource that provides documentation about the Thing
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - IANA Link Relation"
+      alternate:
+        description: Alternative representation of the Thing
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - IANA Link Relation"
+      type:
+        description: Indicate that the Thing is an instance of the target resource
+        comments:
+          - "Occurrence - 0..1"
+          - "Source - IANA Link Relation"
+      tm:extends:
+        description: Extends the existing definition of the target resource
+        comments:
+          - "Occurrence - 0..1"
+          - "Source - W3C WoT Thing Model"
+      tm:submodel:
+        description: Compose one or multiple Thing Models
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - W3C WoT Thing Model"
+      manifest:
+        description: Point to web app manifest
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - IANA Link Relation"
+      proxy-to:
+        description: Target resource provides the address of a proxy
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - W3C WoT Security"
+      collection:
+        description: Points to a collection of Things that the current Thing is part of
+        comments:
+          - "Occurrence - 0..1"
+          - "Source - IANA Link Relation"
+      item:
+        description: Points to a Thing being a member of a collection Thing
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - IANA Link Relation"
+      predecessor-version:
+        description: Points to a previous TD or TM version of the same Thing
+        comments:
+          - "Occurrence - 0..1"
+          - "Source - IANA Link Relation"
+      controlledBy:
+        description: Refers to the Thing that controls the context Thing
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - W3C Thing Description"
   SubprotocolList:
     permissible_values:
       longpoll:
@@ -122,7 +186,7 @@ slots:
     description: >-
       Indicates the operation type (e.g., readproperty, writeproperty, observeproperty, etc.)
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Indicates the semantic intention of performing the operation(s) described by the form. For example, the Property interaction allows get and set operations. The protocol binding may contain a form for the get operation and a different form for the set operation. The op attribute indicates which form is for which and allows the client to select the correct form for the operation required. op can be assigned one or more interaction verb(s) each representing a semantic intention of an operation.
     exactly_one_of:
       - range: string
@@ -143,7 +207,7 @@ slots:
       Assign a content type based on a media type (e.g., text/plain) and potential parameters 
       (e.g., charset=utf-8) for the media type [RFC2046].
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
     slot_uri: hctl:forContentType
     range: string
@@ -160,7 +224,7 @@ slots:
     description: >-
       Indicates the exact protocol that should be used for additional notifications.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Indicates the exact mechanism by which an interaction will be accomplished for a given protocol when there are multiple options. For example, for HTTP and Events, it indicates which of several available mechanisms should be used for asynchronous notifications such as long polling (`longpoll`), WebSub [[websub]] (websub), Server-Sent Events (`sse`) [[html]] (also known as EventSource). Please note that there is no restriction on the subprotocol selection and other mechanisms can also be announced by this subprotocol term.
     range: SubprotocolList
     examples:
@@ -176,7 +240,7 @@ classes:
       "**_link context_** has a **_relation type_** resource at **_link target_**",
       where the optional **_target attributes_** may further describe the resource.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         A link can be viewed as a statement of the form **"link context** has a **relation type** resource at **link target**", where the optional **target attributes** may further describe the resource.
       spec_content:
         value:
@@ -199,6 +263,19 @@ classes:
           - type: markdown
             text: |
               In the following a best practice relation type table is introduced that is recommended to use within WoT Thing Description or Thing Model instances.
+          - type: enum_table
+            enum: LinkRelationType
+            caption: Best practice relation type table
+            table_id: table-rel-type
+            columns:
+              - field: name
+                header: Value
+              - field: "comment:Occurrence"
+                header: Occurrence
+              - field: description
+                header: Explanation
+              - field: "comment:Source"
+                header: Source of value origin
 
       jsonschema_config:
         tag: jsonschema_config
@@ -206,7 +283,7 @@ classes:
           additionalProperties: true
     attributes:
       href:
-        description: Target URI of a link.
+        description: Target IRI of a link or submission target of a form.
         slot_uri: hctl:hasTarget
         range: uri
         required: true
@@ -215,7 +292,7 @@ classes:
           Target attribute providing a hint indicating what the media type [RFC2046] of the result of 
           dereferencing the link should be.
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             Target attribute providing a hint indicating what the media type [[RFC2046]] of the result of dereferencing the link should be.
         slot_uri: hctl:hintsAtMediaType
         range: string
@@ -242,7 +319,7 @@ classes:
           The hreflang attribute specifies the language of a linked document. The value of this must be a valid 
           language tag [BCP47].
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             The hreflang attribute specifies the language of a linked document. The value of this must be a valid language tag [[BCP47]].
         slot_uri: hctl:hasHreflang
         exactly_one_of:
@@ -257,8 +334,10 @@ classes:
         required: true
         range: uri
         annotations:
-          spec_table_definition: >-
-            Target URI of a link.
+          spec_description: >-
+            Target IRI of a link or submission target of a form.
+      type:
+        range: string
       hreflang:
         exactly_one_of:
           - range: string
@@ -271,7 +350,7 @@ classes:
     description: >-
       A form hypermedia control that describes how an operation can be performed.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         A form can be viewed as a statement of "To perform an **operation type** operation on **form context**, make a **request method** request to **submission target**" where the optional **form fields** may further describe the required request. 
         In Thing Descriptions, the **form context** is the surrounding Object, such as Properties, Actions, and Events or the Thing itself for meta-interactions.
       spec_content:
@@ -299,6 +378,18 @@ classes:
               - id: well-known-operation-types-only
                 text: |
                   operations types *MUST* be restricted to the values in the table below.
+          - type: enum_table
+            enum: OperationType
+            caption: Well-known operation types
+            table_id: table-operation-types
+            columns:
+              - field: name
+                header: Operation Type
+              - field: description
+                header: Description
+          - type: markdown
+            text: |
+              A Thing Description of a WoT producer may have multiple forms entries with, e.g., different protocol and/or content types declarations that a Consumer could possibly support. In that case the Consumer may choose any form entry that works (e.g., the protocol and content type is supported) for them. When one form is chosen, it is expected that the Consumer will continue to use it as long as possible for every new interaction with the WoT producer.
           - type: paragraph
             segments:
               - id: td-form-context-submission-target
@@ -306,6 +397,88 @@ classes:
                   As a Form but not just the `href` defines how to execute the interaction, `href` of multiple Forms *MAY* point to the same resource, where the different Forms represent different operations on that resource.
               - text: |
                   For example, in a TD with the HTTP Binding, two Forms with HTTP GET and PUT methods can point to the same resource but represent different operations such as `readproperty` and `writeproperty`.
+      spec_subsections:
+        value:
+          - id: sec-op-data-schema-mapping
+            title: Mapping op Values to Data Schemas
+            class: informative
+            content:
+              - type: markdown
+                text: |
+                  Protocols that can be used with TDs follow request-response or eventing mechanisms. The Data Schema of an affordance generally correlates with the `op` keywords used in `forms`. The table below informatively summarizes the available data schema related terms with the `op` keywords.
+              - type: list
+                items:
+                  - text: Consumer to Thing applies for messages sent by the Consumer to the Thing, such as the value for writing a property.
+                  - text: Thing to Consumer applies for messages sent by the Thing to the Consumer, such as the value of a property value as the result of reading a property.
+                  - text: In case that there is no correlation with the data schema and the operation, it implies that no payload is required for executing the operation or no payload is expected as a result of the operation.
+              - type: enum_table
+                enum: OperationType
+                caption: Mapping op Values to Data Schemas
+                require_comments: true
+                columns:
+                  - field: name
+                    header: Operation Type
+                  - field: "comment:Consumer to Thing"
+                    header: Consumer to Thing DataSchema Correlation
+                  - field: "comment:Thing to Consumer"
+                    header: Thing to Consumer DataSchema Correlation
+              - type: note
+                title: writeproperty and observeproperty relationship
+                text: Writing to a property does not necessarily mean that a new value will be sent to the Consumer observing the property. It depends on the protocol and implementation.
+              - type: note
+                title: Further Data Schemas mappings
+                text: Further specification of how to map operations to data schemas, as well as mapping meta operations such as `readallproperties` can be found in the respective protocol specification of the [[WOT-BINDING-TEMPLATES]].
+          - id: sec-response-usage
+            title: Response-related Terms Usage
+            content:
+              - type: paragraph
+                segments:
+                  - text: |
+                      The optional `response` name-value pair can be used to provide metadata for the expected response message. With the core vocabulary, it can include only content type information, but TD Context Extensions could be applied.
+                  - id: td-expectedResponse-default-contentType
+                    text: |
+                      If no `response` name-value pair is provided, it *MUST* be assumed that the content type of the response is equal to the content type assigned to the Form instance.
+                  - text: |
+                      Note that `contentType` within an `ExpectedResponse` Class does not have a Default Value.
+              - type: markdown
+                text: |
+                  In some cases additional responses might be possible. One example of this is error responses but in some cases there might also be additional successful responses. In this case, the `response` name-value pair is still used for the primary response but `additionalResponses` may also be provided, whose value is an array of `AdditionalExpectedResponse` objects. Each additional response must be distinguished in some way from the primary response, either by `contentType` or by protocol-specific settings such as error code header values. Each additional response may also have a data schema which can differ from the normal output data schema for the interaction.
+              - type: paragraph
+                segments:
+                  - text: |
+                      In some use cases, input and output data might be represented in a different form, for instance an Action that accepts JSON, but returns an image. In such a case, the optional `response` key-value pair can describe the content type of the expected response.
+                  - id: td-expectedResponse-contentType
+                    text: |
+                      If the content type of the expected response differs from the content type of the form, the `Form` instance *MUST* include a name-value pair with the name `response`.
+                  - text: |
+                      As there is no default value defined, the following assertions apply:
+              - type: list
+                items:
+                  - id: td-expectedResponse-missing-contentType
+                    text: |
+                      If there is no `contentType` value defined in a `response` object within a form, a Consumer *MUST* expect that the respective response does not contain any payload.
+                  - id: td-expectedResponse-defined-contentType
+                    text: |
+                      If a content type is defined in the `response` object within a form, a Consumer *MUST* expect a response containing a payload in the respective format, e.g., an image in the case of `image/jpeg`.
+              - type: markdown
+                text: "Similar considerations apply to additional responses:"
+              - type: list
+                items:
+                  - id: td-additionalExpectedResponse-contentType
+                    text: |
+                      If the content type of an additional expected response differs from the content type of the form, the `Form` instance *MUST* include an entry in the array associated with the name `additionalResponses`.
+                  - id: td-additionalExpectedResponse-missing-contentType
+                    text: |
+                      If there is no `contentType` value defined in an additional expected response object, a Consumer *MUST* expect that the respective response does not contain any payload.
+                  - id: td-additionalExpectedResponse-schema
+                    text: |
+                      If the data schema of an additional expected response differs from the output data schema of the interaction, the `Form` *MUST* include an entry in the array associated with the name `additionalResponses` that includes a value for the name `schema`.
+                  - id: td-additionalExpectedResponse-noSchemaWithoutPayload
+                    text: |
+                      The `schema` of an additional expected response object *MUST NOT* be defined when there is no `contentType` present.
+              - type: markdown
+                text: |
+                  The different cases on the variation of request and response are explained above. The tables at [contentType-usage](#contentType-usage) summarize these cases in a concise manner.
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -356,8 +529,8 @@ classes:
         required: true
         range: uri
         annotations:
-          spec_table_definition: >-
-            Target URI of a submission target of a Form. See the [note on URI/IRI](#note-uri-iri).
+          spec_description: >-
+            Target IRI of a link or submission target of a form.
       contentCoding:
         range: string
       subprotocol:
@@ -371,54 +544,32 @@ classes:
                 - longpoll
                 - websub
                 - sse
+      contentType:
+        annotations:
+          spec_default: true
       security:
-        range: string
-        multivalued: true
+        any_of:
+          - range: string
+          - range: string
+            multivalued: true
       scopes:
-        range: string
-        multivalued: true
+        any_of:
+          - range: string
+          - range: string
+            multivalued: true
 
   ExpectedResponse:
     class_uri: hctl:ExpectedResponse
     description: Communication metadata describing the expected response message for the primary response.
-    annotations:
-      spec_content:
-        value:
-          - type: paragraph
-            segments:
-              - id: td-expectedResponse-default-contentType
-                text: |
-                  If no response name-value pair is provided, it *MUST* be assumed that the content type of the response is equal to the content type assigned to the Form instance.
-              - id: td-expectedResponse-missing-contentType
-                text: |
-                  If there is no `contentType` value defined in a `response` object within a form, a Consumer *MUST* expect that the respective response does not contain any payload.
-              - id: td-expectedResponse-defined-contentType
-                text: |
-                  If a content type is defined in the `response` object within a form, a Consumer *MUST* expect a response containing a payload in the respective format, e.g., an image in the case of `image/jpeg`.
     slots:
       - contentType
-
+    slot_usage:
+      contentType:
+        required: true
 
   AdditionalExpectedResponse:
     class_uri: hctl:AdditionalExpectedResponse
     description: Communication metadata describing the expected response message for additional responses.
-    annotations:
-      spec_content:
-        value:
-          - type: paragraph
-            segments:
-              - id: td-additionalExpectedResponse-contentType
-                text: |
-                  If the content type of an additional expected response differs from the content type of the form, the `Form` instance *MUST* include an entry in the array associated with the name `additionalResponses`.
-              - id: td-additionalExpectedResponse-missing-contentType
-                text: |
-                  If there is no `contentType` value defined in an additional expected response object, a Consumer *MUST* expect that the respective response does not contain any payload.
-              - id: td-additionalExpectedResponse-schema
-                text: |
-                  If the data schema of an additional expected response differs from the output data schema of the interaction, the `Form` *MUST* include an entry in the array associated with the name `additionalResponses` that includes a value for the name `schema`.
-              - id: td-additionalExpectedResponse-noSchemaWithoutPayload
-                text: |
-                  The `schema` of an additional expected response object *MUST NOT* be defined when there is no `contentType` present.
     attributes:
       success:
         description: Signals if an additional response should not be considered an error.
@@ -426,22 +577,22 @@ classes:
           spec_default: true
         slot_uri: hctl:isSuccess
         range: boolean
-      schema:
-        description: >-
-          Used to define the output data schema for an additional response if it differs from the default 
-          output data schema. Rather than a DataSchema object, the name of a previous definition given in a 
-          schemaDefinitions map must be used.
-        annotations:
-          spec_table_definition: >-
-            Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a `DataSchema` object, the name of a previous definition given in a `schemaDefinitions` map must be used.
-        slot_uri: hctl:hasAdditionalOutputSchema
-        range: string
       contentType:
         description: >-
           Assign a content type based on a media type (e.g., text/plain) and potential parameters
           (e.g., charset=utf-8) for the media type [RFC2046].
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
         slot_uri: hctl:forContentType
+        range: string
+      schema:
+        description: >-
+          Used to define the output data schema for an additional response if it differs from the default
+          output data schema. Rather than a DataSchema object, the name of a previous definition given in a
+          schemaDefinitions map must be used.
+        annotations:
+          spec_description: >-
+            Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a `DataSchema` object, the name of a previous definition given in a `schemaDefinitions` map must be used.
+        slot_uri: hctl:hasAdditionalOutputSchema
         range: string
