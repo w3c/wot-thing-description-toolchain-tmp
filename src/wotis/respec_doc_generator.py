@@ -559,10 +559,10 @@ def generate_respec_spec(
 
             rows = collect_slot_rows(sv, cls, process_description, schema_prefix)
             raw_desc = getattr(cdef, "description", "") or ""
-            if "spec_table_definition" in ann:
+            if "spec_description" in ann:
                 spec_def = (
-                    getattr(ann["spec_table_definition"], "value", None)
-                    or ann["spec_table_definition"]
+                    getattr(ann["spec_description"], "value", None)
+                    or ann["spec_description"]
                 )
                 raw_desc = str(spec_def) or raw_desc
 

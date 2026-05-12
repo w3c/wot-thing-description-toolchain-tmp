@@ -122,7 +122,7 @@ slots:
     description: >-
       Indicates the operation type (e.g., readproperty, writeproperty, observeproperty, etc.)
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Indicates the semantic intention of performing the operation(s) described by the form. For example, the Property interaction allows get and set operations. The protocol binding may contain a form for the get operation and a different form for the set operation. The op attribute indicates which form is for which and allows the client to select the correct form for the operation required. op can be assigned one or more interaction verb(s) each representing a semantic intention of an operation.
     exactly_one_of:
       - range: string
@@ -143,7 +143,7 @@ slots:
       Assign a content type based on a media type (e.g., text/plain) and potential parameters 
       (e.g., charset=utf-8) for the media type [RFC2046].
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
     slot_uri: hctl:forContentType
     range: string
@@ -160,7 +160,7 @@ slots:
     description: >-
       Indicates the exact protocol that should be used for additional notifications.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Indicates the exact mechanism by which an interaction will be accomplished for a given protocol when there are multiple options. For example, for HTTP and Events, it indicates which of several available mechanisms should be used for asynchronous notifications such as long polling (`longpoll`), WebSub [[websub]] (websub), Server-Sent Events (`sse`) [[html]] (also known as EventSource). Please note that there is no restriction on the subprotocol selection and other mechanisms can also be announced by this subprotocol term.
     range: SubprotocolList
     examples:
@@ -176,7 +176,7 @@ classes:
       "**_link context_** has a **_relation type_** resource at **_link target_**",
       where the optional **_target attributes_** may further describe the resource.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         A link can be viewed as a statement of the form **"link context** has a **relation type** resource at **link target**", where the optional **target attributes** may further describe the resource.
       spec_content:
         value:
@@ -215,7 +215,7 @@ classes:
           Target attribute providing a hint indicating what the media type [RFC2046] of the result of 
           dereferencing the link should be.
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             Target attribute providing a hint indicating what the media type [[RFC2046]] of the result of dereferencing the link should be.
         slot_uri: hctl:hintsAtMediaType
         range: string
@@ -242,7 +242,7 @@ classes:
           The hreflang attribute specifies the language of a linked document. The value of this must be a valid 
           language tag [BCP47].
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             The hreflang attribute specifies the language of a linked document. The value of this must be a valid language tag [[BCP47]].
         slot_uri: hctl:hasHreflang
         exactly_one_of:
@@ -257,7 +257,7 @@ classes:
         required: true
         range: uri
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             Target URI of a link.
       hreflang:
         exactly_one_of:
@@ -271,7 +271,7 @@ classes:
     description: >-
       A form hypermedia control that describes how an operation can be performed.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         A form can be viewed as a statement of "To perform an **operation type** operation on **form context**, make a **request method** request to **submission target**" where the optional **form fields** may further describe the required request. 
         In Thing Descriptions, the **form context** is the surrounding Object, such as Properties, Actions, and Events or the Thing itself for meta-interactions.
       spec_content:
@@ -443,7 +443,7 @@ classes:
         required: true
         range: uri
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             Target URI of a submission target of a Form. See the [note on URI/IRI](#note-uri-iri).
       contentCoding:
         range: string
@@ -488,7 +488,7 @@ classes:
           output data schema. Rather than a DataSchema object, the name of a previous definition given in a 
           schemaDefinitions map must be used.
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a `DataSchema` object, the name of a previous definition given in a `schemaDefinitions` map must be used.
         slot_uri: hctl:hasAdditionalOutputSchema
         range: string
@@ -497,7 +497,7 @@ classes:
           Assign a content type based on a media type (e.g., text/plain) and potential parameters
           (e.g., charset=utf-8) for the media type [RFC2046].
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
         slot_uri: hctl:forContentType
         range: string

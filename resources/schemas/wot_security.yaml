@@ -26,7 +26,7 @@ slots:
   alg:
     description: Encoding, encryption, or digest algorithm (e.g., ES256, ES512-256).
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Encoding, encryption, or digest algorithm.
     range: algList
 
@@ -53,7 +53,7 @@ slots:
     description: >-
       Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Name for query, header, cookie, or uri parameters.
     range: string
 
@@ -68,7 +68,7 @@ slots:
       Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an 
       authorization server and associated with forms in order to identify what resources a client may access and how.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Set of authorization scope identifiers provided as an array. 
         These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources 
         a client may access and how. The values associated with a form SHOULD be chosen from those defined in an `OAuth2SecurityScheme` active on that form.
@@ -117,7 +117,7 @@ classes:
       sensitive information directly providing access MUST NOT be stored in the TD and should instead be shared and 
       stored out-of-band via other mechanisms.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Metadata describing the configuration of a security mechanism.
       spec_intro_content:
         value:
@@ -236,7 +236,7 @@ classes:
     description: >-
       A security configuration indicating there is no authentication or other mechanism required to access the resource.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         A security configuration corresponding to identified by the Vocabulary Term `nosec` (i.e., "scheme": "nosec"), indicating there is no authentication or other mechanism required to access the resource.
       jsonschema_config:
         tag: jsonschema_config
@@ -252,7 +252,7 @@ classes:
       An automatic authentication security configuration identified by the term auto. This scheme indicates that the security 
       parameters are going to be negotiated by the underlying protocols at runtime.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         An automatic authentication security configuration identified by the term `auto` (i.e., "scheme": "auto"). This scheme indicates that the security parameters are going to be negotiated by the underlying protocols at runtime, subject to the respective specifications for the protocol (e.g. [[RFC8288]] for Basic Authentication when using HTTP).
       jsonschema_config:
         tag: jsonschema_config
@@ -267,7 +267,7 @@ classes:
     description: >-
       A combination of other security schemes. Exactly one of either oneOf or allOf vocabulary terms MUST be included.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         A combination of other security schemes identified by the Vocabulary Term `combo` (i.e., "scheme": "combo").
       spec_intro_content:
         value:
@@ -306,7 +306,7 @@ classes:
     description: >-
       Basic Authentication security configuration using an unencrypted username and password.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Basic Authentication [[RFC7617]] security configuration identified by the Vocabulary Term `basic` (i.e., "scheme": "basic"), using an unencrypted username and password.
       jsonschema_config:
         tag: jsonschema_config
@@ -335,7 +335,7 @@ classes:
       Digest Access Authentication security configuration. This scheme is similar to basic authentication but with 
       added features to avoid man-in-the-middle attacks.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Digest Access Authentication [[RFC7616]] security configuration identified by the Vocabulary Term `digest` (i.e., "scheme": "digest").
         This scheme is similar to basic authentication but with added features to avoid man-in-the-middle attacks.
       jsonschema_config:
@@ -375,7 +375,7 @@ classes:
       API key authentication security configuration identified by the term apikey. This scheme is to be used when the 
       access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         API key authentication security configuration identified by the Vocabulary Term `apikey` (i.e., "scheme": "apikey"). 
         This scheme is to be used when the access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider. 
         In this case the key may not be using a standard token format. 
@@ -411,7 +411,7 @@ classes:
     description: >-
       Bearer Token security configuration for situations where bearer tokens are used independently of OAuth2.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Bearer Token [[RFC6750]] security configuration identified by the Vocabulary Term `bearer` (i.e., "scheme": "bearer") for situations where bearer tokens are used independently of OAuth2.
       spec_intro_content:
         value:
@@ -472,7 +472,7 @@ classes:
       Pre-shared key authentication security configuration. This is meant to identify that a standard is used for 
       pre-shared keys such as TLS-PSK.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Pre-shared key authentication security configuration identified by the Vocabulary Term `psk` (i.e., "scheme": "psk"). 
         This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[RFC4279]], 
         and that the ciphersuite used for keys will be established during protocol negotiation.
@@ -488,7 +488,7 @@ classes:
     description: >-
       OAuth 2.0 authentication security configuration for systems conformant with RFC6749 and RFC8252.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]], 
         identified by the Vocabulary Term `oauth2` (i.e., "scheme": "oauth2").
       spec_content:

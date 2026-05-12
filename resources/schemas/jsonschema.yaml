@@ -44,7 +44,7 @@ classes:
     description: >-
       A data schema describes the data format used. It can be used for validation.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Metadata that describes the data format used. It can be used for validation.
       spec_content:
         value:
@@ -123,7 +123,7 @@ classes:
       Metadata describing data of type array. This subclass is indicated by the value array assigned to type in
       DataSchema instances.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Metadata describing data of type array. This subclass is indicated by the value `array` assigned to type in DataSchema instances.
       jsonschema_config:
         tag: jsonschema_config
@@ -159,7 +159,7 @@ classes:
       Metadata describing data of type boolean. This subclass is indicated by the value boolean assigned to type in
       DataSchema instances.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Metadata describing data of type `boolean`. This subclass is indicated by the value `boolean` assigned to type in `DataSchema` instances.
       jsonschema_config:
         tag: jsonschema_config
@@ -173,7 +173,7 @@ classes:
       Metadata describing data of type number. This subclass is indicated by the value number assigned to type in
       DataSchema instances.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Metadata describing data of type `number`. This subclass is indicated by the value `number` assigned to type in `DataSchema` instances.
       jsonschema_config:
         tag: jsonschema_config
@@ -193,7 +193,7 @@ classes:
       Metadata describing data of type integer. This subclass is indicated by the value integer assigned to type in
       DataSchema instances.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Metadata describing data of type `integer`. This Subclass is indicated by the value `integer` assigned to `type` in `DataSchema` instances.
       jsonschema_config:
         tag: jsonschema_config
@@ -225,7 +225,7 @@ classes:
       Metadata describing data of type object. This subclass is indicated by the value object assigned to type in
       DataSchema instances.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Metadata describing data of type Object. This Subclass is indicated by the value `object` assigned to `type` in `DataSchema` instances.
       jsonschema_config:
         tag: jsonschema_config
@@ -249,7 +249,7 @@ classes:
       Metadata describing data of type string. This subclass is indicated by the value string assigned to type in
       DataSchema instances.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Metadata describing data of type `string`. This Subclass is indicated by the value `string` assigned to `type` in `DataSchema` instances.
       spec_content:
         value:
@@ -275,7 +275,7 @@ classes:
           Provides a regular expression to express constraints of the string value.
           The regular expression must follow the ECMA 262 dialect.
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             Provides a regular expression to express constraints of the string value. The regular expression must follow the [[ECMA-262]] dialect.
         range: string
       contentEncoding:
@@ -283,14 +283,14 @@ classes:
         description: >-
           Specifies the encoding used to store the contents, as specified in RFC 2045 (Section 6.1) and RFC 4648.
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             Specifies the encoding used to store the contents, as specified in [[RFC2045]] (Section 6.1) and [[RFC4648]].
         range: contentEncodingList
       contentMediaType:
         slot_uri: jsonschema:contentMediaType
         description: Specifies the MIME type of the contents of a string value, as described in RFC 2046.
         annotations:
-          spec_table_definition: >-
+          spec_description: >-
             Specifies the MIME type of the contents of a string value, as described in [[RFC2046]].
         range: contentMediaTypeList
 
@@ -304,7 +304,7 @@ classes:
       in Java and nil in Ruby programming languages. It can be used as part of a oneOf declaration, where it is
       used to indicate, that the data can also be null.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Metadata describing data of type `null`. This subclass is indicated by the value `null` assigned to `type` in
         `DataSchema` instances. This Subclass describes only one acceptable value, namely `null`. It is important to note
         that `null` does not mean the absence of a value. It is analogous to `null` in JavaScript, `None` in Python, `null`
@@ -362,7 +362,7 @@ slots:
     description: >-
       Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false).
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false).
     range: boolean
 
@@ -370,7 +370,7 @@ slots:
     description: >-
       Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false).
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         !Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false).
     range: boolean
 
@@ -378,7 +378,7 @@ slots:
     description: >-
       Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition (also see Section [Semantic Annotations](#semantic-annotations-example-version-units)).
     range: string
 
@@ -392,7 +392,7 @@ slots:
     description: >-
       Allows validation based on a format pattern such as "date-time", "email", "uri", etc.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Allows validation based on a format pattern such as "date-time", "email", "uri", etc. (Also see below.)
     range: string
 
@@ -405,7 +405,7 @@ slots:
     description: >-
       Supply a default value. The value SHOULD validate against the data schema in which it resides.
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Supply a default value. The value *SHOULD* validate against the data schema in which it resides.
     range: Any
 
@@ -430,7 +430,7 @@ slots:
     description: >-
       Defines which members of the object type are mandatory, i.e. which members are mandatory in the payload that is to be sent (e.g. input of invokeaction, writeproperty) and what members will be definitely delivered in the payload that is being received (e.g. output of invokeaction, readproperty)
     annotations:
-      spec_table_definition: >-
+      spec_description: >-
         Defines which members of the object type are mandatory, i.e. which members are mandatory in the payload that is to be sent (e.g. input of `invokeaction`, `writeproperty`) and what members will be definitely delivered in the payload that is being received (e.g. output of `invokeaction`, `readproperty`)
     range: string
     multivalued: true

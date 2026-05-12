@@ -226,12 +226,12 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
                 continue
         raw_desc = getattr(slot_def, "description", "")
         usage_ann = getattr(usage, "annotations", None) or {} if usage else {}
-        if "spec_table_definition" in usage_ann:
-            raw_desc = str(getattr(usage_ann["spec_table_definition"], "value", usage_ann["spec_table_definition"]))
+        if "spec_description" in usage_ann:
+            raw_desc = str(getattr(usage_ann["spec_description"], "value", usage_ann["spec_description"]))
         elif usage and getattr(usage, "description", None):
             raw_desc = usage.description
-        elif "spec_table_definition" in ann:
-            raw_desc = str(getattr(ann["spec_table_definition"], "value", ann["spec_table_definition"]))
+        elif "spec_description" in ann:
+            raw_desc = str(getattr(ann["spec_description"], "value", ann["spec_description"]))
         desc_html = process_description(raw_desc)
         desc = (desc_html or "").replace("'", "&#39;")
         # special case for the name defined in wot_security.yaml, name is a reserved keyword in LinkML.
