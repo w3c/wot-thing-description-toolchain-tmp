@@ -10,11 +10,11 @@ from linkml_runtime.utils.schemaview import SchemaView
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
-from .specgen.config import Config
-from .specgen.bikeshed_processor import process_fragments
-from .specgen.respec import build_jinja_env, assemble
-from .specgen.tables import collect_slot_rows
-from .specgen.assertions import html_assertions_to_csv
+from ..specgen.config import Config
+from ..specgen.bikeshed_processor import process_fragments
+from ..specgen.respec import build_jinja_env, assemble
+from ..specgen.tables import collect_slot_rows
+from ..specgen.assertions import html_assertions_to_csv
 
 cfg = Config.from_resources_dir(Path("resources"), placeholder="%s")
 

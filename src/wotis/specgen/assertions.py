@@ -160,7 +160,7 @@ def extract_all_table_assertions(
 
         try:
             # merge_imports=False: only classes defined in THIS file,
-            # matching how respec_doc_generator builds file_to_classes.
+            # matching how generators.respec builds file_to_classes.
             sv = SchemaView(str(schema_path), merge_imports=False)
         except Exception as exc:
             logging.error("Cannot load %s for assertion extraction: %s", schema_path, exc)

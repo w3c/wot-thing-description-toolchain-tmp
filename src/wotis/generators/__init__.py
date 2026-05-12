@@ -2,6 +2,7 @@ import json
 import logging
 
 from pathlib import Path
+from typing import Optional
 
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.shaclgen import ShaclGenerator
@@ -10,18 +11,17 @@ from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
-from . import SCHEMA_PATH
-from .visualization_generator import generate_visualizations
+from .. import (SCHEMA_PATH, GENS_PATH, GENERATORS,
+                RESPEC_TEMPLATE_PATH, FINAL_SPEC_PATH,
+                CORE_SCHEMA_PLACEHOLDER, ASSERTION_PATH)
+from .visualization import generate_visualizations
+from .respec import generate_respec_spec
 
-def run_generator(schema_view: SchemaView, generator: str, output_dir: Path):
-    """
-    Runs the LinkML generator (JSON Schema, SHACL, OWL, JSON-LD Context,
-    or LinkML YAML) and saves the output to the designated directory.
 
-    :param schema_view: The loaded SchemaView object.
-    :param generator: The name of the generator to run (e.g., 'jsonschema').
-    :param output_dir: The target output directory.
-    """
+RESOURCE_GENERATORS = [g for g in GENERATORS if g != "visualization"]
+
+
+def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: Path):
     output_dir.mkdir(parents=True, exist_ok=True)
 
     if generator == 'jsonschema':
@@ -57,9 +57,35 @@ def run_generator(schema_view: SchemaView, generator: str, output_dir: Path):
         (output_dir / 'linkml.yaml').write_text(linkml_generator.serialize())
         logging.info(f"Merged LinkML schema saved to {output_dir / 'linkml.yaml'}")
 
-    elif generator == "visualization":
-        logging.info("Proceeding with UML visualization generation")
-        generate_visualizations(SCHEMA_PATH, output_dir)
-
     else:
         logging.warning(f"Unknown generator: {generator}")
+
+
+def run_pipeline(
+    input_path: Path,
+    *,
+    generate_docs: bool = False,
+    assertions_csv_path: Optional[Path] = None,
+    extra_asserts_path: Optional[Path] = None,
+) -> None:
+    schema_view = SchemaView(input_path, merge_imports=True)
+    logging.info(f"Input schema {input_path} loaded successfully!")
+
+    for generator in RESOURCE_GENERATORS:
+        output_dir = GENS_PATH / generator
+        logging.info(f"Proceeding with WoT resource generation for {generator}")
+        _run_linkml_generator(schema_view, generator, output_dir)
+
+    generate_visualizations(SCHEMA_PATH, GENS_PATH / "visualization")
+
+    if generate_docs:
+        logging.info("Starting ReSpec specification generation...")
+        generate_respec_spec(
+            input_path,
+            RESPEC_TEMPLATE_PATH,
+            FINAL_SPEC_PATH,
+            CORE_SCHEMA_PLACEHOLDER,
+            assertions_csv_path=assertions_csv_path or ASSERTION_PATH,
+            extra_asserts_path=extra_asserts_path,
+        )
+        logging.info("ReSpec specification generation complete.")
