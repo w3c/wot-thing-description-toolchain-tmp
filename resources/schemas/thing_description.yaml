@@ -58,6 +58,10 @@ slots:
     description: >-
       Identifier of the Thing in form of a URI RFC3986 (e.g., stable URI, temporary and mutable URI,
       URI with local IP address, URN, etc.).
+    annotations:
+      spec_description: >-
+        Identifier of the Thing in form of a URI [[RFC3986]] (e.g., stable URI, temporary and mutable URI,
+        URI with local IP address, URN, etc.).
     todos: CHECK WHERE THE DEFINITION COMES FROM, IT IS NOT IN ONTOLOGY OR SHACL
     range: uri
 
@@ -321,10 +325,11 @@ classes:
             items:
               - id: td-context-ns-thing-mandatory
                 text: |
-                  The `@context` name-value pair *MUST* contain the anyURI `https://www.w3.org/ns/wot-next/td` in order
+                  The `@context` name-value pair *MUST* contain the anyURI `https://www.w3.org/2022/wot/td/v1.1` in order
                   to identify the document as a TD 1.1 which would allow Consumers to use the newly introduced terms.
-              - text: |
-                  When there are possibly TD 1.0 consumers the anyURI `https://www.w3.org/ns/wot-next/td` *MUST* be the first entry and the `https://www.w3.org/2022/wot/td/v1.1` *MUST* be the second entry.
+              - id: td-context-ns-td10-namespace
+                text: |
+                  When there are possibly TD 1.0 consumers the anyURI `https://www.w3.org/2019/wot/td/v1` *MUST* be the first entry and the `https://www.w3.org/2022/wot/td/v1.1` *MUST* be the second entry.
               - text: |
                   TD 1.1 consumers *MUST* accept TDs satisfying the W3C WoT Thing Description 1.0 [[wot-thing-description10]] specification.
               - id: td-context-ns-thing-optional
@@ -741,7 +746,7 @@ classes:
             segments:
               - id: td-multilanguage-language-tag
                 text: |
-                  Each name of the `MultiLanguage` Map *MUST* be a language tag as defined in [[BCP47]].
+                  Each name of the `MultiLanguage` Map *MUST* be a language tag as defined in [[!BCP47]].
               - id: td-multilanguage-value
                 text: |
                   Each value of the `MultiLanguage` Map *MUST* be of type string.
