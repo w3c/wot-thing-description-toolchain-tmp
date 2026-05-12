@@ -80,7 +80,6 @@ def annotate_html(html: str, entries: Dict[str, GlossaryEntry], phrase_to_key: D
     def repl(match: re.Match) -> str:
         exclusion_char = match.group(1)
         text = match.group(3)
-        # Check for exclusion
         if exclusion_char == '!':
             return text
 
@@ -89,26 +88,13 @@ def annotate_html(html: str, entries: Dict[str, GlossaryEntry], phrase_to_key: D
         if not entry:
             return text
 
-        href_value = entry.href
-        is_external = bool(href_value)
-        class_names = ""
-        data_link_value = ""
+        if entry.href:
+            return f'<a href="{entry.href}"><code>{text}</code></a>'
 
-        if not href_value and entry.id:
-            # Internal DFN Link: use #id
-            href_value = f"#{entry.id}"
-            class_names = "internalDFN"
-            data_link_value = "dfn"
-            is_external = False
-        elif not href_value:
-            return text
+        if entry.id:
+            return f'<a>{text}</a>'
 
-        class_attr = f'class="{class_names}"' if class_names else ""
-        data_attr = f'data-link-type="{data_link_value}"' if data_link_value else ""
-        if is_external:
-            return f'<a href="{href_value}" {class_attr} {data_attr}><code>{text}</code></a>'
-        else:
-            return f'<a href="{href_value}" {class_attr} {data_attr}>{text}</a>'
+        return text
 
      # Protect existing <a> and <code> blocks
     splitter = re.compile(r"(<a\b[^>]*>.*?</a>|<code>.*?</code>|<div\s+class=\"note\">.*?</div>)", flags=re.DOTALL | re.IGNORECASE)

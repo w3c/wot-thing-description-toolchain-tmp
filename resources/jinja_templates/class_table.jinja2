@@ -14,7 +14,7 @@
     {% for slot in slots %}
     <tr class="rfc2119-table-assertion"{% if slot.assertion_id %} id="{{ slot.assertion_id }}"{% endif %}>
       <td><code>{{ slot.slot_name }}</code></td>
-      <td>{{ slot.description | annotate | safe }}</td>
+      <td>{{ slot.description | safe }}</td>
       <td>{{ slot.assignment | safe }}</td>
       <td>{{ slot.range_text | annotate | safe }}</td>
     </tr>

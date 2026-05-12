@@ -4,7 +4,7 @@ terms:
     aliases: [ "Actions", "action", "actions" ]
   anyURI:
     # external link example
-    href: "https://www.w3.org/TR/xmlschema11-2/#anyURI"
+    href: "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"
     aliases: [ ]
   ActionAffordance:
     id: actionaffordance
@@ -175,7 +175,7 @@ terms:
     id: dfn-signature
     aliases: [ "signature", "signatures" ]
   string:
-    href: "https://www.w3.org/TR/xmlschema11-2/#string"
+    href: "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"
     aliases: [ ]
   StringSchema:
     id: stringschema

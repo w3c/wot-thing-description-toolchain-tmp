@@ -10,7 +10,6 @@ from linkml_runtime.utils.schemaview import SchemaView
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
-from .specgen.bibliography import load_bibliography, link_biblio_keys
 from .specgen.config import Config
 from .specgen.glossary import annotate_html, load_glossary
 from .specgen.markdown import render_markdown_html
@@ -445,7 +444,7 @@ def generate_respec_spec(
     This function:
       • Loads the LinkML model
       • Converts Markdown and annotations to HTML
-      • Applies glossary and bibliography linking
+      • Applies glossary linking (bibliography [[...]] refs pass through for ReSpec)
       • Renders each class section with Jinja templates
       • Injects the resulting HTML into the ReSpec index template
 
@@ -487,12 +486,9 @@ def generate_respec_spec(
         )
         return
 
-    biblio = load_bibliography(cfg.biblio_path)
-
     def process_description(raw_text: str) -> str:
-        """Markdown rendering, bibliography linking, and glossary annotation."""
+        """Markdown rendering and glossary annotation. Bibliography [[...]] refs pass through for ReSpec."""
         html = render_markdown_html(raw_text or "")
-        html = link_biblio_keys(html, biblio)
         html = annotate_html(html, glossary_entries, phrase_to_key)
         return html
 
