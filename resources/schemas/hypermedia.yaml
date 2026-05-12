@@ -299,6 +299,18 @@ classes:
               - id: well-known-operation-types-only
                 text: |
                   operations types *MUST* be restricted to the values in the table below.
+          - type: enum_table
+            enum: OperationType
+            caption: Well-known operation types
+            table_id: table-operation-types
+            columns:
+              - field: name
+                header: Operation Type
+              - field: description
+                header: Description
+          - type: markdown
+            text: |
+              A Thing Description of a WoT producer may have multiple forms entries with, e.g., different protocol and/or content types declarations that a Consumer could possibly support. In that case the Consumer may choose any form entry that works (e.g., the protocol and content type is supported) for them. When one form is chosen, it is expected that the Consumer will continue to use it as long as possible for every new interaction with the WoT producer.
           - type: paragraph
             segments:
               - id: td-form-context-submission-target
@@ -306,6 +318,81 @@ classes:
                   As a Form but not just the `href` defines how to execute the interaction, `href` of multiple Forms *MAY* point to the same resource, where the different Forms represent different operations on that resource.
               - text: |
                   For example, in a TD with the HTTP Binding, two Forms with HTTP GET and PUT methods can point to the same resource but represent different operations such as `readproperty` and `writeproperty`.
+      spec_subsections:
+        value:
+          - id: sec-op-data-schema-mapping
+            title: Mapping op Values to Data Schemas
+            class: informative
+            content:
+              - type: markdown
+                text: |
+                  Protocols that can be used with TDs follow request-response or eventing mechanisms. The Data Schema of an affordance generally correlates with the `op` keywords used in `forms`. The table below informatively summarizes the available data schema related terms with the `op` keywords.
+              - type: list
+                items:
+                  - text: Consumer to Thing applies for messages sent by the Consumer to the Thing, such as the value for writing a property.
+                  - text: Thing to Consumer applies for messages sent by the Thing to the Consumer, such as the value of a property value as the result of reading a property.
+                  - text: In case that there is no correlation with the data schema and the operation, it implies that no payload is required for executing the operation or no payload is expected as a result of the operation.
+              - type: enum_table
+                enum: OperationType
+                caption: Mapping op Values to Data Schemas
+                columns:
+                  - field: name
+                    header: Operation Type
+                  - field: "comment:Consumer to Thing"
+                    header: Consumer to Thing DataSchema Correlation
+                  - field: "comment:Thing to Consumer"
+                    header: Thing to Consumer DataSchema Correlation
+              - type: note
+                title: writeproperty and observeproperty relationship
+                text: Writing to a property does not necessarily mean that a new value will be sent to the Consumer observing the property. It depends on the protocol and implementation.
+              - type: note
+                title: Further Data Schemas mappings
+                text: Further specification of how to map operations to data schemas, as well as mapping meta operations such as `readallproperties` can be found in the respective protocol specification of the [[WOT-BINDING-TEMPLATES]].
+          - id: sec-response-usage
+            title: Response-related Terms Usage
+            content:
+              - type: paragraph
+                segments:
+                  - text: |
+                      The optional `response` name-value pair can be used to provide metadata for the expected response message. With the core vocabulary, it can include only content type information, but TD Context Extensions could be applied.
+                  - id: td-expectedResponse-default-contentType
+                    text: |
+                      If no `response` name-value pair is provided, it *MUST* be assumed that the content type of the response is equal to the content type assigned to the Form instance.
+                  - text: |
+                      Note that `contentType` within an `ExpectedResponse` Class does not have a Default Value.
+              - type: markdown
+                text: |
+                  In some cases additional responses might be possible. One example of this is error responses but in some cases there might also be additional successful responses. In this case, the `response` name-value pair is still used for the primary response but `additionalResponses` may also be provided, whose value is an array of `AdditionalExpectedResponse` objects. Each additional response must be distinguished in some way from the primary response, either by `contentType` or by protocol-specific settings such as error code header values. Each additional response may also have a data schema which can differ from the normal output data schema for the interaction.
+              - type: markdown
+                text: |
+                  In some use cases, input and output data might be represented in a different form, for instance an Action that accepts JSON, but returns an image. In such a case, the optional `response` key-value pair can describe the content type of the expected response. As there is no default value defined, the following assertions apply:
+              - type: list
+                items:
+                  - id: td-expectedResponse-missing-contentType
+                    text: |
+                      If there is no `contentType` value defined in a `response` object within a form, a Consumer *MUST* expect that the respective response does not contain any payload.
+                  - id: td-expectedResponse-defined-contentType
+                    text: |
+                      If a content type is defined in the `response` object within a form, a Consumer *MUST* expect a response containing a payload in the respective format, e.g., an image in the case of `image/jpeg`.
+              - type: markdown
+                text: "Similar considerations apply to additional responses:"
+              - type: list
+                items:
+                  - id: td-additionalExpectedResponse-contentType
+                    text: |
+                      If the content type of an additional expected response differs from the content type of the form, the `Form` instance *MUST* include an entry in the array associated with the name `additionalResponses`.
+                  - id: td-additionalExpectedResponse-missing-contentType
+                    text: |
+                      If there is no `contentType` value defined in an additional expected response object, a Consumer *MUST* expect that the respective response does not contain any payload.
+                  - id: td-additionalExpectedResponse-schema
+                    text: |
+                      If the data schema of an additional expected response differs from the output data schema of the interaction, the `Form` *MUST* include an entry in the array associated with the name `additionalResponses` that includes a value for the name `schema`.
+                  - id: td-additionalExpectedResponse-noSchemaWithoutPayload
+                    text: |
+                      The `schema` of an additional expected response object *MUST NOT* be defined when there is no `contentType` present.
+              - type: markdown
+                text: |
+                  The different cases on the variation of request and response are explained above. The tables at [contentType-usage](#contentType-usage) summarize these cases in a concise manner.
       jsonschema_config:
         tag: jsonschema_config
         value:
@@ -381,20 +468,6 @@ classes:
   ExpectedResponse:
     class_uri: hctl:ExpectedResponse
     description: Communication metadata describing the expected response message for the primary response.
-    annotations:
-      spec_content:
-        value:
-          - type: paragraph
-            segments:
-              - id: td-expectedResponse-default-contentType
-                text: |
-                  If no response name-value pair is provided, it *MUST* be assumed that the content type of the response is equal to the content type assigned to the Form instance.
-              - id: td-expectedResponse-missing-contentType
-                text: |
-                  If there is no `contentType` value defined in a `response` object within a form, a Consumer *MUST* expect that the respective response does not contain any payload.
-              - id: td-expectedResponse-defined-contentType
-                text: |
-                  If a content type is defined in the `response` object within a form, a Consumer *MUST* expect a response containing a payload in the respective format, e.g., an image in the case of `image/jpeg`.
     slots:
       - contentType
 
@@ -402,23 +475,6 @@ classes:
   AdditionalExpectedResponse:
     class_uri: hctl:AdditionalExpectedResponse
     description: Communication metadata describing the expected response message for additional responses.
-    annotations:
-      spec_content:
-        value:
-          - type: paragraph
-            segments:
-              - id: td-additionalExpectedResponse-contentType
-                text: |
-                  If the content type of an additional expected response differs from the content type of the form, the `Form` instance *MUST* include an entry in the array associated with the name `additionalResponses`.
-              - id: td-additionalExpectedResponse-missing-contentType
-                text: |
-                  If there is no `contentType` value defined in an additional expected response object, a Consumer *MUST* expect that the respective response does not contain any payload.
-              - id: td-additionalExpectedResponse-schema
-                text: |
-                  If the data schema of an additional expected response differs from the output data schema of the interaction, the `Form` *MUST* include an entry in the array associated with the name `additionalResponses` that includes a value for the name `schema`.
-              - id: td-additionalExpectedResponse-noSchemaWithoutPayload
-                text: |
-                  The `schema` of an additional expected response object *MUST NOT* be defined when there is no `contentType` present.
     attributes:
       success:
         description: Signals if an additional response should not be considered an error.

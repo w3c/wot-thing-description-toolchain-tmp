@@ -84,11 +84,105 @@ def _render_inline_markdown(
 def _render_note_block(
     text: str,
     process_description: Callable[[str], str],
+    title: Optional[str] = None,
 ) -> str:
     body = process_description(str(text or ""))
     if not body:
         return ""
+    if title:
+        return (
+            f'<p class="note" title="{escape(str(title), quote=True)}">'
+            f"{_inline_html(body)}</p>"
+        )
     return f'<div class="note">\n{body}\n</div>'
+
+
+def _extract_enum_cell(
+    pv,
+    field: str,
+    process_description: Callable[[str], str],
+) -> str:
+    if field == "name":
+        return f"<td>{escape(str(pv.text))}</td>"
+    if field == "description":
+        desc = getattr(pv, "description", "") or ""
+        return f"<td>{_inline_html(process_description(str(desc)))}</td>"
+    if field.startswith("comment:"):
+        prefix = field[len("comment:") :]
+        comments = getattr(pv, "comments", None) or []
+        for comment in comments:
+            c = str(comment)
+            if c.startswith(prefix + " - "):
+                content = c[len(prefix) + 3 :]
+                return f"<td>{_inline_html(process_description(content))}</td>"
+            if c.startswith(prefix):
+                content = c[len(prefix) :].lstrip(" -")
+                return f"<td>{_inline_html(process_description(content))}</td>"
+        return "<td>No correlation.</td>"
+    return "<td></td>"
+
+
+def _render_enum_table(
+    block: dict,
+    process_description: Callable[[str], str],
+    schema_view: Optional["SchemaView"] = None,
+) -> str:
+    enum_name = _record_value(block, "enum")
+    if not enum_name or not schema_view:
+        logging.warning("enum_table block requires 'enum' and a SchemaView")
+        return ""
+
+    enum_def = schema_view.get_enum(str(enum_name))
+    if not enum_def:
+        logging.warning("Enum %r not found in schema", enum_name)
+        return ""
+
+    columns = _record_value(block, "columns") or []
+    if not isinstance(columns, list) or not columns:
+        logging.warning("enum_table block requires a non-empty 'columns' list")
+        return ""
+
+    caption = _record_value(block, "caption") or ""
+    table_id = _record_value(block, "table_id") or ""
+
+    headers = []
+    fields = []
+    for col in columns:
+        if isinstance(col, dict):
+            headers.append(escape(str(_record_value(col, "header") or "")))
+            fields.append(str(_record_value(col, "field") or "name"))
+        else:
+            headers.append(escape(str(col)))
+            fields.append("name")
+
+    lines: list[str] = []
+    if table_id:
+        lines.append(f'<div id="{escape(str(table_id), quote=True)}">')
+
+    lines.append('<table class="def numbered">')
+    if caption:
+        lines.append(f"<caption>{escape(str(caption))}</caption>")
+    lines.append("<thead>")
+    lines.append("<tr>")
+    for h in headers:
+        lines.append(f"<th>{h}</th>")
+    lines.append("</tr>")
+    lines.append("</thead>")
+    lines.append("<tbody>")
+
+    pvs = enum_def.permissible_values or {}
+    for pv_key, pv in pvs.items():
+        lines.append("<tr>")
+        for field in fields:
+            lines.append(_extract_enum_cell(pv, field, process_description))
+        lines.append("</tr>")
+
+    lines.append("</tbody>")
+    lines.append("</table>")
+    if table_id:
+        lines.append("</div>")
+
+    return "\n".join(lines)
 
 
 def _render_assertion_span(
@@ -196,11 +290,20 @@ def render_spec_content_annotation(
     annotations: dict,
     process_description: Callable[[str], str],
     annotation_key: str = "spec_content",
+    schema_view: Optional["SchemaView"] = None,
 ) -> str:
     blocks = _as_block_list(_annotation_value(annotations, annotation_key))
     if not blocks:
         return ""
 
+    return _render_content_blocks(blocks, process_description, schema_view)
+
+
+def _render_content_blocks(
+    blocks: list[dict],
+    process_description: Callable[[str], str],
+    schema_view: Optional["SchemaView"] = None,
+) -> str:
     rendered_blocks: list[str] = []
     for block in blocks:
         block_type = str(_record_value(block, "type") or "markdown")
@@ -209,7 +312,10 @@ def render_spec_content_annotation(
         if block_type == "markdown":
             rendered = process_description(str(text))
         elif block_type == "note":
-            rendered = _render_note_block(str(text), process_description)
+            title = _record_value(block, "title")
+            rendered = _render_note_block(
+                str(text), process_description, title=str(title) if title else None
+            )
         elif block_type == "assertion":
             span = _render_assertion_span(block, process_description)
             rendered = f"<p>{span}</p>" if span else ""
@@ -217,6 +323,8 @@ def render_spec_content_annotation(
             rendered = _render_list_block(block, process_description)
         elif block_type == "paragraph":
             rendered = _render_paragraph_block(block, process_description)
+        elif block_type == "enum_table":
+            rendered = _render_enum_table(block, process_description, schema_view)
         else:
             logging.warning("Ignoring unsupported spec_content block type: %s", block_type)
             rendered = ""
@@ -225,6 +333,45 @@ def render_spec_content_annotation(
             rendered_blocks.append(rendered)
 
     return "\n".join(rendered_blocks)
+
+
+def render_subsections(
+    annotations: dict,
+    process_description: Callable[[str], str],
+    schema_view: Optional["SchemaView"] = None,
+) -> str:
+    subsections = _as_block_list(_annotation_value(annotations, "spec_subsections"))
+    if not subsections:
+        return ""
+
+    rendered: list[str] = []
+    for sub in subsections:
+        sub_id = _record_value(sub, "id") or ""
+        sub_title = _record_value(sub, "title") or ""
+        sub_class = _record_value(sub, "class") or ""
+        content_blocks = _as_block_list(_record_value(sub, "content"))
+
+        attrs = ""
+        if sub_id:
+            attrs += f' id="{escape(str(sub_id), quote=True)}"'
+        if sub_class:
+            attrs += f' class="{escape(str(sub_class), quote=True)}"'
+
+        lines: list[str] = [f"<section{attrs}>"]
+        if sub_title:
+            lines.append(f"<h4>{escape(str(sub_title))}</h4>")
+
+        if content_blocks:
+            content_html = _render_content_blocks(
+                content_blocks, process_description, schema_view
+            )
+            if content_html:
+                lines.append(content_html)
+
+        lines.append("</section>")
+        rendered.append("\n".join(lines))
+
+    return "\n".join(rendered)
 
 
 def render_explicit_assertion_annotation(
@@ -432,6 +579,7 @@ def generate_respec_spec(
                 spec_content_html = render_spec_content_annotation(
                     ann,
                     process_description,
+                    schema_view=sv,
                 )
             assertion_html = render_explicit_assertion_annotation(
                 ann,
@@ -442,6 +590,14 @@ def generate_respec_spec(
                     part for part in [spec_content_html, assertion_html] if part
                 )
 
+            subsections_html = ""
+            if "spec_subsections" in ann:
+                subsections_html = render_subsections(
+                    ann,
+                    process_description,
+                    schema_view=sv,
+                )
+
             sections_html.append(
                 section_tpl.render(
                     class_name=cls,
@@ -449,6 +605,7 @@ def generate_respec_spec(
                     slots=rows,
                     spec_intro_html=intro_html,
                     spec_content_html=spec_content_html,
+                    subsections_html=subsections_html,
                 )
             )
 
