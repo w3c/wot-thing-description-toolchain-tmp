@@ -228,7 +228,7 @@ slots:
     description: >-
       Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
     slot_uri: td:title
-    range: string
+    range: Any
 
   titles:
     description: >-
@@ -330,7 +330,8 @@ classes:
               - id: td-context-ns-td10-namespace
                 text: |
                   When there are possibly TD 1.0 consumers the anyURI `https://www.w3.org/2019/wot/td/v1` *MUST* be the first entry and the `https://www.w3.org/2022/wot/td/v1.1` *MUST* be the second entry.
-              - text: |
+              - id: td-context-ns-td10-namespacev10
+                text: |
                   TD 1.1 consumers *MUST* accept TDs satisfying the W3C WoT Thing Description 1.0 [[wot-thing-description10]] specification.
               - id: td-context-ns-thing-optional
                 text: |
@@ -642,8 +643,8 @@ classes:
         annotations:
           spec_description: >-
             Indicates whether the action is synchronous (=true) or not.
-            A synchronous action means that the response contains all information about the result
-            and no further querying about the status is needed.
+            A synchronous action means that the response of action contains all the information about the result of the action
+            and no further querying about the status of the action is needed.
             Lack of this keyword means that no claim on the synchronicity of the action can be made.
         slot_uri: td:isSynchronous
         range: boolean
@@ -694,7 +695,7 @@ classes:
         range: DataSchema
       dataResponse:
         description: >-
-          Defines the data schema of the Event response messages sent by the consumer in response to a data message.
+          Defines the data schema of the Event response messages sent by the consumer in a response to a data message.
         slot_uri: td:hasNotificationResponseSchema
         range: DataSchema
       cancellation:
@@ -722,7 +723,7 @@ classes:
     attributes:
       instance:
         description: >-
-          Provides a version identifier of this TD.
+          Provides a version indicator of this TD.
         slot_uri: td:instance
         range: string
         required: true

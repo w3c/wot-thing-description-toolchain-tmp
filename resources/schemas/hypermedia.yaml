@@ -336,6 +336,8 @@ classes:
         annotations:
           spec_description: >-
             Target IRI of a link or submission target of a form.
+      type:
+        range: string
       hreflang:
         exactly_one_of:
           - range: string
@@ -441,9 +443,15 @@ classes:
               - type: markdown
                 text: |
                   In some cases additional responses might be possible. One example of this is error responses but in some cases there might also be additional successful responses. In this case, the `response` name-value pair is still used for the primary response but `additionalResponses` may also be provided, whose value is an array of `AdditionalExpectedResponse` objects. Each additional response must be distinguished in some way from the primary response, either by `contentType` or by protocol-specific settings such as error code header values. Each additional response may also have a data schema which can differ from the normal output data schema for the interaction.
-              - type: markdown
-                text: |
-                  In some use cases, input and output data might be represented in a different form, for instance an Action that accepts JSON, but returns an image. In such a case, the optional `response` key-value pair can describe the content type of the expected response. As there is no default value defined, the following assertions apply:
+              - type: paragraph
+                segments:
+                  - text: |
+                      In some use cases, input and output data might be represented in a different form, for instance an Action that accepts JSON, but returns an image. In such a case, the optional `response` key-value pair can describe the content type of the expected response.
+                  - id: td-expectedResponse-contentType
+                    text: |
+                      If the content type of the expected response differs from the content type of the form, the `Form` instance *MUST* include a name-value pair with the name `response`.
+                  - text: |
+                      As there is no default value defined, the following assertions apply:
               - type: list
                 items:
                   - id: td-expectedResponse-missing-contentType
@@ -536,6 +544,9 @@ classes:
                 - longpoll
                 - websub
                 - sse
+      contentType:
+        annotations:
+          spec_default: true
       security:
         any_of:
           - range: string
@@ -552,7 +563,9 @@ classes:
     description: Communication metadata describing the expected response message for the primary response.
     slots:
       - contentType
-
+    slot_usage:
+      contentType:
+        required: true
 
   AdditionalExpectedResponse:
     class_uri: hctl:AdditionalExpectedResponse
@@ -564,16 +577,6 @@ classes:
           spec_default: true
         slot_uri: hctl:isSuccess
         range: boolean
-      schema:
-        description: >-
-          Used to define the output data schema for an additional response if it differs from the default 
-          output data schema. Rather than a DataSchema object, the name of a previous definition given in a 
-          schemaDefinitions map must be used.
-        annotations:
-          spec_description: >-
-            Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a `DataSchema` object, the name of a previous definition given in a `schemaDefinitions` map must be used.
-        slot_uri: hctl:hasAdditionalOutputSchema
-        range: string
       contentType:
         description: >-
           Assign a content type based on a media type (e.g., text/plain) and potential parameters
@@ -582,4 +585,14 @@ classes:
           spec_description: >-
             Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
         slot_uri: hctl:forContentType
+        range: string
+      schema:
+        description: >-
+          Used to define the output data schema for an additional response if it differs from the default
+          output data schema. Rather than a DataSchema object, the name of a previous definition given in a
+          schemaDefinitions map must be used.
+        annotations:
+          spec_description: >-
+            Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a `DataSchema` object, the name of a previous definition given in a `schemaDefinitions` map must be used.
+        slot_uri: hctl:hasAdditionalOutputSchema
         range: string

@@ -301,10 +301,26 @@ def extract_html_assertions(html_path: Path) -> List[Assertion]:
     return assertions
 
 
-def html_assertions_to_csv(html_path: Path, out_path: Path) -> None:
-    """Extract assertions from final HTML and write the extractFile.js-compatible CSV."""
-    assertions_to_csv(extract_html_assertions(html_path), out_path)
-    problems = validate_html_assertion_inventory(html_path, out_path)
+def html_assertions_to_csv(
+    html_path: Path,
+    out_path: Path,
+    extra_asserts_path: Optional[Path] = None,
+) -> None:
+    """Extract assertions from final HTML (and optional extra-asserts.html) and write CSV."""
+    assertions = extract_html_assertions(html_path)
+    extra_ids: set[str] = set()
+    if extra_asserts_path and extra_asserts_path.exists():
+        extra = extract_html_assertions(extra_asserts_path)
+        extra_ids = {a.id for a in extra}
+        seen = {a.id for a in assertions}
+        for a in extra:
+            if a.id not in seen:
+                seen.add(a.id)
+                assertions.append(a)
+        assertions.sort(key=lambda a: a.id)
+        logging.info("Merged %d extra assertions from %s", len(extra), extra_asserts_path)
+    assertions_to_csv(assertions, out_path)
+    problems = validate_html_assertion_inventory(html_path, out_path, extra_ids=extra_ids)
     if problems:
         raise ValueError("Assertion inventory compatibility failed:\n" + "\n".join(problems))
 
@@ -326,7 +342,11 @@ def _csv_assertion_ids(csv_path: Path) -> set[str]:
         return {row["ID"] for row in csv.DictReader(fh) if row.get("ID")}
 
 
-def validate_html_assertion_inventory(html_path: Path, csv_path: Optional[Path] = None) -> List[str]:
+def validate_html_assertion_inventory(
+    html_path: Path,
+    csv_path: Optional[Path] = None,
+    extra_ids: Optional[set[str]] = None,
+) -> List[str]:
     """Return compatibility problems for the final HTML assertion inventory."""
     doc = html.fromstring(html_path.read_text(encoding="utf-8", errors="replace"))
     elements = _assertion_elements(doc)
@@ -353,7 +373,7 @@ def validate_html_assertion_inventory(html_path: Path, csv_path: Optional[Path] 
         html_ids = set(ids)
         csv_ids = _csv_assertion_ids(csv_path)
         missing_from_csv = sorted(html_ids - csv_ids)
-        extra_in_csv = sorted(csv_ids - html_ids)
+        extra_in_csv = sorted(csv_ids - html_ids - (extra_ids or set()))
         if missing_from_csv:
             problems.append(f"csv missing html assertion ids: {', '.join(missing_from_csv[:20])}")
         if extra_in_csv:

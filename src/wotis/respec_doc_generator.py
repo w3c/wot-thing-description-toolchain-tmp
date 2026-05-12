@@ -439,6 +439,7 @@ def generate_respec_spec(
     final_spec_path: Path,
     core_schema_placeholder: str,
     assertions_csv_path: Optional[Path] = None,
+    extra_asserts_path: Optional[Path] = None,
 ) -> None:
     """
     Generate the ReSpec-compatible HTML document from the LinkML schema.
@@ -458,6 +459,8 @@ def generate_respec_spec(
             template to replace.
         assertions_csv_path: If provided, write an assertions.csv compatible
             with the WoT TD Test suite (extractFile.js output).
+        extra_asserts_path: If provided, merge additional assertions from
+            this HTML file into the assertion inventory.
     """
     try:
         sv = SchemaView(input_path, merge_imports=True)
@@ -618,6 +621,6 @@ def generate_respec_spec(
 
     if assertions_csv_path is not None:
         try:
-            html_assertions_to_csv(final_spec_path, assertions_csv_path)
+            html_assertions_to_csv(final_spec_path, assertions_csv_path, extra_asserts_path)
         except Exception as exc:
             logging.error("Assertion CSV generation failed: %s", exc, exc_info=True)

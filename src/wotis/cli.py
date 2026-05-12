@@ -33,6 +33,11 @@ assertions_csv_option = click.option('--assertions-csv',
                              show_default=True,
                              help="Path for the storing assertion inventory CSV. "
                                   "Defaults to resources/gens/assertions.csv.")
+extra_asserts_option = click.option('--extra-asserts',
+                             type=click.Path(path_type=Path, dir_okay=False, exists=False),
+                             default=None,
+                             help="Path to extra-asserts.html with additional testing assertions "
+                                  "to merge into the assertion inventory.")
 
 
 
@@ -62,7 +67,8 @@ def main(verbose: int, quiet: bool):
 @input_option
 @docs_option
 @assertions_csv_option
-def generate_wot_resources(input_schema: str, generate_docs: bool, assertions_csv: Path):
+@extra_asserts_option
+def generate_wot_resources(input_schema: str, generate_docs: bool, assertions_csv: Path, extra_asserts: Path):
     """
     Generating WoT resources (RDF, JSON-LD Context, SHACL Shapes, and JSON Schema)
     and the final Respec specification from LinkML schemas.
@@ -88,6 +94,7 @@ def generate_wot_resources(input_schema: str, generate_docs: bool, assertions_cs
                 FINAL_SPEC_PATH,
                 CORE_SCHEMA_PLACEHOLDER,
                 assertions_csv_path=assertions_csv,
+                extra_asserts_path=extra_asserts,
             )
             logging.info("Respec specification generation complete.")
 
