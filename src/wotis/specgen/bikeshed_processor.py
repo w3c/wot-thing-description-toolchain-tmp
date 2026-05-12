@@ -154,6 +154,27 @@ def _extract_body(html_str: str) -> str:
     return "".join(parts)
 
 
+def _unwrap_element(el) -> None:
+    parent = el.getparent()
+    if parent is None:
+        return
+    idx = list(parent).index(el)
+    if el.text:
+        prev = parent[idx - 1] if idx > 0 else None
+        if prev is not None:
+            prev.tail = (prev.tail or "") + el.text
+        else:
+            parent.text = (parent.text or "") + el.text
+    for child in el:
+        child.tail = child.tail or ""
+        parent.insert(idx, child)
+        idx += 1
+    last_moved = parent[idx - 1] if idx > 0 else None
+    if last_moved is not None:
+        last_moved.tail = (last_moved.tail or "") + (el.tail or "")
+    parent.remove(el)
+
+
 def _strip_bikeshed_heading_decoration(root) -> None:
     for secno in root.cssselect("span.secno"):
         secno.getparent().remove(secno)
@@ -161,28 +182,14 @@ def _strip_bikeshed_heading_decoration(root) -> None:
         selflink.getparent().remove(selflink)
     for panel in root.cssselect(".dfn-panel"):
         panel.getparent().remove(panel)
+    for dfn in root.cssselect("dfn.dfn-paneled"):
+        _unwrap_element(dfn)
     for heading in root.cssselect(".heading.settled"):
         heading.attrib.pop("class", None)
         heading.attrib.pop("data-level", None)
         content_span = heading.cssselect("span.content")
         if content_span:
-            span = content_span[0]
-            parent = span.getparent()
-            idx = list(parent).index(span)
-            if span.text:
-                prev = parent[idx - 1] if idx > 0 else None
-                if prev is not None:
-                    prev.tail = (prev.tail or "") + span.text
-                else:
-                    parent.text = (parent.text or "") + span.text
-            for child in span:
-                child.tail = child.tail or ""
-                parent.insert(idx, child)
-                idx += 1
-            last_moved = parent[idx - 1] if idx > 0 else None
-            if last_moved is not None:
-                last_moved.tail = (last_moved.tail or "") + (span.tail or "")
-            parent.remove(span)
+            _unwrap_element(content_span[0])
 
 
 def _split_by_markers(content: str, section_ids: list[str]) -> list[str]:
