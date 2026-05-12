@@ -412,6 +412,7 @@ classes:
               - type: enum_table
                 enum: OperationType
                 caption: Mapping op Values to Data Schemas
+                require_comments: true
                 columns:
                   - field: name
                     header: Operation Type

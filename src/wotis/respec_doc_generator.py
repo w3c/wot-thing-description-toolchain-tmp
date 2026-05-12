@@ -168,8 +168,11 @@ def _render_enum_table(
     lines.append("</thead>")
     lines.append("<tbody>")
 
+    require_comments = _record_value(block, "require_comments")
     pvs = enum_def.permissible_values or {}
     for pv_key, pv in pvs.items():
+        if require_comments and not (getattr(pv, "comments", None) or []):
+            continue
         lines.append("<tr>")
         for field in fields:
             lines.append(_extract_enum_cell(pv, field, process_description))
