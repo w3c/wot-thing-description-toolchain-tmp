@@ -10,7 +10,6 @@ class Config:
     resources_path: Path
     jinja_templates: Path
     glossary_path: Path
-    biblio_path: Path
     placeholder: str
     section_schemas: Dict[str, Path]
     schema_prefixes: Dict[str, str]
@@ -37,7 +36,6 @@ class Config:
             resources_path=resources,
             jinja_templates=resources / "jinja_templates",
             glossary_path=terms / "glossary.yaml",
-            biblio_path=terms / "bibliography.yaml",
             placeholder=placeholder,
             section_schemas=section_map,
             schema_prefixes=schema_prefixes,

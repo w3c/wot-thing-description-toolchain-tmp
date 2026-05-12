@@ -16,7 +16,7 @@
       <td><code>{{ slot.slot_name }}</code></td>
       <td>{{ slot.description | safe }}</td>
       <td>{{ slot.assignment | safe }}</td>
-      <td>{{ slot.range_text | annotate | safe }}</td>
+      <td>{{ slot.range_text | safe }}</td>
     </tr>
     {% endfor %}
   </tbody>

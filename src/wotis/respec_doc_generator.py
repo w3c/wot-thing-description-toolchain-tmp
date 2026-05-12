@@ -11,8 +11,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
 from .specgen.config import Config
-from .specgen.glossary import annotate_html, load_glossary
-from .specgen.markdown import render_markdown_html
+from .specgen.bikeshed_processor import process_fragments
 from .specgen.respec import build_jinja_env, assemble
 from .specgen.tables import collect_slot_rows
 from .specgen.assertions import html_assertions_to_csv
@@ -465,13 +464,6 @@ def generate_respec_spec(
 
     try:
         env = build_jinja_env(cfg.jinja_templates)
-        glossary_entries, phrase_to_key = load_glossary(cfg.glossary_path)
-        env.filters["annotate"] = lambda s: annotate_html(
-            s or "",
-            glossary_entries,
-            phrase_to_key,
-        )
-
         section_tpl = env.get_template("class_section.jinja2")
     except (exceptions.TemplateNotFound, FileNotFoundError) as e:
         logging.error("Template error: %s", e, exc_info=True)
@@ -487,10 +479,8 @@ def generate_respec_spec(
         return
 
     def process_description(raw_text: str) -> str:
-        """Markdown rendering and glossary annotation. Bibliography [[...]] refs pass through for ReSpec."""
-        html = render_markdown_html(raw_text or "")
-        html = annotate_html(html, glossary_entries, phrase_to_key)
-        return html
+        """Pass raw markdown through. Bikeshed handles rendering."""
+        return str(raw_text or "")
 
     file_to_classes: Dict[str, List[str]] = {}
     for section_path in cfg.section_schemas.values():
@@ -606,9 +596,13 @@ def generate_respec_spec(
             )
 
         section_html_fragment = "\n\n".join(sections_html)
-        # Escape all literal percent signs in the fragment content.
-        escaped_fragment = section_html_fragment.replace('%', '%%')
-        sections_content.append(escaped_fragment)
+        sections_content.append(section_html_fragment)
+
+    section_ids = list(cfg.section_schemas.keys())
+    sections_content = process_fragments(section_ids, sections_content, cfg.glossary_path)
+
+    # Escape literal percent signs so assemble()'s placeholder replacement is safe.
+    sections_content = [s.replace('%', '%%') for s in sections_content]
 
     assemble(
         respec_template_path,

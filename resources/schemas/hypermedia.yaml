@@ -21,6 +21,70 @@ imports:
 
 
 enums:
+  LinkRelationType:
+    description: >-
+      Best practice relation type values recommended for use within WoT Thing Description or Thing Model instances.
+    permissible_values:
+      icon:
+        description: Imports an icon associated to the Thing
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - IANA Link Relation"
+      service-doc:
+        description: Relation to resource that provides documentation about the Thing
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - IANA Link Relation"
+      alternate:
+        description: Alternative representation of the Thing
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - IANA Link Relation"
+      type:
+        description: Indicate that the Thing is an instance of the target resource
+        comments:
+          - "Occurrence - 0..1"
+          - "Source - IANA Link Relation"
+      tm:extends:
+        description: Extends the existing definition of the target resource
+        comments:
+          - "Occurrence - 0..1"
+          - "Source - W3C WoT Thing Model"
+      tm:submodel:
+        description: Compose one or multiple Thing Models
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - W3C WoT Thing Model"
+      manifest:
+        description: Point to web app manifest
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - IANA Link Relation"
+      proxy-to:
+        description: Target resource provides the address of a proxy
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - W3C WoT Security"
+      collection:
+        description: Points to a collection of Things that the current Thing is part of
+        comments:
+          - "Occurrence - 0..1"
+          - "Source - IANA Link Relation"
+      item:
+        description: Points to a Thing being a member of a collection Thing
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - IANA Link Relation"
+      predecessor-version:
+        description: Points to a previous TD or TM version of the same Thing
+        comments:
+          - "Occurrence - 0..1"
+          - "Source - IANA Link Relation"
+      controlledBy:
+        description: Refers to the Thing that controls the context Thing
+        comments:
+          - "Occurrence - 0..*"
+          - "Source - W3C Thing Description"
   SubprotocolList:
     permissible_values:
       longpoll:
@@ -199,6 +263,19 @@ classes:
           - type: markdown
             text: |
               In the following a best practice relation type table is introduced that is recommended to use within WoT Thing Description or Thing Model instances.
+          - type: enum_table
+            enum: LinkRelationType
+            caption: Best practice relation type table
+            table_id: table-rel-type
+            columns:
+              - field: name
+                header: Value
+              - field: "comment:Occurrence"
+                header: Occurrence
+              - field: description
+                header: Explanation
+              - field: "comment:Source"
+                header: Source of value origin
 
       jsonschema_config:
         tag: jsonschema_config
