@@ -5,32 +5,25 @@ on:
   release:
     types: [created]
 
+permissions:
+  id-token: write
+
 jobs:
-  build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to PyPI
+  build-and-publish:
+    name: Build and publish to PyPI
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
+        run: uv python install 3.14
 
-      - name: Install Poetry
-        run: |
-          pipx install poetry
-          poetry self add "poetry-dynamic-versioning[plugin]"
+      - name: Build package
+        run: uv build
 
-      # - name: Install dependencies
-      #   run: poetry install --no-interaction
-
-      - name: Build source and wheel archives
-        run: poetry build
-
-      - name: Publish distribution 📦 to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.2.2
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_PASSWORD }}
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

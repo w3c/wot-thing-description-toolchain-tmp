@@ -1,24 +1,27 @@
-# Built from:
-# https://docs.github.com/en/actions/guides/building-and-testing-python
 ---
-name: Build and test thing_description_schema
+name: Build and test WoTIS
 
 on: [pull_request]
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        py: ["3.12"]
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
-      - name: Run the program
-        run: uv run -p ${{ matrix.py }} wotis
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run WoTIS resource generation
+        run: uv run wotis generate-wot-resources
+
+      - name: Run WoTIS spec generation
+        run: uv run wotis generate-wot-resources -d
