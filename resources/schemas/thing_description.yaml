@@ -559,6 +559,7 @@ classes:
           A hint that indicates whether Servients hosting the Thing and Intermediaries should provide a Protocol Binding
           that supports the observeproperty and unobserveproperty operations for this Property.
         annotations:
+          spec_default: true
           spec_table_definition: >-
             A hint that indicates whether Servients hosting the Thing and Intermediaries should provide a Protocol Binding that supports the `observeproperty` and `unobserveproperty` operations for this Property.
         slot_uri: td:isObservable
@@ -617,12 +618,16 @@ classes:
           Signals if the Action is safe (=true) or not.
           Used to signal if there is no internal state (cf. resource state) is changed when invoking an Action.
           In that case responses can be cached as example.
+        annotations:
+          spec_default: true
         slot_uri: td:isSafe
         range: boolean
       idempotent:
         description: >-
           Indicates whether the Action is idempotent (=true) or not.
           Informs whether the Action can be called repeatedly with the same result, if present, based on the same input.
+        annotations:
+          spec_default: true
         slot_uri: td:isIdempotent
         range: boolean
       synchronous:
