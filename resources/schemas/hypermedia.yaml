@@ -537,11 +537,15 @@ classes:
                 - websub
                 - sse
       security:
-        range: string
-        multivalued: true
+        any_of:
+          - range: string
+          - range: string
+            multivalued: true
       scopes:
-        range: string
-        multivalued: true
+        any_of:
+          - range: string
+          - range: string
+            multivalued: true
 
   ExpectedResponse:
     class_uri: hctl:ExpectedResponse
