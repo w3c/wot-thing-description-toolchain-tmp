@@ -283,7 +283,7 @@ classes:
           additionalProperties: true
     attributes:
       href:
-        description: Target URI of a link.
+        description: Target IRI of a link or submission target of a form.
         slot_uri: hctl:hasTarget
         range: uri
         required: true
@@ -335,7 +335,7 @@ classes:
         range: uri
         annotations:
           spec_description: >-
-            Target URI of a link.
+            Target IRI of a link or submission target of a form.
       hreflang:
         exactly_one_of:
           - range: string
@@ -522,7 +522,7 @@ classes:
         range: uri
         annotations:
           spec_description: >-
-            Target URI of a submission target of a Form. See the [note on URI/IRI](#note-uri-iri).
+            Target IRI of a link or submission target of a form.
       contentCoding:
         range: string
       subprotocol:
