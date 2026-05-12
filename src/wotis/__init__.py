@@ -6,7 +6,7 @@ from .specgen.config import Config
 RESOURCES_PATH = Path('resources')
 SCHEMA_PATH = RESOURCES_PATH / 'schemas'
 GENS_PATH = RESOURCES_PATH / 'gens'
-ASSERTION_PATH = GENS_PATH / 'assertions'
+ASSERTION_PATH = GENS_PATH / 'assertions' / 'assertions.csv'
 
 CONFIG = Config.from_resources_dir(RESOURCES_PATH, placeholder="%s")
 

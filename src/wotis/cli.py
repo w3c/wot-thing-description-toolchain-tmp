@@ -25,7 +25,7 @@ assertions_csv_option = click.option('--assertions-csv',
                              default=ASSERTION_PATH,
                              show_default=True,
                              help="Path for the storing assertion inventory CSV. "
-                                  "Defaults to resources/gens/assertions.csv.")
+                                  "Defaults to resources/gens/assertions/assertions.csv.")
 extra_asserts_option = click.option('--extra-asserts',
                              type=click.Path(path_type=Path, dir_okay=False, exists=False),
                              default=None,
