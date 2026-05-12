@@ -125,9 +125,14 @@ def get_assignment(slot_name, class_def, slot_def) -> str:
     return "optional"
 
 
+_NO_LINK_NAMES = frozenset({"any type"})
+
+
 def _link(name: str) -> str:
-    """Wrap a type/class name in an <a> tag for Bikeshed autolink resolution."""
-    return f"<a>{name}</a>"
+    """Wrap a type/class name in an <a><code> tag for Bikeshed autolink resolution."""
+    if name in _NO_LINK_NAMES:
+        return name
+    return f"<a><code>{name}</code></a>"
 
 
 def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effective_range: Optional[str] = None) -> str:
@@ -151,9 +156,9 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
             # If multivalued and range is empty or not provided in the alt, just return "Array"
             if mv:
                 if not getattr(alt, "range", None) and slot_name == "@context":
-                    p = "Array"
+                    p = _link("Array")
                 else:
-                    p = f"Array of {_link(rng)}" if rng else "Array"
+                    p = f"{_link('Array')} of {_link(rng)}" if rng else _link("Array")
             else:
                 p = _link(rng) if rng else ""
             if p and p not in seen:
@@ -183,9 +188,9 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
     if not rng:
         return ""
     if getattr(slot_def, "inlined", False):
-        return _append_type_values(f"Map of {_link(rng)}", slot_name, class_def, slot_def)
+        return _append_type_values(f"{_link('Map')} of {_link(rng)}", slot_name, class_def, slot_def)
     if getattr(slot_def, "multivalued", False):
-        return _append_type_values(f"Array of {_link(rng)}", slot_name, class_def, slot_def)
+        return _append_type_values(f"{_link('Array')} of {_link(rng)}", slot_name, class_def, slot_def)
     return _append_type_values(_link(rng), slot_name, class_def, slot_def)
 
 

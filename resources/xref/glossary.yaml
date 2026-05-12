@@ -2,6 +2,9 @@ terms:
   Action:
     id: dfn-action
     aliases: [ "Actions", "action", "actions" ]
+  AdditionalExpectedResponse:
+    id: additionalexpectedresponse
+    aliases: [ ]
   anyURI:
     # external link example
     href: "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"
@@ -87,6 +90,9 @@ terms:
   EventAffordance:
     id: eventaffordance
     aliases: [ ]
+  ExpectedResponse:
+    id: expectedresponse
+    aliases: [ ]
   Form:
     id: form
     aliases: [  ]
@@ -114,6 +120,9 @@ terms:
   Levels of a TD:
     id: dfn-td-level
     aliases: [ "TD Levels", "levels of a TD", "levels" ]
+  Link:
+    id: link
+    aliases: [ ]
   LINKSET-MEDIA-TYPES:
     id: bib-linkset-media-types
     aliases: [ ]

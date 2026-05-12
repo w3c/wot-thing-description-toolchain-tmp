@@ -482,8 +482,10 @@ def generate_respec_spec(
         return
 
     def process_description(raw_text: str) -> str:
-        """Pass raw markdown through. Bikeshed handles rendering."""
-        return str(raw_text or "")
+        """Convert inline markdown backticks to <code> tags."""
+        text = str(raw_text or "")
+        text = re.sub(r"`([^`]+)`", r"<code>\1</code>", text)
+        return text
 
     file_to_classes: Dict[str, List[str]] = {}
     for section_path in cfg.section_schemas.values():
