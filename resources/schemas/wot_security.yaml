@@ -315,6 +315,19 @@ classes:
     slots:
       - "@name"
       - in
+    slot_usage:
+      in:
+        annotations:
+          spec_default: true
+          spec_type_values:
+            value:
+              mode: one_of
+              values:
+                - header
+                - query
+                - body
+                - cookie
+                - auto
 
   DigestSecurityScheme:
     is_a: SecurityScheme
@@ -333,6 +346,28 @@ classes:
       - "@name"
       - in
       - qop
+    slot_usage:
+      in:
+        annotations:
+          spec_default: true
+          spec_type_values:
+            value:
+              mode: one_of
+              values:
+                - header
+                - query
+                - body
+                - cookie
+                - auto
+      qop:
+        annotations:
+          spec_default: true
+          spec_type_values:
+            value:
+              mode: one_of
+              values:
+                - auth
+                - auth-int
 
   APIKeySecurityScheme:
     is_a: SecurityScheme
@@ -358,6 +393,18 @@ classes:
       in:
         required: true
         range: SecurityLocationType
+        annotations:
+          spec_default: true
+          spec_type_values:
+            value:
+              mode: one_of
+              values:
+                - header
+                - query
+                - body
+                - cookie
+                - uri
+                - auto
 
   BearerSecurityScheme:
     is_a: SecurityScheme
@@ -385,6 +432,39 @@ classes:
       - in
       - alg
       - format
+    slot_usage:
+      in:
+        annotations:
+          spec_default: true
+          spec_type_values:
+            value:
+              mode: one_of
+              values:
+                - header
+                - query
+                - body
+                - cookie
+                - auto
+      alg:
+        annotations:
+          spec_default: true
+          spec_type_values:
+            value:
+              mode: examples
+              values:
+                - ES256
+                - ES512-256
+      format:
+        annotations:
+          spec_default: true
+          spec_type_values:
+            value:
+              mode: examples
+              values:
+                - jwt
+                - cwt
+                - jwe
+                - jws
 
   PSKSecurityScheme:
     is_a: SecurityScheme

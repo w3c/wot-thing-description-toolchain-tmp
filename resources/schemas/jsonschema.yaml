@@ -105,6 +105,12 @@ classes:
             minimum_value: 1
       type:
         range: DataSchemaType
+      readOnly:
+        annotations:
+          spec_default: true
+      writeOnly:
+        annotations:
+          spec_default: true
       # It is not possible to have here range:DataSchema, because probably creates a circular ref
 #      oneOf:
 #        range: DataSchema
