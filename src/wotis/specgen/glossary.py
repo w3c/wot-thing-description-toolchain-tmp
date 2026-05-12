@@ -106,7 +106,7 @@ def annotate_html(html: str, entries: Dict[str, GlossaryEntry], phrase_to_key: D
         class_attr = f'class="{class_names}"' if class_names else ""
         data_attr = f'data-link-type="{data_link_value}"' if data_link_value else ""
         if is_external:
-            return f'<a href="{href_value}" {class_attr} {data_attr}><code translate="no">{text}</code></a>'
+            return f'<a href="{href_value}" {class_attr} {data_attr}><code>{text}</code></a>'
         else:
             return f'<a href="{href_value}" {class_attr} {data_attr}>{text}</a>'
 

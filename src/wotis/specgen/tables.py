@@ -1,8 +1,14 @@
 from __future__ import annotations
+import re
 from typing import Any, Dict, List, Callable, Optional
 from linkml_runtime.utils.schemaview import SchemaView
 
 from .assertions import make_slot_assertion_id
+
+
+def _strip_outer_p(html: str) -> str:
+    match = re.fullmatch(r"\s*<p>(?P<body>.*)</p>\s*", html or "", flags=re.DOTALL)
+    return match.group("body") if match else (html or "")
 
 def _normalize_range_name(rng: str) -> str:
     """
@@ -136,7 +142,7 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
                 alt_rng_raw = raw_rng
             rng = _normalize_range_name(alt_rng_raw)
             mv = bool(getattr(alt, "multivalued", False))
-            # --- SPECIAL HANDLING FOR @CONTEXT where we do not want to specify the range in the table---
+            # SPECIAL HANDLING FOR @CONTEXT where we do not want to specify the range in the table
             # If multivalued and range is empty or not provided in the alt, just return "Array"
             if mv:
                 if not getattr(alt, "range", None) and slot_name == "@context":
@@ -232,7 +238,7 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
             raw_desc = usage.description
         elif "spec_description" in ann:
             raw_desc = str(getattr(ann["spec_description"], "value", ann["spec_description"]))
-        desc_html = process_description(raw_desc)
+        desc_html = _strip_outer_p(process_description(raw_desc))
         desc = (desc_html or "").replace("'", "&#39;")
         # special case for the name defined in wot_security.yaml, name is a reserved keyword in LinkML.
         if slot_name == "@name":
