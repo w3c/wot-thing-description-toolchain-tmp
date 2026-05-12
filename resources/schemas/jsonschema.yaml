@@ -105,6 +105,13 @@ classes:
             minimum_value: 1
       type:
         range: DataSchemaType
+      format:
+        range: string
+        description: >-
+          Allows validation based on a format pattern such as "date-time", "email", "uri", etc.
+        annotations:
+          spec_description: >-
+            Allows validation based on a format pattern such as "date-time", "email", "uri", etc. (Also see below.)
       readOnly:
         annotations:
           spec_default: true
@@ -371,7 +378,7 @@ slots:
       Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false).
     annotations:
       spec_description: >-
-        !Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false).
+        Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false).
     range: boolean
 
   unit:
