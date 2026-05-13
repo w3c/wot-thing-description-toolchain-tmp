@@ -5109,19 +5109,7 @@
 
           <p>Lets assume we have a basic model description as provided in the following example:</p>
 
-          <pre class="example" title="Basic On/Off Thing Model Definition" id="td-model-example-basic-on-off">
-        {
-            "@context": ["https://www.w3.org/ns/wot-next/td"],
-            "@type": "tm:ThingModel",
-            "title": "Basic On/Off Thing Model",
-            "properties": {
-                "onOff": {
-                    "type": "boolean"
-                }
-            }
-        }
-    </pre
-          >
+          {{ snippet('basic-on-off-tm') }}
 
           <p>
             Now a new device class model called 'Smart Lamp Control' that will be used as template for creating TD
@@ -5129,31 +5117,7 @@
             extend it with a <code>dim</code> property:
           </p>
 
-          <pre
-            class="example"
-            title="Smart Lamp Control Thing Model Definition"
-            id="td-model-example-smart-lamp-control"
-          >
-        {
-            "@context": ["https://www.w3.org/ns/wot-next/td"],
-            "@type": "tm:ThingModel",
-            "title": "Smart Lamp Control with Dimming",
-            "links" : [{
-                "rel": "tm:extends",
-                "href": "http://example.com/BasicOnOffTM",
-                "type": "application/tm+json"
-             }],
-            "properties" : {
-                "dim" : {
-                    "title": "Dimming level",
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 100
-                }
-           }
-        }
-    </pre
-          >
+          {{ snippet('smart-lamp-control-tm') }}
           <p>
             Please note that the <code>title</code> is overwritten and will be used when TD instances are created (also
             see in the next subsection <a href="#thing-model-td-generation"></a>).
@@ -5192,19 +5156,7 @@
             <code>onOff</code> from <a href="#td-model-example-basic-on-off"></a> into the new property definition
             <code>switch</code>.
           </p>
-          <pre class="example" title="Smart Lamp Control imports existing definition" id="td-model-example-tmRef">
-        {
-            "@context": ["https://www.w3.org/ns/wot-next/td"],
-            "@type": "tm:ThingModel",
-            "title": "Smart Lamp Control",
-            "properties" : {
-                "switch" : {
-                    "tm:ref": "http://example.com/BasicOnOffTM.tm.jsonld#/properties/onOff"
-                }
-           }
-        }
-    </pre
-          >
+          {{ snippet('tm-ref-import') }}
 
           <p>
             As an example for relative imports using <code>tm:ref</code>, the following Thing Model re-uses and augments
@@ -5212,38 +5164,7 @@
             inner and an outer temperature value, respectively.
           </p>
 
-          <pre
-            class="example"
-            title="Multi Sensor Thing Model re-using definitions with relative imports"
-            id="td-model-example-relative-tmRef"
-          >
-        {
-            "@context": "https://www.w3.org/ns/wot-next/td",
-            "@type": "tm:ThingModel",
-            "title": "Multi Sensor",
-            "properties": {
-                "genericTemperature": {
-                    "type": "number",
-                    "unit": "C"
-                },
-                "innerTemperature": {
-                    "tm:ref": "#/properties/genericTemperature",
-                    "title": "The inner temperature",
-                    "minimum": 10
-                },
-                "outerTemperature": {
-                    "tm:ref": "#/properties/genericTemperature",
-                    "title": "The outer temperature",
-                    "description": "The outer temperature is measured in Kelvin",
-                    "unit": "K"
-                }
-            },
-            "tm:optional": [
-                "/properties/genericTemperature"
-            ]
-        }
-    </pre
-          >
+          {{ snippet('multi-sensor-tm') }}
 
           <p>
             At the place the "tm:ref" is defined, additional name-value pairs can be added. It is also permitted to
@@ -5277,26 +5198,7 @@
             <a href="#td-model-example-smart-lamp-control"></a>.
           </p>
 
-          <pre
-            class="example"
-            title="Smart Lamp Control extend and overwrite existing definitions"
-            id="td-model-example-tmRef2"
-          >
-        {
-            "@context": ["https://www.w3.org/ns/wot-next/td"],
-            "@type": "tm:ThingModel",
-            "title": "Smart Lamp Control",
-            "properties" : {
-                "dimming" : {
-                    "tm:ref": "http://example.com/SmartLampControlwithDimming.tm.jsonld#/properties/dim",
-                    "title": null,
-                    "maximum": 80,
-                    "unit": "%"
-                }
-           }
-        }
-    </pre
-          >
+          {{ snippet('tm-overwrite') }}
 
           <p>
             Based on the JSON Merge Patch algorithm the <code>{"title": null,"maximum": 80,"unit": "%"}</code> would act
@@ -5312,31 +5214,7 @@
             <a href="#td-model-example-smart-lamp-control"></a> respectively.
           </p>
 
-          <pre
-            class="example"
-            title="Smart Lamp Control Thing Model with extend and import mechanism"
-            id="td-model-example-smart-lamp-control-extend-import"
-          >
-        {
-            "@context": ["https://www.w3.org/ns/wot-next/td"],
-            "@type": "tm:ThingModel",
-            "title": "Smart Lamp Control",
-            "links" : [{
-                "rel": "extends",
-                "href": "http://example.com/BasicOnOffTM",
-                "type": "application/tm+json"
-             }],
-            "properties" : {
-                "status" : {
-                    "tm:ref": "http://example.com/LampTM.tm.jsonld#/properties/status"
-                },
-                "dimming" : {
-                    "tm:ref": "http://example.com/LampWithDimmingTM.tm.jsonld#/properties/dim"
-                }
-           }
-        }
-    </pre
-          >
+          {{ snippet('tm-extend-import') }}
 
           <p>
             The <code>tm:extends</code> and the import mechanism based on <code>tm:ref</code> explicitly supports
@@ -5380,109 +5258,7 @@
             <code>dimmable</code> and <code>RGB</code> capabilities.
           </p>
 
-          <aside class="example ds-selector-tabs">
-            <div class="marker">
-              <span class="example-title">Top level/parent Smart Ventilator Thing Model </span>
-            </div>
-            <div class="selectors">
-              <button class="selected exampleTab1 SmartVentilator" onclick="openTab('exampleTab1', 'SmartVentilator')">
-                Smart Ventilator TM
-              </button>
-              <button class="exampleTab1 Ventilation" onclick="openTab('exampleTab1', 'Ventilation')">
-                Ventilation TM
-              </button>
-              <button class="exampleTab1 LED" onclick="openTab('exampleTab1', 'LED')">LED TM</button>
-            </div>
-            <pre class="SmartVentilator exampleTab1 selected json">
-        {
-            "@context": "https://www.w3.org/ns/wot-next/td",
-            "@type": "tm:ThingModel",
-            "title": "Smart Ventilator Thing Model",
-            "version" : { "model": "1.0.0" },
-            "links": [
-              {
-                "rel": "tm:submodel",
-                "href": "./Ventilation.tm.jsonld",
-                "type": "application/tm+json",
-                "instanceName": "ventilation"
-              },
-              {
-                "rel": "tm:submodel",
-                "href": "./LED.tm.jsonld",
-                "type": "application/tm+json",
-                "instanceName": "led"
-              }
-            ],
-            "properties" : {
-                "status" : {"type": "string", "enum": ["on_value", "off_value", "error_value"]}
-            }
-          }
-       </pre
-            >
-            <pre class="Ventilation exampleTab1 json">
-        {
-            "@context": "https://www.w3.org/ns/wot-next/td",
-            "@type": "tm:ThingModel",
-            "title": "Ventilator Thing Model",
-            "version": {
-                "model": "1.0.0"
-            },
-            "properties": {
-                "switch": {
-                    "type": "boolean",
-                    "description": "True=On; False=Off"
-                },
-                "adjustRpm": {
-                    "type": "number",
-                    "minimum": 200,
-                    "maximum": 1200
-                }
-            }
-        }
-       </pre
-            >
-            <pre class="LED exampleTab1 json">
-        {
-            "@context": "https://www.w3.org/ns/wot-next/td",
-            "@type": "tm:ThingModel",
-            "title": "LED Thing Model",
-            "version": {
-                "model": "1.0.0"
-            },
-            "properties": {
-                "R": {
-                    "type": "number",
-                    "description": "Red color"
-                },
-                "G": {
-                    "type": "number",
-                    "description": "Green color"
-                },
-                "B": {
-                    "type": "number",
-                    "description": "Blue color"
-                }
-            },
-            "actions": {
-                "fadeIn": {
-                    "title": "fadeIn",
-                    "input": {
-                        "type": "number",
-                        "description": "fadeIn in ms"
-                    }
-                },
-                "fadeOut": {
-                    "title": "fadeOut",
-                    "input": {
-                        "type": "number",
-                        "description": "fadeOut in ms"
-                    }
-                }
-            }
-        }
-       </pre
-            >
-          </aside>
+          {{ snippet_group('composition-tms') }}
 
           <p>
             Such composition can be introduced by the usage of the <code>links</code> container.
@@ -5509,195 +5285,7 @@
             <a>Thing Descriptions</a>. An example based on Smart Ventilation is given here:
           </p>
 
-          <aside class="example ds-selector-tabs">
-            <div class="marker">
-              <span class="example-title">Thing Descriptions of the Smart Ventilator</span>
-            </div>
-            <div class="selectors">
-              <button class="selected exampleTab1 SmartVentilator" onclick="openTab('exampleTab1', 'SmartVentilator')">
-                Top level Smart Ventilator TD
-              </button>
-              <button class="exampleTab1 Ventilation" onclick="openTab('exampleTab1', 'Ventilation')">
-                Ventilation TD
-              </button>
-              <button class="exampleTab1 LED" onclick="openTab('exampleTab1', 'LED')">LED TD</button>
-            </div>
-            <pre class="SmartVentilator exampleTab1 selected json">
-        {
-            "@context": "https://www.w3.org/ns/wot-next/td",
-            "title": "Smart Ventilator",
-            "securityDefinitions": {
-                "basic_sc": {
-                    "scheme": "basic",
-                    "in": "header"
-                }
-            },
-            "security": "basic_sc",
-            "links": [
-                {
-                    "rel": "item",
-                    "href": "./Ventilation.td.jsonld",
-                    "type": "application/td+json"
-                },
-                {
-                    "rel": "item",
-                    "href": "./LED.td.jsonld",
-                    "type": "application/td+json"
-                },
-                {
-                    "rel": "type",
-                    "href": "./SmartVentilator.tm.jsonld",
-                    "type": "application/tm+json"
-                }
-            ],
-            "properties": {
-                "status": {
-                    "type": "string",
-                    "enum": [
-                        "on_value",
-                        "off_value",
-                        "error_value"
-                    ],
-                    "forms": [
-                        {
-                            "href": "http://127.0.13.232:4563/status"
-                        }
-                    ]
-                }
-            }
-        }
-       </pre
-            >
-            <pre class="Ventilation exampleTab1 json">
-        {
-            "@context": "https://www.w3.org/ns/wot-next/td",
-            "title": "Ventilator",
-            "securityDefinitions": {
-                "basic_sc": {
-                    "scheme": "basic",
-                    "in": "header"
-                }
-            },
-            "security": "basic_sc",
-            "links": [
-                {
-                    "rel": "collection",
-                    "href": "./SmartVentilation.td.jsonld",
-                    "type": "application/td+json"
-                },
-                {
-                    "rel": "type",
-                    "href": "./Ventilation.tm.jsonld",
-                    "type": "application/tm+json"
-                }
-            ],
-            "security": "basic_sc",
-            "properties": {
-                "switch": {
-                    "type": "boolean",
-                    "description": "True=On; False=Off",
-                    "forms": [
-                        {
-                            "href": "http://127.0.13.212:4563/switch"
-                        }
-                    ]
-                },
-                "adjustRpm": {
-                    "type": "number",
-                    "minimum": 200,
-                    "maximum": 1200,
-                    "forms": [
-                        {
-                            "href": "http://127.0.13.212:4563/adjustRpm"
-                        }
-                    ]
-                }
-            }
-        }
-       </pre
-            >
-            <pre class="LED exampleTab1 json">
-        {
-            "@context": "https://www.w3.org/ns/wot-next/td",
-            "title": "LED Thing Model",
-            "securityDefinitions": {
-                "basic_sc": {
-                    "scheme": "basic",
-                    "in": "header"
-                }
-            },
-            "security": "basic_sc",
-            "links": [
-                {
-                    "rel": "collection",
-                    "href": "./SmartVentilation.td.jsonld",
-                    "type": "application/td+json"
-                },
-                {
-                    "rel": "type",
-                    "href": "./LED.tm.jsonld",
-                    "type": "application/tm+json"
-                }
-            ],
-            "properties": {
-                "R": {
-                    "type": "number",
-                    "description": "Red color",
-                    "forms": [
-                        {
-                            "href": "http://127.0.13.211:4563/R"
-                        }
-                    ]
-                },
-                "G": {
-                    "type": "number",
-                    "description": "Green color",
-                    "forms": [
-                        {
-                            "href": "http://127.0.13.211:4563/G"
-                        }
-                    ]
-                },
-                "B": {
-                    "type": "number",
-                    "description": "Blue color",
-                    "forms": [
-                        {
-                            "href": "http://127.0.13.211:4563/B"
-                        }
-                    ]
-                }
-            },
-            "actions": {
-                "fadeIn": {
-                    "title": "fadeIn",
-                    "input": {
-                        "type": "number",
-                        "description": "fadeIn in ms"
-                    },
-                    "forms": [
-                        {
-                            "href": "http://127.0.13.211:4563/fadeIn"
-                        }
-                    ]
-                },
-                "fadeOut": {
-                    "title": "fadeOut",
-                    "input": {
-                        "type": "number",
-                        "description": "fadeOut in ms"
-                    },
-                    "forms": [
-                        {
-                            "href": "http://127.0.13.211:4563/fadeOut"
-                        }
-                    ]
-                }
-            }
-        }
-       </pre
-            >
-          </aside>
+          {{ snippet_group('composition-tds') }}
 
           <p>
             A single TD can also be generated which contains the interaction definitions of the top level/parent
@@ -5709,114 +5297,7 @@
             Ventilator Thing Model.
           </p>
 
-          <pre class="example" title="Self-contained TD of the Smart Ventilator TM">
-    {
-        "@context": "https://www.w3.org/ns/wot-next/td",
-        "title": "Smart Ventilator",
-        "securityDefinitions": {
-            "basic_sc": {
-                "scheme": "basic",
-                "in": "header"
-            }
-        },
-        "security": "basic_sc",
-        "links": [
-            {
-                "rel": "type",
-                "href": "./SmartVentilator.tm.jsonld",
-                "type": "application/tm+json"
-            }
-        ],
-        "properties": {
-            "status": {
-                "type": "string",
-                "enum": [
-                    "on_value",
-                    "off_value",
-                    "error_value"
-                ],
-                "forms": [
-                    {
-                        "href": "http://127.0.13.232:4563/status"
-                    }
-                ]
-            },
-            "switch": {
-                "type": "boolean",
-                "description": "True=On; False=Off",
-                "forms": [
-                    {
-                        "href": "http://127.0.13.212:4563/switch"
-                    }
-                ]
-            },
-            "adjustRpm": {
-                "type": "number",
-                "minimum": 200,
-                "maximum": 1200,
-                "forms": [
-                    {
-                        "href": "http://127.0.13.212:4563/adjustRpm"
-                    }
-                ]
-            },
-            "R": {
-                "type": "number",
-                "description": "Red color",
-                "forms": [
-                    {
-                        "href": "http://127.0.13.211:4563/R"
-                    }
-                ]
-            },
-            "G": {
-                "type": "number",
-                "description": "Green color",
-                "forms": [
-                    {
-                        "href": "http://127.0.13.211:4563/G"
-                    }
-                ]
-            },
-            "B": {
-                "type": "number",
-                "description": "Blue color",
-                "forms": [
-                    {
-                        "href": "http://127.0.13.211:4563/B"
-                    }
-                ]
-            }
-        },
-        "actions": {
-            "fadeIn": {
-                "title": "fadeIn",
-                "input": {
-                    "type": "number",
-                    "description": "fadeIn in ms"
-                },
-                "forms": [
-                    {
-                        "href": "http://127.0.13.211:4563/fadeIn"
-                    }
-                ]
-            },
-            "fadeOut": {
-                "title": "fadeOut",
-                "input": {
-                    "type": "number",
-                    "description": "fadeOut in ms"
-                },
-                "forms": [
-                    {
-                        "href": "http://127.0.13.211:4563/fadeOut"
-                    }
-                ]
-            }
-        }
-    }
-    </pre
-          >
+          {{ snippet('smart-ventilator-selfcontained-td') }}
         </section>
 
         <section id="thing-model-td-optional" class="normative">
@@ -5848,36 +5329,7 @@
             <code>overheating</code>.
           </p>
 
-          <pre class="example" title="Thing Model with the tm:optional term for interaction affordances.">
-{
-    "@context": ["https://www.w3.org/ns/wot-next/td"],
-    "@type": "tm:ThingModel",
-    "title": "Lamp Thing Model",
-    "description": "Lamp Thing Model Description",
-    "tm:optional": [
-        "/events/overheating"
-    ],
-    "properties": {
-        "status": {
-            "description": "current status of the lamp (on|off)",
-            "type": "string",
-            "readOnly": true
-        }
-    },
-    "actions": {
-        "toggle": {
-            "description": "Turn the lamp on or off"
-        }
-    },
-    "events": {
-        "overheating": {
-            "description": "Lamp reaches a critical temperature (overheating)",
-            "data": {"type": "string"}
-        }
-    }
-}
-</pre
-          >
+          {{ snippet('tm-optional') }}
 
           <p>
             Since the <a>Event</a> <code>overheating</code> is not mandatory it may not be available in a
@@ -5890,27 +5342,7 @@
             is extended by another <a>Thing Model</a> through the use of <code>tm:ref</code>:
           </p>
 
-          <pre class="example" title="Thing Model overwrites tm:optional of the previous Thing Model example.">
-    {
-        "@context": ["https://www.w3.org/ns/wot-next/td"],
-        "@type": "tm:ThingModel",
-        "title": "Lamp Thing Model (All Mandatory)",
-        "description": "Lamp Thing Model description expects all interaction affordances (status, toggle, and overheating)",
-        "links": [
-           {
-              "rel": "tm:extends",
-              "href": "./lampThingModel.tm.jsonld",
-              "type": "application/tm+json"
-           }
-        ],
-        "events": {
-            "overheating": {
-                "tm:ref": "./lampThingModel.tm.jsonld#/events/overheating"
-            }
-        }
-    }
-    </pre
-          >
+          {{ snippet('tm-optional-overwrite') }}
         </section>
 
         <section id="thing-model-td-placeholder" class="normative">
@@ -6178,59 +5610,14 @@
           <code>dim</code> property
         </p>
 
-        <pre class="example" title="Extending Smart Control Lamp with a modified dim constrained">
-    {
-        "@context": ["https://www.w3.org/ns/wot-next/td"],
-        "@type": "tm:ThingModel",
-        "links" : [{
-            "rel": "tm:extends",
-            "href": "http://example.com/SmartControlLampTM",
-            "type": "application/tm+json"
-         }],
-        "properties" : {
-            "dim" : {
-                "maximum": 200
-            }
-       }
-    }
-    </pre
-        >
+        {{ snippet('tm-extending-dim') }}
 
         <p>
           The expected <a>Thing Description</a> that is derived from this <a>Thing Model</a> would be (with HTTP Binding
           and basic security applied):
         </p>
 
-        <pre class="example" title="Thing Description">
-        {
-            "@context": ["https://www.w3.org/ns/wot-next/td"],
-            "@type": "Thing",
-            "title": "Smart Lamp Control",
-            "securityDefinitions": {
-                "basic_sc": {"scheme": "basic", "in": "header"}
-            },
-            "security": "basic_sc",
-            "links" : [{
-                "rel": "type",
-                "href": "url/to/SmartLampControlModifiedDimTM",
-                "type": "application/tm+json"
-             }
-           ],
-           "properties" : {
-                "onOff": {
-                    "type": "boolean",
-                    "forms": [{"href": "https://smartlamp.example.com/onoff"}]
-                },
-                "dim" : {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 200,
-                    "forms": [{"href": "https://smartlamp.example.com/dim"}]
-                }
-           }
-        }
-    </pre
-        >
+        {{ snippet('td-derived-from-tm') }}
       </section>
     </section>
 

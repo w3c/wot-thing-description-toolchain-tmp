@@ -1,0 +1,10 @@
+{
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "@type": "tm:ThingModel",
+    "title": "Smart Lamp Control",
+    "properties": {
+        "switch": {
+            "tm:ref": "http://example.com/BasicOnOffTM.tm.jsonld#/properties/onOff"
+        }
+    }
+}
