@@ -1,0 +1,7 @@
+id: property-serialization-sample
+title: Sample of Property serializations
+layout: aside
+show_keys:
+  - properties
+redact_keys:
+  - forms

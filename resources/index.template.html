@@ -498,39 +498,7 @@
           <a>Interaction Model</a> with Properties, Actions, and Events by describing a lamp <a>Thing</a> with the title
           <i>MyLampThing</i>.
         </p>
-        <aside class="example" id="simple-thing-description-sample" title="Thing Description sample">
-          <pre>
-{
-    "@context": "https://www.w3.org/ns/wot-next/td",
-    "id": "urn:uuid:0804d572-cce8-422a-bb7c-4412fcd56f06",
-    "title": "MyLampThing",
-    "securityDefinitions": {
-        "basic_sc": {"scheme": "basic", "in": "header"}
-    },
-    "security": "basic_sc",
-    "properties": {
-        "status": {
-            "type": "string",
-            "forms": [{"href": "https://mylamp.example.com/status"}]
-        }
-    },
-    "actions": {
-        "toggle": {
-            "forms": [{"href": "https://mylamp.example.com/toggle"}]
-        }
-    },
-    "events": {
-        "overheating": {
-            "data": {"type": "string"},
-            "forms": [{
-                "href": "https://mylamp.example.com/oh",
-                "subprotocol": "longpoll"
-            }]
-        }
-    }
-}</pre
-          >
-        </aside>
+        {{ snippet('simple-td') }}
 
         <p>
           From this TD example, we know there exists one <a href="#propertyaffordance">Property affordance</a> with the
@@ -579,52 +547,7 @@
           <code>saref:ToggleCommand</code>.
         </p>
 
-        <aside
-          class="example"
-          id="thing-description-full-serialization"
-          title="Thing Description with TD Context Extension for semantic annotations"
-        >
-          <pre>
-    {
-        "@context": [
-            "https://www.w3.org/ns/wot-next/td",
-            { "saref": "https://w3id.org/saref#" }
-        ],
-        "id": "urn:uuid:300f4c4b-ca6b-484a-88cf-fd5224a9a61d",
-        "title": "MyLampThing",
-        "@type": "saref:LightSwitch",
-        "securityDefinitions": {
-            "basic_sc": {"scheme": "basic", "in": "header"}
-        },
-        "security": "basic_sc",
-        "properties": {
-            "status": {
-                "@type": "saref:OnOffState",
-                "type": "string",
-                "forms": [{
-                    "href": "https://mylamp.example.com/status"
-                }]
-            }
-        },
-        "actions": {
-            "toggle": {
-                "@type": "saref:ToggleCommand",
-                "forms": [{
-                    "href": "https://mylamp.example.com/toggle"
-                }]
-            }
-        },
-        "events": {
-            "overheating": {
-                "data": {"type": "string"},
-                "forms": [{
-                    "href": "https://mylamp.example.com/oh"
-                }]
-            }
-        }
-    }</pre
-          >
-        </aside>
+        {{ snippet('td-context-extension') }}
 
         <p>
           The declaration mechanism inside some
@@ -655,31 +578,7 @@
           <a>Thing Description</a> instance in <a href="#simple-thing-description-sample"></a>.
         </p>
 
-        <pre class="example" title="Thing Model sample" id="td-model-example-lamp">
-        {
-            "@context": ["https://www.w3.org/ns/wot-next/td"],
-            "@type": "tm:ThingModel",
-            "title": "Lamp Thing Model",
-            "properties": {
-                "status": {
-                    "description": "current status of the lamp (on|off)",
-                    "type": "string",
-                    "readOnly": true
-                }
-            },
-            "actions": {
-                "toggle": {
-                    "description": "Turn the lamp on or off"
-                }
-            },
-            "events": {
-                "overheating": {
-                    "description": "Lamp reaches a critical temperature (overheating)",
-                    "data": {"type": "string"}
-                }
-            }
-        }
-        </pre>
+        {{ snippet('tm-model-sample') }}
         <p>
           <a>Thing Model</a> definitions are identified by the <code>"@type": "tm:ThingModel"</code>. As the example
           shows, it does not provide details about a single <a>Thing</a> instance due to the lack of communication and
@@ -2941,43 +2840,7 @@
 
           <p>A snippet for two <a>Property</a> affordances is given below:</p>
 
-          <aside class="example" id="property-serialization-sample" title="Sample of Property serializations">
-            <pre>
-{
-    // ...
-    "properties": {
-        "on": {
-            "type": "boolean",
-            "forms": [...]
-        },
-        "status": {
-            "type": "object",
-            "properties": {
-                "brightness": {
-                    "type": "number",
-                    "minimum": 0.0,
-                    "maximum": 100.0
-                },
-                "rgb": {
-                    "type": "array",
-                    "items": {
-                        "type": "number",
-                        "minimum": 0,
-                        "maximum": 255
-                    },
-                    "minItems": 3,
-                    "maxItems": 3
-                }
-            },
-            "required": ["brightness", "rgb"],
-            "forms": [...]
-        }
-    },
-    // ...
-}
-</pre
-            >
-          </aside>
+          {{ snippet('property-serialization') }}
         </section>
         <!-- end of id="property-serialization-json"-->
 
@@ -6053,7 +5916,7 @@
         <section id="thing-model-td-placeholder" class="normative">
           <h3>Placeholder</h3>
 
-          <p>
+          {% raw %}<p>
             A <a>Thing Model</a> can specify which terms should be used in a TD instance, but their values are
             unspecific and are first known during TD instantiation.
             <span class="rfc2119-assertion" id="tm-placeholder-usecase">
@@ -6169,7 +6032,7 @@
 	</pre
             >
           </aside>
-        </section>
+        </section>{% endraw %}
       </section>
 
       <section id="thing-model-td-generation" class="normative">
@@ -6242,7 +6105,7 @@
         </ul>
 
         <p>
-          It is recommended that the <code>id</code> value of a <a>Thing Model</a> provides a placeholder such as
+          {% raw %}It is recommended that the <code>id</code> value of a <a>Thing Model</a> provides a placeholder such as
           <code>"id": "urn:example:</code><code>{{</code><code>RANDOM_ID_PATTERN</code><code>}}</code><code>"</code> for
           the TD generation process. Please avoid including metadata in the <code>id</code> pattern.
         </p>
@@ -6294,7 +6157,7 @@
 }
 		</pre
           >
-        </aside>
+        </aside>{% endraw %}
 
         <p>
           Please note that a TD can only be an instance of one TM at a time. That means for Thing Descriptions:
