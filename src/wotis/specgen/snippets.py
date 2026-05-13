@@ -40,6 +40,8 @@ def validate_all_snippets(snippets_dir: Path, schema_path: Path) -> list[str]:
     errors: list[str] = []
 
     for json_file in sorted(snippets_dir.glob("*.json")):
+        if json_file.stem == "TEMPLATE":
+            continue
         with json_file.open(encoding="utf-8") as f:
             try:
                 instance = json.load(f)

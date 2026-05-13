@@ -1,0 +1,34 @@
+# Template for snippet metadata — copy and rename to {your-snippet-name}.meta.yaml
+# A matching {your-snippet-name}.json must exist with a complete, valid TD or TM.
+
+# HTML id attribute for the example block (used for cross-references like <a href="#my-id">)
+id: my-example-id
+
+# Title shown above the example in the rendered spec
+title: My Example Title
+
+# "aside" (default) wraps in <aside class="example"><pre>...</pre></aside>
+# "pre" renders as <pre class="example">...</pre>
+layout: aside
+
+# Top-level JSON keys to display (omit for full document).
+# Omitted keys are replaced with an ellipsis marker.
+# show_keys:
+#   - "@context"
+#   - title
+#   - properties
+
+# Top-level JSON keys to hide (alternative to show_keys, mutually exclusive).
+# hide_keys:
+#   - events
+
+# Keys whose values are replaced at any depth with type-aware placeholders:
+# arrays → [...], objects → {...}, scalars → ...
+# redact_keys:
+#   - forms
+
+# Marker inserted where top-level keys are omitted (default: "// ...")
+# ellipsis: "// ..."
+
+# JSON indentation level (default: 4)
+# indent: 4
