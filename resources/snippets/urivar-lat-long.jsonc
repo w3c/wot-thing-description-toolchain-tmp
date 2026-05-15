@@ -1,0 +1,43 @@
+/*
+---
+layout: pre
+---
+*/
+{
+    "@context": ["https://www.w3.org/ns/wot-next/td", {
+        "htv": "http://www.w3.org/2011/http#"
+    }],
+    // @hide-start
+    "id": "urn:uuid:f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f809102",
+    "title": "WeatherService",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "properties": {
+        "weather": {
+            // @hide-start
+            "type": "object",
+            // @hide-end
+            "uriVariables": {
+                "lat": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 90,
+                    "description": "Latitude for the desired location in the world" },
+                "long": {
+                    "type": "number",
+                    "minimum": -180,
+                    "maximum": 180,
+                    "description": "Longitude for the desired location in the world" }
+            },
+            "forms": [{
+              "href": "http://example.org/weather/{?lat,long}",
+              "htv:methodName": "GET"
+            }]
+        }
+    }
+    // @hide-start
+    // @hide-end
+}

@@ -1,0 +1,20 @@
+/*
+---
+layout: pre
+validate: false
+title: SenML Payload Example
+---
+*/
+[
+    {
+        "bn": "/example/light/"
+    },
+    {
+        "n": "level",
+        "v": 50
+    },
+    {
+        "n": "time",
+        "v": 10
+    }
+]

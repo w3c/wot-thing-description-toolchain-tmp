@@ -1,0 +1,59 @@
+/*
+---
+layout: pre
+---
+*/
+{
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:e1f2a3b4-c5d6-4e7f-8091-021324354657",
+    "title": "MyCar",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "schemaDefinitions": {
+      "actionErrorPayload": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "enum": ["cold","hot","maintenance"]
+          },
+          "timeStamp": {
+            "description": "UNIX time in numbers indicating when the error happened",
+            "type": "number"
+          }
+        }
+      }
+    },
+    // @hide-start
+    // @hide-end
+    "actions": {
+        "startEngine": {
+            "output": {
+              "type": "string"
+            },
+            "forms": [{
+                "op": "invokeaction",
+                "href": "http://mycar.example.com/api/engine",
+                "contentType": "application/json",
+                "additionalResponses": [
+                  {
+                    "success": false,
+                    "contentType": "application/json",
+                    "schema": "actionErrorPayload"
+                  },
+                  {
+                    "success": false
+                  }
+                ]
+            }]
+        }
+    }
+    // @hide-start
+    // @hide-end
+}

@@ -1,0 +1,42 @@
+/*
+---
+layout: pre
+---
+*/
+{
+    "@context": ["https://www.w3.org/ns/wot-next/td", {
+        "htv": "http://www.w3.org/2011/http#"
+    }],
+    // @hide-start
+    "id": "urn:uuid:e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8091",
+    "title": "WeatherService",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "properties": {
+        "weather": {
+            // @hide-start
+            "type": "object",
+            // @hide-end
+            "uriVariables": {
+                "city": {
+                    "type": "string",
+                    "description": "City name to find the weather information for"
+                },
+                "unit": {
+                    "type": "string",
+                    "enum": ["fahrenheit_value","celsius_value"],
+                    "description": "Desired unit for the temperature value"
+                }
+            },
+            "forms": [{
+                "href": "http://example.org/weather/{city}/{?unit}",
+                "htv:methodName": "GET"
+            }]
+        }
+    }
+    // @hide-start
+    // @hide-end
+}

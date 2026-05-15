@@ -1,0 +1,37 @@
+/*
+---
+layout: pre
+title: "Thing Model with the tm:optional term for interaction affordances."
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "@type": "tm:ThingModel",
+    "title": "Lamp Thing Model",
+    "description": "Lamp Thing Model Description",
+    "tm:optional": [
+        "/events/overheating"
+    ],
+    "properties": {
+        "status": {
+            "description": "current status of the lamp (on|off)",
+            "type": "string",
+            "readOnly": true
+        }
+    },
+    "actions": {
+        "toggle": {
+            "description": "Turn the lamp on or off"
+        }
+    },
+    "events": {
+        "overheating": {
+            "description": "Lamp reaches a critical temperature (overheating)",
+            "data": {
+                "type": "string"
+            }
+        }
+    }
+}

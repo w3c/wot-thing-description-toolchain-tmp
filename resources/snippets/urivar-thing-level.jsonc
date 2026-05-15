@@ -1,0 +1,69 @@
+/*
+---
+layout: pre
+id: td-forms-urivariables-thing-example
+---
+*/
+{
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        { "htv": "http://www.w3.org/2011/http#" }
+    ],
+    "id": "urn:uuid:a7b8c9d0-e1f2-4a3b-4c5d-6e7f80910213",
+    "title": "MyThing",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "properties": {
+        "temperature": {
+            "type": "number",
+            "forms": [
+                // @hide-start
+                { "href": "https://mything.example.com/temperature" }
+                // @hide-end
+            ]
+        },
+        "brightness": {
+            "type": "number",
+            "forms": [
+                // @hide-start
+                { "href": "https://mything.example.com/brightness" }
+                // @hide-end
+            ]
+        },
+        "humidity": {
+            "type": "integer",
+            "forms": [
+                // @hide-start
+                { "href": "https://mything.example.com/humidity" }
+                // @hide-end
+            ]
+        }
+    },
+    "uriVariables": {
+        "propertyNames": {
+            "type": "string",
+            "description": "Comma separated list of property names to select."
+        },
+        "unitSystem": {
+            "type": "string",
+            "enum": ["metric","imperial","uscustomary"],
+            "description": "System of Measurement that will be used for the values"
+        }
+    },
+    "forms": [{
+        "op": "readallproperties",
+        "href": "https://mything.example.com/properties{?unitSystem}",
+        "contentType": "application/json",
+        "htv:methodName": "GET"
+    },
+    {
+        "op": "readmultipleproperties",
+        "href": "https://mylamp.example.com/properties{?propertyNames,unitSystem}",
+        "contentType": "application/json",
+        "htv:methodName": "GET"
+    }]
+}

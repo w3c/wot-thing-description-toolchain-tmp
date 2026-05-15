@@ -1,0 +1,22 @@
+/*
+---
+layout: pre
+id: td-model-example-tmRef2
+title: Smart Lamp Control extend and overwrite existing definitions
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "@type": "tm:ThingModel",
+    "title": "Smart Lamp Control",
+    "properties": {
+        "dimming": {
+            "tm:ref": "http://example.com/SmartLampControlwithDimming.tm.jsonld#/properties/dim",
+            "title": null,
+            "maximum": 80,
+            "unit": "%"
+        }
+    }
+}

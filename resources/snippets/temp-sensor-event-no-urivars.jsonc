@@ -1,0 +1,64 @@
+/*
+---
+layout: pre
+---
+*/
+{
+  "@context": ["https://www.w3.org/ns/wot-next/td", {
+      "htv": "http://www.w3.org/2011/http#"
+  }],
+  "id": "urn:uuid:4778f80a-4c78-4cbb-a0e4-fa37b7d748df",
+  "title": "TemperatureSensor",
+  "description": "Webhook-based Event with subscription and unsubscribe form.",
+  "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+  "security": ["nosec_sc"],
+  "events": {
+      "temperature": {
+          "description": "Provides periodic temperature value updates.",
+          "subscription": {
+              "type": "object",
+              "properties": {
+                  "callbackURL": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Callback URL provided by subscriber for Webhook notifications.",
+                      "writeOnly": true
+                  },
+                  "subscriptionID": {
+                      "type": "string",
+                      "description": "Unique subscription ID for cancellation provided by WebhookThing.",
+                      "readOnly": true
+                  }
+              }
+          },
+          "data": {
+              "type": "number",
+              "description": "Latest temperature value that is sent to the callback URL."
+          },
+          "cancellation": {
+              "type": "object",
+              "properties": {
+                  "subscriptionID": {
+                      "type": "integer",
+                      "description": "Required subscription ID to cancel subscription.",
+                      "writeOnly": true
+                  }
+              },
+              "required": ["subscriptionID"]
+          },
+          "forms": [
+              {
+                  "op": "subscribeevent",
+                  "href": "http://192.168.0.124:8080/events/temp/subscribe",
+                  "contentType": "application/json",
+                  "htv:methodName": "POST"
+              },
+              {
+                  "op": "unsubscribeevent",
+                  "href": "http://192.168.0.124:8080/events/temp/cancel",
+                  "htv:methodName": "POST"
+              }
+          ]
+      }
+  }
+}

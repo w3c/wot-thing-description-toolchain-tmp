@@ -1,0 +1,35 @@
+/*
+---
+layout: pre
+title: An electric motor is member of the electric drive collection.
+---
+*/
+{
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "title": "Electric Motor 1",
+    "base": "coaps://motor1.example.com",
+    // @hide-start
+    "properties": {
+        "rpm": {
+            "type": "number",
+            "forms": [{ "href": "coaps://motor1.example.com/rpm" }]
+        }
+    },
+    // @hide-end
+    "links": [{
+        "rel": "collection",
+        "href": "coaps://drive.example.com",
+        "type": " application/td+json"
+    }]
+    // @hide-start
+    // @hide-end
+}

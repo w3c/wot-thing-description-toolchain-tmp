@@ -1,0 +1,22 @@
+/*
+---
+layout: pre
+validate: false
+title: DataSchema for Simple JSON Object Payload
+---
+*/
+{
+    "type": "object",
+    "properties": {
+        "level": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+        },
+        "time": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535
+        }
+    }
+}

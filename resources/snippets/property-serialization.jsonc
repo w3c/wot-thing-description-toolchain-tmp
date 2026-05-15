@@ -1,0 +1,61 @@
+/*
+---
+layout: aside
+id: property-serialization-sample
+title: Sample of Property serializations
+---
+*/
+{
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:a4e7b2c1-3f9d-4e8a-b5c6-1d2e3f4a5b6c",
+    "title": "SmartLamp",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "properties": {
+        "on": {
+            "type": "boolean",
+            "forms": [
+                {
+                    "href": "https://smartlamp.example.com/on"
+                }
+            ]
+        },
+        "status": {
+            "type": "object",
+            "properties": {
+                "brightness": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 100.0
+                },
+                "rgb": {
+                    "type": "array",
+                    "items": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 255
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                }
+            },
+            "required": [
+                "brightness",
+                "rgb"
+            ],
+            "forms": [
+                {
+                    "href": "https://smartlamp.example.com/status"
+                }
+            ]
+        }
+    }
+}

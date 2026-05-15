@@ -1,0 +1,21 @@
+/*
+---
+layout: pre
+validate: false
+title: OCF Batch Example
+---
+*/
+[
+    {
+        "href": "/example/light/level",
+        "rep": {
+            "dimmingSetting": 50
+        }
+    },
+    {
+        "href": "/example/light/time",
+        "rep": {
+            "rampTime": 10
+        }
+    }
+]

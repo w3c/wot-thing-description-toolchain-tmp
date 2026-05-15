@@ -1,0 +1,15 @@
+# Template for snippet groups — copy and rename to {your-group-name}.yaml
+# Groups render as tabbed examples using the ds-selector-tabs pattern.
+# Each tab references a snippet by name (must exist in ../snippets/).
+# Add {{ snippet_group('your-group-name') }} in index.template.html.
+
+# Title shown above the tabbed example block
+title: My Tabbed Example Title
+
+# List of tabs — each references a snippet file by name (without .json)
+tabs:
+  - snippet: first-snippet-name
+    label: First Tab Label
+    selected: true              # Only one tab should be selected
+  - snippet: second-snippet-name
+    label: Second Tab Label

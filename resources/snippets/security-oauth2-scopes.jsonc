@@ -1,0 +1,56 @@
+/*
+---
+layout: pre
+id: example-oauth2-scopes
+---
+*/
+{
+    // @hide-start
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "id": "urn:uuid:d6fa7b42-1e5a-4f2d-c9b4-0a6b8d1f5c43",
+    "title": "OAuth2ScopesExample",
+    // @hide-end
+    "securityDefinitions": {
+        "oauth2_sc": {
+            "scheme": "oauth2",
+            "flow": "client",
+            "token": "https://example.com/token",
+            "scopes": ["limited", "special"]
+        }
+    },
+    "security": "oauth2_sc",
+    // @hide-start
+    "description": "Example demonstrating OAuth2 with scopes",
+    // @hide-end
+    "properties": {
+        "status": {
+            // @hide-start
+            "type": "string",
+            // @hide-end
+            "forms": [{
+                "href": "https://scopes.example.com/status",
+                "scopes": ["limited"]
+            }]
+        }
+    },
+    "actions": {
+        "configure": {
+            // @hide-start
+            "description": "Configure the device",
+            // @hide-end
+            "forms": [{
+                "href": "https://scopes.example.com/configure",
+                "scopes": ["special"]
+            }]
+        }
+    }
+    // @hide-start
+    ,
+    "events": {
+        "alert": {
+            "data": {"type": "string"},
+            "forms": [{"href": "https://scopes.example.com/alert"}]
+        }
+    }
+    // @hide-end
+}

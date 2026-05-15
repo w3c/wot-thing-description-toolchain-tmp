@@ -1,0 +1,34 @@
+/*
+---
+layout: pre
+id: td-model-example-relative-tmRef
+title: Multi Sensor Thing Model re-using definitions with relative imports
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "@type": "tm:ThingModel",
+    "title": "Multi Sensor",
+    "properties": {
+        "genericTemperature": {
+            "type": "number",
+            "unit": "C"
+        },
+        "innerTemperature": {
+            "tm:ref": "#/properties/genericTemperature",
+            "title": "The inner temperature",
+            "minimum": 10
+        },
+        "outerTemperature": {
+            "tm:ref": "#/properties/genericTemperature",
+            "title": "The outer temperature",
+            "description": "The outer temperature is measured in Kelvin",
+            "unit": "K"
+        }
+    },
+    "tm:optional": [
+        "/properties/genericTemperature"
+    ]
+}

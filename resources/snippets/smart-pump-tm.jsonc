@@ -1,0 +1,15 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+	// ...
+	"@type": "tm:ThingModel",
+	"title": "Smart Pump",
+	"id": "urn:example:{{RANDOM_ID_PATTERN}}",
+	"description": "Smart Pump live plant and simulator",
+	"version" : {"model" : "1.0.0" },
+	// ...
+}

@@ -1,0 +1,32 @@
+/*
+---
+layout: pre
+title: Subprotocol usage for subscribing events
+---
+*/
+{
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:d5e6f7a8-b9c0-4d1e-2f3a-4b5c6d7e8f9a",
+    "title": "MyLamp",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    "events": {
+        "overheating": {
+            "forms": [
+                {
+                    // @hide-end
+                    "op": "subscribeevent",
+                    "href": "https://mylamp.example.com/overheating",
+                    "subprotocol": "longpoll"
+                    // @hide-start
+                }
+            ]
+        }
+    }
+    // @hide-end
+}

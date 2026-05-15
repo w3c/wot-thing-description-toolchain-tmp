@@ -1,0 +1,51 @@
+/*
+---
+layout: pre
+---
+*/
+{
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:b4c5d6e7-f809-4102-1324-35465768798a",
+    "title": "CoffeeMaker",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "actions": {
+        "brewCoffee": {
+            "description": "Invoking this action does not return a payload.",
+            "input": {
+              "type": "object",
+              "properties": {
+                "coffeeType": {
+                  "enum": [
+                    "espresso",
+                    "americano",
+                    "cappuccino",
+                    "latte"
+                  ]
+                },
+                "useOatMilk": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "required": [
+                "coffeeType"
+              ]
+            },
+            "forms": [{
+                "op": "invokeaction",
+                "href": "http://coffee-maker.example.com/brew-coffee",
+                "contentType": "application/json",
+                "response": {}
+            }]
+        }
+    }
+    // @hide-start
+    // @hide-end
+}

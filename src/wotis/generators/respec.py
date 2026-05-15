@@ -469,7 +469,7 @@ def generate_respec_spec(
         return
 
     try:
-        env = build_jinja_env(cfg.jinja_templates)
+        env = build_jinja_env(cfg.jinja_templates, snippets_dir=cfg.snippets_dir)
         section_tpl = env.get_template("class_section.jinja2")
     except (exceptions.TemplateNotFound, FileNotFoundError) as e:
         logging.error("Template error: %s", e, exc_info=True)
@@ -612,11 +612,35 @@ def generate_respec_spec(
     # Escape literal percent signs so assemble()'s placeholder replacement is safe.
     sections_content = [s.replace('%', '%%') for s in sections_content]
 
+    rendered_template = None
+    if cfg.snippets_dir.is_dir():
+        from ..specgen.snippets import validate_all_snippets
+
+        schemas_dir = cfg.resources_path / "ground-truth-schemas"
+        td_schema_path = schemas_dir / "td-json-schema-validation.json"
+        tm_schema_path = schemas_dir / "tm-json-schema-validation.json"
+        snippet_errors = validate_all_snippets(
+            cfg.snippets_dir,
+            td_schema_path,
+            tm_schema_path,
+        )
+        if snippet_errors:
+            for err in snippet_errors:
+                logging.error("Snippet validation error: %s", err)
+            raise RuntimeError(
+                f"Snippet validation failed with {len(snippet_errors)} error(s)"
+            )
+
+        tpl_text = respec_template_path.read_text(encoding="utf-8")
+        jinja_tpl = env.from_string(tpl_text)
+        rendered_template = jinja_tpl.render()
+
     assemble(
         respec_template_path,
         *sections_content,
         out_path=final_spec_path,
         placeholder=core_schema_placeholder,
+        template_content=rendered_template,
     )
 
     if assertions_csv_path is not None:
