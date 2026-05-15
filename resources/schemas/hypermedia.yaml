@@ -577,15 +577,17 @@ classes:
         annotations:
           spec_default: true
       security:
-        any_of:
+        exactly_one_of:
           - range: string
           - range: string
             multivalued: true
+            minimum_cardinality: 1
       scopes:
-        any_of:
+        exactly_one_of:
           - range: string
           - range: string
             multivalued: true
+            minimum_cardinality: 1
 
   ExpectedResponse:
     class_uri: hctl:ExpectedResponse

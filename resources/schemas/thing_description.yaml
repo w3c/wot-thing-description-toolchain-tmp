@@ -163,10 +163,7 @@ slots:
       spec_description: >-
         Set of security definition names, chosen from those defined in `securityDefinitions`.
         These must all be satisfied for access to resources.
-    any_of:
-      - range: string
-      - range: string
-        multivalued: true
+    range: string
 
   securityDefinitions:
     slot_uri: td:definesSecurityScheme

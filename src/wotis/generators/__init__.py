@@ -14,6 +14,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 from .. import (SCHEMA_PATH, GENS_PATH, GENERATORS,
                 RESPEC_TEMPLATE_PATH, FINAL_SPEC_PATH,
                 CORE_SCHEMA_PLACEHOLDER, ASSERTION_PATH)
+from ..postprocessors.jsonschema_postprocessor import post_process_jsonschema
 from .visualization import generate_visualizations
 from .respec import generate_respec_spec
 
@@ -26,11 +27,19 @@ def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: P
 
     if generator == 'jsonschema':
         logging.info("Proceeding with LinkML to JSON Schema conversion")
-        json_schema_generator = JsonSchemaGenerator(schema_view.schema, mergeimports=True)
-        processed_content = json_schema_generator.serialize()
+        json_schema_generator = JsonSchemaGenerator(
+            schema_view.schema,
+            mergeimports=True,
+            top_class='Thing',
+            not_closed=True,
+            include_null=False,
+            preserve_names=True,
+        )
+        raw_schema = json.loads(json_schema_generator.serialize())
+        processed_schema = post_process_jsonschema(raw_schema, schema_view)
         output_file = output_dir / 'jsonschema.json'
         with output_file.open('w', encoding='utf-8') as f:
-            json.dump(processed_content, f, indent=2, ensure_ascii=False)
+            json.dump(processed_schema, f, indent=2, ensure_ascii=False)
         logging.info(f"JSON Schema saved to {output_file}")
 
     elif generator == 'shacl':

@@ -229,18 +229,6 @@ def _build_oneof_dispatch(schema: dict, sv: SchemaView, config: TransformConfig)
                 "description": f"Additional {cls_name} not covered by known subclasses"
             })
 
-        # Remove identifier-related props from subclasses (name is internal)
-        for sub_name, sub_def_cls in sv.all_classes().items():
-            if sub_def_cls.is_a == cls_name and sub_name in defs:
-                sub_def = defs[sub_name]
-                props = sub_def.get('properties', {})
-                props.pop('name', None)
-                req = sub_def.get('required', [])
-                if 'name' in req:
-                    req.remove('name')
-                if not req:
-                    sub_def.pop('required', None)
-
         # Replace parent def with oneOf dispatch
         defs[cls_name] = {"oneOf": one_of_list}
 
@@ -297,6 +285,13 @@ def _build_form_variants(schema: dict, config: TransformConfig) -> None:
             "oneOf": variant_refs + [{"$ref": f"#/$defs/{base_name}"}]
         }
 
+        # Update Thing-level forms ref to point to the new dispatch def
+        thing_props = schema.get('properties', {})
+        if 'forms' in thing_props:
+            forms_prop = thing_props['forms']
+            if isinstance(forms_prop, dict) and 'items' in forms_prop:
+                forms_prop['items'] = {"$ref": f"#/$defs/{cls_name}"}
+
 
 # ---------------------------------------------------------------------------
 # Transform: Link discrimination
@@ -349,8 +344,17 @@ def _build_link_discrimination(schema: dict, config: TransformConfig) -> None:
         }
         defs[icon_element_name] = icon_element_def
 
-        # Remove original Link def, replace references later
         del defs[cls_name]
+
+        # Update Thing-level links ref to point to discriminated variants
+        thing_props = schema.get('properties', {})
+        if 'links' in thing_props:
+            links_prop = thing_props['links']
+            if isinstance(links_prop, dict) and 'items' in links_prop:
+                links_prop['items'] = {"oneOf": [
+                    {"$ref": f"#/$defs/{link_element_name}"},
+                    {"$ref": f"#/$defs/{icon_element_name}"},
+                ]}
 
 
 # ---------------------------------------------------------------------------
@@ -412,24 +416,6 @@ def _fix_dict_style_slots(schema: dict, config: TransformConfig) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Transform: fix @context slot (strip spurious type: string from oneOf)
-# ---------------------------------------------------------------------------
-
-def _fix_context_slot(schema: dict) -> None:
-    """Clean up LinkML's @context oneOf output.
-
-    LinkML generates a top-level ``type: string`` alongside the ``oneOf`` for
-    exactly_one_of slots. That conflicts with the array branch, so strip it.
-    """
-    thing_props = schema.get('properties', {})
-    ctx = thing_props.get('@context')
-    if not ctx or 'oneOf' not in ctx:
-        return
-
-    ctx.pop('type', None)
-
-
-# ---------------------------------------------------------------------------
 # Transform: strip spurious top-level type from oneOf properties
 # ---------------------------------------------------------------------------
 
@@ -480,53 +466,6 @@ def _simplify_exclusive_minimum(schema: dict) -> None:
         return obj
 
     _walk(schema)
-
-
-# ---------------------------------------------------------------------------
-# Transform: fix security slot (oneOf instead of anyOf)
-# ---------------------------------------------------------------------------
-
-def _fix_security_slot(schema: dict) -> None:
-    thing_props = schema.get('properties', {})
-    if 'security' not in thing_props:
-        return
-
-    sec = thing_props['security']
-    desc = sec.get('description', '')
-
-    thing_props['security'] = {
-        "oneOf": [
-            {"type": "string"},
-            {"type": "array", "items": {"type": "string"}, "minItems": 1}
-        ],
-    }
-    if desc:
-        thing_props['security']['description'] = desc
-
-
-# ---------------------------------------------------------------------------
-# Transform: fix links and forms refs in Thing
-# ---------------------------------------------------------------------------
-
-def _fix_thing_array_refs(schema: dict) -> None:
-    """Update Thing-level links/forms refs to point to discriminated defs."""
-    defs = schema.get('$defs', {})
-    thing_props = schema.get('properties', {})
-
-    # links → link_element (if link discrimination created it)
-    if 'links' in thing_props and 'link_element' in defs:
-        links_prop = thing_props['links']
-        if isinstance(links_prop, dict) and 'items' in links_prop:
-            links_prop['items'] = {"oneOf": [
-                {"$ref": "#/$defs/link_element"},
-                {"$ref": "#/$defs/icon_link_element"},
-            ]}
-
-    # forms → Form oneOf (if form variants replaced it)
-    if 'forms' in thing_props and 'Form' in defs:
-        forms_prop = thing_props['forms']
-        if isinstance(forms_prop, dict) and 'items' in forms_prop:
-            forms_prop['items'] = {"$ref": "#/$defs/Form"}
 
 
 # ---------------------------------------------------------------------------
@@ -606,69 +545,47 @@ def _remove_identifier_slots(schema: dict, sv: SchemaView) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Cleanup: fix $ref paths after structural changes
+# Cleanup: resolve $refs (inline enums, fix paths, remove Any)
 # ---------------------------------------------------------------------------
 
-def _fix_ref_paths(schema: dict) -> None:
-    """Walk the schema and update any $ref pointing to removed/renamed defs."""
-    defs = schema.get('$defs', {})
-    valid_def_names = set(defs.keys())
+def _resolve_refs(schema: dict, sv: SchemaView) -> None:
+    """Single-pass $ref resolution: inline enums, fix broken paths, remove Any."""
+    valid_def_names = set(schema.get('$defs', {}).keys())
 
-    def _walk_and_fix(obj: Any) -> Any:
-        if isinstance(obj, dict):
-            if '$ref' in obj:
-                ref = obj['$ref']
-                if ref.startswith('#/$defs/'):
-                    ref_name = ref[len('#/$defs/'):]
-                    # Try __identifier_optional → base name
-                    if ref_name not in valid_def_names:
-                        base = ref_name.replace('__identifier_optional', '')
-                        if base in valid_def_names:
-                            obj['$ref'] = f'#/$defs/{base}'
-                        # Also handle old #/definitions/ format
-                    elif ref.startswith('#/definitions/'):
-                        ref_name = ref[len('#/definitions/'):]
-                        if ref_name in valid_def_names:
-                            obj['$ref'] = f'#/$defs/{ref_name}'
-
-            # Handle $ref to Any — replace with empty schema (accepts anything)
-            if '$ref' in obj and obj['$ref'] == '#/$defs/Any':
-                del obj['$ref']
-                # Leave the description if present, remove ref
-
-            for key, val in list(obj.items()):
-                obj[key] = _walk_and_fix(val)
-        elif isinstance(obj, list):
-            return [_walk_and_fix(item) for item in obj]
-        return obj
-
-    _walk_and_fix(schema)
-
-
-# ---------------------------------------------------------------------------
-# Cleanup: inline enum refs
-# ---------------------------------------------------------------------------
-
-def _inline_enum_refs(schema: dict, sv: SchemaView) -> None:
-    """Replace $ref to enum defs with inline enum arrays (since enum defs are removed)."""
     enum_values: dict[str, list[str]] = {}
     for enum_name, enum_def in sv.all_enums().items():
         pvs = list(enum_def.permissible_values.keys()) if enum_def.permissible_values else []
         if pvs:
             enum_values[enum_name] = pvs
 
+    def _extract_ref_name(ref: str) -> str | None:
+        for prefix in ('#/$defs/', '#/definitions/'):
+            if ref.startswith(prefix):
+                return ref[len(prefix):]
+        return None
+
     def _walk(obj: Any) -> Any:
         if isinstance(obj, dict):
             if '$ref' in obj:
                 ref = obj['$ref']
-                for prefix in ['#/$defs/', '#/definitions/']:
-                    if ref.startswith(prefix):
-                        ref_name = ref[len(prefix):]
-                        if ref_name in enum_values:
-                            result = {"type": "string", "enum": enum_values[ref_name]}
-                            if 'description' in obj:
-                                result['description'] = obj['description']
-                            return result
+                ref_name = _extract_ref_name(ref)
+
+                if ref_name is not None:
+                    if ref_name in enum_values:
+                        result = {"type": "string", "enum": enum_values[ref_name]}
+                        if 'description' in obj:
+                            result['description'] = obj['description']
+                        return result
+
+                    if ref_name == 'Any':
+                        del obj['$ref']
+                    elif ref_name not in valid_def_names:
+                        base = ref_name.replace('__identifier_optional', '')
+                        if base in valid_def_names:
+                            obj['$ref'] = f'#/$defs/{base}'
+                    elif not ref.startswith('#/$defs/'):
+                        obj['$ref'] = f'#/$defs/{ref_name}'
+
             for key, val in list(obj.items()):
                 obj[key] = _walk(val)
         elif isinstance(obj, list):
@@ -754,16 +671,12 @@ def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     _build_form_variants(schema, config)
     _build_link_discrimination(schema, config)
     _fix_dict_style_slots(schema, config)
-    _fix_context_slot(schema)
     _fix_oneof_type_conflict(schema)
     _simplify_exclusive_minimum(schema)
-    _fix_security_slot(schema)
-    _fix_thing_array_refs(schema)
     _remove_identifier_slots(schema, schema_view)
-    _inline_enum_refs(schema, schema_view)
     _remove_excluded_defs(schema, schema_view, config)
     _fix_anyof_additional_props(schema)
-    _fix_ref_paths(schema)
+    _resolve_refs(schema, schema_view)
     _strip_def_metadata(schema)
     _clean_top_level(schema)
 
