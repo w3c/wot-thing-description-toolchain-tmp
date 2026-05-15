@@ -10,7 +10,7 @@ readme = "README.md"
 include = ["README.md", "resources/schemas/*"]
 requires-python = ">=3.14"
 dependencies = [
-    "linkml @ git+https://github.com/linkml/linkml.git@main",
+    "linkml>=1.10.0",
     "mkdocs-mermaid2-plugin==1.2.3",
     "mkdocs-material>=9.7.6",
     "schemasheets>=0.1.10",
@@ -33,7 +33,6 @@ only-include = ["src/wotis"]
 
 [tool.hatch.metadata]
 root = "src"
-allow-direct-references = true
 
 [project.scripts]
 wotis = "src.wotis.cli:main"
