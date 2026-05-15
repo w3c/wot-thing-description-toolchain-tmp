@@ -3,7 +3,6 @@
 layout: pre
 id: td-model-example-tmRef
 title: Smart Lamp Control imports existing definition
-validate: false
 ---
 */
 {

@@ -1,37 +1,55 @@
 /*
 ---
 layout: aside
-validate: false
 id: dataschema-serialization-sample
 title: Sample of a DataSchema serialization
 ---
 */
 {
-    // ...
-    "type": "object",
-    "properties": {
-        "status": {
-            "title": "Status",
-            "type": "string",
-            "enum": ["on_value", "off_value", "error_value"]
-        },
-        "brightness": {
-            "title": "Brightness value",
-            "type": "number",
-            "minimum": 0.0,
-            "maximum": 100.0
-        },
-        "rgb": {
-            "title": "RGB color value",
-            "type": "array",
-            "items": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 255
-            },
-            "minItems": 3,
-            "maxItems": 3
-        }
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "title": "SmartLamp",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
     },
-    // ...
+    "security": "nosec_sc",
+    "properties": {
+        "lampState": {
+            // @hide-end
+            "type": "object",
+            "properties": {
+                "status": {
+                    "title": "Status",
+                    "type": "string",
+                    "enum": ["on_value", "off_value", "error_value"]
+                },
+                "brightness": {
+                    "title": "Brightness value",
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 100.0
+                },
+                "rgb": {
+                    "title": "RGB color value",
+                    "type": "array",
+                    "items": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 255
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                }
+            }
+            // @hide-start
+            ,
+            "forms": [
+                { "href": "https://smartlamp.example.com/state" }
+            ]
+        }
+    }
+    // @hide-end
 }

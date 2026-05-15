@@ -1,22 +1,39 @@
 /*
 ---
 layout: pre
-validate: false
 id: example-payload-binding
 title: JSON and CBOR media types in forms
 ---
 */
 {
-    "forms": [
-        {
-            "href": "http://example.com/properties/temperature",
-            "op": "readproperty",
-            "contentType": "application/json"
-        },
-        {
-            "href": "coap://example.com/properties/temperature",
-            "op": "readproperty",
-            "contentType": "text/plain;charset=utf-8"
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:e6f7a8b9-c0d1-4e2f-3a4b-5c6d7e8f9a0b",
+    "title": "TemperatureSensor",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    "properties": {
+        "temperature": {
+            "type": "number",
+            // @hide-end
+            "forms": [
+                {
+                    "href": "http://example.com/properties/temperature",
+                    "op": "readproperty",
+                    "contentType": "application/json"
+                },
+                {
+                    "href": "coap://example.com/properties/temperature",
+                    "op": "readproperty",
+                    "contentType": "text/plain;charset=utf-8"
+                }
+            ]
+            // @hide-start
         }
-    ]
+    }
+    // @hide-end
 }

@@ -3,7 +3,6 @@
 layout: pre
 id: td-model-example-lamp
 title: Thing Model sample
-validate: false
 ---
 */
 {
