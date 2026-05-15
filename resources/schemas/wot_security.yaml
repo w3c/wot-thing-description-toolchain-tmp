@@ -117,6 +117,10 @@ classes:
       sensitive information directly providing access MUST NOT be stored in the TD and should instead be shared and 
       stored out-of-band via other mechanisms.
     annotations:
+      jsonschema_oneof_dispatch:
+        value:
+          discriminator: scheme
+          include_unknown: true
       spec_description: >-
         Metadata describing the configuration of a security mechanism.
       spec_intro_content:
@@ -211,10 +215,15 @@ classes:
               - BearerSecurityScheme
               - PSKSecurityScheme
               - OAuth2SecurityScheme
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
+    attributes:
+      name:
+        identifier: true
+        range: string
+        description: Name of the security scheme definition.
+        annotations:
+          spec_exclude: true
     slots:
       - "@type"
       - description
@@ -228,7 +237,7 @@ classes:
           - range: string
           - range: string
             multivalued: true
-            minimum_value: 1
+            minimum_cardinality: 1
 
 
   NoSecurityScheme:
@@ -238,13 +247,13 @@ classes:
     annotations:
       spec_description: >-
         A security configuration corresponding to identified by the Vocabulary Term `nosec` (i.e., "scheme": "nosec"), indicating there is no authentication or other mechanism required to access the resource.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slot_usage:
       scheme:
-        pattern: ^nosec$
+        range: string
+        equals_string_in:
+          - nosec
 
   AutoSecurityScheme:
     is_a: SecurityScheme
@@ -254,13 +263,13 @@ classes:
     annotations:
       spec_description: >-
         An automatic authentication security configuration identified by the term `auto` (i.e., "scheme": "auto"). This scheme indicates that the security parameters are going to be negotiated by the underlying protocols at runtime, subject to the respective specifications for the protocol (e.g. [[RFC8288]] for Basic Authentication when using HTTP).
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slot_usage:
       scheme:
-        pattern: ^auto$
+        range: string
+        equals_string_in:
+          - auto
 
   ComboSecurityScheme:
     is_a: SecurityScheme
@@ -280,16 +289,16 @@ classes:
                   Exactly one of either `oneOf` or `allOf` vocabulary terms *MUST* be included.
               - text: |
                   Only security scheme definitions which can be used together can be combined with `allOf`. For example, it is not possible in general to combine different OAuth 2.0 flows together using `allOf` unless one applies to a proxy and one to the endpoint. Note that when multiple named security scheme definitions are listed in a `security` field the same semantics apply as in an `allOf` combination (and the same limitations on allowable combinations). The `oneOf` combination is equivalent to using different security schemes on forms that are otherwise identical. In this sense a `oneOf` scheme is not an essential feature but it does avoid redundancy in such cases.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slots:
       - oneOf
       - allOf
     slot_usage:
       scheme:
-        pattern: ^combo$
+        range: string
+        equals_string_in:
+          - combo
       oneOf:
         description: >-
           Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, will allow access. Only one may be chosen for use.
@@ -308,14 +317,16 @@ classes:
     annotations:
       spec_description: >-
         Basic Authentication [[RFC7617]] security configuration identified by the Vocabulary Term `basic` (i.e., "scheme": "basic"), using an unencrypted username and password.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slots:
       - "@name"
       - in
     slot_usage:
+      scheme:
+        range: string
+        equals_string_in:
+          - basic
       in:
         annotations:
           spec_default: true
@@ -338,15 +349,17 @@ classes:
       spec_description: >-
         Digest Access Authentication [[RFC7616]] security configuration identified by the Vocabulary Term `digest` (i.e., "scheme": "digest").
         This scheme is similar to basic authentication but with added features to avoid man-in-the-middle attacks.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slots:
       - "@name"
       - in
       - qop
     slot_usage:
+      scheme:
+        range: string
+        equals_string_in:
+          - digest
       in:
         annotations:
           spec_default: true
@@ -380,16 +393,16 @@ classes:
         This scheme is to be used when the access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider. 
         In this case the key may not be using a standard token format. 
         This scheme indicates that the key provided by the service provider needs to be supplied as part of service requests using the mechanism indicated by the `in` field.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slots:
       - "@name"
       - in
     slot_usage:
       scheme:
-        pattern: ^apikey$
+        range: string
+        equals_string_in:
+          - apikey
       in:
         required: true
         range: SecurityLocationType
@@ -422,10 +435,8 @@ classes:
               - id: td-security-bearer-format-extensions
                 text: |
                   Other formats and algorithms for bearer tokens *MAY* be specified in vocabulary extensions.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slots:
       - authorization
       - "@name"
@@ -433,6 +444,10 @@ classes:
       - alg
       - format
     slot_usage:
+      scheme:
+        range: string
+        equals_string_in:
+          - bearer
       in:
         annotations:
           spec_default: true
@@ -476,12 +491,15 @@ classes:
         Pre-shared key authentication security configuration identified by the Vocabulary Term `psk` (i.e., "scheme": "psk"). 
         This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[RFC4279]], 
         and that the ciphersuite used for keys will be established during protocol negotiation.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slots:
       - identity
+    slot_usage:
+      scheme:
+        range: string
+        equals_string_in:
+          - psk
 
   OAuth2SecurityScheme:
     is_a: SecurityScheme
@@ -506,10 +524,8 @@ classes:
                   For the `client` flow, `authorization` vocabulary term *MUST NOT* be included.
               - text: |
                   The mandatory elements for each flow are summarized in the following table:
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slots:
       - authorization
       - token
@@ -517,6 +533,10 @@ classes:
       - scopes
       - flow
     slot_usage:
+      scheme:
+        range: string
+        equals_string_in:
+          - oauth2
       scopes:
         exactly_one_of:
           - range: string

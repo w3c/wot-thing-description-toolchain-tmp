@@ -44,6 +44,7 @@ classes:
     description: >-
       A data schema describes the data format used. It can be used for validation.
     annotations:
+      jsonschema_flatten_subclasses: true
       spec_description: >-
         Metadata that describes the data format used. It can be used for validation.
       spec_content:
@@ -75,10 +76,15 @@ classes:
           - type: note
             text: |
               The format term is not widely implemented by JSON Schema tools. In addition, the term `format` is being discussed by the JSON Schema standardisation community and may be replaced by another mechanism or removed in a future JSON Schema version.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
+    attributes:
+      name:
+        identifier: true
+        range: string
+        description: Name of the data schema definition.
+        annotations:
+          spec_exclude: true
     slots:
       - "@type"
       - title
@@ -102,7 +108,7 @@ classes:
           - range: string
           - range: string
             multivalued: true
-            minimum_value: 1
+            minimum_cardinality: 1
       type:
         range: DataSchemaType
       format:
@@ -132,10 +138,8 @@ classes:
     annotations:
       spec_description: >-
         Metadata describing data of type array. This subclass is indicated by the value `array` assigned to type in DataSchema instances.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     attributes:
       minItems:
         slot_uri: jsonschema:minItems
@@ -168,10 +172,8 @@ classes:
     annotations:
       spec_description: >-
         Metadata describing data of type `boolean`. This subclass is indicated by the value `boolean` assigned to type in `DataSchema` instances.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
 
   NumberSchema:
     class_uri: jsonschema:NumberSchema
@@ -182,10 +184,8 @@ classes:
     annotations:
       spec_description: >-
         Metadata describing data of type `number`. This subclass is indicated by the value `number` assigned to type in `DataSchema` instances.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slots:
       - minimum
       - exclusiveMinimum
@@ -202,10 +202,8 @@ classes:
     annotations:
       spec_description: >-
         Metadata describing data of type `integer`. This Subclass is indicated by the value `integer` assigned to `type` in `DataSchema` instances.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slots:
       - minimum
       - exclusiveMinimum
@@ -234,10 +232,8 @@ classes:
     annotations:
       spec_description: >-
         Metadata describing data of type Object. This Subclass is indicated by the value `object` assigned to `type` in `DataSchema` instances.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slots:
       - properties
       - required
@@ -263,10 +259,8 @@ classes:
           - type: note
             text: |
               The length of a string (i.e., `minLength` and `maxLength`) is defined as the number of Unicode code points, as defined by [[RFC8259]]. Note that some [user-perceived characters](https://www.w3.org/TR/i18n-glossary/#dfn-grapheme) are composed of more than one Unicode code point. Arbitrary index values might not fall on these grapheme boundaries, so truncation according to `maxLength` might alter the appearance or meaning of the string.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     attributes:
       minLength:
         slot_uri: jsonschema:minLength
@@ -317,10 +311,8 @@ classes:
         that `null` does not mean the absence of a value. It is analogous to `null` in JavaScript, `None` in Python, `null`
         in Java and `nil` in Ruby programming languages. It can be used as part of a `oneOf` declaration, where it is
         used to indicate, that the data can also be `null`.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
 
 slots:
   minimum:
@@ -351,7 +343,9 @@ slots:
       Specifies the multipleOf value number. The value must strictly greater than 0.
       Only applicable for associated number or integer types.
     range: decimal
-    pattern: ^[+]?[0-9]*\.?[0-9]+$
+    minimum_value: 0
+    none_of:
+      - equals_number: 0
 
   oneOf:
     description: >-
