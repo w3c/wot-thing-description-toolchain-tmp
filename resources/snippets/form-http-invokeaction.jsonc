@@ -1,0 +1,12 @@
+/*
+---
+layout: pre
+validate: false
+title: Binding instance of an invokeaction operation to HTTP
+---
+*/
+{
+    "op": "invokeaction",
+    "href": "http://192.168.1.32:8081/example/levelaction",
+    "htv:methodName": "POST"
+}

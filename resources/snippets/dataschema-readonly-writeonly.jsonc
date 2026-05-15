@@ -1,0 +1,29 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    // ...
+    "properties": {
+        "status": {
+            "description": "Read or write On/Off status.",
+            "type": "object",
+            "properties": {
+                "latestStatus": {
+                    "type": "string",
+                    "enum": ["on_value", "off_value"],
+                    "readOnly": true
+                },
+                "newStatusValue": {
+                    "type": "string",
+                    "enum": ["on_value", "off_value"],
+                    "writeOnly": true
+                }
+            },
+            "forms": [...]
+        }
+    }
+    // ...
+}

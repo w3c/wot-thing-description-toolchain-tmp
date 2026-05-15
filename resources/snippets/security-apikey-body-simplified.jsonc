@@ -1,0 +1,57 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    // ...
+    "securityDefinitions": {
+        "apikey_body": {
+            "scheme": "apikey",
+            "in": "body",
+            "name": "/auth/key"
+        }
+    },
+    "security": "apikey_body",
+    // ...
+    "properties": {
+        "color": {
+            // ...
+            "type": "object",
+            "properties": {
+                "brightness": {
+                    "type": "number",
+                    // ...
+                },
+                "rgb": {
+                    "type": "array",
+                    // ...
+                }
+            },
+            "required": ["brightness", "rgb"],
+            "forms": [{
+                "href": "https://example.com/color",
+                // ...
+            }]
+        }
+    },
+    "action": {
+        "on": {
+            // ...
+            "required": ["auth"],
+            "forms": [{
+                "href": "https://example.com/on",
+                // ...
+            }]
+        },
+        "off": {
+            // ...
+            "forms": [{
+                "href": "https://example.com/off",
+                // ...
+            }]
+        }
+    },
+    // ...
+}

@@ -1818,13 +1818,7 @@
             <a href="#sec-context-extensions"></a> for details).
           </p>
 
-          <pre class="example">
-{
-    "@context": "https://www.w3.org/ns/wot-next/td",
-    // ...
-}
-</pre
-          >
+          {{ snippet('td-context-only') }}
 
           <p>
             <span class="rfc2119-assertion" id="td-context-toplevel">
@@ -1835,30 +1829,7 @@
 
           <p>A TD snippet for a serialized root object including all mandatory and optional members is given below:</p>
 
-          <pre class="example" id="thing-serialization-sample" title="Sample of Thing serializations">
-{
-    "@context": "https://www.w3.org/ns/wot-next/td",
-    "@type": "Thing",
-    "id": "urn:uuid:1b37933b-3212-4dad-9c2c-74c6042c3e2b",
-    "title": "MyThing",
-    "titles": {/*...*/},
-    "description": "Human readable information.",
-    "descriptions": {/*...*/},
-    "support": "mailto:support@example.com",
-    "version": {/*...*/},
-    "created": "2018-11-14T19:10:23.824Z",
-    "modified": "2019-06-01T09:12:43.124Z",
-    "securityDefinitions": {/*...*/},
-    "security": /*...*/,
-    "base": "https://servient.example.com/",
-    "properties": {/*...*/},
-    "actions": {/*...*/},
-    "events": {/*...*/},
-    "links": [...],
-    "forms": [...]
-}
-</pre
-          >
+          {{ snippet('thing-serialization') }}
 
           <p>
             <span class="rfc2119-assertion" id="td-objects">
@@ -1923,32 +1894,7 @@
             the <code>@context</code> array.
           </p>
 
-          <pre class="example">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        { "@language": "en" }
-    ],
-    "title": "MyThing",
-    "description": "Human readable information.",
-    // ...
-    "properties": {
-        "on": {
-            "title": "On/Off",
-            "type": "boolean",
-            "forms": [...]
-        },
-        "status": {
-            "title": "Status",
-            "type": "object",
-            // ...
-            "forms": [...]
-        }
-    },
-    // ...
-}
-</pre
-          >
+          {{ snippet('i18n-title-description') }}
 
           <p>
             Strings on the Web [[?STRING-META]] recommends the use of metadata to determine the
@@ -1995,35 +1941,7 @@
             <code>@language</code> terms. See [[?json-ld11]] and [[string-meta]] for more detailed information.
           </p>
 
-          <pre class="example">
-			{
-        "@context": [
-            "https://www.w3.org/ns/wot-next/td",
-            {
-              "@language": "ar-EG",
-              "@direction": "rtl"
-            }
-        ],
-        "title": "شيء يخصني يقيس درجة الحرارة",
-        "description": "شيء يقيس درجة الحرارة و يظهر حالته",
-        // ...
-        "properties": {
-            "temp": {
-                "title": "درجة الحرارة",
-                "type": "boolean",
-                "forms": [...]
-            },
-            "status": {
-                "title": "حالة",
-                "type": "object",
-                // ...
-                "forms": [...]
-            }
-        },
-        // ...
-    }
-    </pre
-          >
+          {{ snippet('i18n-rtl-direction') }}
 
           <p>
             The JSON members named <code>titles</code> and <code>descriptions</code> are used within the TD document to
@@ -2045,52 +1963,7 @@
             A TD snippet using <code>titles</code> and <code>descriptions</code> at different levels is given below:
           </p>
 
-          <pre class="example">
-{
-    "@context": "https://www.w3.org/ns/wot-next/td",
-    "title": "MyThing",
-    "titles": {
-        "en": "MyThing",
-        "de": "MeinDing",
-        "ja": "私の物",
-        "zh-Hans": "我的东西",
-        "zh-Hant": "我的東西"
-    },
-    "descriptions": {
-        "en": "Human readable information.",
-        "de": "Menschenlesbare Informationen.",
-        "ja": "人間が読むことができる情報",
-        "zh-Hans": "人们可阅读的信息",
-        "zh-Hant": "人們可閱讀的資訊"
-    },
-    // ...
-    "properties": {
-        "on": {
-            "titles": {
-                "en": "On/Off",
-                "de": "An/Aus",
-                "ja": "オンオフ",
-                "zh-Hans": "开关",
-                "zh-Hant": "開關" },
-            "type": "boolean",
-            "forms": [...]
-        },
-        "status": {
-            "titles": {
-                "en": "Status",
-                "de": "Zustand",
-                "ja": "状態",
-                "zh-Hans": "状态",
-                "zh-Hant": "狀態" },
-            "type": "object",
-            // ...
-            "forms": [...]
-        }
-    },
-    // ...
-}
-</pre
-          >
+          {{ snippet('i18n-multi-language') }}
 
           <p>
             TD instances may also combine the use of <code>title</code> and <code>description</code> with
@@ -2110,58 +1983,7 @@
             of the Thing Description instance.
           </p>
 
-          <pre class="example">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        { "@language": "de" }
-    ],
-    "title": "MeinDing",
-    "titles": {
-        "en": "MyThing",
-        "de": "MeinDing",
-        "ja": "私の物",
-        "zh-Hans": "我的东西",
-        "zh-Hant": "我的東西"
-    },
-    "description": "Menschenlesbare Informationen.",
-    "descriptions": {
-        "en": "Human readable information.",
-        "de": "Menschenlesbare Informationen.",
-        "ja": "人間が読むことができる情報",
-        "zh-Hans": "人们可阅读的信息",
-        "zh-Hant": "人們可閱讀的資訊"
-    },
-    // ...
-    "properties": {
-        "on": {
-            "title": "An/Aus",
-            "titles": {
-                "en": "On/Off",
-                "de": "An/Aus",
-                "ja": "オンオフ",
-                "zh-Hans": "开关",
-                "zh-Hant": "開關" },
-            "type": "boolean",
-            "forms": [...]
-        },
-        "status": {
-            "title": "Zustand",
-            "titles": {
-                "en": "Status",
-                "de": "Zustand",
-                "ja": "状態",
-                "zh-Hans": "状态",
-                "zh-Hant": "狀態" },
-            "type": "object",
-            // ...
-            "forms": [...]
-        }
-    },
-    // ...
-}
-</pre
-          >
+          {{ snippet('i18n-default-language') }}
 
           <p>
             Another possibility to set the default language is through a language negotiation mechanism, such as the
@@ -2204,14 +2026,7 @@
 
           <p>A TD snippet of a version information object is given below:</p>
 
-          <pre class="example">
-{
-    // ...
-    "version": { "instance": "1.2.1" },
-    // ...
-}
-</pre
-          >
+          {{ snippet('version-info') }}
 
           <p>
             The <code>version</code> member is intended as container for additional application- and/or device-specific
@@ -2253,20 +2068,7 @@
             definition is activated by including its JSON name in the <code>security</code> member.
           </p>
 
-          <pre class="example" id="security-basic-example">
-{
-    // ...
-    "securityDefinitions": {
-        "basic_sc": {
-            "scheme": "basic",
-            "in": "header"
-        }
-    },
-    "security": "basic_sc",
-    // ...
-}
-</pre
-          >
+          {{ snippet('security-basic') }}
 
           <p>
             Security configuration in the TD is mandatory.
@@ -2288,22 +2090,7 @@
             <a>Thing level</a>, as shown in the following example:
           </p>
 
-          <pre class="example">
-  {
-      "@context": "https://www.w3.org/ns/wot-next/td",
-      "id": "urn:uuid:e9ecb6ad-cd4c-481b-96ce-5b4c57ddb844",
-      "title": "MyThing",
-      "description": "Human readable information.",
-      "support": "https://servient.example.com/contact",
-      "securityDefinitions": { "nosec_sc": { "scheme": "nosec" }},
-      "security": "nosec_sc",
-      "properties": {/*...*/},
-      "actions": {/*...*/},
-      "events": {/*...*/},
-      "links": [/*...*/]
-  }
-  </pre
-          >
+          {{ snippet('security-nosec') }}
 
           <section id="security-multiple">
             <h3>Multiple Security Definitions</h3>
@@ -2317,43 +2104,7 @@
               configuration is overridden at the form level.
             </p>
 
-            <pre class="example" id="multiple-security-definitions1">
-  {
-      // ...
-      "securityDefinitions": {
-          "basic_sc": {"scheme": "basic"},
-          "nosec_sc": {"scheme": "nosec"}
-      },
-      "security": "basic_sc",
-      // ...
-      "properties": {
-          "status": {
-              // ...
-              "forms": [{
-                  "href": "https://mylamp.example.com/status"
-              }]
-          }
-      },
-      "actions": {
-          "toggle": {
-              // ...
-              "forms": [{
-                  "href": "https://mylamp.example.com/toggle"
-              }]
-          }
-      },
-      "events": {
-          "overheating": {
-              // ...
-              "forms": [{
-                  "href": "https://mylamp.example.com/oh",
-                  "security": "nosec_sc"
-              }]
-          }
-      }
-  }
-  </pre
-            >
+            {{ snippet('multiple-security-definitions1') }}
 
             <p>
               TDs can specify a combination of security schemes as well. Below is a TD snippet showing digest
@@ -2364,27 +2115,7 @@
               activating multiple security definitions, the <code>security</code> member becomes an array.
             </p>
 
-            <pre class="example" id="multiple-security-definitions2a">
-{
-    // ...
-    "securityDefinitions": {
-        "proxy_sc": {
-            "scheme": "digest",
-            "proxy": "https://portal.example.com/"
-        },
-        "bearer_sc": {
-            "scheme": "bearer",
-            "in": "header",
-            "format": "jwt",
-            "alg": "ES256",
-            "authorization": "https://servient.example.com:8443/"
-        }
-    },
-    "security": ["proxy_sc", "bearer_sc"],
-    // ...
-}
-</pre
-            >
+            {{ snippet('multiple-security-definitions2a') }}
             <p>
               <span class="rfc2119-assertion" id="td-security-combo-deprecation">
                 However, the use of an array with multiple elements to combine security schemes in a
@@ -2395,31 +2126,7 @@
               In the following example, which is exactly equivalent to the one above, this is demonstrated:
             </p>
 
-            <pre class="example" id="multiple-security-definitions2b">
-{
-    // ...
-    "securityDefinitions": {
-        "proxy_sc": {
-            "scheme": "digest",
-            "proxy": "https://portal.example.com/"
-        },
-        "bearer_sc": {
-            "scheme": "bearer",
-            "in": "header",
-            "format": "jwt",
-            "alg": "ES256",
-            "authorization": "https://servient.example.com:8443/"
-        },
-        "combo_sc": {
-            "scheme": "combo",
-            "allOf": ["proxy_sc", "bearer_sc"]
-        }
-    },
-    "security": "combo_sc",
-    // ...
-}
-</pre
-            >
+            {{ snippet('multiple-security-definitions2b') }}
           </section>
           <section id="security-security-forms">
             <h3><code>security</code> in Forms</h3>
@@ -2437,34 +2144,7 @@
               Note that activating one (default) configuration at the <a>Thing level</a> is still mandatory.
             </p>
 
-            <pre class="example">
-{
-    // ...
-    "securityDefinitions": {
-        "basic_sc": { "scheme": "basic" },
-        "digest_sc": { "scheme": "digest" },
-        "bearer_sc": { "scheme": "bearer" }
-    },
-    "security": "basic_sc",
-    // ...
-    "properties": {
-        "status": {
-            // ...
-            "forms": [{
-                "href": "https://mylamp.example.com/status"
-            }, {
-                "href": "https://mylamp.example.com/status",
-                "security": "digest_sc"
-            }, {
-                "href": "https://mylamp.example.com/status",
-                "security": "bearer_sc"
-            }]
-        }
-    },
-    // ...
-}
-</pre
-            >
+            {{ snippet('security-in-forms') }}
           </section>
           <section id="security-comboSecurityScheme">
             <h3><code>ComboSecurityScheme</code></h3>
@@ -2474,32 +2154,7 @@
               <a href="#combosecurityscheme"><code>ComboSecurityScheme</code></a> with <code>oneOf</code> can be used
               instead.
             </p>
-            <pre class="example">
-{
-    // ...
-    "securityDefinitions": {
-        "basic_sc": { "scheme": "basic" },
-        "digest_sc": { "scheme": "digest" },
-        "bearer_sc": { "scheme": "bearer" },
-        "combo_sc": {
-            "scheme": "combo",
-            "oneOf": [ "basic_sc", "digest_sc", "bearer_sc" ]
-        }
-    },
-    "security": "combo_sc",
-    // ...
-    "properties": {
-        "status": {
-            // ...
-            "forms": [{
-                "href": "https://mylamp.example.com/status"
-            }]
-        }
-    },
-    // ...
-}
-</pre
-            >
+            {{ snippet('security-combo-oneof') }}
           </section>
           <section id="security-oauth2">
             <h3>OAuth 2.0 usage</h3>
@@ -2516,41 +2171,7 @@
               while ordinary users could be provided with tokens with the <code>limited</code> scope.
             </p>
 
-            <pre class="example" id="example-oauth2-scopes">
-{
-    // ...
-    "securityDefinitions": {
-        "oauth2_sc": {
-            "scheme": "oauth2",
-            "flow": "client",
-            "token": "https://example.com/token",
-            "scopes": ["limited", "special"]
-        }
-    },
-    "security": "oauth2_sc",
-    // ...
-    "properties": {
-        "status": {
-            // ...
-            "forms": [{
-                "href": "https://scopes.example.com/status",
-                "scopes": ["limited"]
-            }]
-        }
-    },
-    "actions": {
-        "configure": {
-            // ...
-            "forms": [{
-                "href": "https://scopes.example.com/configure",
-                "scopes": ["special"]
-            }]
-        }
-    },
-    // ...
-}
-</pre
-            >
+            {{ snippet('security-oauth2-scopes') }}
           </section>
           <section id="security-apikey">
             <h3>API key usage</h3>
@@ -2562,30 +2183,7 @@
               replaced in the URI by the Consumer when sending an HTTPS request.
             </p>
 
-            <pre class="example">
-    {
-        // ...
-        "securityDefinitions": {
-            "apikey_key": {
-                "scheme": "apikey",
-                "in": "uri",
-                "name": "adminKey"
-            }
-        },
-        "security": "apikey_key",
-        "properties": {
-            "status": {
-                // ...
-                "forms": [{
-                    "href": "https://example.com/{adminKey}/status",
-                    // ...
-                }]
-            }
-        },
-        // ...
-    }
-    </pre
-            >
+            {{ snippet('security-apikey') }}
 
             <p>
               To give another example of the use of the
@@ -2600,40 +2198,7 @@
               variables. These can then (in fact, they must) be used in the <code>href</code> in a
               <code>Form</code> where the security scheme is active. An example follows:
             </p>
-            <pre class="example">
-{
-    // ...
-    "securityDefinitions": {
-        "apikey_key": {
-            "scheme": "apikey",
-            "in": "uri",
-            "name": "secKey"
-        },
-        "apikey_id": {
-            "scheme": "apikey",
-            "in": "uri",
-            "name": "secClientID"
-        },
-        "apikey_combo": {
-            "scheme": "combo",
-            "allOf": ["apikey_key","apikey_id"]
-        }
-    },
-    "security": "apikey_combo",
-    // ...
-    "properties": {
-        "status": {
-            // ...
-            "forms": [{
-                "href": "https://example.com/{secClientID}/status/{secKey}",
-                // ...
-            }]
-        }
-    },
-    // ...
-}
-</pre
-            >
+            {{ snippet('security-apikey-combo') }}
             <p>
               While not shown in this example, it is legal to declare additional URI template variables using
               <code>uriVariables</code> and include them in the same URI template, although the names cannot conflict
@@ -2655,151 +2220,13 @@
               multiple security scheme definitions.
             </p>
 
-            <pre class="example">
-{
-    // ...
-    "securityDefinitions": {
-        "apikey_body": {
-            "scheme": "apikey",
-            "in": "body",
-            "name": "/auth/key"
-        }
-    },
-    "security": "apikey_body",
-    // ...
-    "properties": {
-        "color": {
-            // ...
-            "type": "object",
-            "properties": {
-                "brightness": {
-                    "type": "number",
-                    // ...
-                },
-                "rgb": {
-                    "type": "array",
-                    // ...
-                },
-                "auth": {
-                    "type": "object",
-                    "properties": {
-                        "key": {
-                           "type": "string"
-                        }
-                    },
-                    "required": ["key"]
-                }
-            },
-            "required": ["brightness", "rgb", "auth"],
-            "forms": [{
-                "href": "https://example.com/color",
-                // ...
-            }]
-        }
-    },
-    "action": {
-        "on": {
-            // ...
-            "input": {
-                "auth": {
-                    "type": "object",
-                    "properties": {
-                        "key": {
-                           "type": "string"
-                        }
-                    },
-                    "required": ["key"]
-                }
-            },
-            "required": ["auth"],
-            "forms": [{
-                "href": "https://example.com/on",
-                // ...
-            }]
-        },
-        "off": {
-            // ...
-            "input": {
-                "auth": {
-                    "type": "object",
-                    "properties": {
-                        "key": {
-                           "type": "string"
-                        }
-                    },
-                    "required": ["key"]
-                }
-            },
-            "required": ["auth"],
-            "forms": [{
-                "href": "https://example.com/off",
-                // ...
-            }]
-        }
-    },
-    // ...
-}
-</pre
-            >
+            {{ snippet('security-apikey-body') }}
             However, it is rather annoying and redundant to add the security information to every data schema. It is
             possible to simplify this example by using the feature that the location referenced by a JSON pointer in a
             <code>body</code> location will be automatically inserted if it does not exist. In this case the above
             example can be simplified to the following. Note that in fact a data schema will effectively be
             <em>created</em> for the actions <code>on</code> and <code>off</code> to hold just the security information.
-            <pre class="example">
-{
-    // ...
-    "securityDefinitions": {
-        "apikey_body": {
-            "scheme": "apikey",
-            "in": "body",
-            "name": "/auth/key"
-        }
-    },
-    "security": "apikey_body",
-    // ...
-    "properties": {
-        "color": {
-            // ...
-            "type": "object",
-            "properties": {
-                "brightness": {
-                    "type": "number",
-                    // ...
-                },
-                "rgb": {
-                    "type": "array",
-                    // ...
-                }
-            },
-            "required": ["brightness", "rgb"],
-            "forms": [{
-                "href": "https://example.com/color",
-                // ...
-            }]
-        }
-    },
-    "action": {
-        "on": {
-            // ...
-            "required": ["auth"],
-            "forms": [{
-                "href": "https://example.com/on",
-                // ...
-            }]
-        },
-        "off": {
-            // ...
-            "forms": [{
-                "href": "https://example.com/off",
-                // ...
-            }]
-        }
-    },
-    // ...
-}
-</pre
-            >
+            {{ snippet('security-apikey-body-simplified') }}
           </section>
         </section>
         <!-- end of id="security-serialization-json"-->
@@ -2887,40 +2314,7 @@
 
           <p>A TD snippet of an Action affordance is given below:</p>
 
-          <aside class="example" id="action-serialization-sample" title="Sample of an Action serialization">
-            <pre>
-{
-    // ...
-    "actions": {
-        "fade": {
-            "title": "Fade in/out",
-            "description": "Smooth fade in and out animation.",
-            "input": {
-                "type": "object",
-                "properties": {
-                    "from": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 100
-                    },
-                    "to": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 100
-                    },
-                    "duration": {"type": "number"}
-                },
-                "required": ["to","duration"]
-            },
-            "output": {"type": "string"},
-            "forms": [...]
-        }
-    },
-    // ...
-}
-</pre
-            >
-          </aside>
+          {{ snippet('action-serialization') }}
         </section>
         <!-- end of id="action-serialization-json"-->
 
@@ -2967,23 +2361,7 @@
 
           <p>A TD snippet of an Event object is given below:</p>
 
-          <aside class="example" id="event-serialization-sample" title="Sample of an Event serialization">
-            <pre>
-{
-    // ...
-    "events": {
-        "overheated": {
-            "data": {
-                "type": "string"
-            },
-            "forms": [...]
-        }
-    },
-    // ...
-}
-</pre
-            >
-          </aside>
+          {{ snippet('event-serialization') }}
 
           <p>
             Event affordances have been defined in a flexible manner, in order to adopt existing (e.g., WebSub
@@ -3018,76 +2396,21 @@
             unit (e.g., a lamp). For this <code>controlledBy</code> can be used:
           </p>
 
-          <aside class="example" id="link-serialization-sample" title="Sample of a Link serialization">
-            <pre>
-{
-    // ...
-    "links": [{
-        "rel": "controlledBy",
-        "href": "https://servient.example.com/things/lampController",
-        "type": "application/td+json"
-    }]
-    // ...
-}
-</pre
-            >
-          </aside>
+          {{ snippet('link-serialization') }}
 
           <p>To point to a developer documentation of a <a>Thing</a> the value <code>service-doc</code> can be used:</p>
 
-          <pre class="example" title="Link to developer documentation">
-	{
-        // ...
-        "links": [{
-            "rel": "service-doc",
-            "href": "https://example.com/howTo",
-            "type": "application/pdf",
-            "hreflang": "en"
-        }]
-        // ...
-	}
-    </pre
-          >
+          {{ snippet('link-service-doc') }}
 
           <p>
             A superordinate Thing can collect a group of Things and refer to them by using the <code>item</code> value:
           </p>
 
-          <pre class="example" title="An electric drive includes two motors.">
-	{
-        "title": "Electric Drive",
-        // ...
-        "links": [{
-            "rel": "item",
-            "href": "coaps://motor1.example.com",
-            "type": " application/td+json"
-        },
-        {
-            "rel": "item",
-            "href": "coaps://motor2.example.com",
-            "type": " application/td+json"
-        }]
-        // ...
-	}
-    </pre
-          >
+          {{ snippet('link-electric-drive') }}
 
           <p>A Thing refers to a group in which it is collected with the <code>collection</code> value:</p>
 
-          <pre class="example" title="An electric motor is member of the electric drive collection.">
-	{
-        "title": "Electric Motor 1",
-        "base": "coaps://motor1.example.com",
-        // ...
-        "links": [{
-            "rel": "collection",
-            "href": "coaps://drive.example.com",
-            "type": " application/td+json"
-        }]
-        // ...
-	}
-    </pre
-          >
+          {{ snippet('link-electric-motor') }}
         </section>
         <!-- end of id="link-serialization-json"-->
 
@@ -3113,21 +2436,7 @@
 
           <p>A TD snippet of a form object in the <code>forms</code> array is given below:</p>
 
-          <aside class="example" id="form-serialization-sample" title="Sample of a Form serialization">
-            <pre>
-{
-    // ...
-    "forms": [{
-        "op": "writeproperty",
-        "href": "http://mytemp.example.com:5683/temp",
-        "contentType": "application/json",
-        "htv:methodName": "POST"
-    }]
-    // ...
-}
-</pre
-            >
-          </aside>
+          {{ snippet('form-serialization') }}
 
           <section id="form-uriVariables">
             <h3><code>uriVariables</code></h3>
@@ -3160,107 +2469,21 @@
               Affordance level is given below:
             </p>
 
-            <pre class="example">
-{
-    "@context": ["https://www.w3.org/ns/wot-next/td", {
-        "htv": "http://www.w3.org/2011/http#"
-    }],
-    // ...
-    "properties": {
-        "weather": {
-            // ...
-            "uriVariables": {
-                "lat": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 90,
-                    "description": "Latitude for the desired location in the world" },
-                "long": {
-                    "type": "number",
-                    "minimum": -180,
-                    "maximum": 180,
-                    "description": "Longitude for the desired location in the world" }
-            },
-            "forms": [{
-              "href": "http://example.org/weather/{?lat,long}",
-              "htv:methodName": "GET"
-            }]
-        },
-        // ...
-    },
-    // ...
-}
-</pre
-            >
+            {{ snippet('urivar-lat-long') }}
 
             <p>
               Alternatively, as defined in [[RFC6570]], <code>uriVariables</code> can be used for replacing the
               <code>href</code> structure. An example TD is provided below where a valid request to get the forecast of
               Bogota, Colombia would be an HTTP GET request to <code>http://example.org/weather/bogota</code>:
             </p>
-            <pre class="example">
-    {
-        "@context": ["https://www.w3.org/ns/wot-next/td", {
-            "htv": "http://www.w3.org/2011/http#"
-        }],
-        // ...
-        "properties": {
-            "weather": {
-                // ...
-                "uriVariables": {
-                    "city": {
-                        "type": "string",
-                        "description": "City name to find the weather information for"
-                    }
-                },
-                "forms": [{
-                    "href": "http://example.org/weather/{city}",
-                    "htv:methodName": "GET"
-                }]
-            },
-            // ...
-        },
-        // ...
-    }
-</pre
-            >
+            {{ snippet('urivar-city') }}
 
             <p>
               The two examples below can be also combined, while using the same <code>uriVariables</code> feature. An
               HTTP GET request to <code>http://example.org/weather/bogota/?unit=Celsius</code> can be described as
               follows:
             </p>
-            <pre class="example">
-    {
-        "@context": ["https://www.w3.org/ns/wot-next/td", {
-            "htv": "http://www.w3.org/2011/http#"
-        }],
-        // ...
-        "properties": {
-            "weather": {
-                // ...
-                "uriVariables": {
-                    "city": {
-                        "type": "string",
-                        "description": "City name to find the weather information for"
-                    },
-                    "unit": {
-                        "type": "string",
-                        "enum": ["fahrenheit_value","celsius_value"],
-                        "description": "Desired unit for the temperature value"
-                    }
-                },
-                "forms": [{
-                    "href": "http://example.org/weather/{city}/{?unit}",
-                    "htv:methodName": "GET"
-                }]
-            },
-            // ...
-        },
-        // ...
-    }
-</pre
-            >
+            {{ snippet('urivar-city-unit') }}
 
             <p>
               <code>uriVariables</code> are mainly for properties and events. When retrofitting an existing system, it
@@ -3276,14 +2499,7 @@
               parameters as attribute-value pairs separated by a <code>;</code> character. Example:
             </p>
 
-            <pre class="example">
-{
-    // ...
-    "contentType": "text/plain; charset=utf-8",
-    // ...
-}
-</pre
-            >
+            {{ snippet('form-content-type') }}
           </section>
           <section id="form-response">
             <h3><code>response</code></h3>
@@ -3316,69 +2532,13 @@
               <code>takePhoto</code> Action described above:
             </p>
 
-            <pre class="example">
-{
-    // ...
-    "actions": {
-        "takePhoto": {
-            // ...
-            "forms": [{
-                "op": "invokeaction",
-                "href": "http://camera.example.com/api/snapshot",
-                "contentType": "application/json",
-                "response": {
-                    "contentType": "image/jpeg"
-                }
-            }]
-        }
-    },
-    // ...
-}
-</pre
-            >
+            {{ snippet('form-response') }}
 
             <p>
               In cases where responses are not expected to contain a payload and therefore no `contentType` either, an
               empty `response` object can be used to convey this information.
             </p>
-            <pre class="example">
-{
-    // ...
-    "actions": {
-        "brewCoffee": {
-            "description": "Invoking this action does not return a payload.",
-            "input": {
-              "type": "object",
-              "properties": {
-                "coffeeType": {
-                  "enum": [
-                    "espresso",
-                    "americano",
-                    "cappuccino",
-                    "latte"
-                  ]
-                },
-                "useOatMilk": {
-                  "type": "boolean",
-                  "default": false
-                }
-              },
-              "required": [
-                "coffeeType"
-              ]
-            },
-            "forms": [{
-                "op": "invokeaction",
-                "href": "http://coffee-maker.example.com/brew-coffee",
-                "contentType": "application/json",
-                "response": {}
-            }]
-        }
-    },
-    // ...
-}
-</pre
-            >
+            {{ snippet('form-response-empty') }}
           </section>
           <section id="form-additionalResponses">
             <h3><code>additionalResponses</code></h3>
@@ -3403,51 +2563,7 @@
               does not have a payload.
             </p>
 
-            <pre class="example">
-{
-    // ...
-    "schemaDefinitions": {
-      "actionErrorPayload": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "type": "string",
-            "enum": ["cold","hot","maintenance"]
-          },
-          "timeStamp": {
-            "description": "UNIX time in numbers indicating when the error happened",
-            "type": "number"
-          }
-        }
-      }
-    },
-    // ...
-    "actions": {
-        "startEngine": {
-            "output": {
-              "type": "string"
-            },
-            "forms": [{
-                "op": "invokeaction",
-                "href": "http://mycar.example.com/api/engine",
-                "contentType": "application/json",
-                "additionalResponses": [
-                  {
-                    "success": false,
-                    "contentType": "application/json",
-                    "schema": "actionErrorPayload"
-                  },
-                  {
-                    "success": false
-                  },
-                ]
-            }]
-        }
-    },
-    // ...
-}
-</pre
-            >
+            {{ snippet('form-additional-responses') }}
 
             <p>
               The <code>additionalResponses</code> term can be used in non-error cases as well. In that case,
@@ -3465,27 +2581,7 @@
               is shown below:
             </p>
 
-            <pre class="example">
-{
-    // ...
-    "properties": {
-        "image": {
-	        "description": "Provides latest image",
-	        "type": "string",
-	        "contentMediaType": "image/png",
-	        "contentEncoding": "base64",
-	        "forms": [{
-			    "op": "readproperty",
-			    "href": "coaps://mylamp.example.com/lastPicture",
-			    "cov:methodName": "GET",
-			    "contentType": "application/json"
-		    }]
-        }
-    },
-    // ...
-}
-</pre
-            >
+            {{ snippet('form-content-media-encoding') }}
           </section>
 
           <section id="form-top-level">
@@ -3502,39 +2598,7 @@
               transaction.
             </p>
 
-            <pre class="example" id="td-forms-readall-example">
-{
-    // ...
-    "properties": {
-        "on": {
-            "type": "boolean",
-            "forms": [...]
-        },
-        "brightness": {
-            "type": "number",
-            "forms": [...]
-        },
-        "timer": {
-            "type": "integer",
-            "forms": [...]
-        }
-    },
-    // ...
-    "forms": [{
-        "op": "readallproperties",
-        "href": "https://mylamp.example.com/properties",
-        "contentType": "application/json",
-        "htv:methodName": "GET"
-    },
-    {
-        "op": "writeallproperties",
-        "href": "https://mylamp.example.com/properties",
-        "contentType": "application/json",
-        "htv:methodName": "PUT"
-    }]
-}
-</pre
-            >
+            {{ snippet('td-forms-readall') }}
 
             <p>
               Thing-level <code>uriVariables</code> can be used here to supply further variables to the operation or to
@@ -3543,49 +2607,7 @@
               properties can be set:
             </p>
 
-            <pre class="example" id="td-forms-urivariables-thing-example">
-    {
-        // ...
-        "properties": {
-            "temperature": {
-                "type": "number",
-                "forms": [...]
-            },
-            "brightness": {
-                "type": "number",
-                "forms": [...]
-            },
-            "humidity": {
-                "type": "integer",
-                "forms": [...]
-            }
-        },
-        "uriVariables": {
-            "propertyNames": {
-                "type": "string",
-                "description": "Comma separated list of property names to select."
-            },
-            "unitSystem": {
-                "type": "string",
-                "enum": ["metric","imperial","uscustomary"],
-                "description": "System of Measurement that will be used for the values"
-            }
-        },
-        "forms": [{
-            "op": "readallproperties",
-            "href": "https://mything.example.com/properties{?unitSystem}",
-            "contentType": "application/json",
-            "htv:methodName": "GET"
-        },
-        {
-            "op": "readmultipleproperties",
-            "href": "https://mylamp.example.com/properties{?propertyNames,unitSystem}",
-            "contentType": "application/json",
-            "htv:methodName": "GET"
-        }]
-    }
-    </pre
-            >
+            {{ snippet('urivar-thing-level') }}
 
             <p>
               For a <code>readmultipleproperties</code> operation, an example HTTP GET request to the URI
@@ -3664,40 +2686,7 @@
             additional members.
           </p>
 
-          <aside class="example" id="dataschema-serialization-sample" title="Sample of a DataSchema serialization">
-            <pre>
-{
-    // ...
-    "type": "object",
-    "properties": {
-        "status": {
-            "title": "Status",
-            "type": "string",
-            "enum": ["on_value", "off_value", "error_value"]
-        },
-        "brightness": {
-            "title": "Brightness value",
-            "type": "number",
-            "minimum": 0.0,
-            "maximum": 100.0
-        },
-        "rgb": {
-            "title": "RGB color value",
-            "type": "array",
-            "items": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 255
-            },
-            "minItems": 3,
-            "maxItems": 3
-        }
-    },
-    // ...
-}
-</pre
-            >
-          </aside>
+          {{ snippet('dataschema-serialization') }}
 
           <p>
             The terms <code>readOnly</code> and <code>writeOnly</code> can be used to signal which data items are
@@ -3709,32 +2698,7 @@
 
           <p>A TD snippet with the usage of <code>readOnly</code> and <code>writeOnly</code> is given below:</p>
 
-          <pre class="example">
-{
-    // ...
-    "properties": {
-        "status": {
-            "description": "Read or write On/Off status.",
-            "type": "object",
-            "properties": {
-                "latestStatus": {
-                    "type": "string",
-                    "enum": ["on_value", "off_value"],
-                    "readOnly": true
-                },
-                "newStatusValue": {
-                    "type": "string",
-                    "enum": ["on_value", "off_value"],
-                    "writeOnly": true
-                }
-            },
-            "forms": [...]
-        }
-    }
-    // ...
-}
-</pre
-          >
+          {{ snippet('dataschema-readonly-writeonly') }}
 
           <p>
             When the <code>status</code> Property is read, the status data is returned using a
@@ -3848,20 +2812,7 @@
         an extended <code>@context</code> name-value pair. A snippet with <a>TD Context Extensions</a> is given below:
       </p>
 
-      <pre class="example">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "eg": "http://example.org/iot#",
-            "cov": "http://www.example.org/coap-binding#"
-        },
-        "https://schema.org/"
-    ],
-    // ...
-}
-</pre
-      >
+      {{ snippet('context-extensions') }}
 
       <section>
         <h3>Semantic Annotations</h3>
@@ -3907,39 +2858,7 @@
             Please note that these <a>Vocabularies</a> and ontologies are used as examples. Others can be used based on
             application domain and use case.
           </p>
-          <pre class="example">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "saref": "https://w3id.org/saref#",
-            "om": "http://www.ontology-of-units-of-measure.org/resource/om-2/",
-            "schema": "https://schema.org"
-        }
-    ],
-    "version": {
-        "instance": "1.2.1",
-        "schema:softwareVersion": "1.0.1"
-    },
-    "schema:serialNumber": "4CE0460D0G",
-    "schema:manufacturer": {"name": "CompanyName"},
-    // ...
-    "@type": "saref:TemperatureSensor",
-    "properties": {
-        "temperature": {
-            "description": "Temperature value of the weather station",
-            "type": "number",
-            "minimum": -32.5,
-            "maximum": 55.2,
-            "unit": "om:degreeCelsius",
-            "forms": [...]
-        },
-        // ...
-    },
-    // ...
-}
-</pre
-          >
+          {{ snippet('semantic-version-units') }}
         </section>
         <section id="semantic-annotations-example-state">
           <h3>Example II: State Annotations</h3>
@@ -3960,44 +2879,7 @@
             <a>Property</a> with the actual on/off state of the physical world object.
           </p>
 
-          <pre class="example" id="saref-state-annotation-example">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "saref": "https://w3id.org/saref#",
-            "ssn": "http://www.w3.org/ns/ssn/"
-        }
-    ],
-    "id": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4",
-    "@type": "saref:LightSwitch",
-    "saref:hasState": {
-        "@id": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4/state",
-        "@type": "saref:OnOffState"
-    },
-    // ...
-    "properties": {
-        "status": {
-            "ssn:forProperty": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4/state",
-            "type": "string",
-            "forms": [{"href": "https://mylamp.example.com/status"}]
-        },
-        "fullStatus": {
-            "ssn:forProperty": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4/state",
-            "type": "object",
-            "properties": {
-                "statusString": { "type": "string" },
-                "statusCode": { "type": "number" },
-                "statusDescription": { "type": "string" }
-            },
-            "forms": [{"href": "https://mylamp.example.com/status?full=true"}]
-        },
-        // ...
-    },
-    // ...
-}
-</pre
-          >
+          {{ snippet('saref-state-annotation') }}
 
           <p>
             In <a href="#thing-description-full-serialization"></a>, the state of the <a>Thing</a> is given by the
@@ -4024,24 +2906,7 @@
             provide static latitude and longitude metadata at Thing's top level.
           </p>
 
-          <pre class="example" id="saref-geolocation-annotation-example">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#"
-        }
-    ],
-    "@type": "Thing",
-    "geo:lat": "26.58",
-    "geo:long": "297.83",
-    // ...
-    "properties": {
-        // ...
-    }
-}
-</pre
-          >
+          {{ snippet('geolocation-basic') }}
 
           <p>
             In some use cases location based metadata have to be provided at the interaction level, e.g., as provided as
@@ -4049,32 +2914,7 @@
             <code>elevation</code> values based on schema.org:
           </p>
 
-          <pre class="example" id="saref-geolocation-annotation-example-2">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "schema": "https://schema.org#"
-        }
-    ],
-    // ...
-    "properties": {
-        "position": {
-            "type": "object",
-            "@type": "schema:GeoCoordinates",
-            "properties": {
-                    "longitude": { "type": "number" },
-                    "latitude":  { "type": "number" },
-                    "elevation": { "type": "number" }
-            },
-            "forms": [{"href": "https://robot.example.com/position"}]
-        },
-        // ...
-    },
-    // ...
-}
-</pre
-          >
+          {{ snippet('geolocation-schema-org') }}
 
           <p>
             In case a different name is desired for, e.g., <code>longitude</code>, <code>latitude</code>, and
@@ -4083,35 +2923,7 @@
             context for data instances):
           </p>
 
-          <pre class="example" id="saref-geolocation-annotation-example-3">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "schema": "https://schema.org#"
-        }
-    ],
-    // ...
-    "properties": {
-        "position": {
-        "jsonld:context": {
-            "schema": "https://schema.org/",
-            "long": "schema:longitude",
-            "lat": "schema:latitude",
-            "height": "schema:elevation"
-        },
-        "type": "object",
-        "properties": {
-            "long": { "type": "number" },
-            "lat": { "type": "number" },
-            "height": { "type": "number" }
-        }
-        }
-    },
-    // ...
-}
-</pre
-          >
+          {{ snippet('geolocation-jsonld-context') }}
         </section>
       </section>
 
@@ -4141,55 +2953,7 @@
           </span>
         </p>
 
-        <pre class="example">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "cov": "http://www.example.org/coap-binding#",
-            "ace": "http://www.example.org/ace-security#"
-        }
-    ],
-    // ...
-    "securityDefinitions": {
-        "ace_sc": {
-            "scheme": "ace:ACESecurityScheme",
-            // ...
-            "ace:as": "coaps://as.example.com/token",
-            "ace:audience": "coaps://rs.example.com",
-            "ace:scopes": ["limited", "special"],
-            "ace:cnonce": true
-        }
-    },
-    "security": ["ace_sc"],
-    "properties": {
-        "status": {
-            // ...
-            "forms": [{
-                "op": "readproperty",
-                "href": "coaps://rs.example.com/status",
-                "contentType": "application/cbor",
-                "cov:methodName": "GET",
-                "ace:scopes": ["limited"]
-            }]
-        }
-    },
-    "actions": {
-        "configure": {
-            // ...
-            "forms": [{
-                "op": "invokeaction",
-                "href": "coaps://rs.example.com/configure",
-                "contentType": "application/cbor",
-                "cov:methodName": "POST",
-                "ace:scopes": ["special"]
-            }]
-        }
-    },
-    // ...
-}
-</pre
-        >
+        {{ snippet('security-extension-ace') }}
 
         <p>
           Note that all security schemes defined in <a href="#sec-security-vocabulary-definition"></a> are already part
@@ -4311,24 +3075,10 @@
             <tbody>
               <tr>
                 <td style="vertical-align: top; width: 50%">
-                  <pre class="example" title="Binding instance of a readproperty operation to HTTP">
-                                      {
-                                          "href": "http://example.com/props/temperature",
-                                          "op": "readproperty",
-                                          "htv:methodName": "GET"
-                                      }
-                                  </pre
-                  >
+                  {{ snippet('form-http-readproperty') }}
                 </td>
                 <td style="vertical-align: top; width: 50%">
-                  <pre class="example" title="Binding instance of a readproperty operation to Modbus">
-                                      {
-                                          "href": "modbus+tcp://127.0.0.1:60000/1/4",
-                                          "op": "readproperty",
-                                          "modv:function": "readCoil"
-                                      }
-                                  </pre
-                  >
+                  {{ snippet('form-modbus-readproperty') }}
                 </td>
               </tr>
             </tbody>
@@ -4356,25 +3106,10 @@
             <tbody>
               <tr>
                 <td style="vertical-align: top; width: 50%">
-                  <pre class="example" title="Binding instance of an invokeaction operation to HTTP">
-                                      {
-                                          "op": "invokeaction",
-                                          "href": "http://192.168.1.32:8081/example/levelaction",
-                                          "htv:methodName": "POST"
-                                      }
-                                  </pre
-                  >
+                  {{ snippet('form-http-invokeaction') }}
                 </td>
                 <td style="vertical-align: top; width: 50%">
-                  <pre class="example" title="Binding instance of a subscribeevent operation to MQTT">
-                                      {
-                                          "op": "subscribeevent",
-                                          "href": "mqtt://iot.platform.com:8088",
-                                          "mqv:filter": "thing1/events/overheating",
-                                          "mqv:controlPacket": "subscribe"
-                                      }
-                                  </pre
-                  >
+                  {{ snippet('form-mqtt-subscribeevent') }}
                 </td>
               </tr>
             </tbody>
@@ -4414,14 +3149,7 @@
               HTTP:
             </p>
 
-            <pre class="example" title="Subprotocol usage for subscribing events">
-                          {
-                              "op": "subscribeevent",
-                              "href": "https://mylamp.example.com/overheating",
-                              "subprotocol": "longpoll"
-                          }
-                      </pre
-            >
+            {{ snippet('form-subprotocol-longpoll') }}
 
             <p>
               The values that the <code>subprotocol</code> term can take is not constrained by the
@@ -4607,22 +3335,7 @@
               However, for unstructured data such as images and videos, a Data Schema is typically not available.
             </p>
 
-            <pre class="example" title="JSON and CBOR media types in forms" id="example-payload-binding">
-                          {
-                              "forms":[
-                              {
-                                  "href": "http://example.com/properties/temperature",
-                                  "op": "readproperty",
-                                  "contentType": "application/json"
-                              },
-                              {
-                                  "href": "coap://example.com/properties/temperature",
-                                  "op": "readproperty",
-                                  "contentType": "text/plain;charset=utf-8"
-                              }]
-                          }
-                      </pre
-            >
+            {{ snippet('payload-binding-forms') }}
 
             <p>
               Other content types can be also expressed in TDs. In the list below, examples of different content type
@@ -4704,33 +3417,10 @@
               <tbody>
                 <tr>
                   <td style="vertical-align: top; width: 50%">
-                    <pre class="example" title="Simple JSON Object Payload">
-                                          {
-                                              "level": 50,
-                                              "time": 10
-                                          }
-                                      </pre
-                    >
+                    {{ snippet('payload-json-object') }}
                   </td>
                   <td style="vertical-align: top; width: 50%">
-                    <pre class="example" title="DataSchema for Simple JSON Object Payload">
-                                          {
-                                              "type": "object",
-                                              "properties": {
-                                                  "level": {
-                                                      "type": "integer",
-                                                      "minimum": 0,
-                                                      "maximum": 255
-                                                  },
-                                                  "time": {
-                                                      "type": "integer",
-                                                      "minimum": 0,
-                                                      "maximum": 65535
-                                                  }
-                                              }
-                                          }
-                                      </pre
-                    >
+                    {{ snippet('payload-json-object-schema') }}
                   </td>
                 </tr>
               </tbody>
@@ -5049,17 +3739,7 @@
             Thing Model instance.
           </p>
 
-          <pre class="example" title="Thing Model versioning">
-        {
-            // ...
-            "@type": "tm:ThingModel",
-            "title": "Lamp Thing Model",
-            "description": "Lamp Thing Description Model",
-            "version" : {"model": "1.0.0"},
-            // ...
-        }
-    </pre
-          >
+          {{ snippet('tm-versioning') }}
 
           <p>
             <span class="rfc2119-assertion" id="tm-versioning-2">
@@ -7352,71 +6032,10 @@
         <tbody>
           <tr>
             <td style="vertical-align: top; width: 50%">
-              <pre class="example" title="SenML Payload Example">
-                    [
-                        {
-                            "bn": "/example/light/"
-                        },
-                        {
-                            "n": "level",
-                            "v": 50
-                        },
-                        {
-                            "n": "time",
-                            "v": 10
-                        }
-                    ]
-                    </pre
-              >
+              {{ snippet('payload-senml') }}
             </td>
             <td style="vertical-align: top; width: 50%">
-              <pre class="example" title="Data Schema for SenML Payload Example">
-                    {
-                        "type": "array",
-                        "items": [
-                        {
-                            "type": "object",
-                            "properties": {
-                                "bn": {
-                                    "type": "string",
-                                    "const": "example/light"
-                                }
-                            }
-                        },
-                        {
-                            "type": "object",
-                            "properties": {
-                                "n": {
-                                    "type": "string",
-                                    "const": "level"
-                                },
-                                "v": {
-                                    "@type": ["iot:LevelData"],
-                                    "type": "integer",
-                                    "minimum": 0,
-                                    "maximum": 255
-                                }
-                            }
-                        },
-                        {
-                            "type": "object",
-                            "properties": {
-                                "n": {
-                                    "type": "string",
-                                    "const": "time"
-                                },
-                                "v": {
-                                    "@type": ["iot:TransitionTimeData"],
-                                    "type": "integer",
-                                    "minimum": 0,
-                                    "maximum": 65535
-                                }
-                            }
-                        }
-                        ]
-                    }
-                    </pre
-              >
+              {{ snippet('payload-senml-schema') }}
             </td>
           </tr>
         </tbody>
@@ -7428,73 +6047,10 @@
         <tbody>
           <tr>
             <td style="vertical-align: top; width: 50%">
-              <pre class="example" title="OCF Batch Example">
-                    [
-                    {
-                        "href": "/example/light/level",
-                        "rep": {
-                        "dimmingSetting": 50
-                        }
-                    },
-                    {
-                        "href": "/example/light/time",
-                        "rep": {
-                        "rampTime": 10
-                        }
-                    }
-                    ]
-                    </pre
-              >
+              {{ snippet('payload-ocf-batch') }}
             </td>
             <td style="vertical-align: top; width: 50%">
-              <pre class="example" title="Data Schema for OCF Batch Payload Example">
-                    {
-                    "type": "array",
-                    "items": [
-                        {
-                        "type": "object",
-                        "properties": {
-                            "href": {
-                            "type": "string",
-                            "const": "/example/light/level"
-                            },
-                            "rep": {
-                            "type": "object",
-                            "properties": {
-                                "dimmingSetting": {
-                                "@type": ["iot:LevelData"],
-                                "type": "integer",
-                                "minimum": 0,
-                                "maximum": 255
-                                }
-                            }
-                            }
-                        }
-                        },
-                        {
-                        "type": "object",
-                        "properties": {
-                            "href": {
-                            "type": "string",
-                            "const": "/example/light/time"
-                            },
-                            "rep": {
-                            "type": "object",
-                            "properties": {
-                                "rampTime": {
-                                "@type": ["iot:TransitionTimeData"],
-                                "type":"integer",
-                                "minimum": 0,
-                                "maximum": 65535
-                                }
-                            }
-                            }
-                        }
-                        }
-                    ]
-                    }
-                    </pre
-              >
+              {{ snippet('payload-ocf-batch-schema') }}
             </td>
           </tr>
         </tbody>
@@ -7506,71 +6062,10 @@
         <tbody>
           <tr>
             <td style="vertical-align: top; width: 50%">
-              <pre class="example" title="IPSO/LWM2M Payload Example">
-                    {
-                    "bn": "/3001/0/",
-                    "e": [
-                        {
-                        "n": "5044",
-                        "v": 0.5
-                        },
-                        {
-                        "n": "5002",
-                        "v": 10.0
-                        }
-                    ]
-                    }
-                    </pre
-              >
+              {{ snippet('payload-ipso-lwm2m') }}
             </td>
             <td style="vertical-align: top; width: 50%">
-              <pre class="example" title="Data Schema for IPSO/LWM2M Payload Example">
-                    {
-                    "type": "object",
-                    "properties": {
-                        "bn": {
-                        "type": "string",
-                        "const": "/3001/0/"
-                        },
-                        "e": {
-                        "type": "array",
-                        "items": [
-                            {
-                            "type": "object",
-                            "properties": {
-                                "n": {
-                                "type": "string",
-                                "const": "5044"
-                                },
-                                "v": {
-                                "@type": ["iot:LevelData"],
-                                "type": "number",
-                                "minimum": 0.0,
-                                "maximum": 1.0
-                                }
-                            }
-                            },
-                            {
-                            "type": "object",
-                            "Properties": {
-                                "n": {
-                                "type": "string",
-                                "const": "5002"
-                                },
-                                "v": {
-                                "@type": ["iot:TransitionTimeData"],
-                                "type": "number",
-                                "minimum": 0.0,
-                                "maximum": 6553.5
-                                }
-                            }
-                            }
-                        ]
-                        }
-                    }
-                    }
-                    </pre
-              >
+              {{ snippet('payload-ipso-lwm2m-schema') }}
             </td>
           </tr>
         </tbody>

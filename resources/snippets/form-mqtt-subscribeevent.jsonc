@@ -1,0 +1,13 @@
+/*
+---
+layout: pre
+validate: false
+title: Binding instance of a subscribeevent operation to MQTT
+---
+*/
+{
+    "op": "subscribeevent",
+    "href": "mqtt://iot.platform.com:8088",
+    "mqv:filter": "thing1/events/overheating",
+    "mqv:controlPacket": "subscribe"
+}

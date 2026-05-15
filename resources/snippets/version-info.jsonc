@@ -1,0 +1,11 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    // ...
+    "version": { "instance": "1.2.1" },
+    // ...
+}

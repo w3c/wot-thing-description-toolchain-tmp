@@ -1,0 +1,37 @@
+/*
+---
+layout: aside
+validate: false
+id: dataschema-serialization-sample
+title: Sample of a DataSchema serialization
+---
+*/
+{
+    // ...
+    "type": "object",
+    "properties": {
+        "status": {
+            "title": "Status",
+            "type": "string",
+            "enum": ["on_value", "off_value", "error_value"]
+        },
+        "brightness": {
+            "title": "Brightness value",
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 100.0
+        },
+        "rgb": {
+            "title": "RGB color value",
+            "type": "array",
+            "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 255
+            },
+            "minItems": 3,
+            "maxItems": 3
+        }
+    },
+    // ...
+}

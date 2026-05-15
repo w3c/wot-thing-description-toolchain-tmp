@@ -1,0 +1,39 @@
+/*
+---
+layout: pre
+validate: false
+id: example-oauth2-scopes
+---
+*/
+{
+    // ...
+    "securityDefinitions": {
+        "oauth2_sc": {
+            "scheme": "oauth2",
+            "flow": "client",
+            "token": "https://example.com/token",
+            "scopes": ["limited", "special"]
+        }
+    },
+    "security": "oauth2_sc",
+    // ...
+    "properties": {
+        "status": {
+            // ...
+            "forms": [{
+                "href": "https://scopes.example.com/status",
+                "scopes": ["limited"]
+            }]
+        }
+    },
+    "actions": {
+        "configure": {
+            // ...
+            "forms": [{
+                "href": "https://scopes.example.com/configure",
+                "scopes": ["special"]
+            }]
+        }
+    },
+    // ...
+}

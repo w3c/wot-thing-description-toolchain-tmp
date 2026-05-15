@@ -1,0 +1,22 @@
+/*
+---
+layout: pre
+validate: false
+id: example-payload-binding
+title: JSON and CBOR media types in forms
+---
+*/
+{
+    "forms": [
+        {
+            "href": "http://example.com/properties/temperature",
+            "op": "readproperty",
+            "contentType": "application/json"
+        },
+        {
+            "href": "coap://example.com/properties/temperature",
+            "op": "readproperty",
+            "contentType": "text/plain;charset=utf-8"
+        }
+    ]
+}

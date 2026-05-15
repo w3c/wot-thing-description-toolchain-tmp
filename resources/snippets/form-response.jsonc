@@ -1,0 +1,23 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    // ...
+    "actions": {
+        "takePhoto": {
+            // ...
+            "forms": [{
+                "op": "invokeaction",
+                "href": "http://camera.example.com/api/snapshot",
+                "contentType": "application/json",
+                "response": {
+                    "contentType": "image/jpeg"
+                }
+            }]
+        }
+    },
+    // ...
+}

@@ -1,0 +1,48 @@
+/*
+---
+# HTML id attribute for the example block (used for cross-references)
+id: my-example-id
+
+# Title shown above the example in the rendered spec
+title: My Example Title
+
+# "aside" (default) wraps in <aside class="example"><pre>...</pre></aside>
+# "pre" renders as <pre class="example">...</pre>
+layout: aside
+
+# Set to false to skip JSON Schema validation (for non-TD payloads, fragments)
+# validate: false
+
+# Top-level JSON keys to display (omit for full document).
+# Omitted keys are replaced with a // ... ellipsis marker.
+# show_keys:
+#   - "@context"
+#   - title
+#   - properties
+
+# Top-level JSON keys to hide (alternative to show_keys, mutually exclusive).
+# hide_keys:
+#   - events
+
+# Keys whose values are replaced at any depth with type-aware placeholders:
+# arrays -> [...], objects -> {...}, scalars -> ...
+# redact_keys:
+#   - forms
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:REPLACE-WITH-UNIQUE-ID",
+    "title": "MyThingTitle",
+    // @hide-start
+    "securityDefinitions": {
+        "nosec_sc": {"scheme": "nosec"}
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "properties": {},
+    "actions": {},
+    "events": {}
+}

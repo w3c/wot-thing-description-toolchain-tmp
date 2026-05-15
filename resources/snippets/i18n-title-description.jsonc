@@ -1,0 +1,29 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        { "@language": "en" }
+    ],
+    "title": "MyThing",
+    "description": "Human readable information.",
+    // ...
+    "properties": {
+        "on": {
+            "title": "On/Off",
+            "type": "boolean",
+            "forms": [...]
+        },
+        "status": {
+            "title": "Status",
+            "type": "object",
+            // ...
+            "forms": [...]
+        }
+    },
+    // ...
+}

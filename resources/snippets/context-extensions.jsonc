@@ -1,0 +1,17 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "eg": "http://example.org/iot#",
+            "cov": "http://www.example.org/coap-binding#"
+        },
+        "https://schema.org/"
+    ],
+    // ...
+}

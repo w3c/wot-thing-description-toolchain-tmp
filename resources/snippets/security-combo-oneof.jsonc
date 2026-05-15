@@ -1,0 +1,29 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    // ...
+    "securityDefinitions": {
+        "basic_sc": { "scheme": "basic" },
+        "digest_sc": { "scheme": "digest" },
+        "bearer_sc": { "scheme": "bearer" },
+        "combo_sc": {
+            "scheme": "combo",
+            "oneOf": [ "basic_sc", "digest_sc", "bearer_sc" ]
+        }
+    },
+    "security": "combo_sc",
+    // ...
+    "properties": {
+        "status": {
+            // ...
+            "forms": [{
+                "href": "https://mylamp.example.com/status"
+            }]
+        }
+    },
+    // ...
+}

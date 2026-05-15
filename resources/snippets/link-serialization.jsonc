@@ -1,0 +1,29 @@
+/*
+---
+layout: aside
+id: link-serialization-sample
+title: Sample of a Link serialization
+show_keys:
+  - links
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8091",
+    "title": "SmartLamp",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": "nosec_sc",
+    "links": [
+        {
+            "rel": "controlledBy",
+            "href": "https://servient.example.com/things/lampController",
+            "type": "application/td+json"
+        }
+    ]
+}

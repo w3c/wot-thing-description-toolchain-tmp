@@ -1,0 +1,15 @@
+/*
+---
+layout: pre
+validate: false
+title: Thing Model versioning
+---
+*/
+{
+    // ...
+    "@type": "tm:ThingModel",
+    "title": "Lamp Thing Model",
+    "description": "Lamp Thing Description Model",
+    "version" : {"model": "1.0.0"},
+    // ...
+}

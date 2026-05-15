@@ -1,0 +1,41 @@
+/*
+---
+layout: pre
+validate: false
+id: multiple-security-definitions1
+---
+*/
+{
+    // ...
+    "securityDefinitions": {
+        "basic_sc": {"scheme": "basic"},
+        "nosec_sc": {"scheme": "nosec"}
+    },
+    "security": "basic_sc",
+    // ...
+    "properties": {
+        "status": {
+            // ...
+            "forms": [{
+                "href": "https://mylamp.example.com/status"
+            }]
+        }
+    },
+    "actions": {
+        "toggle": {
+            // ...
+            "forms": [{
+                "href": "https://mylamp.example.com/toggle"
+            }]
+        }
+    },
+    "events": {
+        "overheating": {
+            // ...
+            "forms": [{
+                "href": "https://mylamp.example.com/oh",
+                "security": "nosec_sc"
+            }]
+        }
+    }
+}

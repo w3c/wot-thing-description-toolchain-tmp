@@ -1,0 +1,42 @@
+/*
+---
+layout: pre
+validate: false
+id: saref-state-annotation-example
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "saref": "https://w3id.org/saref#",
+            "ssn": "http://www.w3.org/ns/ssn/"
+        }
+    ],
+    "id": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4",
+    "@type": "saref:LightSwitch",
+    "saref:hasState": {
+        "@id": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4/state",
+        "@type": "saref:OnOffState"
+    },
+    // ...
+    "properties": {
+        "status": {
+            "ssn:forProperty": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4/state",
+            "type": "string",
+            "forms": [{"href": "https://mylamp.example.com/status"}]
+        },
+        "fullStatus": {
+            "ssn:forProperty": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4/state",
+            "type": "object",
+            "properties": {
+                "statusString": { "type": "string" },
+                "statusCode": { "type": "number" },
+                "statusDescription": { "type": "string" }
+            },
+            "forms": [{"href": "https://mylamp.example.com/status?full=true"}]
+        },
+        // ...
+    },
+    // ...
+}

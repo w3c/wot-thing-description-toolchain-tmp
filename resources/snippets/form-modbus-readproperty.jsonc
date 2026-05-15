@@ -1,0 +1,12 @@
+/*
+---
+layout: pre
+validate: false
+title: Binding instance of a readproperty operation to Modbus
+---
+*/
+{
+    "href": "modbus+tcp://127.0.0.1:60000/1/4",
+    "op": "readproperty",
+    "modv:function": "readCoil"
+}

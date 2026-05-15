@@ -1,0 +1,29 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    "@context": ["https://www.w3.org/ns/wot-next/td", {
+        "htv": "http://www.w3.org/2011/http#"
+    }],
+    // ...
+    "properties": {
+        "weather": {
+            // ...
+            "uriVariables": {
+                "city": {
+                    "type": "string",
+                    "description": "City name to find the weather information for"
+                }
+            },
+            "forms": [{
+                "href": "http://example.org/weather/{city}",
+                "htv:methodName": "GET"
+            }]
+        },
+        // ...
+    },
+    // ...
+}

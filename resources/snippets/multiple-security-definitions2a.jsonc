@@ -1,0 +1,43 @@
+/*
+---
+layout: pre
+id: multiple-security-definitions2a
+show_keys:
+  - securityDefinitions
+  - security
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:b2a3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d",
+    "title": "SecureDevice",
+    "securityDefinitions": {
+        "proxy_sc": {
+            "scheme": "digest",
+            "proxy": "https://portal.example.com/"
+        },
+        "bearer_sc": {
+            "scheme": "bearer",
+            "in": "header",
+            "format": "jwt",
+            "alg": "ES256",
+            "authorization": "https://servient.example.com:8443/"
+        }
+    },
+    "security": [
+        "proxy_sc",
+        "bearer_sc"
+    ],
+    "properties": {
+        "status": {
+            "type": "string",
+            "forms": [
+                {
+                    "href": "https://securedevice.example.com/status"
+                }
+            ]
+        }
+    }
+}

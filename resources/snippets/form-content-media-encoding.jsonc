@@ -1,0 +1,24 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    // ...
+    "properties": {
+        "image": {
+	        "description": "Provides latest image",
+	        "type": "string",
+	        "contentMediaType": "image/png",
+	        "contentEncoding": "base64",
+	        "forms": [{
+			    "op": "readproperty",
+			    "href": "coaps://mylamp.example.com/lastPicture",
+			    "cov:methodName": "GET",
+			    "contentType": "application/json"
+		    }]
+        }
+    },
+    // ...
+}

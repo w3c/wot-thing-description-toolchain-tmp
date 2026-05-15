@@ -1,0 +1,22 @@
+/*
+---
+layout: pre
+validate: false
+title: An electric drive includes two motors.
+---
+*/
+{
+    "title": "Electric Drive",
+    // ...
+    "links": [{
+        "rel": "item",
+        "href": "coaps://motor1.example.com",
+        "type": " application/td+json"
+    },
+    {
+        "rel": "item",
+        "href": "coaps://motor2.example.com",
+        "type": " application/td+json"
+    }]
+    // ...
+}

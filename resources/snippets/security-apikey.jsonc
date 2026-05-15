@@ -1,0 +1,27 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    // ...
+    "securityDefinitions": {
+        "apikey_key": {
+            "scheme": "apikey",
+            "in": "uri",
+            "name": "adminKey"
+        }
+    },
+    "security": "apikey_key",
+    "properties": {
+        "status": {
+            // ...
+            "forms": [{
+                "href": "https://example.com/{adminKey}/status",
+                // ...
+            }]
+        }
+    },
+    // ...
+}

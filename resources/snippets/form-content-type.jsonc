@@ -1,0 +1,11 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    // ...
+    "contentType": "text/plain; charset=utf-8",
+    // ...
+}

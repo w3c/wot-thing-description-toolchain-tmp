@@ -1,0 +1,12 @@
+/*
+---
+layout: pre
+validate: false
+title: Binding instance of a readproperty operation to HTTP
+---
+*/
+{
+    "href": "http://example.com/props/temperature",
+    "op": "readproperty",
+    "htv:methodName": "GET"
+}

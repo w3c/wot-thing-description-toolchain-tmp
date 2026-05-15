@@ -1,0 +1,37 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    // ...
+    "securityDefinitions": {
+        "apikey_key": {
+            "scheme": "apikey",
+            "in": "uri",
+            "name": "secKey"
+        },
+        "apikey_id": {
+            "scheme": "apikey",
+            "in": "uri",
+            "name": "secClientID"
+        },
+        "apikey_combo": {
+            "scheme": "combo",
+            "allOf": ["apikey_key","apikey_id"]
+        }
+    },
+    "security": "apikey_combo",
+    // ...
+    "properties": {
+        "status": {
+            // ...
+            "forms": [{
+                "href": "https://example.com/{secClientID}/status/{secKey}",
+                // ...
+            }]
+        }
+    },
+    // ...
+}

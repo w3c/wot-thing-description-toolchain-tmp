@@ -1,0 +1,37 @@
+/*
+---
+layout: pre
+validate: false
+id: td-forms-readall-example
+---
+*/
+{
+    // ...
+    "properties": {
+        "on": {
+            "type": "boolean",
+            "forms": [...]
+        },
+        "brightness": {
+            "type": "number",
+            "forms": [...]
+        },
+        "timer": {
+            "type": "integer",
+            "forms": [...]
+        }
+    },
+    // ...
+    "forms": [{
+        "op": "readallproperties",
+        "href": "https://mylamp.example.com/properties",
+        "contentType": "application/json",
+        "htv:methodName": "GET"
+    },
+    {
+        "op": "writeallproperties",
+        "href": "https://mylamp.example.com/properties",
+        "contentType": "application/json",
+        "htv:methodName": "PUT"
+    }]
+}

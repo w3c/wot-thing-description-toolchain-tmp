@@ -1,0 +1,55 @@
+/*
+---
+layout: pre
+validate: false
+title: Data Schema for IPSO/LWM2M Payload Example
+---
+*/
+{
+    "type": "object",
+    "properties": {
+        "bn": {
+            "type": "string",
+            "const": "/3001/0/"
+        },
+        "e": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "n": {
+                            "type": "string",
+                            "const": "5044"
+                        },
+                        "v": {
+                            "@type": [
+                                "iot:LevelData"
+                            ],
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        }
+                    }
+                },
+                {
+                    "type": "object",
+                    "Properties": {
+                        "n": {
+                            "type": "string",
+                            "const": "5002"
+                        },
+                        "v": {
+                            "@type": [
+                                "iot:TransitionTimeData"
+                            ],
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 6553.5
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,32 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+          "@language": "ar-EG",
+          "@direction": "rtl"
+        }
+    ],
+    "title": "شيء يخصني يقيس درجة الحرارة",
+    "description": "شيء يقيس درجة الحرارة و يظهر حالته",
+    // ...
+    "properties": {
+        "temp": {
+            "title": "درجة الحرارة",
+            "type": "boolean",
+            "forms": [...]
+        },
+        "status": {
+            "title": "حالة",
+            "type": "object",
+            // ...
+            "forms": [...]
+        }
+    },
+    // ...
+}

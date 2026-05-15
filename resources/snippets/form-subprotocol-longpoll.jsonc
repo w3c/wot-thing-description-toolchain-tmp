@@ -1,0 +1,12 @@
+/*
+---
+layout: pre
+validate: false
+title: Subprotocol usage for subscribing events
+---
+*/
+{
+    "op": "subscribeevent",
+    "href": "https://mylamp.example.com/overheating",
+    "subprotocol": "longpoll"
+}

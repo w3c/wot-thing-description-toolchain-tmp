@@ -1,0 +1,19 @@
+/*
+---
+layout: pre
+id: td-model-example-basic-on-off
+title: Basic On/Off Thing Model Definition
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "@type": "tm:ThingModel",
+    "title": "Basic On/Off Thing Model",
+    "properties": {
+        "onOff": {
+            "type": "boolean"
+        }
+    }
+}

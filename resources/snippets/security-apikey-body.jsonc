@@ -1,0 +1,89 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    // ...
+    "securityDefinitions": {
+        "apikey_body": {
+            "scheme": "apikey",
+            "in": "body",
+            "name": "/auth/key"
+        }
+    },
+    "security": "apikey_body",
+    // ...
+    "properties": {
+        "color": {
+            // ...
+            "type": "object",
+            "properties": {
+                "brightness": {
+                    "type": "number",
+                    // ...
+                },
+                "rgb": {
+                    "type": "array",
+                    // ...
+                },
+                "auth": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                           "type": "string"
+                        }
+                    },
+                    "required": ["key"]
+                }
+            },
+            "required": ["brightness", "rgb", "auth"],
+            "forms": [{
+                "href": "https://example.com/color",
+                // ...
+            }]
+        }
+    },
+    "action": {
+        "on": {
+            // ...
+            "input": {
+                "auth": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                           "type": "string"
+                        }
+                    },
+                    "required": ["key"]
+                }
+            },
+            "required": ["auth"],
+            "forms": [{
+                "href": "https://example.com/on",
+                // ...
+            }]
+        },
+        "off": {
+            // ...
+            "input": {
+                "auth": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                           "type": "string"
+                        }
+                    },
+                    "required": ["key"]
+                }
+            },
+            "required": ["auth"],
+            "forms": [{
+                "href": "https://example.com/off",
+                // ...
+            }]
+        }
+    },
+    // ...
+}

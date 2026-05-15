@@ -1,0 +1,33 @@
+/*
+---
+layout: pre
+validate: false
+id: saref-geolocation-annotation-example-3
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "schema": "https://schema.org#"
+        }
+    ],
+    // ...
+    "properties": {
+        "position": {
+        "jsonld:context": {
+            "schema": "https://schema.org/",
+            "long": "schema:longitude",
+            "lat": "schema:latitude",
+            "height": "schema:elevation"
+        },
+        "type": "object",
+        "properties": {
+            "long": { "type": "number" },
+            "lat": { "type": "number" },
+            "height": { "type": "number" }
+        }
+        }
+    },
+    // ...
+}

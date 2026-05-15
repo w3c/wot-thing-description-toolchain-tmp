@@ -1,0 +1,47 @@
+/*
+---
+layout: pre
+validate: false
+id: td-forms-urivariables-thing-example
+---
+*/
+{
+    // ...
+    "properties": {
+        "temperature": {
+            "type": "number",
+            "forms": [...]
+        },
+        "brightness": {
+            "type": "number",
+            "forms": [...]
+        },
+        "humidity": {
+            "type": "integer",
+            "forms": [...]
+        }
+    },
+    "uriVariables": {
+        "propertyNames": {
+            "type": "string",
+            "description": "Comma separated list of property names to select."
+        },
+        "unitSystem": {
+            "type": "string",
+            "enum": ["metric","imperial","uscustomary"],
+            "description": "System of Measurement that will be used for the values"
+        }
+    },
+    "forms": [{
+        "op": "readallproperties",
+        "href": "https://mything.example.com/properties{?unitSystem}",
+        "contentType": "application/json",
+        "htv:methodName": "GET"
+    },
+    {
+        "op": "readmultipleproperties",
+        "href": "https://mylamp.example.com/properties{?propertyNames,unitSystem}",
+        "contentType": "application/json",
+        "htv:methodName": "GET"
+    }]
+}

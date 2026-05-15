@@ -1,0 +1,31 @@
+/*
+---
+layout: pre
+validate: false
+id: thing-serialization-sample
+title: Sample of Thing serializations
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "@type": "Thing",
+    "id": "urn:uuid:1b37933b-3212-4dad-9c2c-74c6042c3e2b",
+    "title": "MyThing",
+    "titles": {/*...*/},
+    "description": "Human readable information.",
+    "descriptions": {/*...*/},
+    "support": "mailto:support@example.com",
+    "version": {/*...*/},
+    "created": "2018-11-14T19:10:23.824Z",
+    "modified": "2019-06-01T09:12:43.124Z",
+    "securityDefinitions": {/*...*/},
+    "security": /*...*/,
+    "base": "https://servient.example.com/",
+    "properties": {/*...*/},
+    "actions": {/*...*/},
+    "events": {/*...*/},
+    "links": [...],
+    "forms": [...]
+}

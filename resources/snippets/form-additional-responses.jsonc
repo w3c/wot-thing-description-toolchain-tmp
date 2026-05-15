@@ -1,0 +1,48 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+    // ...
+    "schemaDefinitions": {
+      "actionErrorPayload": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "enum": ["cold","hot","maintenance"]
+          },
+          "timeStamp": {
+            "description": "UNIX time in numbers indicating when the error happened",
+            "type": "number"
+          }
+        }
+      }
+    },
+    // ...
+    "actions": {
+        "startEngine": {
+            "output": {
+              "type": "string"
+            },
+            "forms": [{
+                "op": "invokeaction",
+                "href": "http://mycar.example.com/api/engine",
+                "contentType": "application/json",
+                "additionalResponses": [
+                  {
+                    "success": false,
+                    "contentType": "application/json",
+                    "schema": "actionErrorPayload"
+                  },
+                  {
+                    "success": false
+                  },
+                ]
+            }]
+        }
+    },
+    // ...
+}

@@ -1,0 +1,37 @@
+/*
+---
+layout: aside
+id: event-serialization-sample
+title: Sample of an Event serialization
+show_keys:
+  - events
+redact_keys:
+  - forms
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f80",
+    "title": "SmartLamp",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": "nosec_sc",
+    "events": {
+        "overheated": {
+            "data": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "https://smartlamp.example.com/overheated",
+                    "subprotocol": "longpoll"
+                }
+            ]
+        }
+    }
+}

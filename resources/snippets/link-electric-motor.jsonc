@@ -1,0 +1,18 @@
+/*
+---
+layout: pre
+validate: false
+title: An electric motor is member of the electric drive collection.
+---
+*/
+{
+    "title": "Electric Motor 1",
+    "base": "coaps://motor1.example.com",
+    // ...
+    "links": [{
+        "rel": "collection",
+        "href": "coaps://drive.example.com",
+        "type": " application/td+json"
+    }]
+    // ...
+}

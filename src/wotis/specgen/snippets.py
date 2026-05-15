@@ -2,28 +2,94 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from html import escape
 from pathlib import Path
 from typing import Any
 
 import yaml
-from jsonschema import Draft7Validator, ValidationError
+from jsonschema import Draft7Validator
 
 
-def load_snippet(name: str, snippets_dir: Path) -> tuple[dict[str, Any], dict[str, Any]]:
-    json_path = snippets_dir / f"{name}.json"
-    meta_path = snippets_dir / f"{name}.meta.yaml"
+_FRONTMATTER_RE = re.compile(
+    r"^\s*/\*\s*\n---\n(.*?)\n---\s*\n\*/\s*\n?",
+    re.DOTALL,
+)
 
-    if not json_path.exists():
-        raise FileNotFoundError(f"Snippet file not found: {json_path}")
+_HIDE_START_RE = re.compile(r"^(\s*)//\s*@hide-start\s*$")
+_HIDE_END_RE = re.compile(r"^\s*//\s*@hide-end\s*$")
 
-    with json_path.open(encoding="utf-8") as f:
-        data = json.load(f)
 
-    meta: dict[str, Any] = {}
-    if meta_path.exists():
-        with meta_path.open(encoding="utf-8") as f:
-            meta = yaml.safe_load(f) or {}
+def _extract_frontmatter(text: str) -> tuple[dict[str, Any], str]:
+    m = _FRONTMATTER_RE.match(text)
+    if not m:
+        return {}, text
+    meta = yaml.safe_load(m.group(1)) or {}
+    return meta, text[m.end() :]
+
+
+def _process_hide_ranges(text: str) -> str:
+    lines = text.split("\n")
+    result: list[str] = []
+    hiding = False
+    indent = ""
+    for line in lines:
+        start_m = _HIDE_START_RE.match(line)
+        if start_m:
+            if hiding:
+                raise ValueError("Nested // @hide-start without closing // @hide-end")
+            hiding = True
+            indent = start_m.group(1)
+            continue
+        if _HIDE_END_RE.match(line):
+            if not hiding:
+                raise ValueError("// @hide-end without matching // @hide-start")
+            hiding = False
+            if not result or result[-1].strip() != "// ...":
+                result.append(f"{indent}// ...")
+            continue
+        if not hiding:
+            result.append(line)
+    if hiding:
+        raise ValueError("Unclosed // @hide-start without // @hide-end")
+    return "\n".join(result)
+
+
+_JSONC_TOKEN_RE = re.compile(
+    r'"(?:[^"\\]|\\.)*"'   # double-quoted string (skip)
+    r"|/\*.*?\*/"          # block comment (strip)
+    r"|//[^\n]*"           # line comment (strip)
+    , re.DOTALL,
+)
+
+
+def _strip_jsonc_comments(text: str) -> str:
+    def _replace(m: re.Match[str]) -> str:
+        s = m.group(0)
+        if s.startswith('"'):
+            return s
+        return ""
+    return _JSONC_TOKEN_RE.sub(_replace, text)
+
+
+def load_snippet(name: str, snippets_dir: Path) -> tuple[Any, dict[str, Any]]:
+    jsonc_path = snippets_dir / f"{name}.jsonc"
+
+    if not jsonc_path.exists():
+        raise FileNotFoundError(f"Snippet file not found: {jsonc_path}")
+
+    with jsonc_path.open(encoding="utf-8") as f:
+        raw_text = f.read()
+
+    meta, body = _extract_frontmatter(raw_text)
+    stripped = _strip_jsonc_comments(body)
+    try:
+        data = json.loads(stripped)
+    except json.JSONDecodeError:
+        data = None
+
+    meta["_raw_jsonc"] = body
+    meta["_is_jsonc"] = True
 
     return data, meta
 
@@ -39,23 +105,32 @@ def validate_all_snippets(snippets_dir: Path, schema_path: Path) -> list[str]:
     validator = Draft7Validator(schema)
     errors: list[str] = []
 
-    for json_file in sorted(snippets_dir.glob("*.json")):
-        if json_file.stem == "TEMPLATE":
+    for jsonc_file in sorted(snippets_dir.glob("*.jsonc")):
+        if jsonc_file.stem == "TEMPLATE":
             continue
-        with json_file.open(encoding="utf-8") as f:
-            try:
-                instance = json.load(f)
-            except json.JSONDecodeError as e:
-                errors.append(f"{json_file.name}: invalid JSON — {e}")
-                continue
+
+        with jsonc_file.open(encoding="utf-8") as f:
+            raw_text = f.read()
+
+        meta, body = _extract_frontmatter(raw_text)
+        if meta.get("validate") is False:
+            logging.debug("Skipping validation (validate: false): %s", jsonc_file.name)
+            continue
+
+        stripped = _strip_jsonc_comments(body)
+        try:
+            instance = json.loads(stripped)
+        except json.JSONDecodeError as e:
+            errors.append(f"{jsonc_file.name}: invalid JSON — {e}")
+            continue
 
         if isinstance(instance, dict) and instance.get("@type") == "tm:ThingModel":
-            logging.debug("Skipping ThingModel: %s", json_file.name)
+            logging.debug("Skipping ThingModel: %s", jsonc_file.name)
             continue
 
         for error in validator.iter_errors(instance):
             path = ".".join(str(p) for p in error.absolute_path) or "(root)"
-            errors.append(f"{json_file.name}: {path} — {error.message}")
+            errors.append(f"{jsonc_file.name}: {path} — {error.message}")
 
     return errors
 
@@ -95,7 +170,7 @@ class _RedactEncoder(json.JSONEncoder):
 
 
 def _filter_json(
-    data: dict[str, Any],
+    data: Any,
     meta: dict[str, Any],
 ) -> str:
     indent = meta.get("indent", 4)
@@ -163,7 +238,12 @@ def _filter_json(
 
 def render_snippet(name: str, snippets_dir: Path) -> str:
     data, meta = load_snippet(name, snippets_dir)
-    filtered = _filter_json(data, meta)
+
+    has_filtering = meta.get("show_keys") or meta.get("hide_keys")
+    if not has_filtering:
+        filtered = _process_hide_ranges(meta["_raw_jsonc"]).strip()
+    else:
+        filtered = _filter_json(data, meta)
 
     snippet_id = meta.get("id", "")
     title = meta.get("title", "")
@@ -171,10 +251,10 @@ def render_snippet(name: str, snippets_dir: Path) -> str:
 
     if layout == "pre":
         attrs = f' class="example"'
-        if title:
-            attrs += f' title="{escape(title, quote=True)}"'
         if snippet_id:
             attrs += f' id="{escape(snippet_id, quote=True)}"'
+        if title:
+            attrs += f' title="{escape(title, quote=True)}"'
         return f"<pre{attrs}>\n{filtered}</pre>"
 
     aside_attrs = ' class="example"'
@@ -221,8 +301,12 @@ def render_snippet_group(group_name: str, snippets_dir: Path) -> str:
     lines.append("  </div>")
 
     for tab in tabs:
-        data, meta = load_snippet(tab["snippet"], snippets_dir)
-        filtered = _filter_json(data, meta)
+        data, tab_meta = load_snippet(tab["snippet"], snippets_dir)
+        has_filtering = tab_meta.get("show_keys") or tab_meta.get("hide_keys")
+        if not has_filtering:
+            filtered = _process_hide_ranges(tab_meta["_raw_jsonc"]).strip()
+        else:
+            filtered = _filter_json(data, tab_meta)
         tab_class = tab["snippet"].replace("-", "_")
         selected = " selected" if tab.get("selected") else ""
         lines.append(
