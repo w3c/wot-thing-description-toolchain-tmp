@@ -94,15 +94,26 @@ def load_snippet(name: str, snippets_dir: Path) -> tuple[Any, dict[str, Any]]:
     return data, meta
 
 
-def validate_all_snippets(snippets_dir: Path, schema_path: Path) -> list[str]:
+def validate_all_snippets(
+    snippets_dir: Path,
+    td_schema_path: Path,
+    tm_schema_path: Path,
+) -> list[str]:
     if not snippets_dir.exists():
         return []
 
-    with schema_path.open(encoding="utf-8") as f:
+    with td_schema_path.open(encoding="utf-8") as f:
         raw = json.load(f)
-        schema = json.loads(raw) if isinstance(raw, str) else raw
+        td_schema = json.loads(raw) if isinstance(raw, str) else raw
 
-    validator = Draft7Validator(schema)
+    td_validator = Draft7Validator(td_schema)
+
+    with tm_schema_path.open(encoding="utf-8") as f:
+        raw = json.load(f)
+        tm_schema = json.loads(raw) if isinstance(raw, str) else raw
+
+    tm_validator = Draft7Validator(tm_schema)
+
     errors: list[str] = []
 
     for jsonc_file in sorted(snippets_dir.glob("*.jsonc")):
@@ -124,9 +135,8 @@ def validate_all_snippets(snippets_dir: Path, schema_path: Path) -> list[str]:
             errors.append(f"{jsonc_file.name}: invalid JSON — {e}")
             continue
 
-        if isinstance(instance, dict) and instance.get("@type") == "tm:ThingModel":
-            logging.debug("Skipping ThingModel: %s", jsonc_file.name)
-            continue
+        is_tm = isinstance(instance, dict) and instance.get("@type") == "tm:ThingModel"
+        validator = tm_validator if is_tm else td_validator
 
         for error in validator.iter_errors(instance):
             path = ".".join(str(p) for p in error.absolute_path) or "(root)"
@@ -135,115 +145,10 @@ def validate_all_snippets(snippets_dir: Path, schema_path: Path) -> list[str]:
     return errors
 
 
-def _redact(data: Any, redact_keys: set[str]) -> Any:
-    if isinstance(data, dict):
-        return {
-            k: _redact_placeholder(v) if k in redact_keys else _redact(v, redact_keys)
-            for k, v in data.items()
-        }
-    if isinstance(data, list):
-        return [_redact(item, redact_keys) for item in data]
-    return data
-
-
-def _redact_placeholder(value: Any) -> str:
-    if isinstance(value, list):
-        return "[...]"
-    if isinstance(value, dict):
-        return "{...}"
-    return "..."
-
-
-class _RedactEncoder(json.JSONEncoder):
-    def encode(self, o: Any) -> str:
-        return self._strip_quotes(super().encode(o))
-
-    def iterencode(self, o: Any, _one_shot: bool = False) -> Any:
-        for chunk in super().iterencode(o, _one_shot):
-            yield self._strip_quotes(chunk)
-
-    @staticmethod
-    def _strip_quotes(s: str) -> str:
-        for placeholder in ('"[...]"', '"{...}"', '"..."'):
-            s = s.replace(placeholder, placeholder[1:-1])
-        return s
-
-
-def _filter_json(
-    data: Any,
-    meta: dict[str, Any],
-) -> str:
-    indent = meta.get("indent", 4)
-    ellipsis_marker = meta.get("ellipsis", "// ...")
-    show_keys = meta.get("show_keys")
-    hide_keys = meta.get("hide_keys")
-    redact_keys = set(meta.get("redact_keys", []))
-
-    if redact_keys:
-        data = _redact(data, redact_keys)
-
-    encoder_cls = _RedactEncoder if redact_keys else None
-
-    if not show_keys and not hide_keys:
-        return json.dumps(data, indent=indent, ensure_ascii=False, cls=encoder_cls)
-
-    if not isinstance(data, dict):
-        return json.dumps(data, indent=indent, ensure_ascii=False, cls=encoder_cls)
-
-    all_keys = list(data.keys())
-
-    if show_keys:
-        visible = set(show_keys)
-    elif hide_keys:
-        visible = set(all_keys) - set(hide_keys)
-    else:
-        visible = set(all_keys)
-
-    lines: list[str] = ["{"]
-    pad = " " * indent
-    filtered_entries: list[tuple[str, Any]] = []
-    had_omission = False
-
-    for key in all_keys:
-        if key in visible:
-            if had_omission:
-                filtered_entries.append((None, ellipsis_marker))
-                had_omission = False
-            filtered_entries.append((key, data[key]))
-        else:
-            had_omission = True
-
-    if had_omission:
-        filtered_entries.append((None, ellipsis_marker))
-
-    for i, (key, value) in enumerate(filtered_entries):
-        is_last = i == len(filtered_entries) - 1
-
-        if key is None:
-            lines.append(f"{pad}{value}")
-        else:
-            formatted_value = json.dumps(value, indent=indent, ensure_ascii=False, cls=encoder_cls)
-            if "\n" in formatted_value:
-                indented = formatted_value.replace("\n", f"\n{pad}")
-                entry = f"{pad}{json.dumps(key)}: {indented}"
-            else:
-                entry = f"{pad}{json.dumps(key)}: {formatted_value}"
-            if not is_last:
-                entry += ","
-            lines.append(entry)
-
-    lines.append("}")
-    return "\n".join(lines)
-
-
 def render_snippet(name: str, snippets_dir: Path) -> str:
-    data, meta = load_snippet(name, snippets_dir)
+    _data, meta = load_snippet(name, snippets_dir)
 
-    has_filtering = meta.get("show_keys") or meta.get("hide_keys")
-    if not has_filtering:
-        filtered = _process_hide_ranges(meta["_raw_jsonc"]).strip()
-    else:
-        filtered = _filter_json(data, meta)
+    filtered = _process_hide_ranges(meta["_raw_jsonc"]).strip()
 
     snippet_id = meta.get("id", "")
     title = meta.get("title", "")
@@ -301,12 +206,8 @@ def render_snippet_group(group_name: str, snippets_dir: Path) -> str:
     lines.append("  </div>")
 
     for tab in tabs:
-        data, tab_meta = load_snippet(tab["snippet"], snippets_dir)
-        has_filtering = tab_meta.get("show_keys") or tab_meta.get("hide_keys")
-        if not has_filtering:
-            filtered = _process_hide_ranges(tab_meta["_raw_jsonc"]).strip()
-        else:
-            filtered = _filter_json(data, tab_meta)
+        _data, tab_meta = load_snippet(tab["snippet"], snippets_dir)
+        filtered = _process_hide_ranges(tab_meta["_raw_jsonc"]).strip()
         tab_class = tab["snippet"].replace("-", "_")
         selected = " selected" if tab.get("selected") else ""
         lines.append(

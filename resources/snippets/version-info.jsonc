@@ -1,11 +1,28 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
-    // ...
-    "version": { "instance": "1.2.1" },
-    // ...
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:c9d0e1f2-a3b4-4c5d-6e7f-809102132435",
+    "title": "MyDevice",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "version": { "instance": "1.2.1" }
+    // @hide-start
+    ,
+    "properties": {
+        "status": {
+            "type": "string",
+            "forms": [{ "href": "https://example.com/status" }]
+        }
+    }
+    // @hide-end
 }

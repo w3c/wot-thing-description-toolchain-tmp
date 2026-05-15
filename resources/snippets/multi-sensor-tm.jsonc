@@ -3,6 +3,7 @@
 layout: pre
 id: td-model-example-relative-tmRef
 title: Multi Sensor Thing Model re-using definitions with relative imports
+validate: false
 ---
 */
 {

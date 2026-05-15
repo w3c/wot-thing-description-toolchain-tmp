@@ -1,11 +1,14 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
-    // ...
+    // @hide-start
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "id": "urn:uuid:b4e8c6a3-9f12-4d7e-85ab-6c0d3e2f1a94",
+    "title": "ApiKeyCombinedDevice",
+    // @hide-end
     "securityDefinitions": {
         "apikey_key": {
             "scheme": "apikey",
@@ -23,15 +26,28 @@ validate: false
         }
     },
     "security": "apikey_combo",
-    // ...
+    // @hide-start
+    // @hide-end
     "properties": {
         "status": {
-            // ...
+            // @hide-start
+            "type": "string",
+            // @hide-end
             "forms": [{
-                "href": "https://example.com/{secClientID}/status/{secKey}",
-                // ...
+                "href": "https://example.com/{secClientID}/status/{secKey}"
+                // @hide-start
+                ,
+                "contentType": "application/json"
+                // @hide-end
             }]
         }
-    },
-    // ...
+    }
+    // @hide-start
+    ,
+    "actions": {
+        "toggle": {
+            "forms": [{"href": "https://example.com/{secClientID}/toggle/{secKey}"}]
+        }
+    }
+    // @hide-end
 }

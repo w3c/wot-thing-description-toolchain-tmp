@@ -1,21 +1,28 @@
 /*
 ---
 layout: pre
-validate: false
 id: multiple-security-definitions1
 ---
 */
 {
-    // ...
+    // @hide-start
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "id": "urn:uuid:e7ab8c53-2f6b-4a3e-d0c5-1b7c9e2a6d54",
+    "title": "MultipleSecurityDefinitionsExample",
+    // @hide-end
     "securityDefinitions": {
         "basic_sc": {"scheme": "basic"},
         "nosec_sc": {"scheme": "nosec"}
     },
     "security": "basic_sc",
-    // ...
+    // @hide-start
+    "description": "Example with multiple security definitions and per-interaction override",
+    // @hide-end
     "properties": {
         "status": {
-            // ...
+            // @hide-start
+            "type": "string",
+            // @hide-end
             "forms": [{
                 "href": "https://mylamp.example.com/status"
             }]
@@ -23,7 +30,9 @@ id: multiple-security-definitions1
     },
     "actions": {
         "toggle": {
-            // ...
+            // @hide-start
+            "description": "Toggle the lamp",
+            // @hide-end
             "forms": [{
                 "href": "https://mylamp.example.com/toggle"
             }]
@@ -31,7 +40,10 @@ id: multiple-security-definitions1
     },
     "events": {
         "overheating": {
-            // ...
+            // @hide-start
+            "description": "Overheating event",
+            "data": {"type": "string"},
+            // @hide-end
             "forms": [{
                 "href": "https://mylamp.example.com/oh",
                 "security": "nosec_sc"

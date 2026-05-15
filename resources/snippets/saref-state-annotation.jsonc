@@ -1,7 +1,6 @@
 /*
 ---
 layout: pre
-validate: false
 id: saref-state-annotation-example
 ---
 */
@@ -19,7 +18,13 @@ id: saref-state-annotation-example
         "@id": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4/state",
         "@type": "saref:OnOffState"
     },
-    // ...
+    // @hide-start
+    "title": "SmartLightSwitch",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
     "properties": {
         "status": {
             "ssn:forProperty": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4/state",
@@ -35,8 +40,8 @@ id: saref-state-annotation-example
                 "statusDescription": { "type": "string" }
             },
             "forms": [{"href": "https://mylamp.example.com/status?full=true"}]
-        },
-        // ...
-    },
-    // ...
+        }
+    }
+    // @hide-start
+    // @hide-end
 }

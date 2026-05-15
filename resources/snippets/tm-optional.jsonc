@@ -2,6 +2,7 @@
 ---
 layout: pre
 title: "Thing Model with the tm:optional term for interaction affordances."
+validate: false
 ---
 */
 {

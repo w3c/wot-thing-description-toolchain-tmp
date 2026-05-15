@@ -1,11 +1,20 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
-    // ...
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:d0e1f2a3-b4c5-4d6e-7f80-910213243546",
+    "title": "MyDevice",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
     "properties": {
         "status": {
             "description": "Read or write On/Off status.",
@@ -22,8 +31,13 @@ validate: false
                     "writeOnly": true
                 }
             },
-            "forms": [...]
+            "forms": [
+                // @hide-start
+                { "href": "https://example.com/status" }
+                // @hide-end
+            ]
         }
     }
-    // ...
+    // @hide-start
+    // @hide-end
 }

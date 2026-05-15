@@ -616,15 +616,20 @@ def generate_respec_spec(
     if cfg.snippets_dir.is_dir():
         from ..specgen.snippets import validate_all_snippets
 
-        schema_path = cfg.resources_path / "ground-truth-schemas" / "td-json-schema-validation.json"
-        if schema_path.exists():
-            snippet_errors = validate_all_snippets(cfg.snippets_dir, schema_path)
-            if snippet_errors:
-                for err in snippet_errors:
-                    logging.error("Snippet validation error: %s", err)
-                raise RuntimeError(
-                    f"Snippet validation failed with {len(snippet_errors)} error(s)"
-                )
+        schemas_dir = cfg.resources_path / "ground-truth-schemas"
+        td_schema_path = schemas_dir / "td-json-schema-validation.json"
+        tm_schema_path = schemas_dir / "tm-json-schema-validation.json"
+        snippet_errors = validate_all_snippets(
+            cfg.snippets_dir,
+            td_schema_path,
+            tm_schema_path,
+        )
+        if snippet_errors:
+            for err in snippet_errors:
+                logging.error("Snippet validation error: %s", err)
+            raise RuntimeError(
+                f"Snippet validation failed with {len(snippet_errors)} error(s)"
+            )
 
         tpl_text = respec_template_path.read_text(encoding="utf-8")
         jinja_tpl = env.from_string(tpl_text)

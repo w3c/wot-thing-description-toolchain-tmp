@@ -1,27 +1,50 @@
 /*
 ---
 layout: pre
-validate: false
 id: td-forms-readall-example
 ---
 */
 {
-    // ...
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        { "htv": "http://www.w3.org/2011/http#" }
+    ],
+    "id": "urn:uuid:b8c9d0e1-f2a3-4b4c-5d6e-7f8091021324",
+    "title": "MyLamp",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
     "properties": {
         "on": {
             "type": "boolean",
-            "forms": [...]
+            "forms": [
+                // @hide-start
+                { "href": "https://mylamp.example.com/on" }
+                // @hide-end
+            ]
         },
         "brightness": {
             "type": "number",
-            "forms": [...]
+            "forms": [
+                // @hide-start
+                { "href": "https://mylamp.example.com/brightness" }
+                // @hide-end
+            ]
         },
         "timer": {
             "type": "integer",
-            "forms": [...]
+            "forms": [
+                // @hide-start
+                { "href": "https://mylamp.example.com/timer" }
+                // @hide-end
+            ]
         }
     },
-    // ...
+    // @hide-start
+    // @hide-end
     "forms": [{
         "op": "readallproperties",
         "href": "https://mylamp.example.com/properties",

@@ -2,6 +2,7 @@
 ---
 layout: pre
 title: "Thing Model overwrites tm:optional of the previous Thing Model example."
+validate: false
 ---
 */
 {

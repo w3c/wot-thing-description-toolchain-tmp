@@ -1,11 +1,20 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
-    // ...
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:f2a3b4c5-d6e7-4f80-9102-132435465768",
+    "title": "MyLamp",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
     "properties": {
         "image": {
 	        "description": "Provides latest image",
@@ -19,6 +28,7 @@ validate: false
 			    "contentType": "application/json"
 		    }]
         }
-    },
-    // ...
+    }
+    // @hide-start
+    // @hide-end
 }

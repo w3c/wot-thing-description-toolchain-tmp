@@ -3,13 +3,10 @@
 layout: aside
 id: event-serialization-sample
 title: Sample of an Event serialization
-show_keys:
-  - events
-redact_keys:
-  - forms
 ---
 */
 {
+    // @hide-start
     "@context": [
         "https://www.w3.org/ns/wot-next/td"
     ],
@@ -21,6 +18,7 @@ redact_keys:
         }
     },
     "security": "nosec_sc",
+    // @hide-end
     "events": {
         "overheated": {
             "data": {

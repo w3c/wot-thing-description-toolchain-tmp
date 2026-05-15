@@ -1,17 +1,25 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
     "@context": ["https://www.w3.org/ns/wot-next/td", {
         "htv": "http://www.w3.org/2011/http#"
     }],
-    // ...
+    // @hide-start
+    "id": "urn:uuid:d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f80",
+    "title": "WeatherService",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
     "properties": {
         "weather": {
-            // ...
+            // @hide-start
+            "type": "object",
+            // @hide-end
             "uriVariables": {
                 "city": {
                     "type": "string",
@@ -22,8 +30,8 @@ validate: false
                 "href": "http://example.org/weather/{city}",
                 "htv:methodName": "GET"
             }]
-        },
-        // ...
-    },
-    // ...
+        }
+    }
+    // @hide-start
+    // @hide-end
 }

@@ -1,7 +1,6 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
@@ -19,7 +18,14 @@ validate: false
     },
     "schema:serialNumber": "4CE0460D0G",
     "schema:manufacturer": {"name": "CompanyName"},
-    // ...
+    // @hide-start
+    "id": "urn:uuid:d2f9b6c0-1e3a-4b7d-c8f0-2a4e6d8b1f3c",
+    "title": "WeatherStation",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
     "@type": "saref:TemperatureSensor",
     "properties": {
         "temperature": {
@@ -28,9 +34,11 @@ validate: false
             "minimum": -32.5,
             "maximum": 55.2,
             "unit": "om:degreeCelsius",
-            "forms": [...]
-        },
-        // ...
-    },
-    // ...
+            "forms": [
+                // @hide-start
+                { "href": "https://example.com/temperature" }
+                // @hide-end
+            ]
+        }
+    }
 }

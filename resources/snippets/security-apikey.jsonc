@@ -1,11 +1,14 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
-    // ...
+    // @hide-start
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "id": "urn:uuid:7a3f2b91-d845-4e6c-a87d-3c1e9f4b5a02",
+    "title": "ApiKeyDevice",
+    // @hide-end
     "securityDefinitions": {
         "apikey_key": {
             "scheme": "apikey",
@@ -16,12 +19,24 @@ validate: false
     "security": "apikey_key",
     "properties": {
         "status": {
-            // ...
+            // @hide-start
+            "type": "string",
+            // @hide-end
             "forms": [{
-                "href": "https://example.com/{adminKey}/status",
-                // ...
+                "href": "https://example.com/{adminKey}/status"
+                // @hide-start
+                ,
+                "contentType": "application/json"
+                // @hide-end
             }]
         }
-    },
-    // ...
+    }
+    // @hide-start
+    ,
+    "actions": {
+        "toggle": {
+            "forms": [{"href": "https://example.com/{adminKey}/toggle"}]
+        }
+    }
+    // @hide-end
 }

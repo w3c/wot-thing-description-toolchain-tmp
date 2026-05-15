@@ -1,7 +1,6 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
@@ -13,5 +12,20 @@ validate: false
         },
         "https://schema.org/"
     ],
-    // ...
+    // @hide-start
+    "id": "urn:uuid:b0d7f4a8-9c1e-4f5b-a6d8-0e2c4b6f9d1a",
+    "title": "ExtendedContextDevice",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    "properties": {
+        "status": {
+            "type": "string",
+            "forms": [
+                { "href": "https://example.com/status" }
+            ]
+        }
+    }
+    // @hide-end
 }

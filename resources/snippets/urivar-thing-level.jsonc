@@ -1,24 +1,46 @@
 /*
 ---
 layout: pre
-validate: false
 id: td-forms-urivariables-thing-example
 ---
 */
 {
-    // ...
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        { "htv": "http://www.w3.org/2011/http#" }
+    ],
+    "id": "urn:uuid:a7b8c9d0-e1f2-4a3b-4c5d-6e7f80910213",
+    "title": "MyThing",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
     "properties": {
         "temperature": {
             "type": "number",
-            "forms": [...]
+            "forms": [
+                // @hide-start
+                { "href": "https://mything.example.com/temperature" }
+                // @hide-end
+            ]
         },
         "brightness": {
             "type": "number",
-            "forms": [...]
+            "forms": [
+                // @hide-start
+                { "href": "https://mything.example.com/brightness" }
+                // @hide-end
+            ]
         },
         "humidity": {
             "type": "integer",
-            "forms": [...]
+            "forms": [
+                // @hide-start
+                { "href": "https://mything.example.com/humidity" }
+                // @hide-end
+            ]
         }
     },
     "uriVariables": {

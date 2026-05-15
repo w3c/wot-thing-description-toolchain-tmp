@@ -1,14 +1,28 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
-    // ...
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:a3b4c5d6-e7f8-4091-0213-243546576879",
+    "title": "MyCamera",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
     "actions": {
         "takePhoto": {
-            // ...
+            // @hide-start
+            "output": {
+                "type": "string",
+                "contentMediaType": "image/jpeg"
+            },
+            // @hide-end
             "forms": [{
                 "op": "invokeaction",
                 "href": "http://camera.example.com/api/snapshot",
@@ -18,6 +32,7 @@ validate: false
                 }
             }]
         }
-    },
-    // ...
+    }
+    // @hide-start
+    // @hide-end
 }

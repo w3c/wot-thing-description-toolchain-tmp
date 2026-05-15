@@ -3,11 +3,10 @@
 layout: aside
 id: link-serialization-sample
 title: Sample of a Link serialization
-show_keys:
-  - links
 ---
 */
 {
+    // @hide-start
     "@context": [
         "https://www.w3.org/ns/wot-next/td"
     ],
@@ -19,6 +18,7 @@ show_keys:
         }
     },
     "security": "nosec_sc",
+    // @hide-end
     "links": [
         {
             "rel": "controlledBy",

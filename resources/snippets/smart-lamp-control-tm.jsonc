@@ -3,6 +3,7 @@
 layout: pre
 id: td-model-example-smart-lamp-control
 title: Smart Lamp Control Thing Model Definition
+validate: false
 ---
 */
 {

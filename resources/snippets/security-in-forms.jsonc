@@ -1,21 +1,27 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
-    // ...
+    // @hide-start
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "id": "urn:uuid:a2c4e6f8-3b5d-4a7c-9e1f-8d0b2c4a6e80",
+    "title": "FormSecurityDevice",
+    // @hide-end
     "securityDefinitions": {
         "basic_sc": { "scheme": "basic" },
         "digest_sc": { "scheme": "digest" },
         "bearer_sc": { "scheme": "bearer" }
     },
     "security": "basic_sc",
-    // ...
+    // @hide-start
+    // @hide-end
     "properties": {
         "status": {
-            // ...
+            // @hide-start
+            "type": "string",
+            // @hide-end
             "forms": [{
                 "href": "https://mylamp.example.com/status"
             }, {
@@ -26,6 +32,13 @@ validate: false
                 "security": "bearer_sc"
             }]
         }
-    },
-    // ...
+    }
+    // @hide-start
+    ,
+    "actions": {
+        "toggle": {
+            "forms": [{"href": "https://mylamp.example.com/toggle"}]
+        }
+    }
+    // @hide-end
 }

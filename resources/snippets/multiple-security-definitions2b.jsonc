@@ -2,17 +2,16 @@
 ---
 layout: pre
 id: multiple-security-definitions2b
-show_keys:
-  - securityDefinitions
-  - security
 ---
 */
 {
+    // @hide-start
     "@context": [
         "https://www.w3.org/ns/wot-next/td"
     ],
     "id": "urn:uuid:b2a3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d",
     "title": "SecureDevice",
+    // @hide-end
     "securityDefinitions": {
         "proxy_sc": {
             "scheme": "digest",
@@ -33,7 +32,9 @@ show_keys:
             ]
         }
     },
-    "security": "combo_sc",
+    "security": "combo_sc"
+    // @hide-start
+    ,
     "properties": {
         "status": {
             "type": "string",
@@ -44,4 +45,5 @@ show_keys:
             ]
         }
     }
+    // @hide-end
 }

@@ -1,11 +1,14 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
-    // ...
+    // @hide-start
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "id": "urn:uuid:b4d85f20-9c3e-4d0b-a7f2-8e4f6b9d3a21",
+    "title": "ApiKeyBodySimplifiedExample",
+    // @hide-end
     "securityDefinitions": {
         "apikey_body": {
             "scheme": "apikey",
@@ -14,44 +17,78 @@ validate: false
         }
     },
     "security": "apikey_body",
-    // ...
+    // @hide-start
+    "description": "Simplified example of API key in body security",
+    // @hide-end
     "properties": {
         "color": {
-            // ...
+            // @hide-start
+            "description": "Color setting of the device",
+            // @hide-end
             "type": "object",
             "properties": {
                 "brightness": {
-                    "type": "number",
-                    // ...
+                    "type": "number"
+                    // @hide-start
+                    ,
+                    "minimum": 0,
+                    "maximum": 100
+                    // @hide-end
                 },
                 "rgb": {
-                    "type": "array",
-                    // ...
+                    "type": "array"
+                    // @hide-start
+                    ,
+                    "items": {"type": "integer"},
+                    "minItems": 3,
+                    "maxItems": 3
+                    // @hide-end
                 }
             },
             "required": ["brightness", "rgb"],
             "forms": [{
-                "href": "https://example.com/color",
-                // ...
+                "href": "https://example.com/color"
+                // @hide-start
+                ,
+                "contentType": "application/json"
+                // @hide-end
             }]
         }
     },
-    "action": {
+    "actions": {
         "on": {
-            // ...
+            // @hide-start
+            "description": "Turn the device on",
+            // @hide-end
             "required": ["auth"],
             "forms": [{
-                "href": "https://example.com/on",
-                // ...
+                "href": "https://example.com/on"
+                // @hide-start
+                ,
+                "contentType": "application/json"
+                // @hide-end
             }]
         },
         "off": {
-            // ...
+            // @hide-start
+            "description": "Turn the device off",
+            // @hide-end
             "forms": [{
-                "href": "https://example.com/off",
-                // ...
+                "href": "https://example.com/off"
+                // @hide-start
+                ,
+                "contentType": "application/json"
+                // @hide-end
             }]
         }
-    },
-    // ...
+    }
+    // @hide-start
+    ,
+    "events": {
+        "statusChange": {
+            "data": {"type": "string"},
+            "forms": [{"href": "https://example.com/events/statusChange"}]
+        }
+    }
+    // @hide-end
 }

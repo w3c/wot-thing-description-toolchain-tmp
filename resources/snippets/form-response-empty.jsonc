@@ -1,11 +1,20 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
-    // ...
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:b4c5d6e7-f809-4102-1324-35465768798a",
+    "title": "CoffeeMaker",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
     "actions": {
         "brewCoffee": {
             "description": "Invoking this action does not return a payload.",
@@ -36,6 +45,7 @@ validate: false
                 "response": {}
             }]
         }
-    },
-    // ...
+    }
+    // @hide-start
+    // @hide-end
 }

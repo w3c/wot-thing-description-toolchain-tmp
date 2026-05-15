@@ -1,7 +1,6 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
@@ -14,8 +13,36 @@ validate: false
     "support": "https://servient.example.com/contact",
     "securityDefinitions": { "nosec_sc": { "scheme": "nosec" }},
     "security": "nosec_sc",
-    "properties": {/*...*/},
-    "actions": {/*...*/},
-    "events": {/*...*/},
-    "links": [/*...*/]
+    "properties": {
+        // @hide-start
+        "status": {
+            "type": "string",
+            "forms": [{"href": "https://servient.example.com/status"}]
+        }
+        // @hide-end
+    },
+    "actions": {
+        // @hide-start
+        "toggle": {
+            "forms": [{"href": "https://servient.example.com/toggle"}]
+        }
+        // @hide-end
+    },
+    "events": {
+        // @hide-start
+        "overheating": {
+            "data": {"type": "string"},
+            "forms": [{"href": "https://servient.example.com/oh", "subprotocol": "longpoll"}]
+        }
+        // @hide-end
+    },
+    "links": [
+        // @hide-start
+        {
+            "href": "https://servient.example.com/docs",
+            "rel": "service-doc",
+            "type": "text/html"
+        }
+        // @hide-end
+    ]
 }

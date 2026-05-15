@@ -1,7 +1,6 @@
 /*
 ---
 layout: pre
-validate: false
 ---
 */
 {
@@ -14,19 +13,36 @@ validate: false
     ],
     "title": "شيء يخصني يقيس درجة الحرارة",
     "description": "شيء يقيس درجة الحرارة و يظهر حالته",
-    // ...
+    // @hide-start
+    "id": "urn:uuid:c5e2a9b3-4d6f-4a0c-b1e3-5f7d9c1a4e6b",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
     "properties": {
         "temp": {
             "title": "درجة الحرارة",
             "type": "boolean",
-            "forms": [...]
+            "forms": [
+                // @hide-start
+                { "href": "https://example.com/temp" }
+                // @hide-end
+            ]
         },
         "status": {
             "title": "حالة",
             "type": "object",
-            // ...
-            "forms": [...]
+            // @hide-start
+            "properties": {
+                "code": { "type": "integer" }
+            },
+            // @hide-end
+            "forms": [
+                // @hide-start
+                { "href": "https://example.com/status" }
+                // @hide-end
+            ]
         }
-    },
-    // ...
+    }
 }
