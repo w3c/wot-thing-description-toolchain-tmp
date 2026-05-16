@@ -225,7 +225,7 @@ slots:
     description: >-
       Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
     slot_uri: td:title
-    range: Any
+    range: string
 
   titles:
     description: >-
@@ -749,6 +749,7 @@ classes:
 enums:
   ThingContextUri:
     description: Valid W3C WoT Thing Description context URIs.
+    enum_uri: linkml:uri
     permissible_values:
       "https://www.w3.org/2019/wot/td/v1":
       "https://www.w3.org/2022/wot/td/v1.1":
