@@ -239,14 +239,16 @@ classes:
       A link can be viewed as a statement of the form
       "**_link context_** has a **_relation type_** resource at **_link target_**",
       where the optional **_target attributes_** may further describe the resource.
+    rules:
+      - preconditions:
+          slot_conditions:
+            rel:
+              equals_string: "icon"
+        postconditions:
+          slot_conditions:
+            sizes:
+              required: true
     annotations:
-      jsonschema_link_discrimination:
-        value:
-          discriminator_slot: rel
-          icon_variant:
-            required_slots:
-              - sizes
-            rel_value: icon
       spec_description: >-
         A link can be viewed as a statement of the form **"link context** has a **relation type** resource at **link target**", where the optional **target attributes** may further describe the resource.
       spec_content:

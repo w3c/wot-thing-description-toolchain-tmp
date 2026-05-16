@@ -438,40 +438,23 @@ classes:
         multivalued: true
         required: true
         minimum_cardinality: 1
-        annotations:
-          jsonschema_dict_style:
-            value:
-              ref: SecurityScheme
-              minProperties: 1
       properties:
         slot_uri: td:hasPropertyAffordance
         description: >-
           All Property-based Interaction Affordances of the Thing.
         range: PropertyAffordance
-        annotations:
-          jsonschema_dict_style:
-            value:
-              ref: PropertyAffordance
       actions:
         description: >-
           All Action-based Interaction Affordances of the Thing.
         range: ActionAffordance
         multivalued: true
         inlined: true
-        annotations:
-          jsonschema_dict_style:
-            value:
-              ref: ActionAffordance
       events:
         description: >-
           All Event-based Interaction Affordances of the Thing.
         range: EventAffordance
         multivalued: true
         inlined: true
-        annotations:
-          jsonschema_dict_style:
-            value:
-              ref: EventAffordance
 
   InteractionAffordance:
     class_uri: td:InteractionAffordance
@@ -533,15 +516,14 @@ classes:
 
   PropertyAffordance:
     is_a: InteractionAffordance
+    mixins:
+      - DataSchema
     class_uri: td:PropertyAffordance
     description: >-
       An Interaction Affordance that exposes state of the Thing.
       This state can be retrieved (read) and/or updated (write).
       Things can also choose to make Properties observable by pushing the new state after a change.
     annotations:
-      jsonschema_merge_from:
-        value:
-          - DataSchema
       spec_content:
         value:
           - type: note

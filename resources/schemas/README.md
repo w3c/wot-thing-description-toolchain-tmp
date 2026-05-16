@@ -109,3 +109,80 @@ op:
           - writeproperty
           - invokeaction
 ```
+
+## JSON Schema Annotations
+
+These annotations control how the JSON Schema postprocessor transforms LinkML-generated JSON Schema into the final spec-compliant output.
+
+### `jsonschema_flatten_subclasses`
+
+Merge all subclass slots into the parent class definition and remove the subclass `$defs`. The parent becomes a single flat definition containing all slots from itself and its subclasses.
+
+```yaml
+DataSchema:
+  annotations:
+    jsonschema_flatten_subclasses: true
+```
+
+### `jsonschema_oneof_dispatch`
+
+Generate a discriminated `oneOf` union from subclasses. Each subclass becomes a variant with a `const` constraint on the discriminator slot. With `include_unknown: true`, an additional variant is added without the discriminator constraint as a fallback.
+
+```yaml
+SecurityScheme:
+  annotations:
+    jsonschema_oneof_dispatch:
+      value:
+        discriminator: scheme
+        include_unknown: true
+```
+
+### `jsonschema_form_variants`
+
+Split a class into operation-specific variant definitions, each constrained to a subset of values for the `op` slot. Creates separate `$defs` per variant and a top-level `oneOf` referencing them.
+
+```yaml
+Form:
+  annotations:
+    jsonschema_form_variants:
+      value:
+        op_slot: op
+        variants:
+          property:
+            - readproperty
+            - writeproperty
+            - observeproperty
+            - unobserveproperty
+          action:
+            - invokeaction
+            - queryaction
+            - cancelaction
+          event:
+            - subscribeevent
+```
+
+### `jsonschema_exclude`
+
+Exclude a class entirely from the generated JSON Schema `$defs`.
+
+```yaml
+SomeInternalClass:
+  annotations:
+    jsonschema_exclude: true
+```
+
+## Native LinkML Features Used for JSON Schema
+
+These native LinkML features generate correct JSON Schema constructs without custom annotations. Prefer these over custom annotations when possible.
+
+| LinkML Feature | JSON Schema Output | Example Use |
+|---|---|---|
+| `mixins` | Mixin slots included in class properties | `PropertyAffordance` inherits `DataSchema` slots |
+| `rules` with `preconditions`/`postconditions` | `if`/`then` conditional schemas | Link with `rel: "icon"` requires `sizes` |
+| Multivalued inlined slots with identifier keys | `additionalProperties` pattern | `securityDefinitions`, `properties`, `actions`, `events` |
+| `exactly_one_of` with two range branches | `oneOf` with single-value and array variants | `@type`: string or array of strings |
+| `minimum_cardinality: 1` on multivalued branch | `minItems: 1` in array variant | Ensuring non-empty arrays in `oneOf` |
+| `extra_slots: allowed: true` | `additionalProperties: true` | All schema classes allowing extension |
+| `minimum_value: N` | `minimum: N` | `minItems`, `NonNegativeInteger` |
+| `minimum_value: 0` + `none_of: [{equals_number: 0}]` | `exclusiveMinimum: 0` (after postprocessor simplification) | `multipleOf` must be > 0 |
+| `enum` definitions with `permissible_values` | Inlined `{"type": "string", "enum": [...]}` | `DataSchemaType`, `contentEncodingList` |
