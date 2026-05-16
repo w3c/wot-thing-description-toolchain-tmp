@@ -1,15 +1,20 @@
 # WoT Schemas
 
-The WoT Schemas contains the single, main source of data for all the officially provided WoT resources.
+The WoT Schemas contains the single, main source of data for all the provided WoT resources.
 
 The WoT Schema provides YAML files in [LinkML](https://linkml.io) format as its primary information source, which contain specific classes with their attributes
 and respective information like attributes' datatypes or cardinalities.
 
 These YAML files are then used to create the necessary WoT resource files.
 
-## Schema Annotations
+## Annotations
 
-The schemas use custom annotations to control how vocabulary terms appear in the generated specification. These are the primary way to shape the final HTML output.
+The schemas use custom annotations to control two aspects of artifact generation:
+
+1. **Spec rendering** (`spec_*`) — how vocabulary terms appear in the generated HTML specification
+2. **JSON Schema output** (`jsonschema_*`) — how the postprocessor transforms LinkML-generated JSON Schema into the final spec-compliant output
+
+Where possible, native LinkML features are preferred over custom annotations.
 
 ### `spec_description`
 
@@ -110,10 +115,6 @@ op:
           - invokeaction
 ```
 
-## JSON Schema Annotations
-
-These annotations control how the JSON Schema postprocessor transforms LinkML-generated JSON Schema into the final spec-compliant output.
-
 ### `jsonschema_flatten_subclasses`
 
 Merge all subclass slots into the parent class definition and remove the subclass `$defs`. The parent becomes a single flat definition containing all slots from itself and its subclasses.
@@ -173,7 +174,7 @@ SomeInternalClass:
 
 ## Native LinkML Features Used for JSON Schema
 
-These native LinkML features generate correct JSON Schema constructs without custom annotations. Prefer these over custom annotations when possible.
+These native LinkML features generate correct JSON Schema constructs without custom annotations. Prefer these over `jsonschema_*` annotations when possible.
 
 | LinkML Feature | JSON Schema Output | Example Use |
 |---|---|---|
