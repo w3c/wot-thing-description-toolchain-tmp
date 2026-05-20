@@ -121,8 +121,6 @@ classes:
         value:
           discriminator: scheme
           include_unknown: true
-      spec_description: >-
-        Metadata describing the configuration of a security mechanism.
       spec_intro_content:
         value:
           - type: paragraph
@@ -276,8 +274,6 @@ classes:
     description: >-
       A combination of other security schemes. Exactly one of either oneOf or allOf vocabulary terms MUST be included.
     annotations:
-      spec_description: >-
-        A combination of other security schemes identified by the Vocabulary Term `combo` (i.e., "scheme": "combo").
       spec_intro_content:
         value:
           - type: paragraph
@@ -424,8 +420,6 @@ classes:
     description: >-
       Bearer Token security configuration for situations where bearer tokens are used independently of OAuth2.
     annotations:
-      spec_description: >-
-        Bearer Token [[RFC6750]] security configuration identified by the Vocabulary Term `bearer` (i.e., "scheme": "bearer") for situations where bearer tokens are used independently of OAuth2.
       spec_intro_content:
         value:
           - type: paragraph

@@ -77,7 +77,7 @@ def _get_type_values_annotation(slot_name: str, class_def, slot_def):
 
 
 def _format_value_list(values: List[str]) -> str:
-    values = [str(value) for value in values if str(value)]
+    values = [f"<code>{v}</code>" for v in (str(value) for value in values) if v]
     if not values:
         return ""
     if len(values) == 1:
@@ -186,7 +186,7 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
             return _append_type_values(enum_base, slot_name, class_def, slot_def)
         pv_names = list(enum_def.permissible_values.keys())
         if pv_names:
-            formatted_pvs = f"{', '.join(pv_names[:-1])}, or {pv_names[-1]}" if len(pv_names) > 1 else pv_names[0]
+            formatted_pvs = _format_value_list(pv_names)
             return f"{_link('anyURI', sv)} (one of {formatted_pvs})" if is_uri_enum else f"{_link('string', sv)} (e.g., {formatted_pvs})"
         return _link("string", sv)
     # STANDARD FALLBACK
