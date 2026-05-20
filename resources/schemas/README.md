@@ -1,15 +1,20 @@
 # WoT Schemas
 
-The WoT Schemas contains the single, main source of data for all the officially provided WoT resources.
+The WoT Schemas contains the single, main source of data for all the provided WoT resources.
 
 The WoT Schema provides YAML files in [LinkML](https://linkml.io) format as its primary information source, which contain specific classes with their attributes
 and respective information like attributes' datatypes or cardinalities.
 
 These YAML files are then used to create the necessary WoT resource files.
 
-## Schema Annotations
+## Annotations
 
-The schemas use custom annotations to control how vocabulary terms appear in the generated specification. These are the primary way to shape the final HTML output.
+The schemas use custom annotations to control two aspects of artifact generation:
+
+1. **Spec rendering** (`spec_*`) — how vocabulary terms appear in the generated HTML specification
+2. **JSON Schema output** (`jsonschema_*`) — how the postprocessor transforms LinkML-generated JSON Schema into the final spec-compliant output
+
+Where possible, native LinkML features are preferred over custom annotations.
 
 ### `spec_description`
 
@@ -109,3 +114,76 @@ op:
           - writeproperty
           - invokeaction
 ```
+
+### `jsonschema_flatten_subclasses`
+
+Merge all subclass slots into the parent class definition and remove the subclass `$defs`. The parent becomes a single flat definition containing all slots from itself and its subclasses.
+
+```yaml
+DataSchema:
+  annotations:
+    jsonschema_flatten_subclasses: true
+```
+
+### `jsonschema_oneof_dispatch`
+
+Generate a discriminated `oneOf` union from subclasses. Each subclass becomes a variant with a `const` constraint on the discriminator slot. With `include_unknown: true`, an additional variant is added without the discriminator constraint as a fallback.
+
+```yaml
+SecurityScheme:
+  annotations:
+    jsonschema_oneof_dispatch:
+      value:
+        discriminator: scheme
+        include_unknown: true
+```
+
+### `jsonschema_form_variants`
+
+Split a class into operation-specific variant definitions, each constrained to a subset of values for the `op` slot. Creates separate `$defs` per variant and a top-level `oneOf` referencing them.
+
+```yaml
+Form:
+  annotations:
+    jsonschema_form_variants:
+      value:
+        op_slot: op
+        variants:
+          property:
+            - readproperty
+            - writeproperty
+            - observeproperty
+            - unobserveproperty
+          action:
+            - invokeaction
+            - queryaction
+            - cancelaction
+          event:
+            - subscribeevent
+```
+
+### `jsonschema_exclude`
+
+Exclude a class entirely from the generated JSON Schema `$defs`.
+
+```yaml
+SomeInternalClass:
+  annotations:
+    jsonschema_exclude: true
+```
+
+## Native LinkML Features Used for JSON Schema
+
+These native LinkML features generate correct JSON Schema constructs without custom annotations. Prefer these over `jsonschema_*` annotations when possible.
+
+| LinkML Feature | JSON Schema Output | Example Use |
+|---|---|---|
+| `mixins` | Mixin slots included in class properties | `PropertyAffordance` inherits `DataSchema` slots |
+| `rules` with `preconditions`/`postconditions` | `if`/`then` conditional schemas | Link with `rel: "icon"` requires `sizes` |
+| Multivalued inlined slots with identifier keys | `additionalProperties` pattern | `securityDefinitions`, `properties`, `actions`, `events` |
+| `exactly_one_of` with two range branches | `oneOf` with single-value and array variants | `@type`: string or array of strings |
+| `minimum_cardinality: 1` on multivalued branch | `minItems: 1` in array variant | Ensuring non-empty arrays in `oneOf` |
+| `extra_slots: allowed: true` | `additionalProperties: true` | All schema classes allowing extension |
+| `minimum_value: N` | `minimum: N` | `minItems`, `NonNegativeInteger` |
+| `minimum_value: 0` + `none_of: [{equals_number: 0}]` | `exclusiveMinimum: 0` (after postprocessor simplification) | `multipleOf` must be > 0 |
+| `enum` definitions with `permissible_values` | Inlined `{"type": "string", "enum": [...]}` | `DataSchemaType`, `contentEncodingList` |

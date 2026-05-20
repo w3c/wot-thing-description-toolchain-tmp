@@ -552,22 +552,23 @@ def generate_respec_spec(
                     continue
 
             rows = collect_slot_rows(sv, cls, process_description, schema_prefix)
-            raw_desc = getattr(cdef, "description", "") or ""
-            if "spec_description" in ann:
-                spec_def = (
-                    getattr(ann["spec_description"], "value", None)
-                    or ann["spec_description"]
-                )
-                raw_desc = str(spec_def) or raw_desc
-
-            desc_html = process_description(raw_desc)
             intro_html = ""
+            desc_html = ""
             if "spec_intro_content" in ann:
                 intro_html = render_spec_content_annotation(
                     ann,
                     process_description,
                     annotation_key="spec_intro_content",
                 )
+            else:
+                raw_desc = getattr(cdef, "description", "") or ""
+                if "spec_description" in ann:
+                    spec_def = (
+                        getattr(ann["spec_description"], "value", None)
+                        or ann["spec_description"]
+                    )
+                    raw_desc = str(spec_def) or raw_desc
+                desc_html = process_description(raw_desc)
             spec_content_html = ""
             if "spec_content" in ann:
                 spec_content_html = render_spec_content_annotation(

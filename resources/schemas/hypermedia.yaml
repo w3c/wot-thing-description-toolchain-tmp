@@ -96,9 +96,9 @@ enums:
       As of this version of the specification, it only includes the well-known types necessary to implement the WoT 
       interaction model.
     comments:
-      - Consumer to Thing applies for messages sent by the Consumer to the Thing
-      - Thing to Consumer applies for messages sent by the Thing to the Consumer
-      - No correlation implies no payload is required or expected
+      - "Consumer to Thing applies for messages sent by the Consumer to the Thing"
+      - "Thing to Consumer applies for messages sent by the Thing to the Consumer"
+      - "No correlation implies no payload is required or expected"
     permissible_values:
       readproperty:
         description: Identifies the read operation on Property Affordances to retrieve the corresponding data
@@ -192,7 +192,7 @@ slots:
       - range: string
       - range: string
         multivalued: true
-        minimum_value: 1
+        minimum_cardinality: 1
   href:
     description: Target IRI of a link or submission target of a form.
     slot_uri: hctl:hasTarget
@@ -239,6 +239,15 @@ classes:
       A link can be viewed as a statement of the form
       "**_link context_** has a **_relation type_** resource at **_link target_**",
       where the optional **_target attributes_** may further describe the resource.
+    rules:
+      - preconditions:
+          slot_conditions:
+            rel:
+              equals_string: "icon"
+        postconditions:
+          slot_conditions:
+            sizes:
+              required: true
     annotations:
       spec_description: >-
         A link can be viewed as a statement of the form **"link context** has a **relation type** resource at **link target**", where the optional **target attributes** may further describe the resource.
@@ -277,10 +286,8 @@ classes:
               - field: "comment:Source"
                 header: Source of value origin
 
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     attributes:
       href:
         description: Target IRI of a link or submission target of a form.
@@ -326,7 +333,7 @@ classes:
           - range: string
           - range: string
             multivalued: true
-            minimum_value: 1
+            minimum_cardinality: 1
         comments:
           - The hreflang attribute is allowed to be a string or array in this version of the spec
     slot_usage:
@@ -343,13 +350,39 @@ classes:
           - range: string
           - range: string
             multivalued: true
-            minimum_value: 1
+            minimum_cardinality: 1
 
   Form:
     class_uri: hctl:Form
     description: >-
       A form hypermedia control that describes how an operation can be performed.
     annotations:
+      jsonschema_form_variants:
+        value:
+          op_slot: op
+          variants:
+            property:
+              - readproperty
+              - writeproperty
+              - observeproperty
+              - unobserveproperty
+            action:
+              - invokeaction
+              - queryaction
+              - cancelaction
+            event:
+              - subscribeevent
+              - unsubscribeevent
+            root:
+              - readallproperties
+              - writeallproperties
+              - readmultipleproperties
+              - writemultipleproperties
+              - observeallproperties
+              - unobserveallproperties
+              - queryallactions
+              - subscribeallevents
+              - unsubscribeallevents
       spec_description: >-
         A form can be viewed as a statement of "To perform an **operation type** operation on **form context**, make a **request method** request to **submission target**" where the optional **form fields** may further describe the required request. 
         In Thing Descriptions, the **form context** is the surrounding Object, such as Properties, Actions, and Events or the Thing itself for meta-interactions.
@@ -479,10 +512,8 @@ classes:
               - type: markdown
                 text: |
                   The different cases on the variation of request and response are explained above. The tables at [contentType-usage](#contentType-usage) summarize these cases in a concise manner.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     slots:
       - href
       - contentType
@@ -524,7 +555,7 @@ classes:
           - range: string
           - range: string
             multivalued: true
-            minimum_value: 1
+            minimum_cardinality: 1
       href:
         required: true
         range: uri
@@ -544,32 +575,33 @@ classes:
                 - longpoll
                 - websub
                 - sse
-      contentType:
-        annotations:
-          spec_default: true
+      contentType: {}
       security:
-        any_of:
+        exactly_one_of:
           - range: string
           - range: string
             multivalued: true
+            minimum_cardinality: 1
       scopes:
-        any_of:
+        exactly_one_of:
           - range: string
           - range: string
             multivalued: true
+            minimum_cardinality: 1
 
   ExpectedResponse:
     class_uri: hctl:ExpectedResponse
     description: Communication metadata describing the expected response message for the primary response.
+    extra_slots:
+      allowed: true
     slots:
       - contentType
-    slot_usage:
-      contentType:
-        required: true
 
   AdditionalExpectedResponse:
     class_uri: hctl:AdditionalExpectedResponse
     description: Communication metadata describing the expected response message for additional responses.
+    extra_slots:
+      allowed: true
     attributes:
       success:
         description: Signals if an additional response should not be considered an error.

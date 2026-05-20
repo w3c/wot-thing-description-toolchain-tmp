@@ -40,10 +40,10 @@ slots:
     description: JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
     required: true
     exactly_one_of:
-      - range: uri
-        pattern: '^(https://www\.w3\.org/2019/wot/td/v1|https://www\.w3\.org/2022/wot/td/v1\.1|http://www\.w3\.org/ns/td)$'
-      - multivalued: true
-        minimum_value: 1
+      - range: ThingContextUri
+      - range: ThingContextUri
+        multivalued: true
+        minimum_cardinality: 1
 
   "@type":
     description: JSON-LD keyword to label the object with semantic tags (or types).
@@ -52,7 +52,7 @@ slots:
       - range: string
       - range: string
         multivalued: true
-        minimum_value: 1
+        minimum_cardinality: 1
 
   id:
     description: >-
@@ -163,10 +163,7 @@ slots:
       spec_description: >-
         Set of security definition names, chosen from those defined in `securityDefinitions`.
         These must all be satisfied for access to resources.
-    any_of:
-      - range: string
-      - range: string
-        multivalued: true
+    range: string
 
   securityDefinitions:
     slot_uri: td:definesSecurityScheme
@@ -181,7 +178,7 @@ slots:
     multivalued: true
     inlined: true
     required: true
-    minimum_value: 1
+    minimum_cardinality: 1
 
   profile:
     slot_uri: td:followsProfile
@@ -228,7 +225,7 @@ slots:
     description: >-
       Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
     slot_uri: td:title
-    range: Any
+    range: string
 
   titles:
     description: >-
@@ -312,6 +309,8 @@ classes:
     description: >-
       An abstraction of a physical or a virtual entity whose metadata and interfaces are described by a WoT Thing
       Description, whereas a virtual entity is the composition of one or more Things.
+    extra_slots:
+      allowed: true
     annotations:
       spec_content:
         value:
@@ -409,24 +408,24 @@ classes:
       "@context":
         required: true
         exactly_one_of:
-          - range: uri
-            pattern: ^(https://www\.w3\.org/2019/wot/td/v1|https://www\.w3\.org/2022/wot/td/v1\.1|http://www\.w3\.org/ns/td)$
-          - multivalued: true
-            minimum_value: 1
+          - range: ThingContextUri
+          - range: ThingContextUri
+            multivalued: true
+            minimum_cardinality: 1
       "@type":
         range: string
         exactly_one_of:
           - range: string
           - range: string
             multivalued: true
-            minimum_value: 1
+            minimum_cardinality: 1
       security:
         required: true
         exactly_one_of:
           - range: string
           - range: string
             multivalued: true
-            minimum_value: 1
+            minimum_cardinality: 1
       profile:
         exactly_one_of:
           - range: uri
@@ -438,7 +437,7 @@ classes:
         range: SecurityScheme
         multivalued: true
         required: true
-        minimum_value: 1
+        minimum_cardinality: 1
       properties:
         slot_uri: td:hasPropertyAffordance
         description: >-
@@ -450,32 +449,20 @@ classes:
         range: ActionAffordance
         multivalued: true
         inlined: true
-        annotations:
-          jsonschema_config:
-            tag: jsonschema_config
-            value:
-              type: object
-              additionalProperties:
-                $ref: "#/$defs/ActionAffordance"
       events:
         description: >-
           All Event-based Interaction Affordances of the Thing.
         range: EventAffordance
         multivalued: true
         inlined: true
-        annotations:
-          jsonschema_config:
-            tag: jsonschema_config
-            value:
-              type: object
-              additionalProperties:
-                $ref: "#/$defs/EventAffordance"
 
   InteractionAffordance:
     class_uri: td:InteractionAffordance
     description: >-
       Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact with the Thing.
       There are many types of potential affordances, but W3C WoT defines three types of Interaction Affordances: Properties, Actions, and Events.
+    extra_slots:
+      allowed: true
     annotations:
       spec_content:
         value:
@@ -490,11 +477,11 @@ classes:
     abstract: true
     attributes:
       name:
+        identifier: true
         description: >-
           Name of the interaction affordance.
         slot_uri: td:name
         range: string
-        identifier: true
         annotations:
           spec_exclude: true
     slots:
@@ -513,7 +500,7 @@ classes:
           - range: string
           - range: string
             multivalued: true
-            minimum_value: 1
+            minimum_cardinality: 1
       forms:
         annotations:
           spec_description: >-
@@ -529,6 +516,8 @@ classes:
 
   PropertyAffordance:
     is_a: InteractionAffordance
+    mixins:
+      - DataSchema
     class_uri: td:PropertyAffordance
     description: >-
       An Interaction Affordance that exposes state of the Thing.
@@ -554,10 +543,8 @@ classes:
             text: |
               The observation mechanism depends on the underlying protocol or sub-protocol. Having said that, it is not guaranteed that the current Property value will be provided once the subscription is initiated. Hence, it may be necessary to read the current Property value before/after the subscription to get a first value.
 
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     attributes:
       observable:
         description: >-
@@ -579,13 +566,6 @@ classes:
         minimum_cardinality: 1
         annotations:
           spec_exclude: true
-          jsonschema_config:
-            tag: jsonschema_config
-            value:
-              type: array
-              items:
-                $ref: "#/$defs/Form"
-              minItems: 1
 
   ActionAffordance:
     is_a: InteractionAffordance
@@ -603,10 +583,8 @@ classes:
               - id: td-op-for-action
                 text: |
                   When a Form instance is within an `ActionAffordance` instance, the value assigned to `op` *MUST* either be `invokeaction`, `queryaction`, `cancelaction`, or an Array containing a combination of these terms.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     attributes:
       input:
         description: >-
@@ -677,10 +655,8 @@ classes:
                   Events MAY be triggered through conditions that are not exposed as Properties.
               - text: |
                   Furthermore, EventAffordances allow for more complex subscribing and unsubscribing mechanisms via the definition of subscription, dataResponse, and cancellation DataSchema definitions. Not all protocols might support these more advanced mechanisms, however, which is why in some scenarios, events may be very similar to observable PropertyAffordances. In these cases, the choice between a Property and a Event for modelling the Affordance should be made based on the semantics of the underlying resource; for example, if the state of the affordance is also supposed to be read or written by a Consumer, then a Property is most likely the appropriate choice.
-      jsonschema_config:
-        tag: jsonschema_config
-        value:
-          additionalProperties: true
+    extra_slots:
+      allowed: true
     attributes:
       subscription:
         description: >-
@@ -712,6 +688,8 @@ classes:
       Metadata of a Thing that provides version information about the TD document.
       If required, additional version information such as firmware and hardware version
       (term definitions outside of the TD namespace) can be extended via the TD Context Extension mechanism.
+    extra_slots:
+      allowed: true
     annotations:
       spec_content:
         value:
@@ -736,6 +714,8 @@ classes:
   MultiLanguage:
     description: >-
       A Map providing a set of human-readable texts in different languages identified by language tags as defined in BCP47.
+    extra_slots:
+      allowed: true
     annotations:
       spec_description: >-
         A Map providing a set of human-readable texts in different languages identified by language tags as defined in [[BCP47]].
@@ -754,8 +734,8 @@ classes:
 
     attributes:
       language_tag:
-        range: string
         identifier: true
+        range: string
         required: true
         pattern: "^[a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2})?$"
         annotations:
@@ -765,3 +745,12 @@ classes:
         required: true
         annotations:
           spec_exclude: true
+
+enums:
+  ThingContextUri:
+    description: Valid W3C WoT Thing Description context URIs.
+    enum_uri: linkml:uri
+    permissible_values:
+      "https://www.w3.org/2019/wot/td/v1":
+      "https://www.w3.org/2022/wot/td/v1.1":
+      "http://www.w3.org/ns/td":

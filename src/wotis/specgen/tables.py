@@ -77,7 +77,7 @@ def _get_type_values_annotation(slot_name: str, class_def, slot_def):
 
 
 def _format_value_list(values: List[str]) -> str:
-    values = [str(value) for value in values if str(value)]
+    values = [f"<code>{v}</code>" for v in (str(value) for value in values) if v]
     if not values:
         return ""
     if len(values) == 1:
@@ -125,14 +125,17 @@ def get_assignment(slot_name, class_def, slot_def) -> str:
     return "optional"
 
 
-_NO_LINK_NAMES = frozenset({"any type"})
+_XSD_BASE = "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#"
 
 
-def _link(name: str) -> str:
-    """Wrap a type/class name in an <a><code> tag for Bikeshed autolink resolution."""
-    if name in _NO_LINK_NAMES:
+def _link(name: str, sv: SchemaView) -> str:
+    if name == "any type":
         return name
-    return f"<a><code>{name}</code></a>"
+    if name in ("Array", "Map"):
+        return f"<a>{name}</a>"
+    if name in sv.all_classes():
+        return f'<a href="#{name.lower()}"><code>{name}</code></a>'
+    return f'<a href="{_XSD_BASE}{name}"><code>{name}</code></a>'
 
 
 def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effective_range: Optional[str] = None) -> str:
@@ -143,24 +146,27 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
     if usage:
         choices = getattr(usage, "exactly_one_of", None) or getattr(usage, "any_of", None)
     if choices:
+        all_enums = sv.all_enums()
         pretty = []
         seen = set()
         for alt in choices:
-            # Check local alt range first, then fallback to effective/global range
             alt_rng_raw = getattr(alt, "range", None)
             if not alt_rng_raw:
                 alt_rng_raw = raw_rng
-            rng = _normalize_range_name(alt_rng_raw)
-            mv = bool(getattr(alt, "multivalued", False))
-            # SPECIAL HANDLING FOR @CONTEXT where we do not want to specify the range in the table
-            # If multivalued and range is empty or not provided in the alt, just return "Array"
-            if mv:
-                if not getattr(alt, "range", None) and slot_name == "@context":
-                    p = _link("Array")
-                else:
-                    p = f"{_link('Array')} of {_link(rng)}" if rng else _link("Array")
+            if alt_rng_raw in all_enums:
+                enum_def = all_enums[alt_rng_raw]
+                is_uri = enum_def.enum_uri in ["linkml:uri", "anyURI"] or alt_rng_raw.lower() == "uri"
+                rng = "anyURI" if is_uri else "string"
             else:
-                p = _link(rng) if rng else ""
+                rng = _normalize_range_name(alt_rng_raw)
+            mv = bool(getattr(alt, "multivalued", False))
+            if mv:
+                if slot_name == "@context":
+                    p = _link("Array", sv)
+                else:
+                    p = f"{_link('Array', sv)} of {_link(rng, sv)}" if rng else _link("Array", sv)
+            else:
+                p = _link(rng, sv) if rng else ""
             if p and p not in seen:
                 seen.add(p)
                 pretty.append(p)
@@ -175,23 +181,23 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
     if raw_rng in all_enums:
         enum_def = all_enums[raw_rng]
         is_uri_enum = (enum_def.enum_uri in ["linkml:uri", "anyURI"] or raw_rng.lower() == "uri")
-        enum_base = _link("anyURI") if is_uri_enum else _link("string")
+        enum_base = _link("anyURI", sv) if is_uri_enum else _link("string", sv)
         if _get_type_values_annotation(slot_name, class_def, slot_def) is not None:
             return _append_type_values(enum_base, slot_name, class_def, slot_def)
         pv_names = list(enum_def.permissible_values.keys())
         if pv_names:
-            formatted_pvs = f"{', '.join(pv_names[:-1])}, or {pv_names[-1]}" if len(pv_names) > 1 else pv_names[0]
-            return f"{_link('anyURI')} (one of {formatted_pvs})" if is_uri_enum else f"{_link('string')} (e.g., {formatted_pvs})"
-        return _link("string")
+            formatted_pvs = _format_value_list(pv_names)
+            return f"{_link('anyURI', sv)} (one of {formatted_pvs})" if is_uri_enum else f"{_link('string', sv)} (e.g., {formatted_pvs})"
+        return _link("string", sv)
     # STANDARD FALLBACK
     rng = _normalize_range_name(raw_rng)
     if not rng:
         return ""
     if getattr(slot_def, "inlined", False):
-        return _append_type_values(f"{_link('Map')} of {_link(rng)}", slot_name, class_def, slot_def)
+        return _append_type_values(f"{_link('Map', sv)} of {_link(rng, sv)}", slot_name, class_def, slot_def)
     if getattr(slot_def, "multivalued", False):
-        return _append_type_values(f"{_link('Array')} of {_link(rng)}", slot_name, class_def, slot_def)
-    return _append_type_values(_link(rng), slot_name, class_def, slot_def)
+        return _append_type_values(f"{_link('Array', sv)} of {_link(rng, sv)}", slot_name, class_def, slot_def)
+    return _append_type_values(_link(rng, sv), slot_name, class_def, slot_def)
 
 
 def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Callable[[str], str], schema_prefix: str = "",
