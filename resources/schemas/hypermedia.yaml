@@ -575,9 +575,7 @@ classes:
                 - longpoll
                 - websub
                 - sse
-      contentType:
-        annotations:
-          spec_default: true
+      contentType: {}
       security:
         exactly_one_of:
           - range: string
@@ -598,9 +596,6 @@ classes:
       allowed: true
     slots:
       - contentType
-    slot_usage:
-      contentType:
-        required: true
 
   AdditionalExpectedResponse:
     class_uri: hctl:AdditionalExpectedResponse
