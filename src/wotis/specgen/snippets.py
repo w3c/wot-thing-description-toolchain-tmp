@@ -87,18 +87,22 @@ def _parse_snippet_file(snippet_path: Path) -> SnippetData:
     raw_text = snippet_path.read_text(encoding="utf-8")
     meta, body = _extract_frontmatter(raw_text)
 
+    validate = meta.get("validate", True)
     stripped = _strip_jsonc_comments(body)
     try:
         parsed_json = json.loads(stripped)
     except json.JSONDecodeError:
-        logger.warning("Failed to parse JSON in snippet: %s", snippet_path.name)
+        if validate:
+            logger.error("Failed to parse JSON in snippet: %s", snippet_path.name)
+        else:
+            logger.debug("Skipping JSON parse warning (validate: false): %s", snippet_path.name)
         parsed_json = None
 
     return SnippetData(
         snippet_id=meta.get("id", ""),
         title=meta.get("title", ""),
         layout=meta.get("layout", "aside"),
-        validate=meta.get("validate", True),
+        validate=validate,
         raw_jsonc=body,
         parsed_json=parsed_json,
         extra={k: v for k, v in meta.items() if k not in {"id", "title", "layout", "validate"}},
@@ -162,7 +166,8 @@ def _collect_schema_errors(
 
     for error in validator.iter_errors(instance):
         path = ".".join(str(p) for p in error.absolute_path) or "(root)"
-        errors.append(f"{filename}: {path} — {error.message}")
+        schema_path = "/".join(str(p) for p in error.absolute_schema_path)
+        errors.append(f"{filename}: {path} — {error.message} [schema: {schema_path}]")
 
 
 def render_snippet(name: str, snippets_dir: Path) -> str:
