@@ -1,0 +1,87 @@
+/*
+---
+layout: pre
+id: thing-serialization-sample
+title: Sample of Thing serializations
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "@type": "Thing",
+    "id": "urn:uuid:1b37933b-3212-4dad-9c2c-74c6042c3e2b",
+    "title": "MyThing",
+    "titles": {
+        // @hide-start
+        "en": "MyThing",
+        "de": "MeinDing"
+        // @hide-end
+    },
+    "description": "Human readable information.",
+    "descriptions": {
+        // @hide-start
+        "en": "Human readable information.",
+        "de": "Menschenlesbare Informationen."
+        // @hide-end
+    },
+    "support": "mailto:support@example.com",
+    "version": {
+        // @hide-start
+        "instance": "1.0.0"
+        // @hide-end
+    },
+    "created": "2018-11-14T19:10:23.824Z",
+    "modified": "2019-06-01T09:12:43.124Z",
+    "securityDefinitions": {
+        // @hide-start
+        "nosec_sc": { "scheme": "nosec" }
+        // @hide-end
+    },
+    "security":
+    // @hide-start
+    "nosec_sc",
+    // @hide-end
+    "base": "https://servient.example.com/",
+    "properties": {
+        // @hide-start
+        "status": {
+            "type": "string",
+            "forms": [{ "href": "https://servient.example.com/status" }]
+        }
+        // @hide-end
+    },
+    "actions": {
+        // @hide-start
+        "toggle": {
+            "forms": [{ "href": "https://servient.example.com/toggle" }]
+        }
+        // @hide-end
+    },
+    "events": {
+        // @hide-start
+        "overheating": {
+            "data": { "type": "string" },
+            "forms": [{ "href": "https://servient.example.com/overheating" }]
+        }
+        // @hide-end
+    },
+    "links": [
+        // @hide-start
+        {
+            "rel": "service-doc",
+            "href": "https://servient.example.com/docs",
+            "type": "application/pdf"
+        }
+        // @hide-end
+    ],
+    "forms": [
+        // @hide-start
+        {
+            "op": "readallproperties",
+            "href": "https://servient.example.com/properties",
+            "contentType": "application/json"
+        }
+        // @hide-end
+    ]
+}

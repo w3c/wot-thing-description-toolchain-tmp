@@ -1,0 +1,35 @@
+/*
+---
+layout: pre
+id: saref-geolocation-annotation-example
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#"
+        }
+    ],
+    "@type": "Thing",
+    "geo:lat": "26.58",
+    "geo:long": "297.83",
+    // @hide-start
+    "id": "urn:uuid:e7a4c1d5-6f8b-4c2e-d3a5-7b9f1e3c6a8d",
+    "title": "GeoDevice",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "properties": {
+        // @hide-start
+        "temperature": {
+            "type": "number",
+            "forms": [
+                { "href": "https://example.com/temperature" }
+            ]
+        }
+        // @hide-end
+    }
+}

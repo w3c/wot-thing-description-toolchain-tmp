@@ -1,0 +1,35 @@
+/*
+---
+# HTML id attribute for the example block (used for cross-references)
+id: my-example-id
+
+# Title shown above the example in the rendered spec
+title: My Example Title
+
+# "aside" (default) wraps in <aside class="example"><pre>...</pre></aside>
+# "pre" renders as <pre class="example">...</pre>
+layout: aside
+
+# Set to false to skip JSON Schema validation (for non-TD/TM snippets)
+# validate: false
+---
+*/
+// Each snippet MUST be a complete, valid TD or TM.
+// Use // @hide-start and // @hide-end to hide lines from the rendered output.
+// Hidden ranges are replaced with a single "// ..." marker.
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:REPLACE-WITH-UNIQUE-ID",
+    "title": "MyThingTitle",
+    // @hide-start
+    "securityDefinitions": {
+        "nosec_sc": {"scheme": "nosec"}
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "properties": {},
+    "actions": {},
+    "events": {}
+}

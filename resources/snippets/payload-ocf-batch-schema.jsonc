@@ -1,0 +1,56 @@
+/*
+---
+layout: pre
+validate: false
+title: Data Schema for OCF Batch Payload Example
+---
+*/
+{
+    "type": "array",
+    "items": [
+        {
+            "type": "object",
+            "properties": {
+                "href": {
+                    "type": "string",
+                    "const": "/example/light/level"
+                },
+                "rep": {
+                    "type": "object",
+                    "properties": {
+                        "dimmingSetting": {
+                            "@type": [
+                                "iot:LevelData"
+                            ],
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 255
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "type": "object",
+            "properties": {
+                "href": {
+                    "type": "string",
+                    "const": "/example/light/time"
+                },
+                "rep": {
+                    "type": "object",
+                    "properties": {
+                        "rampTime": {
+                            "@type": [
+                                "iot:TransitionTimeData"
+                            ],
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

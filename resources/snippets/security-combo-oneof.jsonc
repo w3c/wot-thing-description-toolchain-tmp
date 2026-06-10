@@ -1,0 +1,42 @@
+/*
+---
+layout: pre
+---
+*/
+{
+    // @hide-start
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "id": "urn:uuid:d5f9a7b2-1c34-4e8f-96cd-7e0a2b3d4f15",
+    "title": "ComboOneOfDevice",
+    // @hide-end
+    "securityDefinitions": {
+        "basic_sc": { "scheme": "basic" },
+        "digest_sc": { "scheme": "digest" },
+        "bearer_sc": { "scheme": "bearer" },
+        "combo_sc": {
+            "scheme": "combo",
+            "oneOf": [ "basic_sc", "digest_sc", "bearer_sc" ]
+        }
+    },
+    "security": "combo_sc",
+    // @hide-start
+    // @hide-end
+    "properties": {
+        "status": {
+            // @hide-start
+            "type": "string",
+            // @hide-end
+            "forms": [{
+                "href": "https://mylamp.example.com/status"
+            }]
+        }
+    }
+    // @hide-start
+    ,
+    "actions": {
+        "toggle": {
+            "forms": [{"href": "https://mylamp.example.com/toggle"}]
+        }
+    }
+    // @hide-end
+}

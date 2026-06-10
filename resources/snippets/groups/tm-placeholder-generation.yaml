@@ -1,0 +1,9 @@
+title: Thing Description generation from Thing Model
+tabs:
+  - snippet: thermostat-placeholder-tm
+    label: Thing Model
+    selected: true
+  - snippet: thermostat-placeholder-map
+    label: Placeholder Map
+  - snippet: thermostat-placeholder-td
+    label: Thing Description

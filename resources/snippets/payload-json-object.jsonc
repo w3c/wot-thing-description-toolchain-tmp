@@ -1,0 +1,11 @@
+/*
+---
+layout: pre
+validate: false
+title: Simple JSON Object Payload
+---
+*/
+{
+    "level": 50,
+    "time": 10
+}

@@ -1,0 +1,17 @@
+/*
+---
+layout: pre
+title: Thing Model versioning
+---
+*/
+{
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    // @hide-end
+    "@type": "tm:ThingModel",
+    "title": "Lamp Thing Model",
+    "description": "Lamp Thing Description Model",
+    "version": {"model": "1.0.0"}
+}

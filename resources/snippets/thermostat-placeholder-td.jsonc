@@ -1,0 +1,23 @@
+/*
+---
+layout: pre
+validate: false
+---
+*/
+{
+	"@context": ["https://www.w3.org/ns/wot-next/td"],
+	"@type": "Thing",
+	"title": "Thermostate No. 4",
+	"version": {"instance": "1.0.1", "model": "2.0.0"},
+	"base": "mqtt://192.168.178.72:1883",
+	"properties": {
+		"temperature": {
+			"description": "Shows the current temperature value",
+			"type": "number",
+			"minimum": -20.0,
+			"maximum": 47.7,
+			"observable": true
+		}
+	}
+	...
+}

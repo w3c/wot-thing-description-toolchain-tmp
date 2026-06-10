@@ -1,0 +1,34 @@
+/*
+---
+layout: pre
+id: saref-geolocation-annotation-example-2
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "schema": "https://schema.org#"
+        }
+    ],
+    // @hide-start
+    "id": "urn:uuid:a9c6e3f7-8b0d-4e4a-f5c7-9d1b3a5e8c0f",
+    "title": "GeoSchemaDevice",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "properties": {
+        "position": {
+            "type": "object",
+            "@type": "schema:GeoCoordinates",
+            "properties": {
+                    "longitude": { "type": "number" },
+                    "latitude":  { "type": "number" },
+                    "elevation": { "type": "number" }
+            },
+            "forms": [{"href": "https://robot.example.com/position"}]
+        }
+    }
+}

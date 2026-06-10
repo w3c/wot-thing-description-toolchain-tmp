@@ -1,0 +1,20 @@
+/*
+---
+layout: pre
+validate: false
+title: IPSO/LWM2M Payload Example
+---
+*/
+{
+    "bn": "/3001/0/",
+    "e": [
+        {
+            "n": "5044",
+            "v": 0.5
+        },
+        {
+            "n": "5002",
+            "v": 10.0
+        }
+    ]
+}

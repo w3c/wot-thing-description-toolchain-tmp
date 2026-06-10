@@ -1,0 +1,58 @@
+/*
+---
+layout: aside
+id: action-serialization-sample
+title: Sample of an Action serialization
+---
+*/
+{
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+    "title": "SmartLamp",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": "nosec_sc",
+    // @hide-end
+    "actions": {
+        "fade": {
+            "title": "Fade in/out",
+            "description": "Smooth fade in and out animation.",
+            "input": {
+                "type": "object",
+                "properties": {
+                    "from": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100
+                    },
+                    "to": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100
+                    },
+                    "duration": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "to",
+                    "duration"
+                ]
+            },
+            "output": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "https://smartlamp.example.com/fade"
+                }
+            ]
+        }
+    }
+}

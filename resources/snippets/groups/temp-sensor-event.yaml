@@ -1,0 +1,7 @@
+title: Temperature Sensor with a Temperature Event with subscription and cancellation
+tabs:
+  - snippet: temp-sensor-event-no-urivars
+    label: Without uriVariables
+    selected: true
+  - snippet: temp-sensor-event-urivars
+    label: With uriVariables

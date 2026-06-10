@@ -1,0 +1,26 @@
+/*
+---
+layout: pre
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    // @hide-start
+    "id": "urn:uuid:c1e8a5b9-0d2f-4a6c-b7e9-1f3d5c7a0e2b",
+    "title": "MinimalDevice",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    "properties": {
+        "status": {
+            "type": "string",
+            "forms": [
+                { "href": "https://example.com/status" }
+            ]
+        }
+    }
+    // @hide-end
+}

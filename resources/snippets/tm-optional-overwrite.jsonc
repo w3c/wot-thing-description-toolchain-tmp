@@ -1,0 +1,26 @@
+/*
+---
+layout: pre
+title: "Thing Model overwrites tm:optional of the previous Thing Model example."
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "@type": "tm:ThingModel",
+    "title": "Lamp Thing Model (All Mandatory)",
+    "description": "Lamp Thing Model description expects all interaction affordances (status, toggle, and overheating)",
+    "links": [
+        {
+            "rel": "tm:extends",
+            "href": "./lampThingModel.tm.jsonld",
+            "type": "application/tm+json"
+        }
+    ],
+    "events": {
+        "overheating": {
+            "tm:ref": "./lampThingModel.tm.jsonld#/events/overheating"
+        }
+    }
+}

@@ -1,0 +1,36 @@
+/*
+---
+layout: pre
+title: Binding instance of a subscribeevent operation to MQTT
+---
+*/
+{
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "mqv": "https://w3c.github.io/wot-binding-templates/bindings/protocols/mqtt/#"
+        }
+    ],
+    "id": "urn:uuid:c4d5e6f7-a8b9-4c0d-1e2f-3a4b5c6d7e8f",
+    "title": "IoTPlatformThing",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    "events": {
+        "overheating": {
+            "forms": [
+                {
+                    // @hide-end
+                    "op": "subscribeevent",
+                    "href": "mqtt://iot.platform.com:8088",
+                    "mqv:filter": "thing1/events/overheating",
+                    "mqv:controlPacket": "subscribe"
+                    // @hide-start
+                }
+            ]
+        }
+    }
+    // @hide-end
+}

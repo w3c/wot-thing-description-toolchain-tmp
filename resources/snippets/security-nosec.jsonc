@@ -1,0 +1,48 @@
+/*
+---
+layout: pre
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:e9ecb6ad-cd4c-481b-96ce-5b4c57ddb844",
+    "title": "MyThing",
+    "description": "Human readable information.",
+    "support": "https://servient.example.com/contact",
+    "securityDefinitions": { "nosec_sc": { "scheme": "nosec" }},
+    "security": "nosec_sc",
+    "properties": {
+        // @hide-start
+        "status": {
+            "type": "string",
+            "forms": [{"href": "https://servient.example.com/status"}]
+        }
+        // @hide-end
+    },
+    "actions": {
+        // @hide-start
+        "toggle": {
+            "forms": [{"href": "https://servient.example.com/toggle"}]
+        }
+        // @hide-end
+    },
+    "events": {
+        // @hide-start
+        "overheating": {
+            "data": {"type": "string"},
+            "forms": [{"href": "https://servient.example.com/oh", "subprotocol": "longpoll"}]
+        }
+        // @hide-end
+    },
+    "links": [
+        // @hide-start
+        {
+            "href": "https://servient.example.com/docs",
+            "rel": "service-doc",
+            "type": "text/html"
+        }
+        // @hide-end
+    ]
+}

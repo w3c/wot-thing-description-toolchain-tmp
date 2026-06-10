@@ -1,0 +1,33 @@
+/*
+---
+layout: pre
+title: Link to developer documentation
+---
+*/
+{
+    // @hide-start
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td"
+    ],
+    "id": "urn:uuid:c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7a",
+    "title": "MyDevice",
+    "securityDefinitions": {
+        "nosec_sc": { "scheme": "nosec" }
+    },
+    "security": "nosec_sc",
+    "properties": {
+        "status": {
+            "type": "string",
+            "forms": [{ "href": "https://example.com/status" }]
+        }
+    },
+    // @hide-end
+    "links": [{
+        "rel": "service-doc",
+        "href": "https://example.com/howTo",
+        "type": "application/pdf",
+        "hreflang": "en"
+    }]
+    // @hide-start
+    // @hide-end
+}

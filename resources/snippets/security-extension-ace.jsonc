@@ -1,0 +1,68 @@
+/*
+---
+layout: pre
+---
+*/
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "cov": "http://www.example.org/coap-binding#",
+            "ace": "http://www.example.org/ace-security#"
+        }
+    ],
+    // @hide-start
+    "id": "urn:uuid:c5e96a31-0d4f-4e1c-b8a3-9f5a7c0e4b32",
+    "title": "AceSecurityExtensionExample",
+    // @hide-end
+    "securityDefinitions": {
+        "ace_sc": {
+            "scheme": "ace:ACESecurityScheme",
+            // @hide-start
+            "description": "ACE security scheme configuration",
+            // @hide-end
+            "ace:as": "coaps://as.example.com/token",
+            "ace:audience": "coaps://rs.example.com",
+            "ace:scopes": ["limited", "special"],
+            "ace:cnonce": true
+        }
+    },
+    "security": ["ace_sc"],
+    "properties": {
+        "status": {
+            // @hide-start
+            "type": "string",
+            // @hide-end
+            "forms": [{
+                "op": "readproperty",
+                "href": "coaps://rs.example.com/status",
+                "contentType": "application/cbor",
+                "cov:methodName": "GET",
+                "ace:scopes": ["limited"]
+            }]
+        }
+    },
+    "actions": {
+        "configure": {
+            // @hide-start
+            "description": "Configure the device",
+            // @hide-end
+            "forms": [{
+                "op": "invokeaction",
+                "href": "coaps://rs.example.com/configure",
+                "contentType": "application/cbor",
+                "cov:methodName": "POST",
+                "ace:scopes": ["special"]
+            }]
+        }
+    }
+    // @hide-start
+    ,
+    "events": {
+        "alert": {
+            "data": {"type": "string"},
+            "forms": [{"href": "coaps://rs.example.com/alert", "contentType": "application/cbor", "cov:methodName": "GET"}]
+        }
+    }
+    // @hide-end
+}
