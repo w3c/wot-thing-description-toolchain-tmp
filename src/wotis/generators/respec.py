@@ -84,15 +84,15 @@ def _render_note_block(
     process_description: Callable[[str], str],
     title: Optional[str] = None,
 ) -> str:
-    body = process_description(str(text or ""))
+    body = _inline_html(process_description(str(text or ""))).strip()
     if not body:
         return ""
     if title:
         return (
             f'<p class="note" title="{escape(str(title), quote=True)}">'
-            f"{_inline_html(body)}</p>"
+            f"{body}</p>"
         )
-    return f'<div class="note">\n{body}\n</div>'
+    return f'<div class="note">\n<p>{body}</p>\n</div>'
 
 
 def _extract_enum_cell(
