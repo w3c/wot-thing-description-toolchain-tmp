@@ -37,7 +37,6 @@ class TransformConfig:
     oneof_dispatches: list[OneOfDispatchConfig] = field(default_factory=list)
     form_variants: list[FormVariantsConfig] = field(default_factory=list)
     excluded_classes: list[str] = field(default_factory=list)
-    extra_slots_classes: list[str] = field(default_factory=list)
 
 
 def _walk_schema(obj: Any, fn: Callable[[dict], dict | None]) -> Any:
@@ -110,24 +109,8 @@ def _read_annotations(sv: SchemaView) -> TransformConfig:
         if _get_annotation_value(cls_def, 'jsonschema_exclude'):
             config.excluded_classes.append(cls_name)
 
-        if hasattr(cls_def, 'extra_slots') and cls_def.extra_slots:
-            allowed = getattr(cls_def.extra_slots, 'allowed', None)
-            if allowed:
-                config.extra_slots_classes.append(cls_name)
-
     return config
 
-
-def _apply_additional_properties(schema: dict, config: TransformConfig) -> None:
-    defs = schema.get('$defs', {})
-    for cls_name in config.extra_slots_classes:
-        if cls_name in defs and isinstance(defs[cls_name], dict):
-            defs[cls_name]['additionalProperties'] = True
-
-    if schema.get('additionalProperties') is False:
-        for cls_name in config.extra_slots_classes:
-            if cls_name == 'Thing':
-                schema['additionalProperties'] = True
 
 
 def _flatten_subclasses(schema: dict, sv: SchemaView, config: TransformConfig) -> None:
@@ -253,14 +236,6 @@ def _normalize_types(schema: dict) -> None:
     for defn in schema.get('$defs', {}).values():
         if isinstance(defn, dict) and 'properties' in defn:
             _strip_oneof_type(defn['properties'])
-
-    def _strip_nullable(obj: dict) -> None:
-        if 'type' in obj and isinstance(obj['type'], list):
-            types = [t for t in obj['type'] if t != 'null']
-            if len(types) == 1:
-                obj['type'] = types[0]
-
-    _walk_schema(schema, _strip_nullable)
 
 
 def _simplify_exclusive_minimum(schema: dict) -> None:
@@ -413,9 +388,7 @@ def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     logger.debug(f"  flatten_subclass_parents: {config.flatten_subclass_parents}")
     logger.debug(f"  oneof_dispatches: {[d.class_name for d in config.oneof_dispatches]}")
     logger.debug(f"  form_variants: {[f.class_name for f in config.form_variants]}")
-    logger.debug(f"  extra_slots_classes: {config.extra_slots_classes}")
 
-    _apply_additional_properties(schema, config)
     _flatten_subclasses(schema, schema_view, config)
     _build_oneof_dispatch(schema, schema_view, config)
     _build_form_variants(schema, config)
