@@ -97,7 +97,7 @@ uv run wotis generate-wot-resources -d --assertions-csv resources/gens/assertion
 - Common fix: "Failed to parse JSON in snippet" → snippet has `// ...` or `{{PLACEHOLDER}}`, add `validate: false`
 - Full reference: `docs/snippets.md`
 
-## Spec Annotations (LinkML → HTML)
+## Spec Generator Custom Annotations (LinkML → HTML)
 
 - `spec_description` — richer prose for spec (markdown, cross-refs, RFC keywords); overrides `description` in spec output only
 - `spec_content` — content blocks rendered after the class property table
@@ -114,7 +114,7 @@ uv run wotis generate-wot-resources -d --assertions-csv resources/gens/assertion
 - Code spans: `` `term` `` → `<code>term</code>`
 - Bikeshed bibliography refs: `[[RFC2045]]` → rendered by Bikeshed
 
-### Spec Table Type Column Rules (`tables.py:slot_type_text`)
+### Spec Table Generator Type Column Rules (`tables.py:slot_type_text`)
 
 | LinkML slot flags | Spec table renders as |
 |---|---|
