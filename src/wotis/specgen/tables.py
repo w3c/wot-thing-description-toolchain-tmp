@@ -193,7 +193,7 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
     rng = _normalize_range_name(raw_rng)
     if not rng:
         return ""
-    if getattr(slot_def, "inlined", False):
+    if getattr(slot_def, "inlined", False) and getattr(slot_def, "multivalued", False):
         return _append_type_values(f"{_link('Map', sv)} of {_link(rng, sv)}", slot_name, class_def, slot_def)
     if getattr(slot_def, "multivalued", False):
         return _append_type_values(f"{_link('Array', sv)} of {_link(rng, sv)}", slot_name, class_def, slot_def)

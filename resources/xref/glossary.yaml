@@ -51,9 +51,6 @@ terms:
   Class:
     id: dfn-class
     aliases: [ "Classes", "class", "classes" ]
-  ComboSecurityScheme:
-    id: combosecurityscheme
-    aliases: [ ]
   Consumer:
     id: dfn-consumer
     aliases: [ "consumer", "Consumers" ]

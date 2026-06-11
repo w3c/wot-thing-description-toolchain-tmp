@@ -160,8 +160,10 @@ classes:
         range: DataSchema
         exactly_one_of:
           - range: DataSchema
+            inlined: true
           - range: DataSchema
             multivalued: true
+            inlined_as_list: true
 
   BooleanSchema:
     class_uri: jsonschema:BooleanSchema
@@ -352,6 +354,7 @@ slots:
       Used to ensure that the data is valid against one of the specified schemas in the array. This can be used to describe multiple input or output schemas.
     multivalued: true
     range: DataSchema
+    inlined_as_list: true
 
   type:
     description: >-
@@ -407,7 +410,7 @@ slots:
       Supply a default value. The value SHOULD validate against the data schema in which it resides.
     annotations:
       spec_description: >-
-        Supply a default value. The value *SHOULD* validate against the data schema in which it resides.
+        Supply a default value. The value SHOULD validate against the data schema in which it resides.
     range: Any
 
   items:

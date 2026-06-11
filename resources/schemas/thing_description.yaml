@@ -234,7 +234,7 @@ slots:
     annotations:
       spec_description: >-
         Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
-        Also see *MultiLanguage*.
+        Also see [=MultiLanguage=].
     slot_uri: td:titleInLanguage
     inlined: true
     multivalued: true
@@ -253,7 +253,7 @@ slots:
     annotations:
       spec_description: >-
         Can be used to support (human-readable) information in different languages.
-        Also see *MultiLanguage*.
+        Also see [=MultiLanguage=].
     slot_uri: td:descriptionInLanguage
     inlined: true
     multivalued: true
@@ -591,11 +591,13 @@ classes:
           Used to define the input data schema of the Action.
         slot_uri: td:hasInputSchema
         range: DataSchema
+        inlined: true
       output:
         description: >-
           Used to define the output data schema of the Action.
         slot_uri: td:hasOutputSchema
         range: DataSchema
+        inlined: true
       safe:
         description: >-
           Signals if the Action is safe (=true) or not.
@@ -664,22 +666,26 @@ classes:
           e.g., filters or message format for setting up Webhooks.
         slot_uri: td:hasSubscriptionSchema
         range: DataSchema
+        inlined: true
       data:
         description: >-
           Defines the data schema of the Event instance messages pushed by the Thing.
         slot_uri: td:hasNotificationSchema
         range: DataSchema
+        inlined: true
       dataResponse:
         description: >-
           Defines the data schema of the Event response messages sent by the consumer in a response to a data message.
         slot_uri: td:hasNotificationResponseSchema
         range: DataSchema
+        inlined: true
       cancellation:
         description: >-
           Defines any data that needs to be passed to cancel a subscription,
           e.g., a specific message to remove a Webhook.
         slot_uri: td:hasCancellationSchema
         range: DataSchema
+        inlined: true
 
   VersionInfo:
     class_uri: td:versionInfo
