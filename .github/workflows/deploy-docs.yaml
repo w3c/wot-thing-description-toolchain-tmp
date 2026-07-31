@@ -30,8 +30,15 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
+      - name: Install Graphviz (needed for generating diagrams)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq graphviz
+
       - name: Generate Thing Description Specification
         run: uv run wotis generate-wot-resources -d
+
+      - name: Check index.html was generated
+        # the CLI logs errors but still exits 0, so check the output here
+        run: test -s resources/gens/index.html
 
       - name: Upload Generated Artifacts
         uses: actions/upload-pages-artifact@v4

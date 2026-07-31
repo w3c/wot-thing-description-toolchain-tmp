@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run *)",
+      "Bash(uv sync)",
+      "Bash(uv run pytest *)",
+      "Bash(uv run ruff *)",
+      "Bash(uv run linkml-lint *)",
+      "Bash(uv run wotis *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git status)",
+      "Bash(find . *)",
+      "Bash(grep *)",
+      "Bash(python3 *)",
+      "Bash(curl -s https://api.github.com/*)",
+      "Bash(curl -s https://linkml.io/*)",
+      "Bash(gh pr *)",
+      "Bash(gh api *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=\"$CLAUDE_TOOL_INPUT_FILE_PATH\"; case \"$file\" in *.py) uv run ruff check --fix \"$file\" 2>&1 | grep -v 'All checks passed' || true ;; resources/schemas/*.yaml) echo \"Schema edited — run /verify before opening a PR\" ;; esac"
+          }
+        ]
+      }
+    ]
+  }
+}

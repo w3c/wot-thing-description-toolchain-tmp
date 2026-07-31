@@ -32,7 +32,10 @@ Clone the repository and navigate to the project directory:
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
 uv sync
+pre-commit install
 ```
+
+`pre-commit install` activates commit hooks (ruff linting, LinkML schema lint). If `pre-commit` is not installed: `pip install pre-commit` or `uv tool install pre-commit`.
 
 Install the package or run it by executing:
 

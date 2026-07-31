@@ -1,18 +1,15 @@
----
-name: Publish Python Package
+name: Release
 
 on:
   release:
     types: [created]
 
-permissions:
-  id-token: write
-
 jobs:
   build-and-publish:
     name: Build and publish to PyPI
     runs-on: ubuntu-latest
-
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -27,3 +24,43 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+
+  # also attach the generated resources to the GitHub release, so users can
+  # download them without building anything
+  release-artifacts:
+    name: Attach generated resources to release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Generate WoT resources
+        run: uv run wotis generate-wot-resources
+
+      - name: Bundle generated resources
+        run: |
+          set -euo pipefail
+          test -s resources/gens/jsonschema/jsonschema.json
+          zip -r wotis-generated-resources.zip resources/gens
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" \
+            wotis-generated-resources.zip \
+            resources/gens/jsonschema/jsonschema.json \
+            resources/gens/jsonldcontext/context.jsonld \
+            --clobber

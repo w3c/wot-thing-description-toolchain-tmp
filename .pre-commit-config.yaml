@@ -1,0 +1,21 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.11
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: linkml-lint
+        name: LinkML schema lint
+        language: system
+        entry: uv run linkml-lint
+        args:
+          - resources/schemas/thing_description.yaml
+          - resources/schemas/hypermedia.yaml
+          - resources/schemas/wot_security.yaml
+          - resources/schemas/jsonschema.yaml
+        pass_filenames: false
+        files: resources/schemas/.*\.yaml$

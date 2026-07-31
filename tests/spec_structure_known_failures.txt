@@ -1,0 +1,25 @@
+# Spec HTML structure tests that currently fail: the generated index.html
+# is missing the "well-known operation types" table and two related
+# subsections. conftest.py marks these xfail(strict); once the spec
+# generation is fixed, the lines here must be removed.
+tests/test_golden_form_structure.py::TestFormSubsectionsPresent::test_well_known_operation_types_table_present
+tests/test_golden_form_structure.py::TestFormSubsectionsPresent::test_op_data_schema_mapping_subsection_present
+tests/test_golden_form_structure.py::TestFormSubsectionsPresent::test_response_usage_subsection_present
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[readproperty]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[writeproperty]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[observeproperty]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[unobserveproperty]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[invokeaction]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[queryaction]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[cancelaction]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[subscribeevent]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[unsubscribeevent]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[readallproperties]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[writeallproperties]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[readmultipleproperties]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[writemultipleproperties]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[observeallproperties]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[unobserveallproperties]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[queryallactions]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[subscribeallevents]
+tests/test_golden_form_structure.py::TestOperationTypeTableRows::test_operation_type_in_table[unsubscribeallevents]
