@@ -34,7 +34,6 @@ def test_td20_default_assignments_match_manual_golden_rows() -> None:
         "td-vocab-in--BearerSecurityScheme",
         "td-vocab-alg--BearerSecurityScheme",
         "td-vocab-format--BearerSecurityScheme",
-        "td-vocab-contentType--Form",
         "td-vocab-op--Form",
         "td-vocab-success--AdditionalExpectedResponse",
     }
@@ -74,18 +73,18 @@ def test_type_value_hints_are_independent_from_default_assignment() -> None:
     s = f'<a href="{xsd}string"><code>string</code></a>'
 
     assert basic_rows["td-vocab-in--BasicSecurityScheme"]["range_text"] == (
-        f"{s} (one of header, query, body, cookie, or auto)"
+        f"{s} (one of <code>header</code>, <code>query</code>, <code>body</code>, <code>cookie</code>, or <code>auto</code>)"
     )
     assert apikey_rows["td-vocab-in--APIKeySecurityScheme"]["range_text"] == (
-        f"{s} (one of header, query, body, cookie, uri, or auto)"
+        f"{s} (one of <code>header</code>, <code>query</code>, <code>body</code>, <code>cookie</code>, <code>uri</code>, or <code>auto</code>)"
     )
     assert bearer_rows["td-vocab-alg--BearerSecurityScheme"]["range_text"] == (
-        f"{s} (e.g., ES256, or ES512-256)"
+        f"{s} (e.g., <code>ES256</code>, or <code>ES512-256</code>)"
     )
     assert form_rows["td-vocab-op--Form"]["range_text"].startswith(
-        f"{s} or <a>Array</a> of {s} (one of readproperty"
+        f"{s} or <a>Array</a> of {s} (one of <code>readproperty</code>"
     )
     assert form_rows["td-vocab-subprotocol--Form"]["assignment"] == "optional"
     assert form_rows["td-vocab-subprotocol--Form"]["range_text"] == (
-        f"{s} (e.g., longpoll, websub, or sse)"
+        f"{s} (e.g., <code>longpoll</code>, <code>websub</code>, or <code>sse</code>)"
     )

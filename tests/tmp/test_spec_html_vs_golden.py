@@ -4,7 +4,7 @@ Scope: the four sections the pipeline generates. resources/index.template.html
 holds exactly four "%s" placeholders and each one sits inside one of these, so
 their content comes from the LinkML schema. The other sections are hand-written
 in the template and pass through unchanged. The golden file
-tests/manual_goldens/html/index.html is the hand-verified reference, any
+resources/upstream/html/index.html is the hand-verified reference, any
 difference inside the four sections is an error.
 
 The two integrity tests at the end check the generated file on its own and
@@ -29,8 +29,8 @@ from .spec_html_compare import (
 )
 
 TESTS_DIR = Path(__file__).resolve().parent
-REPO_ROOT = TESTS_DIR.parent
-GOLDEN_PATH = TESTS_DIR / "manual_goldens" / "html" / "index.html"
+REPO_ROOT = TESTS_DIR.parent.parent
+GOLDEN_PATH = REPO_ROOT / "resources" / "upstream" / "html" / "index.html"
 GENERATED_PATH = REPO_ROOT / "resources" / "gens" / "index.html"
 
 @pytest.fixture(scope="module")

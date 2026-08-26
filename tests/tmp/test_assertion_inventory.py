@@ -15,7 +15,7 @@ from pathlib import Path
 import pytest
 
 TESTS_DIR = Path(__file__).resolve().parent
-REPO_ROOT = TESTS_DIR.parent
+REPO_ROOT = TESTS_DIR.parent.parent
 OUR_CSV = REPO_ROOT / "resources" / "gens" / "assertions" / "assertions.csv"
 UPSTREAM_CSV = REPO_ROOT / "resources" / "upstream" / "assertions.csv"
 

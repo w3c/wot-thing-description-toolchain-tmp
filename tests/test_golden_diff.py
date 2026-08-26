@@ -1,5 +1,5 @@
-"""Golden diff: the generated artifacts must match the committed snapshots
-under tests/goldens/. A snapshot is our own last output, so this says whether
+"""Snapshot diff: the generated artifacts must match the committed snapshots
+under tests/snapshots/. A snapshot is our own last output, so this says whether
 the output changed without us noticing, not whether it is correct. If a change
 is intended, update the snapshots with:
 
@@ -14,11 +14,11 @@ from pathlib import Path
 
 import pytest
 
-from .spec_html_compare import generated_sections_html
+from .tmp.spec_html_compare import generated_sections_html
 
 TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent
-GOLDENS_DIR = TESTS_DIR / "goldens"
+GOLDENS_DIR = TESTS_DIR / "snapshots"
 
 def _normalize_json(path: Path) -> str:
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -51,7 +51,7 @@ def test_golden_matches_generated(request, name: str, gen_path: Path, normalize)
         return
 
     diff = list(difflib.unified_diff(
-        golden.splitlines(), current.splitlines(), f"goldens/{name}", f"generated {name}", lineterm=""
+        golden.splitlines(), current.splitlines(), f"snapshots/{name}", f"generated {name}", lineterm=""
     ))
     step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if step_summary:

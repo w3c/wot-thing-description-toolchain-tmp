@@ -21,7 +21,7 @@ from .rejections import defined_at, main_rejection
 TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent
 SCHEMA_PATH = REPO_ROOT / "resources" / "gens" / "jsonschema" / "jsonschema.json"
-GROUND_TRUTH = REPO_ROOT / "resources" / "ground-truth-schemas"
+GROUND_TRUTH = REPO_ROOT / "resources" / "upstream" / "schemas"
 DATA_DIR = TESTS_DIR / "data"
 DIVERGENCES = TESTS_DIR / "known_failures" / "td_crosscheck.txt"
 

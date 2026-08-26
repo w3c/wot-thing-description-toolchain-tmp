@@ -617,7 +617,7 @@ def generate_respec_spec(
     if cfg.snippets_dir.is_dir():
         from ..specgen.snippets import validate_all_snippets
 
-        schemas_dir = cfg.resources_path / "ground-truth-schemas"
+        schemas_dir = cfg.resources_path / "upstream" / "schemas"
         td_schema_path = schemas_dir / "td-json-schema-validation.json"
         tm_schema_path = schemas_dir / "tm-json-schema-validation.json"
         snippet_errors = validate_all_snippets(
