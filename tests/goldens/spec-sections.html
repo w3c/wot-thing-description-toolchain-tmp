@@ -1,0 +1,1528 @@
+<section id="sec-core-vocabulary-definition">
+          <h2>Core Vocabulary Definitions</h2>
+
+          <!-- rendered from RDF definitions -->
+          
+  
+  <section>
+   <h3 id="thing"><code>Thing</code></h3>
+   <p>An abstraction of a physical or a virtual entity whose metadata and interfaces are described by a WoT Thing Description, whereas a virtual entity is the composition of one or more Things.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in Thing Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-at-context--Thing">
+      <td><code>@context</code>
+      </td><td>JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI"><code>anyURI</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array"><code>Array</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-at-type--Thing">
+      <td><code>@type</code>
+      </td><td>JSON-LD keyword to label the object with semantic tags (or types).
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array①"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string①"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-id--Thing">
+      <td><code>id</code>
+      </td><td>Identifier of the Thing in form of a URI [[RFC3986]] (e.g., stable URI, temporary and mutable URI, URI with local IP address, URN, etc.).
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI①"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-title--Thing">
+      <td><code>title</code>
+      </td><td>Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
+      </td><td>mandatory
+      </td><td>any type
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-titles--Thing">
+      <td><code>titles</code>
+      </td><td>Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages). Also see <em>MultiLanguage</em>.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map"><code>Map</code></a> of <a data-link-type="dfn" href="#multilanguage%%E2%%91%%A0" id="ref-for-multilanguage①"><code>MultiLanguage</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-description--Thing">
+      <td><code>description</code>
+      </td><td>Provides additional (human-readable) information based on a default language.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string②"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-descriptions--Thing">
+      <td><code>descriptions</code>
+      </td><td>Can be used to support (human-readable) information in different languages. Also see <em>MultiLanguage</em>.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map①"><code>Map</code></a> of <a data-link-type="dfn" href="#multilanguage%%E2%%91%%A0" id="ref-for-multilanguage①①"><code>MultiLanguage</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-version--Thing">
+      <td><code>version</code>
+      </td><td>Provides version information.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#versioninfo%%E2%%91%%A0" id="ref-for-versioninfo①"><code>VersionInfo</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-created--Thing">
+      <td><code>created</code>
+      </td><td>Provides information when the TD instance was created.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#dateTime" id="ref-for-dateTime"><code>dateTime</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-modified--Thing">
+      <td><code>modified</code>
+      </td><td>Provides information when the TD instance was last modified.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#dateTime" id="ref-for-dateTime①"><code>dateTime</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-support--Thing">
+      <td><code>support</code>
+      </td><td>Provides information about the TD maintainer as URI scheme (e.g., <code>mailto</code> [[RFC6068]], <code>tel</code> [[RFC3966]], <code>https</code> [[RFC9112]]).
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI②"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-base--Thing">
+      <td><code>base</code>
+      </td><td>Define the base URI that is used for all relative URI references throughout a TD document. In TD instances, all relative URIs are resolved relative to the base URI using the algorithm defined in [[RFC3986]].
+<code>base</code> does not affect the URIs used in <code>@context</code> and the IRIs used within Linked Data [[LINKED-DATA]] graphs that are relevant when semantic processing is applied to TD instances.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI③"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-properties--Thing">
+      <td><code>properties</code>
+      </td><td>All Property-based Interaction Affordances of the Thing.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map②"><code>Map</code></a> of <a data-link-type="dfn" href="#propertyaffordance%%E2%%91%%A0" id="ref-for-propertyaffordance①"><code>PropertyAffordance</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-actions--Thing">
+      <td><code>actions</code>
+      </td><td>All Action-based Interaction Affordances of the Thing.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map③"><code>Map</code></a> of <a data-link-type="dfn" href="#actionaffordance%%E2%%91%%A0" id="ref-for-actionaffordance①"><code>ActionAffordance</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-events--Thing">
+      <td><code>events</code>
+      </td><td>All Event-based Interaction Affordances of the Thing.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map④"><code>Map</code></a> of <a data-link-type="dfn" href="#eventaffordance%%E2%%91%%A0" id="ref-for-eventaffordance①"><code>EventAffordance</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-links--Thing">
+      <td><code>links</code>
+      </td><td>Provides Web links to arbitrary resources that relate to the specified Thing Description.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array②"><code>Array</code></a> of <a data-link-type="dfn" href="#link%%E2%%91%%A0" id="ref-for-link①"><code>Link</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-forms--Thing">
+      <td><code>forms</code>
+      </td><td>Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. <a href="#dfn-td-thing-level">Thing level</a> forms are used to describe endpoints for a group of interaction affordances.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array③"><code>Array</code></a> of <a data-link-type="dfn" href="#form%%E2%%91%%A0" id="ref-for-form①"><code>Form</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-security--Thing">
+      <td><code>security</code>
+      </td><td>Set of security definition names, chosen from those defined in <code>securityDefinitions</code>. These must all be satisfied for access to resources.
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string③"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array④"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string④"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-securityDefinitions--Thing">
+      <td><code>securityDefinitions</code>
+      </td><td>Set of named security configurations (definitions only). Not actually applied unless names are used in a <code>security</code> name-value pair.
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map⑤"><code>Map</code></a> of <a data-link-type="dfn" href="#securityscheme%%E2%%91%%A0" id="ref-for-securityscheme①"><code>SecurityScheme</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-profile--Thing">
+      <td><code>profile</code>
+      </td><td>Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI④"><code>anyURI</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array⑤"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI⑤"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-schemaDefinitions--Thing">
+      <td><code>schemaDefinitions</code>
+      </td><td>Set of named data schemas. To be used in a schema name-value pair inside an <code>AdditionalExpectedResponse</code> object.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map⑥"><code>Map</code></a> of <a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①"><code>DataSchema</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-uriVariables--Thing">
+      <td><code>uriVariables</code>
+      </td><td>Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations. The Thing level <code>uriVariables</code> can be used in Thing level forms or in Interaction Affordances. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the <code>href</code> upon the execution of the operation. If the same variable is both declared in Thing level <code>uriVariables</code> and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map⑦"><code>Map</code></a> of <a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①①"><code>DataSchema</code></a>
+   </td></tr></tbody></table>
+   <div class="note" role="note">
+The following list items about the <code>@context</code> URL rules will go through major changes.
+
+</div>
+   
+For <code>@context</code> the following rules are defined for Thing Description instances:
+
+
+   <ul>
+    <li><span class="rfc2119-assertion" id="td-context-ns-thing-mandatory">The <code>@context</code> name-value pair <em>MUST</em> contain the anyURI <code>https://www.w3.org/2022/wot/td/v1.1</code> in order
+to identify the document as a TD 1.1 which would allow Consumers to use the newly introduced terms.
+</span>
+    </li><li><span class="rfc2119-assertion" id="td-context-ns-td10-namespace">When there are possibly TD 1.0 consumers the anyURI <code>https://www.w3.org/2019/wot/td/v1</code> <em>MUST</em> be the first entry and the <code>https://www.w3.org/2022/wot/td/v1.1</code> <em>MUST</em> be the second entry.
+</span>
+    </li><li><span class="rfc2119-assertion" id="td-context-ns-td10-namespacev10">TD 1.1 consumers <em>MUST</em> accept TDs satisfying the W3C WoT Thing Description 1.0 [[wot-thing-description10]] specification.
+</span>
+    </li><li><span class="rfc2119-assertion" id="td-context-ns-thing-optional">When <code>@context</code> is an Array, the anyURI <code>https://www.w3.org/2022/wot/td/v1.1</code> <em>MAY</em> be followed by elements of type
+<code>anyURI</code> or type Map in any order, while it is <em>RECOMMENDED</em> to include only one Map with all the name-value pairs in the <code>@context</code> Array.
+</span>
+    </li><li><span class="rfc2119-assertion" id="td-context-ns-thing-map-of-namespaces">Maps contained in an <code>@context</code> Array <em>MAY</em> contain name-value pairs, where the value is a namespace
+identifier of type anyURI and the name a Term or prefix denoting that namespace.
+</span>
+    </li><li><span class="rfc2119-assertion" id="td-context-default-language">One Map contained in an <code>@context</code> Array <em>SHOULD</em> contain a name-value pair that defines the default language
+for the Thing Description, where the name is the Term @language and the value is a well-formed language tag as defined by [[BCP47]] (e.g., en, de-AT, gsw-CH, zh-Hans, zh-Hant-HK, sl-nedis).
+</span>
+   </li></ul>
+   
+To determine the base direction of all human-readable text in Thing Description and Thing Model instances this specification recommends to follow the [[STRING-META]] guideline about <a href="https://www.w3.org/TR/string-meta/#string_specific_direction">string-specific directional information</a> when no built-in mechanism for associating base direction metadata is available.
+
+
+   <p>TD Processors <em>SHOULD</em> be aware of certain special cases when processing bidirectional text. <span class="rfc2119-assertion" id="td-processor-bidi-isolation">TD Processors <em>SHOULD</em> take care to use bidi isolation when presenting strings to users, particularly when embedding in surrounding text (e.g., for Web user interface).
+</span> Mixed direction text can occur in any language, even when the language is properly identified.</p>
+   <p><span class="rfc2119-assertion" id="td-producer-mixed-direction">TD producers <em>SHOULD</em> attempt to provide mixed direction strings in a way that can be displayed successfully by a naive user agent.
+</span> For example, if an RTL string begins with an LTR run (such as a number or a brand or trade name in Latin script), including an RLM character at the start of the string or wrapping opposite direction runs in bidi controls can assist in proper display.</p>
+   
+<em>Strings on the Web: Language and Direction Metadata</em> string-meta provides some guidance and illustrates a number of pitfalls when using bidirectional text.
+
+
+   <p>In addition to the explicitly provided Interaction Affordances in the <code>properties</code>, <code>actions</code>, and <code>events</code> Maps, a Thing can also provide meta-interactions, which are indicated by <code>Form</code> instances in its optional <code>forms</code> Array. <span class="rfc2119-assertion" id="td-op-for-thing">When the <code>forms</code> Array of a Thing instance contains <code>Form</code> instances, it MUST contain <code>op</code> member with the string values assigned to the name <code>op</code>, either directly or within an Array, MUST be one of the following <em>operation types</em>: <code>readallproperties</code>, <code>writeallproperties</code>, <code>readmultipleproperties</code>, <code>writemultipleproperties</code>, <code>observeallproperties</code>, <code>unobserveallproperties</code>, <code>queryallactions</code>, <code>subscribeallevents</code>, or <code>unsubscribeallevents</code>.
+</span> (See <a href="#td-forms-readall-example">an example</a> for an usage of <code>form</code> in a Thing instance.)</p>
+   
+The data schema for each of the property meta-interactions is constructed by combining the data schemas of each <code>PropertyAffordance</code> instance in a single <code>ObjectSchema</code> instance, where the <code>properties</code> Map of the <code>ObjectSchema</code> instance contains each data schema of the <code>PropertyAffordances</code> identified by the name of the corresponding <code>PropertyAffordances</code> instance.
+
+
+   <p>If not specified otherwise (e.g., through a TD Context Extension), the request data of the <code>readmultipleproperties</code> operation is an Array that contains the intended <code>PropertyAffordances</code> instance names, which is serialized to the content type specified by the <code>Form</code> instance.</p>
+  </section>
+  
+  <section>
+   <h3 id="interactionaffordance"><code>InteractionAffordance</code></h3>
+   <p>Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact with the Thing. There are many types of potential affordances, but W3C WoT defines three types of Interaction Affordances: Properties, Actions, and Events.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in InteractionAffordance Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-at-type--InteractionAffordance">
+      <td><code>@type</code>
+      </td><td>JSON-LD keyword to label the object with semantic tags (or types).
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑤"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array⑥"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑥"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-title--InteractionAffordance">
+      <td><code>title</code>
+      </td><td>Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
+      </td><td>optional
+      </td><td>any type
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-titles--InteractionAffordance">
+      <td><code>titles</code>
+      </td><td>Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages). Also see <em>MultiLanguage</em>.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map⑧"><code>Map</code></a> of <a data-link-type="dfn" href="#multilanguage%%E2%%91%%A0" id="ref-for-multilanguage①②"><code>MultiLanguage</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-description--InteractionAffordance">
+      <td><code>description</code>
+      </td><td>Provides additional (human-readable) information based on a default language.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑦"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-descriptions--InteractionAffordance">
+      <td><code>descriptions</code>
+      </td><td>Can be used to support (human-readable) information in different languages. Also see <em>MultiLanguage</em>.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map⑨"><code>Map</code></a> of <a data-link-type="dfn" href="#multilanguage%%E2%%91%%A0" id="ref-for-multilanguage①③"><code>MultiLanguage</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-forms--InteractionAffordance">
+      <td><code>forms</code>
+      </td><td>Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. The array cannot be empty.
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array⑦"><code>Array</code></a> of <a data-link-type="dfn" href="#form%%E2%%91%%A0" id="ref-for-form①①"><code>Form</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-uriVariables--InteractionAffordance">
+      <td><code>uriVariables</code>
+      </td><td>Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the <code>href</code> upon the execution of the operation. If the same variable is both declared in Thing level <code>uriVariables</code> and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map①⓪"><code>Map</code></a> of <a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①②"><code>DataSchema</code></a>
+   </td></tr></tbody></table>
+   <p>The !class <code>InteractionAffordance</code> has the following subclasses:</p>
+   <ul>
+    <li data-md="">
+     <p>PropertyAffordance</p>
+    </li><li data-md="">
+     <p>ActionAffordance</p>
+    </li><li data-md="">
+     <p>EventAffordance</p>
+   </li></ul>
+  </section>
+  
+  <section>
+   <h3 id="propertyaffordance"><code>PropertyAffordance</code></h3>
+   <p>An Interaction Affordance that exposes state of the Thing. This state can be retrieved (read) and/or updated (write). Things can also choose to make Properties observable by pushing the new state after a change.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in PropertyAffordance Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-observable--PropertyAffordance">
+      <td><code>observable</code>
+      </td><td>A hint that indicates whether Servients hosting the Thing and Intermediaries should provide a Protocol Binding that supports the <code>observeproperty</code> and <code>unobserveproperty</code> operations for this Property.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#boolean" id="ref-for-boolean"><code>boolean</code></a>
+   </td></tr></tbody></table>
+   <div class="note" role="note">
+Property instances are also instances of the class DataSchema. Therefore, it can contain the <code>type</code>, <code>unit</code>, <code>readOnly</code> and <code>writeOnly</code> members, among others.
+
+</div>
+   <p><code>PropertyAffordance</code> is a Subclass of the <code>InteractionAffordance</code> Class and the DataSchema Class. <span class="rfc2119-assertion" id="td-op-for-property">When a Form instance is within a <code>PropertyAffordance</code> instance, the value assigned to <code>op</code> MUST be one of <code>readproperty</code>, <code>writeproperty</code>, <code>observeproperty</code>, <code>unobserveproperty</code> or an Array containing a combination of these terms.
+</span></p>
+   <div class="note" role="note">
+It is considered to be good practice that each <code>observeproperty</code> has a corresponding <code>unobserveproperty</code> unless the protocol supports implicit unsubscription mechanisms (e.g., heartbeat to detect connection loss).
+
+</div>
+   <div class="note" role="note">
+The observation mechanism depends on the underlying protocol or sub-protocol. Having said that, it is not guaranteed that the current Property value will be provided once the subscription is initiated. Hence, it may be necessary to read the current Property value before/after the subscription to get a first value.
+
+</div>
+  </section>
+  
+  <section>
+   <h3 id="actionaffordance"><code>ActionAffordance</code></h3>
+   <p>An Interaction Affordance that allows to invoke a function of the Thing, which manipulates state (e.g., toggling a lamp on or off) or triggers a process on the Thing (e.g., dim a lamp over time).</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in ActionAffordance Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-input--ActionAffordance">
+      <td><code>input</code>
+      </td><td>Used to define the input data schema of the Action.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①③"><code>DataSchema</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-output--ActionAffordance">
+      <td><code>output</code>
+      </td><td>Used to define the output data schema of the Action.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①④"><code>DataSchema</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-safe--ActionAffordance">
+      <td><code>safe</code>
+      </td><td>Signals if the Action is safe (=true) or not. Used to signal if there is no internal state (cf. resource state) is changed when invoking an Action. In that case responses can be cached as example.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#boolean" id="ref-for-boolean①"><code>boolean</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-idempotent--ActionAffordance">
+      <td><code>idempotent</code>
+      </td><td>Indicates whether the Action is idempotent (=true) or not. Informs whether the Action can be called repeatedly with the same result, if present, based on the same input.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#boolean" id="ref-for-boolean②"><code>boolean</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-synchronous--ActionAffordance">
+      <td><code>synchronous</code>
+      </td><td>Indicates whether the action is synchronous (=true) or not. A synchronous action means that the response of action contains all the information about the result of the action and no further querying about the status of the action is needed. Lack of this keyword means that no claim on the synchronicity of the action can be made.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#boolean" id="ref-for-boolean③"><code>boolean</code></a>
+   </td></tr></tbody></table>
+   <p><code>ActionAffordance</code> is a Subclass of the <code>InteractionAffordance</code> Class. <span class="rfc2119-assertion" id="td-op-for-action">When a Form instance is within an <code>ActionAffordance</code> instance, the value assigned to <code>op</code> <em>MUST</em> either be <code>invokeaction</code>, <code>queryaction</code>, <code>cancelaction</code>, or an Array containing a combination of these terms.
+</span></p>
+  </section>
+  
+  <section>
+   <h3 id="eventaffordance"><code>EventAffordance</code></h3>
+   <p>An Interaction Affordance that describes an event source, which asynchronously pushes event data to Consumers (e.g., overheating alerts).</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in EventAffordance Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-subscription--EventAffordance">
+      <td><code>subscription</code>
+      </td><td>Defines data that needs to be passed upon subscription, e.g., filters or message format for setting up Webhooks.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①⑤"><code>DataSchema</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-data--EventAffordance">
+      <td><code>data</code>
+      </td><td>Defines the data schema of the Event instance messages pushed by the Thing.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①⑥"><code>DataSchema</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-dataResponse--EventAffordance">
+      <td><code>dataResponse</code>
+      </td><td>Defines the data schema of the Event response messages sent by the consumer in a response to a data message.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①⑦"><code>DataSchema</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-cancellation--EventAffordance">
+      <td><code>cancellation</code>
+      </td><td>Defines any data that needs to be passed to cancel a subscription, e.g., a specific message to remove a Webhook.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①⑧"><code>DataSchema</code></a>
+   </td></tr></tbody></table>
+   <p><code>EventAffordance</code> is a Subclass of the <code>InteractionAffordance</code> Class. <span class="rfc2119-assertion" id="td-op-for-event">When a Form instance is within an EventAffordance instance, the value assigned to <code>op</code> <em>MUST</em> be either <code>subscribeevent</code>, <code>unsubscribeevent</code>, or both terms within an Array.
+</span></p>
+   <div class="note" role="note">
+It is considered to be good practice that each <code>subscribeevent</code> has a corresponding <code>unsubscribeevent</code> unless the protocol supports implicit unsubscription mechanisms (e.g., heartbeat to detect connection loss).
+
+</div>
+   <p>EventAffordances are similar to observable PropertyAffordances in the sense that the Thing itself informs interested Consumers about state changes. However, a main difference of EventAffordances is that not every change of the associated resource needs to trigger an !event message to be emitted, e.g., a critical threshold for a numeric value. <span class="rfc2119-assertion" id="td-event-trigger">Events MAY be triggered through conditions that are not exposed as Properties.
+</span> Furthermore, EventAffordances allow for more complex subscribing and unsubscribing mechanisms via the definition of subscription, dataResponse, and cancellation DataSchema definitions. Not all protocols might support these more advanced mechanisms, however, which is why in some scenarios, events may be very similar to observable PropertyAffordances. In these cases, the choice between a Property and a Event for modelling the Affordance should be made based on the semantics of the underlying resource; for example, if the state of the affordance is also supposed to be read or written by a Consumer, then a Property is most likely the appropriate choice.</p>
+  </section>
+  
+  <section>
+   <h3 id="versioninfo"><code>VersionInfo</code></h3>
+   <p>Metadata of a Thing that provides version information about the TD document. If required, additional version information such as firmware and hardware version (term definitions outside of the TD namespace) can be extended via the TD Context Extension mechanism.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in VersionInfo Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-instance--VersionInfo">
+      <td><code>instance</code>
+      </td><td>Provides a version indicator of this TD.
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑧"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-model--VersionInfo">
+      <td><code>model</code>
+      </td><td>Provides a version indicator of the underlying TM.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑨"><code>string</code></a>
+   </td></tr></tbody></table>
+   <p>It is recommended that the values within <code>instances</code> and <code>model</code> of the <code>VersionInfo</code> <a href="#dfn-class">Class</a> follow the semantic versioning pattern, where a sequence of three numbers separated by a dot indicates the major version, minor version, and patch version, respectively. See [[SEMVER]] for details.</p>
+  </section>
+  
+  <section>
+   <h3 id="multilanguage"><code>MultiLanguage</code></h3>
+   <p>A Map providing a set of human-readable texts in different languages identified by language tags as defined in [[BCP47]]. See <a href="#titles-descriptions-serialization-json">6.3.2 Human-Readable Metadata</a> for example usages of this container in a Thing Description instance.</p>
+   <p><span class="rfc2119-assertion" id="td-multilanguage-language-tag">Each name of the <code>MultiLanguage</code> Map <em>MUST</em> be a language tag as defined in [[!BCP47]].
+</span> <span class="rfc2119-assertion" id="td-multilanguage-value">Each value of the <code>MultiLanguage</code> Map <em>MUST</em> be of type string.
+</span></p>
+  </section>
+        </section>
+
+        
+<section id="sec-data-schema-vocabulary-definition">
+          <h2>Data Schema Vocabulary Definitions</h2>
+          <p>A data schema is an abstract notation for data contained in data formats.</p>
+          <p>
+            The data schema vocabulary definition reflects a very common subset of the terms defined by JSON Schema
+            [[?JSON-SCHEMA]]. A JSON Schema [[?JSON-SCHEMA]] processor for
+            <a href="https://json-schema.org/specification-links#draft-7">JSON Schema draft 7</a> can consume a data
+            schema. It is noted that data schema definitions within Thing Description instances are not limited to this
+            defined subset and may use additional terms found in JSON Schema using a <a>TD Context Extension</a> for the
+            additional terms as described in <a href="#sec-context-extensions"/>, otherwise these terms are
+            semantically ignored by <a>TD Processors</a>
+            (for details about semantic processing, please refer to
+            <a href="#json-ld-ctx-usage"/> and the documentation under the namespace IRIs, e.g.,
+            <a href="https://www.w3.org/2019/wot/td">https://www.w3.org/2019/wot/td</a>).
+          </p>
+          <p>
+            In a TD, concrete data formats are specified in Forms (see <a href="#form"/>) using content types. When
+            the value of a content type in an instance of the Form is <code>application/json</code>, the data schema can
+            be processed directly by JSON Schema processors. Otherwise, entries in Web of Things (WoT) Binding Registry
+            [[?WOT-BINDING-REGISTRY]] define available mappings from data schemas to other content types such as XML
+            [[?xml]]. If the content type in an instance of the Form is not <code>application/json</code> and if no
+            mapping is defined for the content type, specifying a data schema does not make sense for the content type.
+          </p>
+          <p>
+            <span>The following table contains content types which MAY use data schema to describe the structure of their
+              payloads.</span>
+          </p>
+          <table class="def numbered">
+            <caption>
+              Content types that can use a Data Schema
+            </caption>
+            <thead>
+              <tr>
+                <th>Format</th>
+                <th>Content Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>JSON/CBOR</td>
+                <td>
+                  <code>application/json</code> <br/>
+                  <code>application/ld+json</code> <br/>
+                  <code>application/senml+json</code> <br/>
+                  <code>application/cbor</code> <br/>
+                  <code>application/senml+cbor</code> <br/>
+                </td>
+              </tr>
+              <tr>
+                <td>XML/EXI</td>
+                <td>
+                  <code>application/xml</code> <br/>
+                  <code>application/senml+xml</code> <br/>
+                  <code>application/exi</code> <br/>
+                  <code>application/senml-exi</code> <br/>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- rendered from RDF definitions -->
+          <section>
+   <h3 id="dataschema"><code>DataSchema</code></h3>
+   <p>Metadata that describes the data format used. It can be used for validation.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in DataSchema Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-at-type--DataSchema">
+      <td><code>@type</code>
+      </td><td>JSON-LD keyword to label the object with semantic tags (or types).
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string①⓪"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array⑧"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string①①"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-title--DataSchema">
+      <td><code>title</code>
+      </td><td>Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
+      </td><td>optional
+      </td><td>any type
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-titles--DataSchema">
+      <td><code>titles</code>
+      </td><td>Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages). Also see <em>MultiLanguage</em>.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map①①"><code>Map</code></a> of <a data-link-type="dfn" href="#multilanguage%%E2%%91%%A0" id="ref-for-multilanguage①④"><code>MultiLanguage</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-description--DataSchema">
+      <td><code>description</code>
+      </td><td>Provides additional (human-readable) information based on a default language.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string①②"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-descriptions--DataSchema">
+      <td><code>descriptions</code>
+      </td><td>Can be used to support (human-readable) information in different languages. Also see <em>MultiLanguage</em>.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map①②"><code>Map</code></a> of <a data-link-type="dfn" href="#multilanguage%%E2%%91%%A0" id="ref-for-multilanguage①⑤"><code>MultiLanguage</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-const--DataSchema">
+      <td><code>const</code>
+      </td><td>Provides a constant value.
+      </td><td>optional
+      </td><td>any type
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-default--DataSchema">
+      <td><code>default</code>
+      </td><td>Supply a default value. The value <em>SHOULD</em> validate against the data schema in which it resides.
+      </td><td>optional
+      </td><td>any type
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-unit--DataSchema">
+      <td><code>unit</code>
+      </td><td>Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition (also see Section <a href="#semantic-annotations-example-version-units">Semantic Annotations</a>).
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string①③"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-oneOf--DataSchema">
+      <td><code>oneOf</code>
+      </td><td>Used to ensure that the data is valid against one of the specified schemas in the array. This can be used to describe multiple input or output schemas.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array⑨"><code>Array</code></a> of <a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①⑨"><code>DataSchema</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-enum--DataSchema">
+      <td><code>enum</code>
+      </td><td>Restricted set of values provided as an array.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array①⓪"><code>Array</code></a> of any type
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-readOnly--DataSchema">
+      <td><code>readOnly</code>
+      </td><td>Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false).
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#boolean" id="ref-for-boolean④"><code>boolean</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-writeOnly--DataSchema">
+      <td><code>writeOnly</code>
+      </td><td>Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false).
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#boolean" id="ref-for-boolean⑤"><code>boolean</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-format--DataSchema">
+      <td><code>format</code>
+      </td><td>Allows validation based on a format pattern such as "date-time", "email", "uri", etc. (Also see below.)
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string①④"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-type--DataSchema">
+      <td><code>type</code>
+      </td><td>Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null).
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI⑥"><code>anyURI</code></a> (one of object, array, string, number, integer, boolean, or null)
+   </td></tr></tbody></table>
+   <p>The class DataSchema has the following subclasses:</p>
+   <ul>
+    <li data-md="">
+     <p>ArraySchema</p>
+    </li><li data-md="">
+     <p>BooleanSchema</p>
+    </li><li data-md="">
+     <p>NumberSchema</p>
+    </li><li data-md="">
+     <p>IntegerSchema</p>
+    </li><li data-md="">
+     <p>ObjectSchema</p>
+    </li><li data-md="">
+     <p>StringSchema</p>
+    </li><li data-md="">
+     <p>NullSchema</p>
+   </li></ul>
+   <p>The format string values are known from a fixed set of values and their corresponding format rules defined in [[JSON-SCHEMA]] (Section 7.3 Defined Formats in particular). <span class="rfc2119-assertion" id="td-format-validation-known-values">Servients <em>MAY</em> use the <code>format</code> value to perform additional validation accordingly.
+</span> <span class="rfc2119-assertion" id="td-format-validation-other-values">When a value that is not found in the known set of values is assigned to <code>format</code>, such a validation <em>SHOULD</em> succeed.
+</span></p>
+   
+Vocabulary terms typed as any <code>type</code> (e.g., <code>const</code>, <code>default</code>) follow data types compatible with JSON Schema (boolean, integer, number, string, object, array, or null).
+
+
+   <div class="note" role="note">
+The format term is not widely implemented by JSON Schema tools. In addition, the term <code>format</code> is being discussed by the JSON Schema standardisation community and may be replaced by another mechanism or removed in a future JSON Schema version.
+
+</div>
+  </section>
+  
+  <section>
+   <h3 id="arrayschema"><code>ArraySchema</code></h3>
+   <p>Metadata describing data of type array. This subclass is indicated by the value <code>array</code> assigned to type in DataSchema instances.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in ArraySchema Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-items--ArraySchema">
+      <td><code>items</code>
+      </td><td>Used to define the characteristics of an array
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①①⓪"><code>DataSchema</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array①①"><code>Array</code></a> of <a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①①①"><code>DataSchema</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-minItems--ArraySchema">
+      <td><code>minItems</code>
+      </td><td>Defines the minimum number of items that have to be in the array.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#unsignedInt" id="ref-for-unsignedInt"><code>unsignedInt</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-maxItems--ArraySchema">
+      <td><code>maxItems</code>
+      </td><td>Defines the maximum number of items that have to be in the array.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#unsignedInt" id="ref-for-unsignedInt①"><code>unsignedInt</code></a>
+   </td></tr></tbody></table>
+  </section>
+  
+  <section>
+   <h3 id="booleanschema"><code>BooleanSchema</code></h3>
+   <p>Metadata describing data of type <code>boolean</code>. This subclass is indicated by the value <code>boolean</code> assigned to type in <code>DataSchema</code> instances.</p>
+  </section>
+  
+  <section>
+   <h3 id="numberschema"><code>NumberSchema</code></h3>
+   <p>Metadata describing data of type <code>number</code>. This subclass is indicated by the value <code>number</code> assigned to type in <code>DataSchema</code> instances.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in NumberSchema Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-minimum--NumberSchema">
+      <td><code>minimum</code>
+      </td><td>Specifies a minimum numeric value, representing an inclusive lower limit. Only applicable for associated number or integer types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#double" id="ref-for-double"><code>double</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-exclusiveMinimum--NumberSchema">
+      <td><code>exclusiveMinimum</code>
+      </td><td>Specifies a minimum numeric value, representing an exclusive lower limit. Only applicable for associated number or integer types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#double" id="ref-for-double①"><code>double</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-maximum--NumberSchema">
+      <td><code>maximum</code>
+      </td><td>Specifies a maximum numeric value, representing an inclusive upper limit. Only applicable for associated number or integer types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#double" id="ref-for-double②"><code>double</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-exclusiveMaximum--NumberSchema">
+      <td><code>exclusiveMaximum</code>
+      </td><td>Specifies a maximum numeric value, representing an exclusive upper limit. Only applicable for associated number or integer types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#double" id="ref-for-double③"><code>double</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-multipleOf--NumberSchema">
+      <td><code>multipleOf</code>
+      </td><td>Specifies the multipleOf value number. The value must strictly greater than 0. Only applicable for associated number or integer types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#double" id="ref-for-double④"><code>double</code></a>
+   </td></tr></tbody></table>
+  </section>
+  
+  <section>
+   <h3 id="integerschema"><code>IntegerSchema</code></h3>
+   <p>Metadata describing data of type <code>integer</code>. This Subclass is indicated by the value <code>integer</code> assigned to <code>type</code> in <code>DataSchema</code> instances.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in IntegerSchema Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-minimum--IntegerSchema">
+      <td><code>minimum</code>
+      </td><td>Specifies a minimum numeric value, representing an inclusive lower limit. Only applicable for associated number or integer types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://drafts.csswg.org/css-values-4/#integer" id="ref-for-integer"><code>integer</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-exclusiveMinimum--IntegerSchema">
+      <td><code>exclusiveMinimum</code>
+      </td><td>Specifies a minimum numeric value, representing an exclusive lower limit. Only applicable for associated number or integer types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://drafts.csswg.org/css-values-4/#integer" id="ref-for-integer①"><code>integer</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-maximum--IntegerSchema">
+      <td><code>maximum</code>
+      </td><td>Specifies a maximum numeric value, representing an inclusive upper limit. Only applicable for associated number or integer types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://drafts.csswg.org/css-values-4/#integer" id="ref-for-integer②"><code>integer</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-exclusiveMaximum--IntegerSchema">
+      <td><code>exclusiveMaximum</code>
+      </td><td>Specifies a maximum numeric value, representing an exclusive upper limit. Only applicable for associated number or integer types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://drafts.csswg.org/css-values-4/#integer" id="ref-for-integer③"><code>integer</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-multipleOf--IntegerSchema">
+      <td><code>multipleOf</code>
+      </td><td>Specifies the multipleOf value number. The value must strictly greater than 0. Only applicable for associated number or integer types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://drafts.csswg.org/css-values-4/#integer" id="ref-for-integer④"><code>integer</code></a>
+   </td></tr></tbody></table>
+  </section>
+  
+  <section>
+   <h3 id="objectschema"><code>ObjectSchema</code></h3>
+   <p>Metadata describing data of type Object. This Subclass is indicated by the value <code>object</code> assigned to <code>type</code> in <code>DataSchema</code> instances.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in ObjectSchema Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-properties--ObjectSchema">
+      <td><code>properties</code>
+      </td><td>Data schema nested definitions.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map①③"><code>Map</code></a> of <a data-link-type="dfn" href="#dataschema%%E2%%91%%A0" id="ref-for-dataschema①①②"><code>DataSchema</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-required--ObjectSchema">
+      <td><code>required</code>
+      </td><td>Defines which members of the object type are mandatory, i.e. which members are mandatory in the payload that is to be sent (e.g. input of <code>invokeaction</code>, <code>writeproperty</code>) and what members will be definitely delivered in the payload that is being received (e.g. output of <code>invokeaction</code>, <code>readproperty</code>)
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array①②"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string①⑤"><code>string</code></a>
+   </td></tr></tbody></table>
+  </section>
+  
+  <section>
+   <h3 id="stringschema"><code>StringSchema</code></h3>
+   <p>Metadata describing data of type <code>string</code>. This Subclass is indicated by the value <code>string</code> assigned to <code>type</code> in <code>DataSchema</code> instances.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in StringSchema Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-minLength--StringSchema">
+      <td><code>minLength</code>
+      </td><td>Specifies the minimum length of a string. Only applicable for associated string types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#unsignedInt" id="ref-for-unsignedInt②"><code>unsignedInt</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-maxLength--StringSchema">
+      <td><code>maxLength</code>
+      </td><td>Specifies the maximum length of a string. Only applicable for associated string types.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#unsignedInt" id="ref-for-unsignedInt③"><code>unsignedInt</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-pattern--StringSchema">
+      <td><code>pattern</code>
+      </td><td>Provides a regular expression to express constraints of the string value. The regular expression must follow the [[ECMA-262]] dialect.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string①⑥"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-contentEncoding--StringSchema">
+      <td><code>contentEncoding</code>
+      </td><td>Specifies the encoding used to store the contents, as specified in [[RFC2045]] (Section 6.1) and [[RFC4648]].
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string①⑦"><code>string</code></a> (e.g., 7bit, 8bit, binary, quoted-printable, base16, base32, or base64)
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-contentMediaType--StringSchema">
+      <td><code>contentMediaType</code>
+      </td><td>Specifies the MIME type of the contents of a string value, as described in [[RFC2046]].
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string①⑧"><code>string</code></a> (e.g., image/png, or audio/mpeg)
+   </td></tr></tbody></table>
+   <div class="note" role="note">
+The length of a string (i.e., <code>minLength</code> and <code>maxLength</code>) is defined as the number of Unicode code points, as defined by [[RFC8259]]. Note that some <a href="https://www.w3.org/TR/i18n-glossary/#dfn-grapheme">user-perceived characters</a> are composed of more than one Unicode code point. Arbitrary index values might not fall on these grapheme boundaries, so truncation according to <code>maxLength</code> might alter the appearance or meaning of the string.
+
+</div>
+  </section>
+  
+  <section>
+   <h3 id="nullschema"><code>NullSchema</code></h3>
+   <p>Metadata describing data of type <code>null</code>. This subclass is indicated by the value <code>null</code> assigned to <code>type</code> in <code>DataSchema</code> instances. This Subclass describes only one acceptable value, namely <code>null</code>. It is important to note that <code>null</code> does not mean the absence of a value. It is analogous to <code>null</code> in JavaScript, <code>None</code> in Python, <code>null</code> in Java and <code>nil</code> in Ruby programming languages. It can be used as part of a <code>oneOf</code> declaration, where it is used to indicate, that the data can also be <code>null</code>.</p>
+  </section>
+        </section>
+
+        
+<section id="sec-security-vocabulary-definition">
+          <h2>Security Vocabulary Definitions</h2>
+
+          <p>
+            This specification provides a selection of well-established security mechanisms that are directly built into
+            protocols eligible as <a>Protocol Bindings</a> for W3C WoT or are widely in use with those protocols. The
+            current set of HTTP security schemes is partly based on
+            <a href="https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.1.md#security-scheme-object">OpenAPI 3.0.1</a>
+            (see also [[?OPENAPI]]). However while the HTTP security schemes, <a>Vocabulary</a>, and syntax given in
+            this specification share many similarities with OpenAPI, they are not compatible.
+          </p>
+
+          <p>
+            Generally, security schemes require some form of secure transport to be effective, such as TLS or DTLS.
+            Requirements for the use of secure transport are given in Section <a href="#sec-security-consideration"/>
+            in this document and in the Security Considerations section of [[wot-architecture11]].
+          </p>
+
+          <!-- rendered from RDF definitions -->
+          <section>
+   <h3 id="securityscheme"><code>SecurityScheme</code></h3>
+   <p>Metadata describing the configuration of a security mechanism.</p>
+   <p>Metadata describing the configuration of a security mechanism. <span class="rfc2119-assertion" id="td-security-scheme-name">The value assigned to the name <code>scheme</code> MUST be defined within a Vocabulary included in the Thing Description, either in the standard Vocabulary defined in <a href="#sec-vocabulary-definition">TD Information Model</a> or in a <a href="#sec-vocabulary-definition">TD Context Extension</a>.
+</span></p>
+   <p><span class="rfc2119-assertion" id="td-security-no-secrets">For all security schemes, any keys, passwords, or other sensitive information directly providing access <em>MUST NOT</em> be stored in the TD and should instead be shared and stored out-of-band via other mechanisms.
+</span> The purpose of a TD is to describe how to access a Thing if and only if a Consumer already has authorization, and is not meant be used to grant that authorization.</p>
+   
+Each security scheme object used in a TD defines a set of requirements to be met before access can be granted. We say a security scheme is <em>satisfied</em> when all its requirements are met. In some cases requirements from multiple security schemes will have to be met before access can be granted.
+
+
+   <p>Security schemes generally may require additional authentication parameters, such as a password or key. The location of this information is indicated by the value associated with the name <code>in</code>, often in combination with the value associated with <code>name</code>. The value associated with <code>in</code> can take one of the following values:</p>
+   <p><strong>header</strong>:
+The parameter will be given in a header provided by the protocol, with the name of the header provided by the value of name.</p>
+   <p><strong>query</strong>:
+The parameter will be appended to the URI as a query parameter, with the name of the query parameter provided by name.</p>
+   <p><strong>body</strong>: The parameter will be provided in the body of the request payload, with the data schema element used provided by <em>name</em>. <span class="rfc2119-assertion" id="td-security-body-name-json-pointer">When used in the context of a <em>body</em> security information location, the value of name <em>MUST</em> be in the form of a JSON pointer [[!RFC6901]] relative to the root of the input <code>DataSchema</code> for each interaction it is used with.
+</span> Since this value is not a fragment identifier, and is not relative to the root of the TD but to whichever data schemas the security scheme is bound to, this value should not start with #; it is a "pure" JSON pointer. Since this value is not a fragment identifier, it also does not need to URL-encode special characters. The targeted element may or may not already exist at the specified location in the referenced object or array schema (consequently the mechanism is not applicable to simple types). If it does not, it will be inserted. This avoids having to duplicate definitions in the data schemas of every interaction. <span class="rfc2119-assertion" id="td-security-body-name-json-pointer-creatable">When an element of a data schema indicated by a JSON pointer indicated in a body locator does not already exist in the indicated schema, it <em>MUST</em> be possible to insert the indicated element at the location indicated by the pointer.
+</span> <span class="rfc2119-assertion" id="td-security-body-name-json-pointer-array">The JSON pointer used in the body locator <em>MAY</em> use the "-" character to indicate a non-existent array element when it is necessary to insert an element after the last element of an existing array.
+</span> <span class="rfc2119-assertion" id="td-security-body-name-json-pointer-type">The element referenced (or created) by a <code>body</code> security information location <em>MUST</em> be required and of type "string".
+</span> If name is not given, it is assumed the entire body is to be used as the security parameter.</p>
+   
+<strong>cookie</strong>:
+The parameter is stored in a cookie identified by the value of name.
+
+
+   <p><strong>uri</strong>: The parameter is embedded in the URI itself, which is encoded in the relevant interaction using a URI template variable defined by the value of name. This is more general than the query mechanism but more complex. <span class="rfc2119-assertion" id="td-security-in-query-over-uri">The value uri <em>SHOULD</em> be specified for the name in in a security scheme only if query is not applicable.
+</span> <span class="rfc2119-assertion" id="td-security-in-uri-variable">The URIs provided in interactions where a security scheme using uri as the value for in <em>MUST</em> be a URI template including the defined variable.
+</span></p>
+   <p><strong>auto</strong>: The location is determined as part of the protocol, or negotiated. <span class="rfc2119-assertion" id="td-security-security-vocab-auto-in-no-name">If a value of <code>auto</code> is set for the <code>in</code> field of a <code>SecurityScheme</code>, then the name field <em>SHOULD NOT</em> be set.
+</span> In this case, the application of the <code>SecurityScheme</code> is subject to the respective specification for the given protocol (e.g. [[RFC8288]] when using the <code>BasicSecurityScheme</code> with HTTP).</p>
+   
+If multiple parameters are needed for a security scheme, repeat the security scheme definition for each parameter and combine them using a combo security scheme and <code>allOf</code>. In some cases parameters may not actually be secret but a user may wish to leave them out of the TD to help protect privacy. As an example of this, some security mechanisms require both a client identifier and a secret key. In theory, the client identifier is public however it may be hard to update and pose a tracking risk. In such a case it can be provided as an additional security parameter so it does not appear in the TD.
+
+
+   <p><span class="rfc2119-assertion" id="td-security-uri-variables-distinct">The names of URI variables declared in a <code>SecurityScheme</code> <em>MUST</em> be distinct from all other URI variables declared in the TD.
+</span></p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in SecurityScheme Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-at-type--SecurityScheme">
+      <td><code>@type</code>
+      </td><td>JSON-LD keyword to label the object with semantic tags (or types).
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string①⑨"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array①③"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string②⓪"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-description--SecurityScheme">
+      <td><code>description</code>
+      </td><td>Provides additional (human-readable) information based on a default language.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string②①"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-descriptions--SecurityScheme">
+      <td><code>descriptions</code>
+      </td><td>Can be used to support (human-readable) information in different languages. Also see <em>MultiLanguage</em>.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map①④"><code>Map</code></a> of <a data-link-type="dfn" href="#multilanguage%%E2%%91%%A0" id="ref-for-multilanguage①⑥"><code>MultiLanguage</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-proxy--SecurityScheme">
+      <td><code>proxy</code>
+      </td><td>URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI⑦"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-scheme--SecurityScheme">
+      <td><code>scheme</code>
+      </td><td>Identification of the security mechanism being configured.
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string②②"><code>string</code></a> (e.g., nosec, combo, basic, digest, bearer, psk, oauth2, apikey, or auto)
+   </td></tr></tbody></table>
+   <p>The !class SecurityScheme has the following subclasses:</p>
+   <ul>
+    <li data-md="">
+     <p>NoSecurityScheme</p>
+    </li><li data-md="">
+     <p>AutoSecurityScheme</p>
+    </li><li data-md="">
+     <p>ComboSecurityScheme</p>
+    </li><li data-md="">
+     <p>BasicSecurityScheme</p>
+    </li><li data-md="">
+     <p>DigestSecurityScheme</p>
+    </li><li data-md="">
+     <p>APIKeySecurityScheme</p>
+    </li><li data-md="">
+     <p>BearerSecurityScheme</p>
+    </li><li data-md="">
+     <p>PSKSecurityScheme</p>
+    </li><li data-md="">
+     <p>OAuth2SecurityScheme</p>
+   </li></ul>
+  </section>
+  
+  <section>
+   <h3 id="nosecurityscheme"><code>NoSecurityScheme</code></h3>
+   <p>A security configuration corresponding to identified by the Vocabulary Term <code>nosec</code> (i.e., "scheme": "nosec"), indicating there is no authentication or other mechanism required to access the resource.</p>
+  </section>
+  
+  <section>
+   <h3 id="autosecurityscheme"><code>AutoSecurityScheme</code></h3>
+   <p>An automatic authentication security configuration identified by the term <code>auto</code> (i.e., "scheme": "auto"). This scheme indicates that the security parameters are going to be negotiated by the underlying protocols at runtime, subject to the respective specifications for the protocol (e.g. [[RFC8288]] for Basic Authentication when using HTTP).</p>
+  </section>
+  
+  <section>
+   <h3 id="combosecurityscheme"><code>ComboSecurityScheme</code></h3>
+   <p>A combination of other security schemes identified by the Vocabulary Term <code>combo</code> (i.e., "scheme": "combo").</p>
+   <p>A combination of other security schemes identified by the Vocabulary Term <code>combo</code> (i.e., "scheme": "combo"). Elements of this scheme define various ways in which other named schemes defined in <code>securityDefinitions</code>, including other ComboSecurityScheme definitions, are to be combined to create a new scheme definition. <span class="rfc2119-assertion" id="td-security-combo-exclusive-oneof-or-allof">Exactly one of either <code>oneOf</code> or <code>allOf</code> vocabulary terms <em>MUST</em> be included.
+</span> Only security scheme definitions which can be used together can be combined with <code>allOf</code>. For example, it is not possible in general to combine different OAuth 2.0 flows together using <code>allOf</code> unless one applies to a proxy and one to the endpoint. Note that when multiple named security scheme definitions are listed in a <code>security</code> field the same semantics apply as in an <code>allOf</code> combination (and the same limitations on allowable combinations). The <code>oneOf</code> combination is equivalent to using different security schemes on forms that are otherwise identical. In this sense a <code>oneOf</code> scheme is not an essential feature but it does avoid redundancy in such cases.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in ComboSecurityScheme Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-oneOf--ComboSecurityScheme">
+      <td><code>oneOf</code>
+      </td><td>Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, will allow access. Only one may be chosen for use.
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array①④"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string②③"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-allOf--ComboSecurityScheme">
+      <td><code>allOf</code>
+      </td><td>Array of two or more strings identifying other named security scheme definitions, all of which must be  satisfied for access.
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array①⑤"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string②④"><code>string</code></a>
+   </td></tr></tbody></table>
+  </section>
+  
+  <section>
+   <h3 id="basicsecurityscheme"><code>BasicSecurityScheme</code></h3>
+   <p>Basic Authentication [[RFC7617]] security configuration identified by the Vocabulary Term <code>basic</code> (i.e., "scheme": "basic"), using an unencrypted username and password.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in BasicSecurityScheme Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-name--BasicSecurityScheme">
+      <td><code>name</code>
+      </td><td>Name for query, header, cookie, or uri parameters.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string②⑤"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-in--BasicSecurityScheme">
+      <td><code>in</code>
+      </td><td>Specifies the location of security authentication information.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string②⑥"><code>string</code></a> (one of header, query, body, cookie, or auto)
+   </td></tr></tbody></table>
+  </section>
+  
+  <section>
+   <h3 id="digestsecurityscheme"><code>DigestSecurityScheme</code></h3>
+   <p>Digest Access Authentication [[RFC7616]] security configuration identified by the Vocabulary Term <code>digest</code> (i.e., "scheme": "digest"). This scheme is similar to basic authentication but with added features to avoid man-in-the-middle attacks.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in DigestSecurityScheme Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-name--DigestSecurityScheme">
+      <td><code>name</code>
+      </td><td>Name for query, header, cookie, or uri parameters.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string②⑦"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-in--DigestSecurityScheme">
+      <td><code>in</code>
+      </td><td>Specifies the location of security authentication information.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string②⑧"><code>string</code></a> (one of header, query, body, cookie, or auto)
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-qop--DigestSecurityScheme">
+      <td><code>qop</code>
+      </td><td>Quality of protection.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string②⑨"><code>string</code></a> (one of auth, or auth-int)
+   </td></tr></tbody></table>
+  </section>
+  
+  <section>
+   <h3 id="apikeysecurityscheme"><code>APIKeySecurityScheme</code></h3>
+   <p>API key authentication security configuration identified by the Vocabulary Term <code>apikey</code> (i.e., "scheme": "apikey").  This scheme is to be used when the access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.  In this case the key may not be using a standard token format.  This scheme indicates that the key provided by the service provider needs to be supplied as part of service requests using the mechanism indicated by the <code>in</code> field.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in APIKeySecurityScheme Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-name--APIKeySecurityScheme">
+      <td><code>name</code>
+      </td><td>Name for query, header, cookie, or uri parameters.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string③⓪"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-in--APIKeySecurityScheme">
+      <td><code>in</code>
+      </td><td>Specifies the location of security authentication information.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string③①"><code>string</code></a> (one of header, query, body, cookie, uri, or auto)
+   </td></tr></tbody></table>
+  </section>
+  
+  <section>
+   <h3 id="bearersecurityscheme"><code>BearerSecurityScheme</code></h3>
+   <p>Bearer Token [[RFC6750]] security configuration identified by the Vocabulary Term <code>bearer</code> (i.e., "scheme": "bearer") for situations where bearer tokens are used independently of OAuth2.</p>
+   <p>Bearer Token [[RFC6750]] security configuration identified by the Vocabulary Term <code>bearer</code> (i.e., "scheme": "bearer") for situations where bearer tokens are used independently of OAuth2. If the <code>oauth2</code> scheme is specified it is not generally necessary to specify this scheme as well as it is implied. For <code>format</code>, the value <code>jwt</code> indicates conformance with [[RFC7519]], <code>jws</code> indicates conformance with [[RFC7797]], <code>cwt</code> indicates conformance with [[RFC8392]], and <code>jwe</code> indicates conformance with [[RFC7516]], with values for <code>alg</code> interpreted consistently with those standards. <span class="rfc2119-assertion" id="td-security-bearer-format-extensions">Other formats and algorithms for bearer tokens <em>MAY</em> be specified in vocabulary extensions.
+</span></p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in BearerSecurityScheme Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-authorization--BearerSecurityScheme">
+      <td><code>authorization</code>
+      </td><td>URI of the authorization server.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI⑧"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-name--BearerSecurityScheme">
+      <td><code>name</code>
+      </td><td>Name for query, header, cookie, or uri parameters.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string③②"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-in--BearerSecurityScheme">
+      <td><code>in</code>
+      </td><td>Specifies the location of security authentication information.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string③③"><code>string</code></a> (one of header, query, body, cookie, or auto)
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-alg--BearerSecurityScheme">
+      <td><code>alg</code>
+      </td><td>Encoding, encryption, or digest algorithm.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string③④"><code>string</code></a> (e.g., ES256, or ES512-256)
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-format--BearerSecurityScheme">
+      <td><code>format</code>
+      </td><td>Specifies format of security authentication information.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string③⑤"><code>string</code></a> (e.g., jwt, cwt, jwe, or jws)
+   </td></tr></tbody></table>
+  </section>
+  
+  <section>
+   <h3 id="psksecurityscheme"><code>PSKSecurityScheme</code></h3>
+   <p>Pre-shared key authentication security configuration identified by the Vocabulary Term <code>psk</code> (i.e., "scheme": "psk").  This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[RFC4279]],  and that the ciphersuite used for keys will be established during protocol negotiation.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in PSKSecurityScheme Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-identity--PSKSecurityScheme">
+      <td><code>identity</code>
+      </td><td>Identifier providing information which can be used for selection or confirmation.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string③⑥"><code>string</code></a>
+   </td></tr></tbody></table>
+  </section>
+  
+  <section>
+   <h3 id="oauth2securityscheme"><code>OAuth2SecurityScheme</code></h3>
+   <p>OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]],  identified by the Vocabulary Term <code>oauth2</code> (i.e., "scheme": "oauth2").</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in OAuth2SecurityScheme Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-authorization--OAuth2SecurityScheme">
+      <td><code>authorization</code>
+      </td><td>URI of the authorization server.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI⑨"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-token--OAuth2SecurityScheme">
+      <td><code>token</code>
+      </td><td>URI of the token server.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI①⓪"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-refresh--OAuth2SecurityScheme">
+      <td><code>refresh</code>
+      </td><td>URI of the refresh server.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI①①"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-scopes--OAuth2SecurityScheme">
+      <td><code>scopes</code>
+      </td><td>Set of authorization scope identifiers provided as an array.  These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources  a client may access and how. The values associated with a form SHOULD be chosen from those defined in an <code>OAuth2SecurityScheme</code> active on that form.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string③⑦"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array①⑥"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string③⑧"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-flow--OAuth2SecurityScheme">
+      <td><code>flow</code>
+      </td><td>Authorization flow.
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string③⑨"><code>string</code></a> (e.g., code, or client)
+   </td></tr></tbody></table>
+   <p><span class="rfc2119-assertion" id="td-security-oauth2-code-flow">For the code flow, both <code>authorization</code> and token vocabulary terms <em>MUST</em> be included.
+</span> <span class="rfc2119-assertion" id="td-security-oauth2-client-flow">For the <code>client</code> flow, token vocabulary term <em>MUST</em> be included.
+</span> <span class="rfc2119-assertion" id="td-security-oauth2-client-flow-no-auth">For the <code>client</code> flow, <code>authorization</code> vocabulary term <em>MUST NOT</em> be included.
+</span> The mandatory elements for each flow are summarized in the following table:</p>
+  </section>
+        </section>
+
+        
+<section id="sec-hypermedia-vocabulary-definition">
+          <h2>Hypermedia Controls Vocabulary Definitions</h2>
+
+          <p>
+            The present model provides a representation for (typed) Web links and Web forms exposed by a <a>Thing</a>.
+            The <code>Link</code> class definition reflects a very common subset of the terms defined in Web Linking
+            [[!RFC8288]]. The defined terms can be used, e.g., to describe the relation to another <a>Thing</a> such as
+            a <i>Lamp Thing</i> is controlled by a <i>Switch Thing</i>. The <code>Form</code> class corresponds to a
+            newly introduced form of hypermedia control to manipulate the state of <a>Things</a> (and other Web
+            resources).
+          </p>
+
+          <!-- rendered from RDF definitions -->
+          <section>
+   <h3 id="link"><code>Link</code></h3>
+   <p>A link can be viewed as a statement of the form <strong>"link context</strong> has a <strong>relation type</strong> resource at <strong>link target</strong>", where the optional <strong>target attributes</strong> may further describe the resource.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in Link Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-href--Link">
+      <td><code>href</code>
+      </td><td>Target IRI of a link or submission target of a form.
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI①②"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-type--Link">
+      <td><code>type</code>
+      </td><td>Target attribute providing a hint indicating what the media type [[RFC2046]] of the result of dereferencing the link should be.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string④⓪"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-rel--Link">
+      <td><code>rel</code>
+      </td><td>A link relation type identifies the semantics of a link.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string④①"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-anchor--Link">
+      <td><code>anchor</code>
+      </td><td>Overrides the link context (by default the Thing itself identified by its id) with the given URI or IRI.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI①③"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-sizes--Link">
+      <td><code>sizes</code>
+      </td><td>Target attribute that specifies one or more sizes for the referenced icon. Only applicable for relation  type "icon". The value pattern follows {Height}x{Width} (e.g., "16x16", "16x16 32x32").
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string④②"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-hreflang--Link">
+      <td><code>hreflang</code>
+      </td><td>The hreflang attribute specifies the language of a linked document. The value of this must be a valid language tag [[BCP47]].
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string④③"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array①⑦"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string④④"><code>string</code></a>
+   </td></tr></tbody></table>
+   <div class="note" role="note">
+The hreflang attribute is allowed to be a <code>string</code> or <code>array</code> in this version of the spec. Depending on the result of [[LINKSET-MEDIA-TYPES]] the values of <code>hrefLang</code> can be restricted to <code>array</code> only.
+
+</div>
+   
+Link relations can be used to describe relations such as to other Things (e.g., a Switch Thing controls a Lamp Thing), to a specific kind of Thing Models (e.g., a Thing Description is an instance of a specific Thing Model), or to further documentations information (e.g., device manual of a Thing). It is recommended to reuse existing and established Link Relation definitions from IANA.
+
+
+   <p>The link relation types follow Web Linking [[RFC8288]], meaning:</p>
+   <ul>
+    <li><span class="rfc2119-assertion" id="td-rel-type-case-insensitive">Relation types <em>MUST</em> be compared as strings using case-insensitive comparison.
+</span>
+    </li><li><span class="rfc2119-assertion" id="td-rel-type-lowercase">All-lowercase URIs <em>SHOULD</em> be used for extension relation types.
+</span>
+   </li></ul>
+   
+In the following a best practice relation type table is introduced that is recommended to use within WoT Thing Description or Thing Model instances.
+
+
+   <div id="table-rel-type">
+    <table class="def numbered">
+     <caption>Best practice relation type table</caption>
+     <thead>
+      <tr>
+       <th>Value
+       </th><th>Occurrence
+       </th><th>Explanation
+       </th><th>Source of value origin
+     </th></tr></thead><tbody>
+      <tr>
+       <td>icon
+       </td><td>0..*
+       </td><td>Imports an icon associated to the Thing
+       </td><td>IANA Link Relation
+      </td></tr><tr>
+       <td>service-doc
+       </td><td>0..*
+       </td><td>Relation to resource that provides documentation about the Thing
+       </td><td>IANA Link Relation
+      </td></tr><tr>
+       <td>alternate
+       </td><td>0..*
+       </td><td>Alternative representation of the Thing
+       </td><td>IANA Link Relation
+      </td></tr><tr>
+       <td>type
+       </td><td>0..1
+       </td><td>Indicate that the Thing is an instance of the target resource
+       </td><td>IANA Link Relation
+      </td></tr><tr>
+       <td>tm:extends
+       </td><td>0..1
+       </td><td>Extends the existing definition of the target resource
+       </td><td>W3C WoT Thing Model
+      </td></tr><tr>
+       <td>tm:submodel
+       </td><td>0..*
+       </td><td>Compose one or multiple Thing Models
+       </td><td>W3C WoT Thing Model
+      </td></tr><tr>
+       <td>manifest
+       </td><td>0..*
+       </td><td>Point to web app manifest
+       </td><td>IANA Link Relation
+      </td></tr><tr>
+       <td>proxy-to
+       </td><td>0..*
+       </td><td>Target resource provides the address of a proxy
+       </td><td>W3C WoT Security
+      </td></tr><tr>
+       <td>collection
+       </td><td>0..1
+       </td><td>Points to a collection of Things that the current Thing is part of
+       </td><td>IANA Link Relation
+      </td></tr><tr>
+       <td>item
+       </td><td>0..*
+       </td><td>Points to a Thing being a member of a collection Thing
+       </td><td>IANA Link Relation
+      </td></tr><tr>
+       <td>predecessor-version
+       </td><td>0..1
+       </td><td>Points to a previous TD or TM version of the same Thing
+       </td><td>IANA Link Relation
+      </td></tr><tr>
+       <td>controlledBy
+       </td><td>0..*
+       </td><td>Refers to the Thing that controls the context Thing
+       </td><td>W3C Thing Description
+    </td></tr></tbody></table>
+   </div>
+  </section>
+  
+  <section>
+   <h3 id="form"><code>Form</code></h3>
+   <p>A form can be viewed as a statement of "To perform an <strong>operation type</strong> operation on <strong>form context</strong>, make a <strong>request method</strong> request to <strong>submission target</strong>" where the optional <strong>form fields</strong> may further describe the required request.  In Thing Descriptions, the <strong>form context</strong> is the surrounding Object, such as Properties, Actions, and Events or the Thing itself for meta-interactions.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in Form Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-href--Form">
+      <td><code>href</code>
+      </td><td>Target IRI of a link or submission target of a form.
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI" id="ref-for-anyURI①④"><code>anyURI</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-contentType--Form">
+      <td><code>contentType</code>
+      </td><td>Assign a content type based on a media type (e.g., <code>text/plain</code>) and potential parameters (e.g., <code>charset=utf-8</code>) for the media type [[RFC2046]].
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string④⑤"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-contentCoding--Form">
+      <td><code>contentCoding</code>
+      </td><td>Content coding values indicate an encoding transformation that has been or can be applied to a representation. Content codings are primarily used to allow a representation to be compressed or otherwise usefully transformed without losing the identity of its underlying media type and without loss of information. Examples of content coding include "gzip", "deflate", etc.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string④⑥"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-security--Form">
+      <td><code>security</code>
+      </td><td>Set of security definition names, chosen from those defined in <code>securityDefinitions</code>. These must all be satisfied for access to resources.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string④⑦"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array①⑧"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string④⑧"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-scopes--Form">
+      <td><code>scopes</code>
+      </td><td>Set of authorization scope identifiers provided as an array.  These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources  a client may access and how. The values associated with a form SHOULD be chosen from those defined in an <code>OAuth2SecurityScheme</code> active on that form.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string④⑨"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array①⑨"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑤⓪"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-response--Form">
+      <td><code>response</code>
+      </td><td>This optional term can be used if, e.g., the output communication metadata differ from input metadata (e.g., output contentType differ from the input contentType). The response name contains metadata that is only valid for the primary response messages.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#expectedresponse%%E2%%91%%A0" id="ref-for-expectedresponse①"><code>ExpectedResponse</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-additionalResponses--Form">
+      <td><code>additionalResponses</code>
+      </td><td>This optional term can be used if additional expected responses are possible, e.g. for error reporting. Each additional response needs to be distinguished from others in some way (for example, by specifying a protocol-specific error code), and may also have its own data schema.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array②⓪"><code>Array</code></a> of <a data-link-type="dfn" href="#additionalexpectedresponse%%E2%%91%%A0" id="ref-for-additionalexpectedresponse①"><code>AdditionalExpectedResponse</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-subprotocol--Form">
+      <td><code>subprotocol</code>
+      </td><td>Indicates the exact mechanism by which an interaction will be accomplished for a given protocol when there are multiple options. For example, for HTTP and Events, it indicates which of several available mechanisms should be used for asynchronous notifications such as long polling (<code>longpoll</code>), WebSub [[websub]] (websub), Server-Sent Events (<code>sse</code>) [[html]] (also known as EventSource). Please note that there is no restriction on the subprotocol selection and other mechanisms can also be announced by this subprotocol term.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑤①"><code>string</code></a> (e.g., longpoll, websub, or sse)
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-op--Form">
+      <td><code>op</code>
+      </td><td>Indicates the semantic intention of performing the operation(s) described by the form. For example, the Property interaction allows get and set operations. The protocol binding may contain a form for the get operation and a different form for the set operation. The op attribute indicates which form is for which and allows the client to select the correct form for the operation required. op can be assigned one or more interaction verb(s) each representing a semantic intention of an operation.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑤②"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array②①"><code>Array</code></a> of <a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑤③"><code>string</code></a> (one of readproperty, writeproperty, observeproperty, unobserveproperty, invokeaction, queryaction, cancelaction, subscribeevent, unsubscribeevent, readallproperties, writeallproperties, readmultipleproperties, writemultipleproperties, observeallproperties, unobserveallproperties, subscribeallevents, unsubscribeallevents, or queryallactions)
+   </td></tr></tbody></table>
+   <div class="note" role="note">
+The value of the <code>href</code> property in a Form instance can be a relative URI or an absolute URI.
+
+</div>
+   <p><span class="rfc2119-assertion" id="td-form-href-relative">To properly build the target URI, if base is present in the Thing level, the <code>href</code> value <em>MUST</em> be resolved using the base URI.
+</span></p>
+   <p>While this table defines the terms available in a form, <span class="rfc2119-assertion" id="td-form-additional-mediatype-metadata">Bindings <em>MAY</em> have additional information that specifies representation formats in more detail than the media type alone.
+</span> For example, in a TD with the Modbus Binding, <code>modv:mostSignificantByte</code> in a form describes the endianness of the payload. Please see <a href="#bindings">Bindings</a> for further information. Furthermore, possible values for the <code>contentCoding</code> property can be found, e.g., in the IANA HTTP content coding registry.</p>
+   <p>The list of possible operation types of a form is fixed. As of this version of the specification, it only includes the well-known types necessary to implement the WoT interaction model described in [[wot-architecture11]]. Future versions of the standard may extend this list but <span class="rfc2119-assertion" id="well-known-operation-types-only">operations types <em>MUST</em> be restricted to the values in the table below.
+</span></p>
+   <div id="table-operation-types">
+    <table class="def numbered">
+     <caption>Well-known operation types</caption>
+     <thead>
+      <tr>
+       <th>Operation Type
+       </th><th>Description
+     </th></tr></thead><tbody>
+      <tr>
+       <td>readproperty
+       </td><td>Identifies the read operation on Property Affordances to retrieve the corresponding data
+      </td></tr><tr>
+       <td>writeproperty
+       </td><td>Identifies the write operation on Property Affordances to update the corresponding data
+      </td></tr><tr>
+       <td>observeproperty
+       </td><td>Identifies the observe operation on Property Affordances to be notified with the new data when the  Property is updated
+      </td></tr><tr>
+       <td>unobserveproperty
+       </td><td>Identifies the unobserve operation on Property Affordances to stop the corresponding notifications
+      </td></tr><tr>
+       <td>invokeaction
+       </td><td>Identifies the invoke operation on Action Affordances to perform the corresponding action
+      </td></tr><tr>
+       <td>queryaction
+       </td><td>Identifies the querying operation on Action Affordances to get the status of the corresponding action
+      </td></tr><tr>
+       <td>cancelaction
+       </td><td>Identifies the cancel operation on Action Affordances to cancel the ongoing corresponding action
+      </td></tr><tr>
+       <td>subscribeevent
+       </td><td>Identifies the subscribe operation on Event Affordances to be notified by the Thing when the event occurs
+      </td></tr><tr>
+       <td>unsubscribeevent
+       </td><td>Identifies the unsubscribe operation on Event Affordances to stop the corresponding notifications
+      </td></tr><tr>
+       <td>readallproperties
+       </td><td>Identifies the readallproperties operation on a Thing to retrieve the data of all Properties in a  single interaction
+      </td></tr><tr>
+       <td>writeallproperties
+       </td><td>Identifies the writeallproperties operation on a Thing to update the data of all writable Properties  in a single interaction
+      </td></tr><tr>
+       <td>readmultipleproperties
+       </td><td>Identifies the readmultipleproperties operation on a Thing to retrieve the data of selected Properties  in a single interaction
+      </td></tr><tr>
+       <td>writemultipleproperties
+       </td><td>Identifies the writemultipleproperties operation on a Thing to update the data of selected writable  Properties in a single interaction
+      </td></tr><tr>
+       <td>observeallproperties
+       </td><td>Identifies the observeallproperties operation on Properties to be notified with new data when any  Property is updated
+      </td></tr><tr>
+       <td>unobserveallproperties
+       </td><td>Identifies the unobserveallproperties operation on Properties to stop notifications from all Properties  in a single interaction
+      </td></tr><tr>
+       <td>queryallactions
+       </td><td>Identifies the queryallactions operation on a Thing to get the status of all Actions in a single interaction
+      </td></tr><tr>
+       <td>subscribeallevents
+       </td><td>Identifies the subscribeallevents operation on Events to subscribe to notifications from all Events in  a single interaction
+      </td></tr><tr>
+       <td>unsubscribeallevents
+       </td><td>Identifies the unsubscribeallevents operation on Events to unsubscribe from notifications from all Events  in a single interaction
+    </td></tr></tbody></table>
+   </div>
+   
+A Thing Description of a WoT producer may have multiple forms entries with, e.g., different protocol and/or content types declarations that a Consumer could possibly support. In that case the Consumer may choose any form entry that works (e.g., the protocol and content type is supported) for them. When one form is chosen, it is expected that the Consumer will continue to use it as long as possible for every new interaction with the WoT producer.
+
+
+   <p><span class="rfc2119-assertion" id="td-form-context-submission-target">As a Form but not just the <code>href</code> defines how to execute the interaction, <code>href</code> of multiple Forms <em>MAY</em> point to the same resource, where the different Forms represent different operations on that resource.
+</span> For example, in a TD with the HTTP Binding, two Forms with HTTP GET and PUT methods can point to the same resource but represent different operations such as <code>readproperty</code> and <code>writeproperty</code>.</p>
+   <section class="informative" id="sec-op-data-schema-mapping">
+    <h4 id="mapping-op-values-to-data-schemas">Mapping op Values to Data Schemas</h4>
+    
+Protocols that can be used with TDs follow request-response or eventing mechanisms. The Data Schema of an affordance generally correlates with the <code>op</code> keywords used in <code>forms</code>. The table below informatively summarizes the available data schema related terms with the <code>op</code> keywords.
+
+
+    <ul>
+     <li>Consumer to Thing applies for messages sent by the Consumer to the Thing, such as the value for writing a property.
+     </li><li>Thing to Consumer applies for messages sent by the Thing to the Consumer, such as the value of a property value as the result of reading a property.
+     </li><li>In case that there is no correlation with the data schema and the operation, it implies that no payload is required for executing the operation or no payload is expected as a result of the operation.
+    </li></ul>
+    <table class="def numbered">
+     <caption>Mapping op Values to Data Schemas</caption>
+     <thead>
+      <tr>
+       <th>Operation Type
+       </th><th>Consumer to Thing DataSchema Correlation
+       </th><th>Thing to Consumer DataSchema Correlation
+     </th></tr></thead><tbody>
+      <tr>
+       <td>readproperty
+       </td><td>No correlation
+       </td><td>All fields in the Property Affordance without "writeOnly":true
+      </td></tr><tr>
+       <td>writeproperty
+       </td><td>All fields in the Property Affordance without "readOnly":true
+       </td><td>No correlation, additionalResponses can be used in the form level
+      </td></tr><tr>
+       <td>observeproperty
+       </td><td>No correlation
+       </td><td>All fields in the Property Affordance without "writeOnly":true
+      </td></tr><tr>
+       <td>unobserveproperty
+       </td><td>No correlation.
+       </td><td>No correlation.
+      </td></tr><tr>
+       <td>invokeaction
+       </td><td>Value of the input key
+       </td><td>Value of the output key
+      </td></tr><tr>
+       <td>queryaction
+       </td><td>No correlation.
+       </td><td>No correlation.
+      </td></tr><tr>
+       <td>cancelaction
+       </td><td>No correlation.
+       </td><td>No correlation.
+      </td></tr><tr>
+       <td>subscribeevent
+       </td><td>Value of the subscription key with all fields without "readOnly":true
+       </td><td>Value of the subscription key with all fields without "writeOnly":true
+      </td></tr><tr>
+       <td>unsubscribeevent
+       </td><td>Value of the subscription key with all fields without "readOnly":true
+       </td><td>Value of the subscription key with all fields without "writeOnly":true
+    </td></tr></tbody></table>
+    <p class="note" role="note" title="writeproperty and observeproperty relationship">Writing to a property does not necessarily mean that a new value will be sent to the Consumer observing the property. It depends on the protocol and implementation.</p>
+    <p class="note" role="note" title="Further Data Schemas mappings">Further specification of how to map operations to data schemas, as well as mapping meta operations such as <code>readallproperties</code> can be found in the respective protocol specification of the [[WOT-BINDING-TEMPLATES]].</p>
+   </section>
+   <section id="sec-response-usage">
+    <h4 id="response-related-terms-usage">Response-related Terms Usage</h4>
+    <p>The optional <code>response</code> name-value pair can be used to provide metadata for the expected response message. With the core vocabulary, it can include only content type information, but TD Context Extensions could be applied. <span class="rfc2119-assertion" id="td-expectedResponse-default-contentType">If no <code>response</code> name-value pair is provided, it <em>MUST</em> be assumed that the content type of the response is equal to the content type assigned to the Form instance.
+</span> Note that <code>contentType</code> within an <code>ExpectedResponse</code> Class does not have a Default Value.</p>
+    
+In some cases additional responses might be possible. One example of this is error responses but in some cases there might also be additional successful responses. In this case, the <code>response</code> name-value pair is still used for the primary response but <code>additionalResponses</code> may also be provided, whose value is an array of <code>AdditionalExpectedResponse</code> objects. Each additional response must be distinguished in some way from the primary response, either by <code>contentType</code> or by protocol-specific settings such as error code header values. Each additional response may also have a data schema which can differ from the normal output data schema for the interaction.
+
+
+    <p>In some use cases, input and output data might be represented in a different form, for instance an Action that accepts JSON, but returns an image. In such a case, the optional <code>response</code> key-value pair can describe the content type of the expected response. <span class="rfc2119-assertion" id="td-expectedResponse-contentType">If the content type of the expected response differs from the content type of the form, the <code>Form</code> instance <em>MUST</em> include a name-value pair with the name <code>response</code>.
+</span> As there is no default value defined, the following assertions apply:</p>
+    <ul>
+     <li><span class="rfc2119-assertion" id="td-expectedResponse-missing-contentType">If there is no <code>contentType</code> value defined in a <code>response</code> object within a form, a Consumer <em>MUST</em> expect that the respective response does not contain any payload.
+</span>
+     </li><li><span class="rfc2119-assertion" id="td-expectedResponse-defined-contentType">If a content type is defined in the <code>response</code> object within a form, a Consumer <em>MUST</em> expect a response containing a payload in the respective format, e.g., an image in the case of <code>image/jpeg</code>.
+</span>
+    </li></ul>
+    
+Similar considerations apply to additional responses:
+
+    <ul>
+     <li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-contentType">If the content type of an additional expected response differs from the content type of the form, the <code>Form</code> instance <em>MUST</em> include an entry in the array associated with the name <code>additionalResponses</code>.
+</span>
+     </li><li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-missing-contentType">If there is no <code>contentType</code> value defined in an additional expected response object, a Consumer <em>MUST</em> expect that the respective response does not contain any payload.
+</span>
+     </li><li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-schema">If the data schema of an additional expected response differs from the output data schema of the interaction, the <code>Form</code> <em>MUST</em> include an entry in the array associated with the name <code>additionalResponses</code> that includes a value for the name <code>schema</code>.
+</span>
+     </li><li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-noSchemaWithoutPayload">The <code>schema</code> of an additional expected response object <em>MUST NOT</em> be defined when there is no <code>contentType</code> present.
+</span>
+    </li></ul>
+    
+The different cases on the variation of request and response are explained above. The tables at <a href="#contentType-usage">contentType-usage</a> summarize these cases in a concise manner.
+
+
+   </section>
+  </section>
+  
+  <section>
+   <h3 id="expectedresponse"><code>ExpectedResponse</code></h3>
+   <p>Communication metadata describing the expected response message for the primary response.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in ExpectedResponse Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-contentType--ExpectedResponse">
+      <td><code>contentType</code>
+      </td><td>Assign a content type based on a media type (e.g., <code>text/plain</code>) and potential parameters (e.g., <code>charset=utf-8</code>) for the media type [[RFC2046]].
+      </td><td>mandatory
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑤④"><code>string</code></a>
+   </td></tr></tbody></table>
+  </section>
+  
+  <section>
+   <h3 id="additionalexpectedresponse"><code>AdditionalExpectedResponse</code></h3>
+   <p>Communication metadata describing the expected response message for additional responses.</p>
+   <table class="def numbered">
+    <caption>Vocabulary Terms in AdditionalExpectedResponse Level</caption>
+    <thead>
+     <tr>
+      <th>Vocabulary term
+      </th><th>Description
+      </th><th>Assignment
+      </th><th>Type
+    </th></tr></thead><tbody>
+     <tr class="rfc2119-table-assertion" id="td-vocab-success--AdditionalExpectedResponse">
+      <td><code>success</code>
+      </td><td>Signals if an additional response should not be considered an error.
+      </td><td><a href="#sec-default-values">with default</a>
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#boolean" id="ref-for-boolean⑥"><code>boolean</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-contentType--AdditionalExpectedResponse">
+      <td><code>contentType</code>
+      </td><td>Assign a content type based on a media type (e.g., <code>text/plain</code>) and potential parameters (e.g., <code>charset=utf-8</code>) for the media type [[RFC2046]].
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑤⑤"><code>string</code></a>
+     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-schema--AdditionalExpectedResponse">
+      <td><code>schema</code>
+      </td><td>Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a <code>DataSchema</code> object, the name of a previous definition given in a <code>schemaDefinitions</code> map must be used.
+      </td><td>optional
+      </td><td><a data-link-type="dfn" href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string" id="ref-for-string⑤⑥"><code>string</code></a>
+   </td></tr></tbody></table>
+  </section>
+        </section>
+      

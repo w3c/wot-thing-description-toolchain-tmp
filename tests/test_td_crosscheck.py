@@ -23,7 +23,7 @@ REPO_ROOT = TESTS_DIR.parent
 SCHEMA_PATH = REPO_ROOT / "resources" / "gens" / "jsonschema" / "jsonschema.json"
 GROUND_TRUTH = REPO_ROOT / "resources" / "ground-truth-schemas"
 DATA_DIR = TESTS_DIR / "data"
-DIVERGENCES = TESTS_DIR / "td_crosscheck_known_divergences.txt"
+DIVERGENCES = TESTS_DIR / "known_failures" / "td_crosscheck.txt"
 
 GROUND_TRUTH_SCHEMAS = {
     "td11": GROUND_TRUTH / "td11-json-schema-validation.json",

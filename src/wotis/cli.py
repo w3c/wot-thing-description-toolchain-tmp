@@ -4,7 +4,7 @@ import yaml
 
 from pathlib import Path
 
-from src.wotis import YAML_SCHEMA_PATH, ASSERTION_PATH
+from src.wotis import YAML_SCHEMA_PATH, ASSERTION_PATH, EXTRA_ASSERTS_PATH
 from src.wotis.generators import run_pipeline
 
 
@@ -28,7 +28,8 @@ assertions_csv_option = click.option('--assertions-csv',
                                   "Defaults to resources/gens/assertions/assertions.csv.")
 extra_asserts_option = click.option('--extra-asserts',
                              type=click.Path(path_type=Path, dir_okay=False, exists=False),
-                             default=None,
+                             default=EXTRA_ASSERTS_PATH,
+                             show_default=True,
                              help="Path to extra-asserts.html with additional testing assertions "
                                   "to merge into the assertion inventory.")
 

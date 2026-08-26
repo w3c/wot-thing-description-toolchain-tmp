@@ -23,7 +23,7 @@ TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent
 SCHEMA_PATH = REPO_ROOT / "resources" / "gens" / "jsonschema" / "jsonschema.json"
 DATA_DIR = TESTS_DIR / "data"
-KNOWN_FAILURES = TESTS_DIR / "td_gate_known_failures.txt"
+KNOWN_FAILURES = TESTS_DIR / "known_failures" / "td_gate.txt"
 
 
 @pytest.fixture(scope="session")

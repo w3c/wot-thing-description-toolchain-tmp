@@ -9,7 +9,7 @@ from .baselines import load_baseline
 from .rejections import defined_at
 
 TESTS_DIR = Path(__file__).resolve().parent
-SPEC_STRUCTURE_BASELINE = TESTS_DIR / "spec_structure_known_failures.txt"
+SPEC_STRUCTURE_BASELINE = TESTS_DIR / "known_failures" / "spec_structure.txt"
 
 
 def pytest_addoption(parser):
@@ -23,6 +23,7 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     config.rejections = {}
     config.new_failures = []
+    config.spec_html_findings = []
 
 
 @pytest.fixture
@@ -37,9 +38,21 @@ def new_failures(request):
     return request.config.new_failures
 
 
+@pytest.fixture
+def spec_html_findings(request):
+    """One line per difference between the generated spec HTML and the golden.
+
+    The four spec HTML tests fail one per section, so pytest prints four
+    separate stack traces. Collecting the lines here gives one readable list
+    for the whole run instead.
+    """
+    return request.config.spec_html_findings
+
+
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
     fails = config.new_failures
-    if not config.rejections and not fails:
+    html_findings = config.spec_html_findings
+    if not config.rejections and not fails and not html_findings:
         return
     versions = sorted({v for v, _ in config.rejections})
     # regroup per schema location, with per-version counts and one example message
@@ -62,6 +75,10 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
             src = defined_at(spath)
             terminalreporter.write_line(f"  {spath}: {nums}" + (f"  (defined at {src})" if src else ""))
             terminalreporter.write_line(f"      e.g. {loc['example']}")
+    if html_findings:
+        terminalreporter.write_line(f"spec HTML vs manual golden, {len(html_findings)} difference(s):")
+        for line in html_findings:
+            terminalreporter.write_line("  " + line)
 
     # markdown for the GitHub step summary
     step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -83,6 +100,14 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
             example = loc["example"].replace("|", "\\|")
             src = defined_at(spath)
             md.append(f"| `{spath}` | {nums} | `{example}` | " + (f"`{src}` |" if src else "|"))
+        md.append("")
+    if html_findings:
+        md.append(f"### Spec HTML vs manual golden, {len(html_findings)} differences")
+        md.append("")
+        # a code block, the findings are multi line and would break a list
+        md.append("```")
+        md += html_findings
+        md.append("```")
         md.append("")
     with open(step_summary, "a", encoding="utf-8") as fh:
         fh.write("\n".join(md) + "\n")

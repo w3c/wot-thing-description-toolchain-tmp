@@ -76,7 +76,7 @@ Check:
 - Golden diff covers priority artifacts: `jsonschema.json`, assertion CSVs, `index.html`?
 - Snippet validation step present?
 
-**Step 7 — known-failures review (if `tests/td_gate_known_failures_*.txt` changed).**
+**Step 7 — known-failures review (if anything under `tests/known_failures/` changed).**
 - New entries must be valid TD files only (name contains `-valid`).
 - Every entry must correspond to a GitHub issue (check PR description).
 

@@ -14,8 +14,8 @@ jobs:
     name: Static analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
@@ -33,8 +33,8 @@ jobs:
     needs: static-analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
@@ -64,14 +64,14 @@ jobs:
         run: uv build
 
       - name: Upload generated resources
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: generated-resources
           path: resources/gens/
           if-no-files-found: error
 
       - name: Upload Python package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-package
           path: dist/
@@ -82,15 +82,15 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
         run: uv sync
 
       - name: Download generated resources
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: generated-resources
           path: resources/gens/
@@ -104,20 +104,29 @@ jobs:
       - name: Spec HTML structure tests
         run: uv run pytest tests/test_spec_content_rendering.py tests/test_golden_form_structure.py -v
 
+      # Disabled: the generated HTML still differs from the manual golden. Some
+      # differences are real schema gaps, some are only markup because the
+      # golden is older than the generator. Enable again after they are fixed.
+      # - name: Spec HTML vs manual golden
+      #   run: uv run pytest tests/test_spec_html_vs_golden.py -v
+
+      - name: Assertion inventory vs upstream
+        run: uv run pytest tests/test_assertion_inventory.py -v
+
   golden-diff:
     name: Golden diff
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
         run: uv sync
 
       - name: Download generated resources
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: generated-resources
           path: resources/gens/

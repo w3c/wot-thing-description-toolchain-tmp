@@ -1,5 +1,7 @@
-"""Golden diff: the generated JSON artifacts must match the committed snapshots
-under tests/goldens/. If a change is intended, update the snapshots with:
+"""Golden diff: the generated artifacts must match the committed snapshots
+under tests/goldens/. A snapshot is our own last output, so this says whether
+the output changed without us noticing, not whether it is correct. If a change
+is intended, update the snapshots with:
 
     uv run pytest tests/test_golden_diff.py --update-goldens
 """
@@ -12,26 +14,30 @@ from pathlib import Path
 
 import pytest
 
+from .spec_html_compare import generated_sections_html
+
 TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent
 GOLDENS_DIR = TESTS_DIR / "goldens"
 
-ARTIFACTS = [
-    ("jsonschema.json", REPO_ROOT / "resources" / "gens" / "jsonschema" / "jsonschema.json"),
-    ("context.jsonld", REPO_ROOT / "resources" / "gens" / "jsonldcontext" / "context.jsonld"),
-]
-
-
-def _normalize(path: Path) -> str:
+def _normalize_json(path: Path) -> str:
     data = json.loads(path.read_text(encoding="utf-8"))
     return json.dumps(data, sort_keys=True, indent=2, ensure_ascii=False) + "\n"
 
 
-@pytest.mark.parametrize("name, gen_path", ARTIFACTS, ids=[n for n, _ in ARTIFACTS])
-def test_golden_matches_generated(request, name: str, gen_path: Path):
+# name, generated file, function that turns it into the compared text
+ARTIFACTS = [
+    ("jsonschema.json", REPO_ROOT / "resources" / "gens" / "jsonschema" / "jsonschema.json", _normalize_json),
+    ("context.jsonld", REPO_ROOT / "resources" / "gens" / "jsonldcontext" / "context.jsonld", _normalize_json),
+    ("spec-sections.html", REPO_ROOT / "resources" / "gens" / "index.html", generated_sections_html),
+]
+
+
+@pytest.mark.parametrize("name, gen_path, normalize", ARTIFACTS, ids=[n for n, _, _ in ARTIFACTS])
+def test_golden_matches_generated(request, name: str, gen_path: Path, normalize):
     if not gen_path.exists():
         pytest.skip(f"Generated artifact not found: {gen_path}")
-    current = _normalize(gen_path)
+    current = normalize(gen_path)
     golden_path = GOLDENS_DIR / name
 
     if request.config.getoption("--update-goldens"):

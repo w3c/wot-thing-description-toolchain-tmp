@@ -1,52 +1,69 @@
 # WoTIS Testing
 
-This directory contains test files and validation tools for the WoT Thing Description toolchain.
-
-## TD Instance Validation
-
-The `validate_td_instances.py` script provides functionality to validate TD instances against both the generated JSON Schema and a benchmark schema. This helps ensure that our generated schema maintains compatibility with the WoT TD specification.
-
-### Usage
+All tests run against the generated artifacts, so generate them first:
 
 ```bash
-python src/validate_td_instances.py --schema <path-to-generated-schema> --benchmark-schema <path-to-benchmark-schema> --test-data <path-to-test-data-dir>
+uv run wotis generate-wot-resources -d
+uv run pytest tests/ -v
 ```
 
-#### Arguments
+## What each test file checks
 
-- `--schema`: Path to the generated JSON Schema file (default: resources/gens/jsonschema/jsonschema.json)
-- `--benchmark-schema`: Path to the benchmark JSON Schema file (default: resources/benchmark_schemas/td-json-schema-validation.json)
-- `--test-data`: Path to the directory containing TD instance files to validate
+| File | Question it answers |
+|---|---|
+| `test_td_instance_gate.py` | Does the generated JSON Schema accept every valid sample in `data/` and reject every invalid one? |
+| `test_td_crosscheck.py` | Does the generated JSON Schema give the same verdict as the W3C schemas in `resources/ground-truth-schemas/`? |
+| `test_golden_diff.py` | Did the generated JSON Schema, JSON-LD context or the four generated spec sections change without us noticing? Compares with the snapshots in `goldens/`. |
+| `test_spec_html_vs_golden.py` | Does the generated spec HTML match `manual_goldens/html/index.html` inside the four sections the pipeline generates? Fails today, so it is not run in CI. Also holds two integrity checks on the generated file alone (unique ids, resolvable in-page links). |
+| `test_assertion_inventory.py` | Does our assertion id set match the upstream one in `resources/upstream/assertions.csv`? Reports only, never fails. |
+| `test_golden_form_structure.py` | Does the Form section of the generated HTML have the expected structure? |
+| `test_spec_content_rendering.py` | Do the HTML rendering functions produce the expected markup? Uses fake input, does not read generated files. |
 
-### Features
+Helper modules, not test files: `baselines.py` (reads the known-failure lists,
+derives TD 2.0 samples from TD 1.1 ones), `rejections.py` (groups schema
+rejections for the CI report), `spec_html_compare.py` (DOM comparison used by
+`test_spec_html_vs_golden.py`), `conftest.py` (shared options and the CI
+summary).
 
-- **Dual Schema Validation**: Validates TD instances against both the generated schema and a benchmark schema
-- **CLI Output**: Provide validation results
-- **Validation Statistics**: Shows statistics about schema compatibility and validation consistency
-- **Detailed Error Reporting**: Provides detailed error messages when validation fails
+## Golden files
 
-### Example Output
+- `manual_goldens/` is hand-verified reference data. Never update it without
+  maintainer approval.
+- `goldens/` holds machine-updatable snapshots. Update with
+  `uv run pytest tests/test_golden_diff.py --update-goldens` when a change is
+  intended.
 
-The script provides a detailed table showing:
-- File paths and their validation status
-- Expected validity of each file
-- Validation results from both schemas
-- Detailed error messages when validation fails
-- Overall statistics including total files tested and validation consistency
+## known_failures/
 
-### Test Data Organization
+Lists of things that fail on purpose right now. A listed item is marked
+`xfail(strict=True)`, so when it starts passing the test fails and the line has
+to be removed. The lists can only shrink.
 
-The `data` directory contains TD instance files organized in subdirectories based on their test categories:
+This directory is transitional. When all lists are empty, delete the directory.
+
+## Remove when the toolchain moves into wot-thing-description
+
+The following exist only because the reference files live in another
+repository. After a merge into `w3c/wot-thing-description` the repository is
+its own reference, so they lose their meaning:
+
+- `resources/upstream/`
+- `test_assertion_inventory.py` — the upstream assertions.csv would then be the
+  file we generate ourselves
+- `test_spec_html_vs_golden.py` and `manual_goldens/` — the golden is a
+  hand-adapted copy of the upstream index.html. `spec_html_compare.py` cannot
+  go with them, `test_golden_diff.py` uses `generated_sections_html` from it
+- `known_failures/` and the xfail wiring in `conftest.py`
+
+## Test data
+
+`data/` holds TD instance files, grouped by topic:
+
 - `6-security-schemas/`: TD instances testing security configurations
 - `7-complex-data-schemas/`: TD instances with complex data schema structures
 - `8-meta-interactions/`: TD instances testing meta-interactions
 - `9-versioning/`: TD instances testing versioning features
 
-### Adding New Tests
-
-To add new test cases:
-1. Create a TD instance file with `.jsonld` extension
-2. Place it in an appropriate subdirectory under `tests/data/`
-3. Name the file to indicate whether it should be valid or invalid:
-   - Valid TD instances: `*-td-valid.jsonld`
-   - Invalid TD instances: `*-td-invalid.jsonld` 
+To add a test case, put a `.jsonld` file in the right subdirectory and name it
+`*-td-valid.jsonld` or `*-td-invalid.jsonld`. The name decides what the test
+expects, so it must be correct.

@@ -47,7 +47,7 @@ Each entry: **what the gap is**, **which artifact(s) affected**, **current worka
 `src/wotis/postprocessors/json_schema_postprocessor.py` exists but is empty — no active fixes yet. All current JSON Schema correctness is handled entirely by the generator. If a new JSON Schema postprocessor fix is needed, it goes here.
 
 ### 7. Known schema-vs-instance gaps (from known-failures baselines)
-The files `tests/td_gate_known_failures_td11.txt` and `tests/td_gate_known_failures_td20.txt` track valid TD instances that the generated JSON Schema wrongly rejects. These represent JSON Schema generator fidelity gaps. Each entry must link to a GitHub issue. Current status: files do not exist yet in `main` (added by PR #63).
+The file `tests/known_failures/td_gate.txt` tracks valid TD instances that the generated JSON Schema wrongly rejects. These represent JSON Schema generator fidelity gaps. Each entry must link to a GitHub issue.
 
 ---
 

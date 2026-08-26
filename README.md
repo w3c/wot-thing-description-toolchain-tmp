@@ -84,19 +84,17 @@ wotis generate-wot-resources -d
 
 ## Validation
 
-The toolchain includes a validation script to verify Thing Description instances against both the generated JSON Schema and a benchmark schema. This helps ensure the generated schema maintains compatibility with the WoT TD specification.
+The tests check the generated artifacts. Generate them first, then run pytest:
 
 ```bash
-python tests/src/validate_td_instances.py \
-  --schema resources/gens/jsonschema/jsonschema.json \
-  --benchmark-schema resources/benchmark_schemas/td-json-schema-validation.json \
-  --test-data tests/data
+uv run wotis generate-wot-resources -d
+uv run pytest tests/ -v
 ```
 
-The validator provides:
-- Validation against both generated and benchmark schemas
-- Detailed validation results with rich CLI output
-- Statistics on schema compatibility
+This validates Thing Description instances against the generated JSON Schema,
+compares the verdicts with the W3C schemas, and compares the generated JSON
+Schema, JSON-LD context and spec HTML with the reference files. See
+[tests/README.md](tests/README.md) for what each test file checks.
 
 ## Project Structure
 
