@@ -6,9 +6,7 @@ title: Thing Description sample
 ---
 */
 {
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:0804d572-cce8-422a-bb7c-4412fcd56f06",
     "title": "MyLampThing",
     "securityDefinitions": {

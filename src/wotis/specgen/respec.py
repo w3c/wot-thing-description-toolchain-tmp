@@ -1,26 +1,39 @@
 from __future__ import annotations
 
 import logging
+import re
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from markupsafe import Markup
 from pathlib import Path
 
+_SNIPPET_PLACEHOLDER_RE = re.compile(r"%(snippet(?:_group)?)\('([^']+)'\)%")
 
-def build_jinja_env(templates_dir: Path, snippets_dir: Path | None = None) -> Environment:
+
+def process_snippet_placeholders(text: str, snippets_dir: Path) -> str:
+    """Replace %snippet('name')% and %snippet_group('name')% with rendered HTML."""
+    from .snippets import render_snippet, render_snippet_group
+
+    renderers = {
+        "snippet": render_snippet,
+        "snippet_group": render_snippet_group,
+    }
+
+    def _replace(m: re.Match[str]) -> str:
+        call_type, name = m.group(1), m.group(2)
+        return renderers[call_type](name, snippets_dir)
+
+    return _SNIPPET_PLACEHOLDER_RE.sub(_replace, text)
+
+
+def build_jinja_env(templates_dir: Path) -> Environment:
     if not templates_dir.is_dir():
         raise FileNotFoundError(f"Template directory not found: {templates_dir}")
-    env = Environment(
+    return Environment(
         loader=FileSystemLoader(templates_dir),
         autoescape=select_autoescape(["html", "xml"]),
         trim_blocks=True,
         lstrip_blocks=True,
     )
-    if snippets_dir and snippets_dir.is_dir():
-        from .snippets import render_snippet, render_snippet_group
-        env.globals["snippet"] = lambda name: Markup(render_snippet(name, snippets_dir))
-        env.globals["snippet_group"] = lambda name: Markup(render_snippet_group(name, snippets_dir))
-    return env
 
 
 def assemble(

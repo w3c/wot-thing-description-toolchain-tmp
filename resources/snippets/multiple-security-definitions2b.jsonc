@@ -26,10 +26,7 @@ id: multiple-security-definitions2b
         },
         "combo_sc": {
             "scheme": "combo",
-            "allOf": [
-                "proxy_sc",
-                "bearer_sc"
-            ]
+            "allOf": ["proxy_sc", "bearer_sc"]
         }
     },
     "security": "combo_sc"

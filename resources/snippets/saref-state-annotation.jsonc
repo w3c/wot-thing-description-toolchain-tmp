@@ -2,6 +2,7 @@
 ---
 layout: pre
 id: saref-state-annotation-example
+validate: true
 ---
 */
 {
@@ -42,6 +43,4 @@ id: saref-state-annotation-example
             "forms": [{"href": "https://mylamp.example.com/status?full=true"}]
         }
     }
-    // @hide-start
-    // @hide-end
 }

@@ -25,6 +25,7 @@
         edDraftURI: "https://w3c.github.io/wot-thing-description/",
         github: "https://github.com/w3c/wot-thing-description",
         issueBase: "https://www.github.com/w3c/wot-thing-description/issues",
+        lint: { "informative-dfn": false },
         editors: [
           {
             name: "Ege Korkan",
@@ -463,7 +464,7 @@
         <p>
           The WoT Thing Description (TD) is a central building block in the W3C Web of Things (WoT) and can be
           considered as the entry point of a <a>Thing</a> (much like the <i>index.html</i> of a Web site). A TD instance
-          has five main components: textual metadata about the <a href="#thing">Thing</a> itself, a set of
+          has five main components: textual metadata about the <a>Thing</a> itself, a set of
           <a href="#interactionaffordance">Interaction Affordances</a> that indicate how the <a>Thing</a> can be used,
           <a href="#sec-data-schema-vocabulary-definition">schemas</a> for the data exchanged with the <a>Thing</a> for
           machine-understandability, <a href="#sec-security-vocabulary-definition">Security Definitions</a> to provide
@@ -498,7 +499,7 @@
           <a>Interaction Model</a> with Properties, Actions, and Events by describing a lamp <a>Thing</a> with the title
           <i>MyLampThing</i>.
         </p>
-        {{ snippet('simple-td') }}
+        %snippet('simple-td')%
 
         <p>
           From this TD example, we know there exists one <a href="#propertyaffordance">Property affordance</a> with the
@@ -547,7 +548,7 @@
           <code>saref:ToggleCommand</code>.
         </p>
 
-        {{ snippet('td-context-extension') }}
+        %snippet('td-context-extension')%
 
         <p>
           The declaration mechanism inside some
@@ -578,7 +579,7 @@
           <a>Thing Description</a> instance in <a href="#simple-thing-description-sample"></a>.
         </p>
 
-        {{ snippet('tm-model-sample') }}
+        %snippet('tm-model-sample')%
         <p>
           <a>Thing Model</a> definitions are identified by the <code>"@type": "tm:ThingModel"</code>. As the example
           shows, it does not provide details about a single <a>Thing</a> instance due to the lack of communication and
@@ -1273,12 +1274,6 @@
               <td><code>false</code></td>
               <td></td>
             </tr>
-            <tr class="rfc2119-default-assertion" id="td-default-AdditionalResponseContentType">
-              <td><code>AdditionalExpectedResponse</code></td>
-              <td><code>contentType</code></td>
-              <td>value of the <code>contentType</code> of the <code>Form</code> element it belongs to.</td>
-              <td></td>
-            </tr>
             <tr class="rfc2119-default-assertion" id="td-default-contentType">
               <td><code>Form</code></td>
               <td><code>contentType</code></td>
@@ -1818,7 +1813,7 @@
             <a href="#sec-context-extensions"></a> for details).
           </p>
 
-          {{ snippet('td-context-only') }}
+          %snippet('td-context-only')%
 
           <p>
             <span class="rfc2119-assertion" id="td-context-toplevel">
@@ -1829,7 +1824,7 @@
 
           <p>A TD snippet for a serialized root object including all mandatory and optional members is given below:</p>
 
-          {{ snippet('thing-serialization') }}
+          %snippet('thing-serialization')%
 
           <p>
             <span class="rfc2119-assertion" id="td-objects">
@@ -1894,11 +1889,11 @@
             the <code>@context</code> array.
           </p>
 
-          {{ snippet('i18n-title-description') }}
+          %snippet('i18n-title-description')%
 
           <p>
-            Strings on the Web [[?STRING-META]] recommends the use of metadata to determine the
-            <a class="lint-ignore">base direction</a> of string values.
+            Strings on the Web [[?STRING-META]] recommends the use of metadata to determine the [=Base direction=] of
+            string values.
             <span class="rfc2119-assertion" id="td-text-at-direction">
               Given that the Thing Description format is based on JSON-LD 1.1 [[?json-ld11]],
               <code>@direction</code> with the string values <code>"ltr"</code>, <code>"rtl"</code> and null value
@@ -1906,12 +1901,12 @@
               the human readable strings in the entire TD document.
             </span>
             <span class="rfc2119-assertion" id="td-text-direction-first-strong">
-              When metadata such as <code>@direction</code> is not present, TD Consumers SHOULD use
-              <a class="lint-ignore">first-strong detection</a> as a fallback.
+              When metadata such as <code>@direction</code> is not present, TD Consumers SHOULD use [=First-strong
+              detection=] as a fallback.
             </span>
             <span class="rfc2119-assertion" id="td-text-direction-language-tag">
-              For the MultiLanguage <a>Map</a>, TD Consumers MAY infer the
-              <a class="lint-ignore">base direction</a> from the language tag of the individual strings.
+              For the MultiLanguage <a>Map</a>, TD Consumers MAY infer the [=base direction=] from the language tag of
+              the individual strings.
             </span>
             These can be summarized into the steps below that can be implemented by TD Consumers based on the
             information provided in a TD.
@@ -1941,16 +1936,15 @@
             <code>@language</code> terms. See [[?json-ld11]] and [[string-meta]] for more detailed information.
           </p>
 
-          {{ snippet('i18n-rtl-direction') }}
+          %snippet('i18n-rtl-direction')%
 
           <p>
             The JSON members named <code>titles</code> and <code>descriptions</code> are used within the TD document to
             provide human-readable metadata in multiple languages within a single TD document.
             <span class="rfc2119-assertion" id="td-multi-languages">
               All name-value pairs of a <code>MultiLanguage</code> <a>Map</a> MUST be serialized as members of a JSON
-              object, where the name is a valid language tag as defined by [[!BCP47]] (also see
-              <a href="https://www.w3.org/TR/i18n-glossary/#dfn-valid">W3C I18N Glossary</a>) and the value is a
-              human-readable string in the language indicated by the tag.
+              object, where the name is a valid language tag as defined by [[!BCP47]] (also see [[I18N-Glossary]]) and
+              the value is a human-readable string in the language indicated by the tag.
             </span>
             See <a href="#multilanguage"></a> for details.
             <span class="rfc2119-assertion" id="td-multi-languages-consistent">
@@ -1963,7 +1957,7 @@
             A TD snippet using <code>titles</code> and <code>descriptions</code> at different levels is given below:
           </p>
 
-          {{ snippet('i18n-multi-language') }}
+          %snippet('i18n-multi-language')%
 
           <p>
             TD instances may also combine the use of <code>title</code> and <code>description</code> with
@@ -1983,7 +1977,7 @@
             of the Thing Description instance.
           </p>
 
-          {{ snippet('i18n-default-language') }}
+          %snippet('i18n-default-language')%
 
           <p>
             Another possibility to set the default language is through a language negotiation mechanism, such as the
@@ -2026,7 +2020,7 @@
 
           <p>A TD snippet of a version information object is given below:</p>
 
-          {{ snippet('version-info') }}
+          %snippet('version-info')%
 
           <p>
             The <code>version</code> member is intended as container for additional application- and/or device-specific
@@ -2068,7 +2062,7 @@
             definition is activated by including its JSON name in the <code>security</code> member.
           </p>
 
-          {{ snippet('security-basic') }}
+          %snippet('security-basic')%
 
           <p>
             Security configuration in the TD is mandatory.
@@ -2090,7 +2084,7 @@
             <a>Thing level</a>, as shown in the following example:
           </p>
 
-          {{ snippet('security-nosec') }}
+          %snippet('security-nosec')%
 
           <section id="security-multiple">
             <h3>Multiple Security Definitions</h3>
@@ -2104,7 +2098,7 @@
               configuration is overridden at the form level.
             </p>
 
-            {{ snippet('multiple-security-definitions1') }}
+            %snippet('multiple-security-definitions1')%
 
             <p>
               TDs can specify a combination of security schemes as well. Below is a TD snippet showing digest
@@ -2115,7 +2109,7 @@
               activating multiple security definitions, the <code>security</code> member becomes an array.
             </p>
 
-            {{ snippet('multiple-security-definitions2a') }}
+            %snippet('multiple-security-definitions2a')%
             <p>
               <span class="rfc2119-assertion" id="td-security-combo-deprecation">
                 However, the use of an array with multiple elements to combine security schemes in a
@@ -2126,7 +2120,7 @@
               In the following example, which is exactly equivalent to the one above, this is demonstrated:
             </p>
 
-            {{ snippet('multiple-security-definitions2b') }}
+            %snippet('multiple-security-definitions2b')%
           </section>
           <section id="security-security-forms">
             <h3><code>security</code> in Forms</h3>
@@ -2144,7 +2138,7 @@
               Note that activating one (default) configuration at the <a>Thing level</a> is still mandatory.
             </p>
 
-            {{ snippet('security-in-forms') }}
+            %snippet('security-in-forms')%
           </section>
           <section id="security-comboSecurityScheme">
             <h3><code>ComboSecurityScheme</code></h3>
@@ -2154,7 +2148,7 @@
               <a href="#combosecurityscheme"><code>ComboSecurityScheme</code></a> with <code>oneOf</code> can be used
               instead.
             </p>
-            {{ snippet('security-combo-oneof') }}
+            %snippet('security-combo-oneof')%
           </section>
           <section id="security-oauth2">
             <h3>OAuth 2.0 usage</h3>
@@ -2171,7 +2165,7 @@
               while ordinary users could be provided with tokens with the <code>limited</code> scope.
             </p>
 
-            {{ snippet('security-oauth2-scopes') }}
+            %snippet('security-oauth2-scopes')%
           </section>
           <section id="security-apikey">
             <h3>API key usage</h3>
@@ -2183,7 +2177,7 @@
               replaced in the URI by the Consumer when sending an HTTPS request.
             </p>
 
-            {{ snippet('security-apikey') }}
+            %snippet('security-apikey')%
 
             <p>
               To give another example of the use of the
@@ -2198,7 +2192,7 @@
               variables. These can then (in fact, they must) be used in the <code>href</code> in a
               <code>Form</code> where the security scheme is active. An example follows:
             </p>
-            {{ snippet('security-apikey-combo') }}
+            %snippet('security-apikey-combo')%
             <p>
               While not shown in this example, it is legal to declare additional URI template variables using
               <code>uriVariables</code> and include them in the same URI template, although the names cannot conflict
@@ -2220,13 +2214,13 @@
               multiple security scheme definitions.
             </p>
 
-            {{ snippet('security-apikey-body') }}
+            %snippet('security-apikey-body')%
             However, it is rather annoying and redundant to add the security information to every data schema. It is
             possible to simplify this example by using the feature that the location referenced by a JSON pointer in a
             <code>body</code> location will be automatically inserted if it does not exist. In this case the above
             example can be simplified to the following. Note that in fact a data schema will effectively be
             <em>created</em> for the actions <code>on</code> and <code>off</code> to hold just the security information.
-            {{ snippet('security-apikey-body-simplified') }}
+            %snippet('security-apikey-body-simplified')%
           </section>
         </section>
         <!-- end of id="security-serialization-json"-->
@@ -2267,7 +2261,7 @@
 
           <p>A snippet for two <a>Property</a> affordances is given below:</p>
 
-          {{ snippet('property-serialization') }}
+          %snippet('property-serialization')%
         </section>
         <!-- end of id="property-serialization-json"-->
 
@@ -2314,7 +2308,7 @@
 
           <p>A TD snippet of an Action affordance is given below:</p>
 
-          {{ snippet('action-serialization') }}
+          %snippet('action-serialization')%
         </section>
         <!-- end of id="action-serialization-json"-->
 
@@ -2361,7 +2355,7 @@
 
           <p>A TD snippet of an Event object is given below:</p>
 
-          {{ snippet('event-serialization') }}
+          %snippet('event-serialization')%
 
           <p>
             Event affordances have been defined in a flexible manner, in order to adopt existing (e.g., WebSub
@@ -2396,21 +2390,21 @@
             unit (e.g., a lamp). For this <code>controlledBy</code> can be used:
           </p>
 
-          {{ snippet('link-serialization') }}
+          %snippet('link-serialization')%
 
           <p>To point to a developer documentation of a <a>Thing</a> the value <code>service-doc</code> can be used:</p>
 
-          {{ snippet('link-service-doc') }}
+          %snippet('link-service-doc')%
 
           <p>
             A superordinate Thing can collect a group of Things and refer to them by using the <code>item</code> value:
           </p>
 
-          {{ snippet('link-electric-drive') }}
+          %snippet('link-electric-drive')%
 
           <p>A Thing refers to a group in which it is collected with the <code>collection</code> value:</p>
 
-          {{ snippet('link-electric-motor') }}
+          %snippet('link-electric-motor')%
         </section>
         <!-- end of id="link-serialization-json"-->
 
@@ -2436,7 +2430,7 @@
 
           <p>A TD snippet of a form object in the <code>forms</code> array is given below:</p>
 
-          {{ snippet('form-serialization') }}
+          %snippet('form-serialization')%
 
           <section id="form-uriVariables">
             <h3><code>uriVariables</code></h3>
@@ -2469,21 +2463,21 @@
               Affordance level is given below:
             </p>
 
-            {{ snippet('urivar-lat-long') }}
+            %snippet('urivar-lat-long')%
 
             <p>
               Alternatively, as defined in [[RFC6570]], <code>uriVariables</code> can be used for replacing the
               <code>href</code> structure. An example TD is provided below where a valid request to get the forecast of
               Bogota, Colombia would be an HTTP GET request to <code>http://example.org/weather/bogota</code>:
             </p>
-            {{ snippet('urivar-city') }}
+            %snippet('urivar-city')%
 
             <p>
               The two examples below can be also combined, while using the same <code>uriVariables</code> feature. An
               HTTP GET request to <code>http://example.org/weather/bogota/?unit=Celsius</code> can be described as
               follows:
             </p>
-            {{ snippet('urivar-city-unit') }}
+            %snippet('urivar-city-unit')%
 
             <p>
               <code>uriVariables</code> are mainly for properties and events. When retrofitting an existing system, it
@@ -2499,7 +2493,7 @@
               parameters as attribute-value pairs separated by a <code>;</code> character. Example:
             </p>
 
-            {{ snippet('form-content-type') }}
+            %snippet('form-content-type')%
           </section>
           <section id="form-response">
             <h3><code>response</code></h3>
@@ -2516,29 +2510,17 @@
             </p>
 
             <p>
-              <span class="rfc2119-assertion" id="td-form-response-object">
-                If present, the value assigned to <code>response</code> in an instance of <code>Form</code> MUST be a
-                JSON object.
-              </span>
-              <span class="rfc2119-assertion" id="td-forms-response">
-                If present, the response object MUST contain a <code>contentType</code> member as defined in the
-                <a>Class</a> definition of <a href="#expectedresponse" class="sec-ref"><code>ExpectedResponse</code></a
-                >.
-              </span>
-            </p>
-
-            <p>
               A <code>form</code> snippet with the <code>response</code> member is shown below based on the
               <code>takePhoto</code> Action described above:
             </p>
 
-            {{ snippet('form-response') }}
+            %snippet('form-response')%
 
             <p>
               In cases where responses are not expected to contain a payload and therefore no `contentType` either, an
               empty `response` object can be used to convey this information.
             </p>
-            {{ snippet('form-response-empty') }}
+            %snippet('form-response-empty')%
           </section>
           <section id="form-additionalResponses">
             <h3><code>additionalResponses</code></h3>
@@ -2563,7 +2545,7 @@
               does not have a payload.
             </p>
 
-            {{ snippet('form-additional-responses') }}
+            %snippet('form-additional-responses')%
 
             <p>
               The <code>additionalResponses</code> term can be used in non-error cases as well. In that case,
@@ -2581,7 +2563,7 @@
               is shown below:
             </p>
 
-            {{ snippet('form-content-media-encoding') }}
+            %snippet('form-content-media-encoding')%
           </section>
 
           <section id="form-top-level">
@@ -2598,7 +2580,7 @@
               transaction.
             </p>
 
-            {{ snippet('td-forms-readall') }}
+            %snippet('td-forms-readall')%
 
             <p>
               Thing-level <code>uriVariables</code> can be used here to supply further variables to the operation or to
@@ -2607,7 +2589,7 @@
               properties can be set:
             </p>
 
-            {{ snippet('urivar-thing-level') }}
+            %snippet('urivar-thing-level')%
 
             <p>
               For a <code>readmultipleproperties</code> operation, an example HTTP GET request to the URI
@@ -2686,7 +2668,7 @@
             additional members.
           </p>
 
-          {{ snippet('dataschema-serialization') }}
+          %snippet('dataschema-serialization')%
 
           <p>
             The terms <code>readOnly</code> and <code>writeOnly</code> can be used to signal which data items are
@@ -2698,7 +2680,7 @@
 
           <p>A TD snippet with the usage of <code>readOnly</code> and <code>writeOnly</code> is given below:</p>
 
-          {{ snippet('dataschema-readonly-writeonly') }}
+          %snippet('dataschema-readonly-writeonly')%
 
           <p>
             When the <code>status</code> Property is read, the status data is returned using a
@@ -2812,7 +2794,7 @@
         an extended <code>@context</code> name-value pair. A snippet with <a>TD Context Extensions</a> is given below:
       </p>
 
-      {{ snippet('context-extensions') }}
+      %snippet('context-extensions')%
 
       <section>
         <h3>Semantic Annotations</h3>
@@ -2858,7 +2840,7 @@
             Please note that these <a>Vocabularies</a> and ontologies are used as examples. Others can be used based on
             application domain and use case.
           </p>
-          {{ snippet('semantic-version-units') }}
+          %snippet('semantic-version-units')%
         </section>
         <section id="semantic-annotations-example-state">
           <h3>Example II: State Annotations</h3>
@@ -2879,7 +2861,7 @@
             <a>Property</a> with the actual on/off state of the physical world object.
           </p>
 
-          {{ snippet('saref-state-annotation') }}
+          %snippet('saref-state-annotation')%
 
           <p>
             In <a href="#thing-description-full-serialization"></a>, the state of the <a>Thing</a> is given by the
@@ -2906,7 +2888,7 @@
             provide static latitude and longitude metadata at Thing's top level.
           </p>
 
-          {{ snippet('geolocation-basic') }}
+          %snippet('geolocation-basic')%
 
           <p>
             In some use cases location based metadata have to be provided at the interaction level, e.g., as provided as
@@ -2914,7 +2896,7 @@
             <code>elevation</code> values based on schema.org:
           </p>
 
-          {{ snippet('geolocation-schema-org') }}
+          %snippet('geolocation-schema-org')%
 
           <p>
             In case a different name is desired for, e.g., <code>longitude</code>, <code>latitude</code>, and
@@ -2923,7 +2905,7 @@
             context for data instances):
           </p>
 
-          {{ snippet('geolocation-jsonld-context') }}
+          %snippet('geolocation-jsonld-context')%
         </section>
       </section>
 
@@ -2953,7 +2935,7 @@
           </span>
         </p>
 
-        {{ snippet('security-extension-ace') }}
+        %snippet('security-extension-ace')%
 
         <p>
           Note that all security schemes defined in <a href="#sec-security-vocabulary-definition"></a> are already part
@@ -3075,10 +3057,10 @@
             <tbody>
               <tr>
                 <td style="vertical-align: top; width: 50%">
-                  {{ snippet('form-http-readproperty') }}
+                  %snippet('form-http-readproperty')%
                 </td>
                 <td style="vertical-align: top; width: 50%">
-                  {{ snippet('form-modbus-readproperty') }}
+                  %snippet('form-modbus-readproperty')%
                 </td>
               </tr>
             </tbody>
@@ -3106,10 +3088,10 @@
             <tbody>
               <tr>
                 <td style="vertical-align: top; width: 50%">
-                  {{ snippet('form-http-invokeaction') }}
+                  %snippet('form-http-invokeaction')%
                 </td>
                 <td style="vertical-align: top; width: 50%">
-                  {{ snippet('form-mqtt-subscribeevent') }}
+                  %snippet('form-mqtt-subscribeevent')%
                 </td>
               </tr>
             </tbody>
@@ -3149,7 +3131,7 @@
               HTTP:
             </p>
 
-            {{ snippet('form-subprotocol-longpoll') }}
+            %snippet('form-subprotocol-longpoll')%
 
             <p>
               The values that the <code>subprotocol</code> term can take is not constrained by the
@@ -3220,73 +3202,6 @@
               </li>
             </ul>
           </section>
-
-          <section id="http-binding-assertions">
-            <h6>Protocol Binding based on HTTP</h6>
-
-            <p>
-              Per default the Thing Description supports the <a>Protocol Binding</a> based on HTTP by including the HTTP
-              RDF vocabulary definitions from <em>HTTP Vocabulary in RDF 1.0</em> [[?HTTP-in-RDF10]]. This vocabulary can
-              be directly used within TD instances by the usage of the prefix <code>htv</code>, which points to
-              <code>http://www.w3.org/2011/http#</code>. Further details of <a>Protocol Binding</a> based on HTTP can be
-              found in [[?WOT-BINDING-TEMPLATES]].
-            </p>
-            <p>
-              To interact with a <a>Thing</a> that implements the <a>Protocol Binding</a> based on HTTP, a
-              <a>Consumer</a> needs to know what HTTP method to use when submitting a form. In the general case, a Thing
-              Description can explicitly include a term indicating the method, i.e.,
-              <code>htv:methodName</code>. For the sake of conciseness, the <a>Protocol Binding</a> based on HTTP defines
-              <a>Default Values</a> for the operation types listed below, which also aims at convergence of the methods
-              expected by <a>Things</a> (e.g., GET to read, PUT to write).
-              <span class="rfc2119-assertion" id="td-default-http-method">
-                When no method is indicated in a form representing an <a>Protocol Binding</a> based on HTTP, a
-                <a>Default Value</a> MUST be assumed as shown in the following table.
-              </span>
-            </p>
-
-            <table class="def numbered">
-              <caption>
-                Default values of vocabulary terms for HTTP that are used when the terms are not present in a form of a
-                TD, containing an HTTP URI Scheme
-              </caption>
-              <thead>
-                <tr>
-                  <th><a>Vocabulary term</a></th>
-                  <th>Default value</th>
-                  <th>Context</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="rfc2119-default-assertion" id="td-default-http-method_get">
-                  <td>
-                    <code>htv:methodName</code>
-                  </td>
-                  <td><code>GET</code></td>
-                  <td>
-                    <code>Form</code> with operation type <code>readproperty</code>,
-                    <code>readallproperties</code>, <code>readmultipleproperties</code>
-                  </td>
-                </tr>
-                <tr class="rfc2119-default-assertion" id="td-default-http-method_put">
-                  <td>
-                    <code>htv:methodName</code>
-                  </td>
-                  <td><code>PUT</code></td>
-                  <td>
-                    <code>Form</code> with operation type <code>writeproperty</code>,
-                    <code>writeallproperties</code>, <code>writemultipleproperties</code>
-                  </td>
-                </tr>
-                <tr class="rfc2119-default-assertion" id="td-default-http-method_post">
-                  <td>
-                    <code>htv:methodName</code>
-                  </td>
-                  <td><code>POST</code></td>
-                  <td><code>Form</code> with operation type <code>invokeaction</code></td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
         </section>
 
         <section id="payload-bindings">
@@ -3335,7 +3250,7 @@
               However, for unstructured data such as images and videos, a Data Schema is typically not available.
             </p>
 
-            {{ snippet('payload-binding-forms') }}
+            %snippet('payload-binding-forms')%
 
             <p>
               Other content types can be also expressed in TDs. In the list below, examples of different content type
@@ -3417,10 +3332,10 @@
               <tbody>
                 <tr>
                   <td style="vertical-align: top; width: 50%">
-                    {{ snippet('payload-json-object') }}
+                    %snippet('payload-json-object')%
                   </td>
                   <td style="vertical-align: top; width: 50%">
-                    {{ snippet('payload-json-object-schema') }}
+                    %snippet('payload-json-object-schema')%
                   </td>
                 </tr>
               </tbody>
@@ -3475,13 +3390,13 @@
     </section>
 
     <section id="behavior" class="normative">
-      <h2>Behavioral Assertions</h2>
+      <h2>Behavioral Considerations</h2>
       <p>
-        The following assertions relate to the behavior of components of a WoT system, as opposed to the representation
-        or information model of the TD. However, note that TDs are descriptive, and may in particular be used to
-        describe pre-existing network interfaces. In these cases, assertions cannot be made that constrain the behavior
-        of such pre-existing interfaces. Instead, the assertions are to be interpreted as constraints on the TD to
-        accurately represent such interfaces.
+        The following sections relate to the behavior of components of a WoT system, as opposed to the representation or
+        information model of the TD. However, note that TDs are descriptive, and may in particular be used to describe
+        pre-existing network interfaces. In these cases, assertions found in these sections cannot be made that
+        constrain the behavior of such pre-existing interfaces. Instead, the assertions are to be interpreted as
+        constraints on the TD to accurately represent such interfaces.
       </p>
       <p>
         <!-- 1. arch-td-metadata, 3. arch-td-mandatory -->
@@ -3633,6 +3548,133 @@
         </ul>
       </section>
       <!-- end of id="behavior-data"-->
+      <section id="interaction-semantics">
+        <h3>Interaction Semantics</h3>
+        <p>
+          The interaction semantics are hinted by different keywords in the <a>affordance level</a> of the TD, such as
+          <code>readOnly</code>, <code>writeOnly</code> and <code>observable</code> for <a>Properties</a>. These act as
+          hints, where the form containg the relevant <code>op</code> value is the one that defines the actual
+          interaction semantics. For example, if a form with <code>op</code> value of <code>readproperty</code>
+          is present, then the interaction semantics of that property is to be considered as readable, even if the
+          <code>readOnly</code> keyword is not present or set to false. However, if all forms have <code>op</code> key
+          but there is no form with <code>op</code> value of <code>readproperty</code>, then the interaction semantics
+          of that property is to be considered as not readable, even if the <code>readOnly</code> keyword is present and
+          set to true.
+        </p>
+
+        <p>
+          Other terms can also influence the interaction semantics and also the location of the terms mentioned above.
+          As indicated in Section <a href="#dataschema" class="sec-ref">DataSchema</a>, <code>readOnly</code> and
+          <code>writeOnly</code> can exist in other levels such as within the input or output of an <a>Action</a> or
+          within the data, subscription or cancellation of an <a>Event</a>. Furthermore, the presence of an object or
+          array in the Data Schema creates the possibility to include these terms in deeper levels of a Data Schema.
+        </p>
+
+        <p class="ednote">
+          Make sure to include the information in
+          <a
+            href="https://github.com/w3c/wot-thing-description/blob/main/planning/work-items/analysis/readOnly-writeOnly.md"
+            >readOnly-writeOnly.md</a
+          >
+        </p>
+
+        <section id="sec-op-data-schema-mapping" class="informative">
+          <h4>Mapping op Values to Data Schemas</h4>
+
+          <p>
+            Protocols that can be used with TDs follow request-response or eventing mechanisms. The Data Schema of an
+            affordance generally correlates with the <code>op</code> keywords used in <code>forms</code>. The table
+            below informatively summarizes the available data schema related terms with the <code>op</code> keywords.
+          </p>
+          <ul>
+            <li>
+              Consumer to Thing applies for messages sent by the Consumer to the Thing, such as the value for writing a
+              property.
+            </li>
+            <li>
+              Thing to Consumer applies for messages sent by the Thing to the Consumer, such as the value of a property
+              value as the result of reading a property.
+            </li>
+            <li>
+              In case that there is no correlation with the data schema and the operation, it implies that no payload is
+              required for executing the operation or no payload is expected as a result of the operation.
+            </li>
+          </ul>
+
+          <table class="def numbered">
+            <caption>
+              Mapping op Values to Data Schemas
+            </caption>
+            <thead>
+              <tr>
+                <th>Operation Type</th>
+                <th>Consumer to Thing DataSchema Correlation</th>
+                <th>Thing to Consumer DataSchema Correlation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>readproperty</td>
+                <td>No correlation.</td>
+                <td>All fields in the Property Affordance without <code>"writeOnly":true</code>.</td>
+              </tr>
+              <tr>
+                <td>writeproperty</td>
+                <td>All fields in the Property Affordance without <code>"readOnly":true</code>.</td>
+                <td>No correlation. <code>additionalResponses</code> can be used in the form level.</td>
+              </tr>
+              <tr>
+                <td>observeproperty</td>
+                <td>No correlation.</td>
+                <td>All fields in the Property Affordance without <code>"writeOnly":true</code>.</td>
+              </tr>
+              <tr>
+                <td>unobserveproperty</td>
+                <td>No correlation.</td>
+                <td>No correlation.</td>
+              </tr>
+              <tr>
+                <td>invokeaction</td>
+                <td>Value of the <code>input</code> key.</td>
+                <td>Value of the <code>output</code> key.</td>
+              </tr>
+              <tr>
+                <td>queryaction</td>
+                <td>No correlation.</td>
+                <td>No correlation. <code>additionalResponses</code> can be used in the form level.</td>
+              </tr>
+              <tr>
+                <td>cancelaction</td>
+                <td>No correlation.</td>
+                <td>No correlation. <code>additionalResponses</code> can be used in the form level.</td>
+              </tr>
+              <tr>
+                <td>subscribeevent</td>
+                <td>Value of the <code>subscription</code> key with all fields without <code>"readOnly":true</code></td>
+                <td>
+                  Value of the <code>subscription</code> key with all fields without <code>"writeOnly":true</code>
+                </td>
+              </tr>
+              <tr>
+                <td>unsubscribeevent</td>
+                <td>Value of the <code>subscription</code> key with all fields without <code>"readOnly":true</code></td>
+                <td>
+                  Value of the <code>subscription</code> key with all fields without <code>"writeOnly":true</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note" title="writeproperty and observeproperty relationship">
+            Writing to a property does not necessarily mean that a new value will be sent to the Consumer observing the
+            property. It depends on the protocol and implementation.
+          </p>
+          <p class="note" title="Further Data Schemas mappings">
+            Further specification of how to map operations to data schemas, as well as mapping meta operations such as
+            <code>readallproperties</code>
+            can be found in the respective binding entry of the [[WOT-BINDING-REGISTRY]].
+          </p>
+        </section>
+      </section>
     </section>
     <!-- end of id="behavior"-->
 
@@ -3739,7 +3781,7 @@
             Thing Model instance.
           </p>
 
-          {{ snippet('tm-versioning') }}
+          %snippet('tm-versioning')%
 
           <p>
             <span class="rfc2119-assertion" id="tm-versioning-2">
@@ -3789,7 +3831,7 @@
 
           <p>Lets assume we have a basic model description as provided in the following example:</p>
 
-          {{ snippet('basic-on-off-tm') }}
+          %snippet('basic-on-off-tm')%
 
           <p>
             Now a new device class model called 'Smart Lamp Control' that will be used as template for creating TD
@@ -3797,7 +3839,7 @@
             extend it with a <code>dim</code> property:
           </p>
 
-          {{ snippet('smart-lamp-control-tm') }}
+          %snippet('smart-lamp-control-tm')%
           <p>
             Please note that the <code>title</code> is overwritten and will be used when TD instances are created (also
             see in the next subsection <a href="#thing-model-td-generation"></a>).
@@ -3836,7 +3878,7 @@
             <code>onOff</code> from <a href="#td-model-example-basic-on-off"></a> into the new property definition
             <code>switch</code>.
           </p>
-          {{ snippet('tm-ref-import') }}
+          %snippet('tm-ref-import')%
 
           <p>
             As an example for relative imports using <code>tm:ref</code>, the following Thing Model re-uses and augments
@@ -3844,7 +3886,7 @@
             inner and an outer temperature value, respectively.
           </p>
 
-          {{ snippet('multi-sensor-tm') }}
+          %snippet('multi-sensor-tm')%
 
           <p>
             At the place the "tm:ref" is defined, additional name-value pairs can be added. It is also permitted to
@@ -3878,7 +3920,7 @@
             <a href="#td-model-example-smart-lamp-control"></a>.
           </p>
 
-          {{ snippet('tm-overwrite') }}
+          %snippet('tm-overwrite')%
 
           <p>
             Based on the JSON Merge Patch algorithm the <code>{"title": null,"maximum": 80,"unit": "%"}</code> would act
@@ -3894,7 +3936,7 @@
             <a href="#td-model-example-smart-lamp-control"></a> respectively.
           </p>
 
-          {{ snippet('tm-extend-import') }}
+          %snippet('tm-extend-import')%
 
           <p>
             The <code>tm:extends</code> and the import mechanism based on <code>tm:ref</code> explicitly supports
@@ -3938,7 +3980,7 @@
             <code>dimmable</code> and <code>RGB</code> capabilities.
           </p>
 
-          {{ snippet_group('composition-tms') }}
+          %snippet_group('thing-model-composition')%
 
           <p>
             Such composition can be introduced by the usage of the <code>links</code> container.
@@ -3965,7 +4007,7 @@
             <a>Thing Descriptions</a>. An example based on Smart Ventilation is given here:
           </p>
 
-          {{ snippet_group('composition-tds') }}
+          %snippet_group('td-smart-ventilator')%
 
           <p>
             A single TD can also be generated which contains the interaction definitions of the top level/parent
@@ -3977,7 +4019,7 @@
             Ventilator Thing Model.
           </p>
 
-          {{ snippet('smart-ventilator-selfcontained-td') }}
+          %snippet('smart-ventilator-selfcontained-td')%
         </section>
 
         <section id="thing-model-td-optional" class="normative">
@@ -4009,7 +4051,7 @@
             <code>overheating</code>.
           </p>
 
-          {{ snippet('tm-optional') }}
+          %snippet('tm-optional')%
 
           <p>
             Since the <a>Event</a> <code>overheating</code> is not mandatory it may not be available in a
@@ -4022,13 +4064,13 @@
             is extended by another <a>Thing Model</a> through the use of <code>tm:ref</code>:
           </p>
 
-          {{ snippet('tm-optional-overwrite') }}
+          %snippet('tm-optional-overwrite')%
         </section>
 
         <section id="thing-model-td-placeholder" class="normative">
           <h3>Placeholder</h3>
 
-          {% raw %}<p>
+          <p>
             A <a>Thing Model</a> can specify which terms should be used in a TD instance, but their values are
             unspecific and are first known during TD instantiation.
             <span class="rfc2119-assertion" id="tm-placeholder-usecase">
@@ -4039,12 +4081,13 @@
               The placeholder labeling MUST be substituted with a concrete value (e.g., as JSON number, JSON string,
               JSON object, etc) when TD instance is created from the Thing Model.
             </span>
-            <span class="rfc2119-assertion" id="tm-placeholder">
-              The string-based pattern of the placeholder MUST follow a valid pattern based on the regular expression
-              <code>{{2}[ -~]+}{2}</code> (e.g., <code>{{</code><code>PLACEHOLDER_IDENTIFIER</code><code>}}</code>). The
-              characters between <code>{{</code> and <code>}}</code> are used as identifier name of the placeholder. The
-              identifier name can be used to identify the placeholder for the substitution process.
+            <span class="rfc2119-assertion" id="tm-placeholder-pattern">
+              The string-based pattern of the placeholder MUST be defined with double curly braces to clearly
+              distinguish the placeholder from the rest of the value content (e.g., <code>{{</code>
+              <code>PLACEHOLDER_IDENTIFIER</code><code>}}</code>).
             </span>
+            The characters between <code>{{</code> and <code>}}</code> are used as identifier name of the placeholder.
+            The identifier name can be used to identify the placeholder for the substitution process.
 
             <span class="rfc2119-assertion" id="tm-placeholder-multiple-placeholders">
               Within a single value, there MAY be multiple placeholders, e.g.,
@@ -4076,9 +4119,9 @@
           <p>
             The following Thing Model example defines different placeholders. The placeholder map is used to apply the
             replacement and to transform the intended value type.
-          </p>{% endraw %}
+          </p>
 
-          {{ snippet_group('tm-placeholder-generation') }}
+          %snippet_group('td-from-tm')%
         </section>
       </section>
 
@@ -4152,9 +4195,9 @@
         </ul>
 
         <p>
-          {% raw %}It is recommended that the <code>id</code> value of a <a>Thing Model</a> provides a placeholder such as
+          It is recommended that the <code>id</code> value of a <a>Thing Model</a> provides a placeholder such as
           <code>"id": "urn:example:</code><code>{{</code><code>RANDOM_ID_PATTERN</code><code>}}</code><code>"</code> for
-          the TD generation process. Please avoid including metadata in the <code>id</code> pattern.{% endraw %}
+          the TD generation process. Please avoid including metadata in the <code>id</code> pattern.
         </p>
 
         <p>
@@ -4163,7 +4206,7 @@
           <code>"rel": "type"</code> (also see Section <a href="#link"></a>), as shown in the following example:
         </p>
 
-        {{ snippet_group('tm-td-linking') }}
+        %snippet_group('linking-td-to-tm')%
 
         <p>
           Please note that a TD can only be an instance of one TM at a time. That means for Thing Descriptions:
@@ -4184,14 +4227,14 @@
           <code>dim</code> property
         </p>
 
-        {{ snippet('tm-extending-dim') }}
+        %snippet('tm-extending-dim')%
 
         <p>
           The expected <a>Thing Description</a> that is derived from this <a>Thing Model</a> would be (with HTTP Binding
           and basic security applied):
         </p>
 
-        {{ snippet('td-derived-from-tm') }}
+        %snippet('td-derived-from-tm')%
       </section>
     </section>
 
@@ -5125,7 +5168,7 @@
           </li>
         </ul>
 
-        {{ snippet_group('temp-sensor-event') }}
+        %snippet_group('temperature-sensor-event')%
 
         <p class="note">
           Instead of a periodic POST request to the Thing, the <a>Consumer</a> may provide response data with
@@ -5426,11 +5469,11 @@
       <h2>contentType usage in Thing Descriptions</h2>
       <p>
         The different cases on the variation of request and response are explained at
-        <a href="#sec-response-usage"></a>. The tables below summarize these cases in a concise manner. The tables start
-        from simpler cases, such as single <code>contentType</code>, and go for more complex cases, such as multiple
-        <code>contentType</code>s. In all the tables, the messages are seen from the Thing point of view, where input
-        means messages sent from Consumer to the Thing (e.g., request) and output means messages sent from Thing to the
-        Consumer (e.g., response).
+        <a href="#additionalexpectedresponse"></a> and <a href="#expectedresponse"></a>. The tables below summarize
+        these cases in a concise manner. The tables start from simpler cases, such as single <code>contentType</code>,
+        and go for more complex cases, such as multiple <code>contentType</code>s. In all the tables, the messages are
+        seen from the Thing point of view, where input means messages sent from Consumer to the Thing (e.g., request)
+        and output means messages sent from Thing to the Consumer (e.g., response).
       </p>
       <p>The cases are numbered, which can be used to associate them with examples after the tables.</p>
       <table class="def numbered">
@@ -5800,10 +5843,10 @@
         <tbody>
           <tr>
             <td style="vertical-align: top; width: 50%">
-              {{ snippet('payload-senml') }}
+              %snippet('payload-senml')%
             </td>
             <td style="vertical-align: top; width: 50%">
-              {{ snippet('payload-senml-schema') }}
+              %snippet('payload-senml-schema')%
             </td>
           </tr>
         </tbody>
@@ -5815,10 +5858,10 @@
         <tbody>
           <tr>
             <td style="vertical-align: top; width: 50%">
-              {{ snippet('payload-ocf-batch') }}
+              %snippet('payload-ocf-batch')%
             </td>
             <td style="vertical-align: top; width: 50%">
-              {{ snippet('payload-ocf-batch-schema') }}
+              %snippet('payload-ocf-batch-schema')%
             </td>
           </tr>
         </tbody>
@@ -5830,10 +5873,10 @@
         <tbody>
           <tr>
             <td style="vertical-align: top; width: 50%">
-              {{ snippet('payload-ipso-lwm2m') }}
+              %snippet('payload-ipso-lwm2m')%
             </td>
             <td style="vertical-align: top; width: 50%">
-              {{ snippet('payload-ipso-lwm2m-schema') }}
+              %snippet('payload-ipso-lwm2m-schema')%
             </td>
           </tr>
         </tbody>
@@ -5875,7 +5918,6 @@
         group to come up with the concept of WoT building blocks including the Thing Description.
       </p>
     </section>
-
 
     <p class="note">
       Temporary ReSpec fix regarding non-listed references: [[RFC6068]], [[RFC3966]], [[html]], [[RFC6750]],

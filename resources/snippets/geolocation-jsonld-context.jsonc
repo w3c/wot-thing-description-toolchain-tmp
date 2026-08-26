@@ -2,6 +2,7 @@
 ---
 layout: pre
 id: saref-geolocation-annotation-example-3
+validate: true
 ---
 */
 {
@@ -32,12 +33,7 @@ id: saref-geolocation-annotation-example-3
             "long": { "type": "number" },
             "lat": { "type": "number" },
             "height": { "type": "number" }
-        },
-        // @hide-start
-        "forms": [
-            { "href": "https://example.com/position" }
-        ]
-        // @hide-end
+        }
         }
     }
 }

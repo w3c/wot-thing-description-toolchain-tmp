@@ -469,7 +469,7 @@ def generate_respec_spec(
         return
 
     try:
-        env = build_jinja_env(cfg.jinja_templates, snippets_dir=cfg.snippets_dir)
+        env = build_jinja_env(cfg.jinja_templates)
         section_tpl = env.get_template("class_section.jinja2")
     except (exceptions.TemplateNotFound, FileNotFoundError) as e:
         logging.error("Template error: %s", e, exc_info=True)
@@ -632,9 +632,10 @@ def generate_respec_spec(
                 "Snippet validation failed with %d error(s) — continuing", len(snippet_errors)
             )
 
-        tpl_text = respec_template_path.read_text(encoding="utf-8")
-        jinja_tpl = env.from_string(tpl_text)
-        rendered_template = jinja_tpl.render()
+        rendered_template = respec_template_path.read_text(encoding="utf-8")
+        if cfg.snippets_dir and cfg.snippets_dir.is_dir():
+            from ..specgen.respec import process_snippet_placeholders
+            rendered_template = process_snippet_placeholders(rendered_template, cfg.snippets_dir)
 
     assemble(
         respec_template_path,

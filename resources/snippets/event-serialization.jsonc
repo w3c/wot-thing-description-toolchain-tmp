@@ -3,6 +3,7 @@
 layout: aside
 id: event-serialization-sample
 title: Sample of an Event serialization
+validate: true
 ---
 */
 {
@@ -25,10 +26,12 @@ title: Sample of an Event serialization
                 "type": "string"
             },
             "forms": [
+                // @hide-start
                 {
                     "href": "https://smartlamp.example.com/overheated",
                     "subprotocol": "longpoll"
                 }
+                // @hide-end
             ]
         }
     }

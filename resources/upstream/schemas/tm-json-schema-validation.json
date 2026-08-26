@@ -1,6 +1,6 @@
 {
   "title": "Thing Model",
-  "version": "1.1-09-November-2023",
+  "version": "1.1-12-March-2025",
   "description": "JSON Schema for validating Thing Models. This is automatically generated from the WoT TD Schema.",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://raw.githubusercontent.com/w3c/wot-thing-description/main/validation/tm-json-schema-validation.json",
@@ -83,26 +83,34 @@
       "const": "https://www.w3.org/ns/wot-next/td"
     },
     "thing-context": {
-      "$comment": "Experimental context URI with other vocabularies after it",
-      "type": "array",
-      "items": [
+      "anyOf": [
         {
+          "$comment": "Only the experimental context URI",
           "$ref": "#/definitions/thing-context-td-uri-temp"
-        }
-      ],
-      "additionalItems": {
-        "anyOf": [
-          {
-            "$ref": "#/definitions/anyUri"
-          },
-          {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
+        },
+        {
+          "$comment": "Experimental context URI with other vocabularies after it",
+          "type": "array",
+          "items": [
+            {
+              "$ref": "#/definitions/thing-context-td-uri-temp"
             }
+          ],
+          "additionalItems": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/anyUri"
+              },
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
     "bcp47_string": {
       "type": "string",

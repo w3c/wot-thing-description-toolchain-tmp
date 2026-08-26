@@ -4,9 +4,7 @@ title: LED TM
 ---
 */
 {
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "@type": "tm:ThingModel",
     "title": "LED Thing Model",
     "version": {

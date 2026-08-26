@@ -2,6 +2,7 @@
 ---
 layout: pre
 id: saref-geolocation-annotation-example-2
+validate: true
 ---
 */
 {

@@ -2,8 +2,11 @@ title: Thing Descriptions of the Smart Ventilator
 tabs:
   - snippet: smart-ventilator-td
     label: Top level Smart Ventilator TD
+    tab_class: SmartVentilator
     selected: true
   - snippet: ventilation-td
     label: Ventilation TD
+    tab_class: Ventilation
   - snippet: led-td
     label: LED TD
+    tab_class: LED

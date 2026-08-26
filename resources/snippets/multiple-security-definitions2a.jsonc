@@ -25,10 +25,7 @@ id: multiple-security-definitions2a
             "authorization": "https://servient.example.com:8443/"
         }
     },
-    "security": [
-        "proxy_sc",
-        "bearer_sc"
-    ]
+    "security": ["proxy_sc", "bearer_sc"]
     // @hide-start
     ,
     "properties": {

@@ -3,6 +3,7 @@
 layout: aside
 id: property-serialization-sample
 title: Sample of Property serializations
+validate: true
 ---
 */
 {
@@ -23,9 +24,11 @@ title: Sample of Property serializations
         "on": {
             "type": "boolean",
             "forms": [
+                // @hide-start
                 {
                     "href": "https://smartlamp.example.com/on"
                 }
+                // @hide-end
             ]
         },
         "status": {
@@ -47,14 +50,13 @@ title: Sample of Property serializations
                     "maxItems": 3
                 }
             },
-            "required": [
-                "brightness",
-                "rgb"
-            ],
+            "required": ["brightness", "rgb"],
             "forms": [
+                // @hide-start
                 {
                     "href": "https://smartlamp.example.com/status"
                 }
+                // @hide-end
             ]
         }
     }

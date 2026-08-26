@@ -54,6 +54,7 @@ def _process_hide_ranges(text: str) -> str:
     result: list[str] = []
     is_hiding = False
     indent = ""
+    hidden_has_comma = False
     for line in lines:
         start_match = _HIDE_START_RE.match(line)
         if start_match:
@@ -61,18 +62,49 @@ def _process_hide_ranges(text: str) -> str:
                 raise ValueError("Nested // @hide-start without closing // @hide-end")
             is_hiding = True
             indent = start_match.group(1)
+            hidden_has_comma = False
             continue
         if _HIDE_END_RE.match(line):
             if not is_hiding:
                 raise ValueError("// @hide-end without matching // @hide-start")
             is_hiding = False
+            if hidden_has_comma and result and not result[-1].rstrip().endswith(","):
+                result[-1] = result[-1].rstrip() + ","
             if not result or result[-1].strip() != "// ...":
                 result.append(f"{indent}// ...")
             continue
-        if not is_hiding:
+        if is_hiding:
+            stripped = line.strip()
+            if stripped.startswith(",") or stripped == ",":
+                hidden_has_comma = True
+        else:
             result.append(line)
     if is_hiding:
         raise ValueError("Unclosed // @hide-start without // @hide-end")
+    return _compact_placeholder_lines("\n".join(result))
+
+
+def _compact_placeholder_lines(text: str) -> str:
+    lines = text.split("\n")
+    result: list[str] = []
+    i = 0
+    while i < len(lines):
+        stripped = lines[i].strip()
+        if i + 2 < len(lines):
+            next1 = lines[i + 1].strip()
+            next2 = lines[i + 2].strip()
+            if next1 == "// ..." and stripped.endswith("{") and next2.startswith("}"):
+                after = next2[1:]
+                result.append(lines[i].rstrip() + "// ..." + "}" + after)
+                i += 3
+                continue
+            if next1 == "// ..." and stripped.endswith("[") and next2.startswith("]"):
+                after = next2[1:]
+                result.append(lines[i].rstrip() + "// ..." + "]" + after)
+                i += 3
+                continue
+        result.append(lines[i])
+        i += 1
     return "\n".join(result)
 
 
@@ -189,7 +221,7 @@ def render_snippet_group(group_name: str, snippets_dir: Path) -> str:
     group = yaml.safe_load(group_path.read_text(encoding="utf-8"))
     title = group.get("title", "")
     tabs = group.get("tabs", [])
-    tab_group_id = f"snippetTab_{group_name}"
+    tab_group_id = f"example-tabs-{group_name}"
 
     lines: list[str] = ['<aside class="example ds-selector-tabs">']
     if title:
@@ -210,7 +242,7 @@ def _append_tab_selectors(lines: list[str], tabs: list[dict[str, Any]], tab_grou
     lines.append('  <div class="selectors">')
     for tab in tabs:
         label = escape(tab.get("label", tab["snippet"]))
-        tab_class = tab["snippet"].replace("-", "_")
+        tab_class = tab.get("tab_class", tab["snippet"].replace("-", "_"))
         selected = "selected " if tab.get("selected") else ""
         lines.append(
             f'    <button class="{selected}{tab_group_id} {tab_class}"'
@@ -230,7 +262,7 @@ def _append_tab_contents(
     for tab in tabs:
         snippet = _parse_snippet_file(snippets_dir / f"{tab['snippet']}.jsonc")
         filtered = _process_hide_ranges(snippet.raw_jsonc).strip()
-        tab_class = tab["snippet"].replace("-", "_")
+        tab_class = tab.get("tab_class", tab["snippet"].replace("-", "_"))
         selected = " selected" if tab.get("selected") else ""
         lines.append(
             f'  <pre class="{tab_class} {tab_group_id}{selected} json">'

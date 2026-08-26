@@ -2,6 +2,8 @@ title: Temperature Sensor with a Temperature Event with subscription and cancell
 tabs:
   - snippet: temp-sensor-event-no-urivars
     label: Without uriVariables
+    tab_class: without
     selected: true
   - snippet: temp-sensor-event-urivars
     label: With uriVariables
+    tab_class: with
