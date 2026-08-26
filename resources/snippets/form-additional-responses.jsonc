@@ -5,9 +5,7 @@ layout: pre
 */
 {
     // @hide-start
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:e1f2a3b4-c5d6-4e7f-8091-021324354657",
     "title": "MyCar",
     "securityDefinitions": {

@@ -5,9 +5,7 @@ layout: pre
 */
 {
     // @hide-start
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:b4c5d6e7-f809-4102-1324-35465768798a",
     "title": "CoffeeMaker",
     "securityDefinitions": {

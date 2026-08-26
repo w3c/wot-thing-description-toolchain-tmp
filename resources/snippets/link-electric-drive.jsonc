@@ -6,9 +6,7 @@ title: An electric drive includes two motors.
 */
 {
     // @hide-start
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
     "securityDefinitions": {
         "nosec_sc": { "scheme": "nosec" }

@@ -8,9 +8,7 @@ validate: true
 */
 {
     // @hide-start
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:a4e7b2c1-3f9d-4e8a-b5c6-1d2e3f4a5b6c",
     "title": "SmartLamp",
     "securityDefinitions": {

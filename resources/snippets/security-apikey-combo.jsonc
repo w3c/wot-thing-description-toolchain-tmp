@@ -5,7 +5,7 @@ layout: pre
 */
 {
     // @hide-start
-    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:b4e8c6a3-9f12-4d7e-85ab-6c0d3e2f1a94",
     "title": "ApiKeyCombinedDevice",
     // @hide-end

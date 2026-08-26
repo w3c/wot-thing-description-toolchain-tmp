@@ -6,9 +6,7 @@ title: Smart Lamp Control imports existing definition
 ---
 */
 {
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
     "@type": "tm:ThingModel",
     "title": "Smart Lamp Control",
     "properties": {

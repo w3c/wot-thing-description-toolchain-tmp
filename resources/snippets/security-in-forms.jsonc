@@ -5,7 +5,7 @@ layout: pre
 */
 {
     // @hide-start
-    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:a2c4e6f8-3b5d-4a7c-9e1f-8d0b2c4a6e80",
     "title": "FormSecurityDevice",
     // @hide-end

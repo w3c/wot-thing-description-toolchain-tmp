@@ -5,7 +5,7 @@ layout: pre
 */
 {
     // @hide-start
-    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:a3c74e1f-8b2d-4c9a-b6f1-7d3e5a8c2f10",
     "title": "ApiKeyBodyExample",
     // @hide-end

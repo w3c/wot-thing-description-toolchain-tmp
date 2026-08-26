@@ -5,9 +5,7 @@ title: "Thing Model with the tm:optional term for interaction affordances."
 ---
 */
 {
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
     "@type": "tm:ThingModel",
     "title": "Lamp Thing Model",
     "description": "Lamp Thing Model Description",

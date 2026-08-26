@@ -4,9 +4,7 @@ layout: pre
 ---
 */
 {
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:e9ecb6ad-cd4c-481b-96ce-5b4c57ddb844",
     "title": "MyThing",
     "description": "Human readable information.",

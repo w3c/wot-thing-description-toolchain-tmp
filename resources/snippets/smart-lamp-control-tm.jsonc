@@ -6,9 +6,7 @@ title: Smart Lamp Control Thing Model Definition
 ---
 */
 {
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "@type": "tm:ThingModel",
     "title": "Smart Lamp Control with Dimming",
     "links": [

@@ -6,10 +6,7 @@ id: td-forms-urivariables-thing-example
 */
 {
     // @hide-start
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        { "htv": "http://www.w3.org/2011/http#" }
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:a7b8c9d0-e1f2-4a3b-4c5d-6e7f80910213",
     "title": "MyThing",
     "securityDefinitions": {

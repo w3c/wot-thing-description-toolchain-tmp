@@ -5,9 +5,7 @@ layout: pre
 */
 {
     // @hide-start
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:d0e1f2a3-b4c5-4d6e-7f80-910213243546",
     "title": "MyDevice",
     "securityDefinitions": {

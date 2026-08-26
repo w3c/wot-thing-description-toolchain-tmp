@@ -7,9 +7,7 @@ title: JSON and CBOR media types in forms
 */
 {
     // @hide-start
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:e6f7a8b9-c0d1-4e2f-3a4b-5c6d7e8f9a0b",
     "title": "TemperatureSensor",
     "securityDefinitions": {

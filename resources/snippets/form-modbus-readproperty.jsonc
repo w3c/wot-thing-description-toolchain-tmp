@@ -6,12 +6,7 @@ title: Binding instance of a readproperty operation to Modbus
 */
 {
     // @hide-start
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "modv": "https://w3c.github.io/wot-binding-templates/bindings/protocols/modbus/#"
-        }
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e",
     "title": "ModbusDevice",
     "securityDefinitions": {

@@ -6,7 +6,7 @@ id: multiple-security-definitions1
 */
 {
     // @hide-start
-    "@context": ["https://www.w3.org/ns/wot-next/td"],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:e7ab8c53-2f6b-4a3e-d0c5-1b7c9e2a6d54",
     "title": "MultipleSecurityDefinitionsExample",
     // @hide-end

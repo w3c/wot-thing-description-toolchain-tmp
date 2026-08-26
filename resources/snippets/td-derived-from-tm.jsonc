@@ -5,9 +5,7 @@ title: Thing Description
 ---
 */
 {
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "@type": "Thing",
     "title": "Smart Lamp Control",
     "securityDefinitions": {
