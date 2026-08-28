@@ -103,6 +103,12 @@ def _compact_placeholder_lines(text: str) -> str:
                 result.append(lines[i].rstrip() + "// ..." + "]" + after)
                 i += 3
                 continue
+        if i + 1 < len(lines):
+            next1 = lines[i + 1].strip()
+            if next1 == "// ..." and stripped.rstrip().endswith(":"):
+                result.append(lines[i].rstrip() + " // ...")
+                i += 2
+                continue
         result.append(lines[i])
         i += 1
     return "\n".join(result)
