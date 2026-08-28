@@ -210,6 +210,8 @@ def _collect_schema_errors(
 
 def render_snippet(name: str, snippets_dir: Path) -> str:
     snippet = _parse_snippet_file(snippets_dir / f"{name}.jsonc")
+    if not snippet.snippet_id:
+        raise ValueError(f"Snippet '{name}' missing required 'id' field in frontmatter")
     filtered = _process_hide_ranges(snippet.raw_jsonc).strip()
     attrs = _build_element_attrs(snippet.snippet_id, snippet.title)
 
