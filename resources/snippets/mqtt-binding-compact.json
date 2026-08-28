@@ -1,0 +1,32 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "mqv": "http://www.example.org/mqtt-binding#"
+        }
+    ],
+    "title": "MyIlluminanceSensor",
+    "id": "urn:uuid:9489991a-7622-45b6-8437-f858b59835d4",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": [
+        "nosec_sc"
+    ],
+    "events": {
+        "illuminance": {
+            "data": {
+                "type": "integer"
+            },
+            "forms": [
+                {
+                    "href": "mqtt://broker.com:1883/",
+                    "contentType": "text/plain",
+                    "mqv:filter": "mySensor/illuminance"
+                }
+            ]
+        }
+    }
+}

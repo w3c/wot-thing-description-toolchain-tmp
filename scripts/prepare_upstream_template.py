@@ -20,13 +20,16 @@ UPSTREAM_TEMPLATE = REPO_ROOT / "resources" / "upstream" / "html" / "index.templ
 OUTPUT_TEMPLATE = REPO_ROOT / "resources" / "index.template.html"
 
 EXAMPLE_RE = re.compile(
-    r"<(aside|pre)\s+class=\"example(?:\s+ds-selector-tabs)?\"[^>]*>",
+    r"<(aside|pre)\s+class=\"example(?:\s+(?:ds-selector-tabs|with-default|json))?\"[^>]*>",
 )
 
 SNIPPET_CALLS: list[tuple[str, str]] = [
     ("snippet", "simple-td"),
     ("snippet", "td-context-extension"),
     ("snippet", "tm-model-sample"),
+    ("snippet_group", "context-expansion"),
+    ("snippet_group", "multiple-defaults"),
+    ("snippet_group", "td-default-values"),
     ("snippet", "td-context-only"),
     ("snippet", "thing-serialization"),
     ("snippet", "i18n-title-description"),
@@ -97,7 +100,11 @@ SNIPPET_CALLS: list[tuple[str, str]] = [
     ("snippet_group", "linking-td-to-tm"),
     ("snippet", "tm-extending-dim"),
     ("snippet", "td-derived-from-tm"),
+    ("snippet_group", "coap-binding"),
+    ("snippet_group", "mqtt-binding"),
     ("snippet_group", "temperature-sensor-event"),
+    ("snippet", "multiprotocol-single"),
+    ("snippet", "multiprotocol-mixed"),
     ("snippet", "payload-senml"),
     ("snippet", "payload-senml-schema"),
     ("snippet", "payload-ocf-batch"),

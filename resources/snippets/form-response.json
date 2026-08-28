@@ -1,0 +1,29 @@
+{
+    "@context": "https://www.w3.org/ns/wot-next/td",
+    "id": "urn:uuid:a3b4c5d6-e7f8-4091-0213-243546576879",
+    "title": "MyCamera",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": "nosec_sc",
+    "actions": {
+        "takePhoto": {
+            "output": {
+                "type": "string",
+                "contentMediaType": "image/jpeg"
+            },
+            "forms": [
+                {
+                    "op": "invokeaction",
+                    "href": "http://camera.example.com/api/snapshot",
+                    "contentType": "application/json",
+                    "response": {
+                        "contentType": "image/jpeg"
+                    }
+                }
+            ]
+        }
+    }
+}

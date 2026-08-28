@@ -1,0 +1,80 @@
+{
+    "@context": "https://www.w3.org/ns/wot-next/td",
+    "id": "urn:uuid:b4d85f20-9c3e-4d0b-a7f2-8e4f6b9d3a21",
+    "title": "ApiKeyBodySimplifiedExample",
+    "securityDefinitions": {
+        "apikey_body": {
+            "scheme": "apikey",
+            "in": "body",
+            "name": "/auth/key"
+        }
+    },
+    "security": "apikey_body",
+    "description": "Simplified example of API key in body security",
+    "properties": {
+        "color": {
+            "description": "Color setting of the device",
+            "type": "object",
+            "properties": {
+                "brightness": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                },
+                "rgb": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                }
+            },
+            "required": [
+                "brightness",
+                "rgb"
+            ],
+            "forms": [
+                {
+                    "href": "https://example.com/color",
+                    "contentType": "application/json"
+                }
+            ]
+        }
+    },
+    "actions": {
+        "on": {
+            "description": "Turn the device on",
+            "required": [
+                "auth"
+            ],
+            "forms": [
+                {
+                    "href": "https://example.com/on",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "off": {
+            "description": "Turn the device off",
+            "forms": [
+                {
+                    "href": "https://example.com/off",
+                    "contentType": "application/json"
+                }
+            ]
+        }
+    },
+    "events": {
+        "statusChange": {
+            "data": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "https://example.com/events/statusChange"
+                }
+            ]
+        }
+    }
+}

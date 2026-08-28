@@ -1,0 +1,680 @@
+snippets:
+  action-serialization:
+    id: action-serialization-sample
+    title: Sample of an Action serialization
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+  basic-on-off-tm:
+    id: td-model-example-basic-on-off
+    title: Basic On/Off Thing Model Definition
+    layout: pre
+  coap-binding-compact:
+    validate: false
+  coap-binding-expanded:
+    validate: false
+  context-expansion-compact:
+    validate: false
+  context-expansion-expanded:
+    validate: false
+  context-extensions:
+    id: td-context-ns-thing-optional
+    layout: pre
+    hide_paths:
+    - id
+    - title
+    - securityDefinitions
+    - security
+    - properties
+  dataschema-readonly-writeonly:
+    id: td-schema-readonly-writeonly
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+  dataschema-serialization:
+    id: dataschema-serialization-sample
+    title: Sample of a DataSchema serialization
+    show_paths:
+    - properties.lampState.type
+    - properties.lampState.properties
+  event-serialization:
+    id: event-serialization-sample
+    title: Sample of an Event serialization
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+  form-additional-responses:
+    id: form-additionalResponses
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+  form-content-media-encoding:
+    id: form-contentMediaType-contentEncoding
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+  form-content-type:
+    id: form-contentType
+    layout: pre
+    show_paths:
+    - properties.status.forms.contentType
+  form-http-invokeaction:
+    id: form-http-invokeaction
+    title: Binding instance of an invokeaction operation to HTTP
+    layout: pre
+    validate: false
+  form-http-readproperty:
+    id: form-http-readproperty
+    title: Binding instance of a readproperty operation to HTTP
+    layout: pre
+    validate: false
+  form-modbus-readproperty:
+    id: form-modbus-readproperty
+    title: Binding instance of a readproperty operation to Modbus
+    layout: pre
+    validate: false
+  form-mqtt-subscribeevent:
+    id: form-mqtt-subscribeevent
+    title: Binding instance of a subscribeevent operation to MQTT
+    layout: pre
+    validate: false
+  form-response-empty:
+    id: form-response-empty
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+  form-response:
+    id: form-response
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+  form-serialization:
+    id: form-serialization-sample
+    title: Sample of a Form serialization
+    show_paths:
+    - properties.temperature.forms
+  form-subprotocol-longpoll:
+    id: form-subprotocol-longpoll
+    title: Subprotocol usage for subscribing events
+    layout: pre
+    validate: false
+  geolocation-basic:
+    id: saref-geolocation-annotation-example
+    layout: pre
+    hide_paths:
+    - id
+    - title
+    - securityDefinitions
+    - security
+  geolocation-jsonld-context:
+    id: saref-geolocation-annotation-example-3
+    layout: pre
+    hide_paths:
+    - id
+    - title
+    - securityDefinitions
+    - security
+  geolocation-schema-org:
+    id: saref-geolocation-annotation-example-2
+    layout: pre
+    hide_paths:
+    - id
+    - title
+    - securityDefinitions
+    - security
+  i18n-default-language:
+    id: td-context-default-language
+    layout: pre
+    hide_paths:
+    - id
+    - securityDefinitions
+    - security
+    - properties.*.forms.*
+  i18n-multi-language:
+    id: td-context-multi-language
+    layout: pre
+    hide_paths:
+    - id
+    - securityDefinitions
+    - security
+    - properties.*.forms.*
+  i18n-rtl-direction:
+    id: td-context-rtl-direction
+    layout: pre
+    hide_paths:
+    - id
+    - securityDefinitions
+    - security
+    - properties.*.forms.*
+  i18n-title-description:
+    id: td-context-title-description
+    layout: pre
+    hide_paths:
+    - id
+    - securityDefinitions
+    - security
+    - properties.*.forms.*
+  led-td:
+    title: LED TD
+  led-tm:
+    title: LED TM
+  link-electric-drive:
+    id: link-electric-drive
+    title: An electric drive includes two motors.
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - securityDefinitions
+    - security
+    - properties
+  link-electric-motor:
+    id: example-an-electric-motor-is-member-of-the-electric-drive-collection
+    title: An electric motor is member of the electric drive collection
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - securityDefinitions
+    - security
+    - properties
+  link-serialization:
+    id: link-serialization-sample
+    title: Sample of a Link serialization
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+  link-service-doc:
+    id: link-service-doc
+    title: Link to developer documentation
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+    - properties
+  mqtt-binding-compact:
+    validate: false
+  mqtt-binding-expanded:
+    validate: false
+  multi-sensor-tm:
+    id: td-model-example-relative-tmRef
+    title: Multi Sensor Thing Model re-using definitions with relative imports
+    layout: pre
+  multiple-defaults-compact:
+    validate: false
+  multiple-defaults-expanded:
+    validate: false
+  multiple-security-definitions1:
+    id: multiple-security-definitions1
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - description
+  multiple-security-definitions2a:
+    id: multiple-security-definitions2a
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - properties
+  multiple-security-definitions2b:
+    id: multiple-security-definitions2b
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - properties
+  multiprotocol-mixed:
+    title: Multiprotocol TD of a Lamp with Multiple Protocols per Form
+    layout: pre
+    validate: false
+  multiprotocol-single:
+    title: Multiprotocol TD of a Lamp with one Protocol per Form
+    layout: pre
+    validate: false
+  payload-binding-forms:
+    id: example-payload-binding
+    title: JSON and CBOR media types in forms
+    layout: pre
+    validate: false
+  payload-ipso-lwm2m-schema:
+    id: payload-ipso-lwm2m-schema
+    title: Data Schema for IPSO/LWM2M Payload Example
+    layout: pre
+    validate: false
+  payload-ipso-lwm2m:
+    id: payload-ipso-lwm2m
+    title: IPSO/LWM2M Payload Example
+    layout: pre
+    validate: false
+  payload-json-object-schema:
+    id: payload-json-object-schema
+    title: DataSchema for Simple JSON Object Payload
+    layout: pre
+    validate: false
+  payload-json-object:
+    id: payload-json-object
+    title: Simple JSON Object Payload
+    layout: pre
+    validate: false
+  payload-ocf-batch-schema:
+    id: payload-ocf-batch-schema
+    title: Data Schema for OCF Batch Payload Example
+    layout: pre
+    validate: false
+  payload-ocf-batch:
+    id: payload-ocf-batch
+    title: OCF Batch Example
+    layout: pre
+    validate: false
+  payload-senml-schema:
+    id: payload-senml-schema
+    title: Data Schema for SenML Payload Example
+    layout: pre
+    validate: false
+  payload-senml:
+    id: payload-senml
+    title: SenML Payload Example
+    layout: pre
+    validate: false
+  property-serialization:
+    id: property-serialization-sample
+    title: Sample of Property serializations
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+    - actions
+  saref-state-annotation:
+    id: saref-state-annotation-example
+    layout: pre
+    hide_paths:
+    - title
+    - securityDefinitions
+    - security
+  security-apikey-body-simplified:
+    id: security-apikey-body-simplified
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - description
+    - events
+  security-apikey-body:
+    id: security-apikey-body
+    layout: pre
+    show_paths:
+      - securityDefinitions
+      - security
+      - properties.color.type
+      - properties.color.properties.brightness.type
+      - properties.color.properties.rgb.type
+      - properties.color.properties.auth
+      - properties.color.required
+      - properties.color.forms.href
+      - actions.*.input.auth
+      - actions.*.required
+      - actions.*.forms.href
+  security-apikey-combo:
+    id: security-apikey-combo
+    layout: pre
+    show_paths:
+      - securityDefinitions
+      - security
+      - properties.status.forms.href
+  security-apikey:
+    id: security-apikey
+    layout: pre
+    show_paths:
+      - securityDefinitions
+      - security
+      - properties.status.forms.href
+  security-basic:
+    id: security-basic-example
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - properties
+    - actions
+    - events
+  security-combo-oneof:
+    id: security-comboSecurityScheme
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - properties.*.type
+    - actions
+  security-extension-ace:
+    id: security-extension-ace
+    layout: pre
+    hide_paths:
+    - id
+    - title
+    - events
+  security-in-forms:
+    id: security-security-forms
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - properties.*.type
+    - actions
+  security-nosec:
+    id: security-nosec
+    layout: pre
+    hide_paths:
+    - properties.*
+    - actions.*
+    - events.*
+    - links.*
+  security-oauth2-scopes:
+    id: example-oauth2-scopes
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - description
+    - events
+  semantic-version-units:
+    id: semantic-annotations-example-version-units
+    layout: pre
+    hide_paths:
+    - id
+    - title
+    - securityDefinitions
+    - security
+  simple-td:
+    id: simple-thing-description-sample
+    title: Thing Description sample
+  smart-lamp-control-tm:
+    id: td-model-example-smart-lamp-control
+    title: Smart Lamp Control Thing Model Definition
+    layout: pre
+  smart-pump-td:
+    layout: pre
+    validate: false
+  smart-pump-tm:
+    layout: pre
+    validate: false
+  smart-ventilator-selfcontained-td:
+    id: smart-ventilator-selfcontained-td
+    title: Self-contained TD of the Smart Ventilator TM
+    layout: pre
+  smart-ventilator-td:
+    title: Top level Smart Ventilator TD
+  smart-ventilator-tm:
+    title: Smart Ventilator TM
+  td-context-extension:
+    id: thing-description-full-serialization
+    title: Thing Description with TD Context Extension for semantic annotations
+  td-context-only:
+    id: td-context-only
+    layout: pre
+    hide_paths:
+    - id
+    - title
+    - securityDefinitions
+    - security
+  td-default-values-compact:
+    validate: false
+  td-default-values-expanded:
+    validate: false
+  td-derived-from-tm:
+    id: td-derived-from-tm
+    title: Thing Description
+    layout: pre
+  td-forms-readall:
+    id: td-forms-readall-example
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+  temp-sensor-event-no-urivars:
+    layout: pre
+  temp-sensor-event-urivars:
+    layout: pre
+  thermostat-placeholder-map:
+    layout: pre
+    validate: false
+  thermostat-placeholder-td:
+    layout: pre
+    validate: false
+  thermostat-placeholder-tm:
+    layout: pre
+    validate: false
+  thing-serialization:
+    id: thing-serialization-sample
+    title: Sample of Thing serializations
+    layout: pre
+    hide_paths:
+    - titles.*
+    - descriptions.*
+    - version.*
+    - securityDefinitions.*
+    - security.*
+    - properties.*
+    - actions.*
+    - events.*
+    - links.*
+    - forms.*
+  tm-extend-import:
+    id: td-model-example-smart-lamp-control-extend-import
+    title: Smart Lamp Control Thing Model with extend and import mechanism
+    layout: pre
+  tm-extending-dim:
+    id: tm-extending-dim
+    title: Extending Smart Control Lamp with a modified dim constrained
+    layout: pre
+  tm-model-sample:
+    id: td-model-example-lamp
+    title: Thing Model sample
+    layout: pre
+  tm-optional-overwrite:
+    id: tm-optional-overwrite
+    title: Thing Model overwrites tm:optional of the previous Thing Model example.
+    layout: pre
+  tm-optional:
+    id: tm-optional
+    title: Thing Model with the tm:optional term for interaction affordances.
+    layout: pre
+  tm-overwrite:
+    id: td-model-example-tmRef2
+    title: Smart Lamp Control extend and overwrite existing definitions
+    layout: pre
+  tm-ref-import:
+    id: td-model-example-tmRef
+    title: Smart Lamp Control imports existing definition
+    layout: pre
+  tm-versioning:
+    id: tm-versioning
+    title: Thing Model versioning
+    layout: pre
+    hide_paths:
+    - '@context'
+  urivar-city-unit:
+    id: form-uriVariables-city-unit
+    layout: pre
+    hide_paths:
+    - id
+    - title
+    - securityDefinitions
+    - security
+  urivar-city:
+    id: form-uriVariables-city
+    layout: pre
+    hide_paths:
+    - id
+    - title
+    - securityDefinitions
+    - security
+  urivar-lat-long:
+    id: form-uriVariables-lat-long
+    layout: pre
+    hide_paths:
+    - id
+    - title
+    - securityDefinitions
+    - security
+  urivar-thing-level:
+    id: td-forms-urivariables-thing-example
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+  ventilation-td:
+    title: Ventilation TD
+  ventilation-tm:
+    title: Ventilation TM
+  version-info:
+    id: semantic-annotations-example-version-units-ver
+    layout: pre
+    hide_paths:
+    - '@context'
+    - id
+    - title
+    - securityDefinitions
+    - security
+    - properties
+groups:
+  coap-binding:
+    layout: with-default
+    title: MyLampThing with CoAP Protocol Binding
+    toggle_label: with Default Values
+    compact: coap-binding-compact
+    expanded: coap-binding-expanded
+  context-expansion:
+    layout: with-default
+    id: example-context-expansion
+    title: TD with htv prefix and context expansion
+    toggle_label: with Context Expansion
+    compact: context-expansion-compact
+    expanded: context-expansion-expanded
+  linking-td-to-tm:
+    title: Linking Thing Description to a Thing Model Definition
+    tabs:
+    - snippet: smart-pump-tm
+      label: Thing Model
+      tab_class: thingmodel
+      selected: true
+    - snippet: smart-pump-td
+      label: Thing Description
+      tab_class: thingdescription
+  mqtt-binding:
+    layout: with-default
+    title: MyIlluminanceSensor with MQTT Protocol Binding
+    toggle_label: with Default Values
+    compact: mqtt-binding-compact
+    expanded: mqtt-binding-expanded
+  multiple-defaults:
+    layout: with-default
+    id: example-multiple-defaults-and-expansions
+    title: TD with multiple default value and expansion mechanisms
+    toggle_label: with Defaults and Expansions
+    compact: multiple-defaults-compact
+    expanded: multiple-defaults-expanded
+  td-default-values:
+    layout: with-default
+    title: TD with Default Values that can be omitted
+    toggle_label: with Default Values
+    compact: td-default-values-compact
+    expanded: td-default-values-expanded
+  td-from-tm:
+    title: Thing Description generation from Thing Model
+    tabs:
+    - snippet: thermostat-placeholder-tm
+      label: Thing Model
+      tab_class: thingmodel
+      selected: true
+    - snippet: thermostat-placeholder-map
+      label: Placeholder Map
+      tab_class: placeholder
+    - snippet: thermostat-placeholder-td
+      label: Thing Description
+      tab_class: thingdescription
+  td-smart-ventilator:
+    title: Thing Descriptions of the Smart Ventilator
+    tabs:
+    - snippet: smart-ventilator-td
+      label: Top level Smart Ventilator TD
+      tab_class: SmartVentilator
+      selected: true
+    - snippet: ventilation-td
+      label: Ventilation TD
+      tab_class: Ventilation
+    - snippet: led-td
+      label: LED TD
+      tab_class: LED
+  temperature-sensor-event:
+    title: Temperature Sensor with a Temperature Event with subscription and cancellation
+    tabs:
+    - snippet: temp-sensor-event-no-urivars
+      label: Without uriVariables
+      tab_class: without
+      selected: true
+    - snippet: temp-sensor-event-urivars
+      label: With uriVariables
+      tab_class: with
+  thing-model-composition:
+    title: Top level/parent Smart Ventilator Thing Model
+    tabs:
+    - snippet: smart-ventilator-tm
+      label: Smart Ventilator TM
+      tab_class: SmartVentilator
+      selected: true
+    - snippet: ventilation-tm
+      label: Ventilation TM
+      tab_class: Ventilation
+    - snippet: led-tm
+      label: LED TM
+      tab_class: LED

@@ -1,0 +1,69 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "cov": "http://www.example.org/coap-binding#"
+        }
+    ],
+    "id": "urn:uuid:bd472149-0b41-4dc9-80c0-977f39dc7e77",
+    "title": "MyLampThing",
+    "description": "MyLampThing uses JSON serialization",
+    "securityDefinitions": {
+        "psk_sc": {
+            "scheme": "psk"
+        }
+    },
+    "security": [
+        "psk_sc"
+    ],
+    "properties": {
+        "status": {
+            "description": "Shows the current status of the lamp",
+            "type": "string",
+            "forms": [
+                {
+                    "op": "readproperty",
+                    "href": "coaps://mylamp.example.com/status",
+                    "cov:methodName": "GET",
+                    "contentType": "application/json"
+                }
+            ],
+            "observable": false,
+            "readOnly": true
+        }
+    },
+    "actions": {
+        "toggle": {
+            "description": "Turn on or off the lamp",
+            "forms": [
+                {
+                    "href": "coaps://mylamp.example.com/toggle",
+                    "cov:methodName": "POST",
+                    "op": "invokeaction",
+                    "contentType": "application/json"
+                }
+            ],
+            "safe": false,
+            "idempotent": false
+        }
+    },
+    "events": {
+        "overheating": {
+            "description": "Lamp reaches a critical temperature (overheating)",
+            "data": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "coaps://mylamp.example.com/oh",
+                    "subprotocol": "cov:observe",
+                    "op": [
+                        "subscribeevent",
+                        "unsubscribeevent"
+                    ],
+                    "contentType": "application/json"
+                }
+            ]
+        }
+    }
+}

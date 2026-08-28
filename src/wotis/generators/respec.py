@@ -635,7 +635,9 @@ def generate_respec_spec(
         rendered_template = respec_template_path.read_text(encoding="utf-8")
         if cfg.snippets_dir and cfg.snippets_dir.is_dir():
             from ..specgen.respec import process_snippet_placeholders
-            rendered_template = process_snippet_placeholders(rendered_template, cfg.snippets_dir)
+            rendered_template = process_snippet_placeholders(
+                rendered_template, cfg.snippets_dir, cfg.jinja_templates
+            )
 
     assemble(
         respec_template_path,

@@ -6,21 +6,25 @@ import re
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from pathlib import Path
 
-_SNIPPET_PLACEHOLDER_RE = re.compile(r"%(snippet(?:_group)?)\('([^']+)'\)%")
+_SNIPPET_PLACEHOLDER_RE = re.compile(r"%snippet\('([^']+)'\)%")
 
 
-def process_snippet_placeholders(text: str, snippets_dir: Path) -> str:
-    """Replace %snippet('name')% and %snippet_group('name')% with rendered HTML."""
-    from .snippets import render_snippet, render_snippet_group
+def process_snippet_placeholders(text: str, snippets_dir: Path, templates_dir: Path) -> str:
+    """Replace %snippet('name')% with rendered HTML. Auto-detects groups from manifest."""
+    from .snippets import render_snippet, render_snippet_group, _load_manifest
 
-    renderers = {
-        "snippet": render_snippet,
-        "snippet_group": render_snippet_group,
-    }
+    manifest = _load_manifest(snippets_dir)
+    groups = manifest.get("groups", {})
+
+    snippets = manifest.get("snippets", {})
 
     def _replace(m: re.Match[str]) -> str:
-        call_type, name = m.group(1), m.group(2)
-        return renderers[call_type](name, snippets_dir)
+        name = m.group(1)
+        if name in groups and name in snippets:
+            raise ValueError(f"'{name}' exists as both snippet and group in manifest — rename one")
+        if name in groups:
+            return render_snippet_group(name, snippets_dir, templates_dir)
+        return render_snippet(name, snippets_dir)
 
     return _SNIPPET_PLACEHOLDER_RE.sub(_replace, text)
 

@@ -1,0 +1,121 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "cov": "http://www.example.org/coap-binding#",
+            "mqv": "http://www.example.org/mqtt-binding#",
+            "htv": "http://www.w3.org/2011/http#"
+        }
+    ],
+    "title": "Lamp",
+    "id": "urn:dev:ops:32473-WoTLamp-5678",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": [
+        "nosec_sc"
+    ],
+    "properties": {
+        "switchState": {
+            "type": "boolean",
+            "readOnly": true,
+            "observable": false,
+            "forms": [
+                {
+                    "href": "http://example.com/light/switchstate",
+                    "op": "readproperty",
+                    "contentType": "application/json",
+                    "htv:methodName": "GET"
+                },
+                {
+                    "href": "coap://example.com/light/switchstate",
+                    "op": "readproperty",
+                    "contentType": "application/json",
+                    "cov:method": "GET"
+                }
+            ]
+        },
+        "brightness": {
+            "type": "number",
+            "readOnly": true,
+            "observable": true,
+            "forms": [
+                {
+                    "href": "http://example.com/light/switchstate",
+                    "op": "readproperty",
+                    "contentType": "application/json",
+                    "htv:methodName": "GET"
+                },
+                {
+                    "href": "coap://example.com/light/switchstate",
+                    "op": "readproperty",
+                    "contentType": "application/json",
+                    "cov:method": "GET"
+                },
+                {
+                    "href": "mqtt://broker.com",
+                    "mqv:filter": "application/deviceid/sensor/brightness",
+                    "op": "observeproperty",
+                    "mqv:controlPacket": "subscribe"
+                }
+            ]
+        }
+    },
+    "actions": {
+        "switchLight": {
+            "input": {
+                "type": "boolean"
+            },
+            "forms": [
+                {
+                    "href": "http://example.com/switch/state",
+                    "op": "invokeaction",
+                    "contentType": "application/json",
+                    "htv:methodName": "POST"
+                }
+            ]
+        },
+        "setBrightness": {
+            "input": {
+                "type": "number",
+                "maximum": 255
+            },
+            "forms": [
+                {
+                    "href": "coap://example.com/light/brightness",
+                    "op": "invokeaction",
+                    "contentType": "application/json",
+                    "cov:method": "POST"
+                }
+            ]
+        }
+    },
+    "events": {
+        "concentration": {
+            "title": "Gas Concentration Event Stream",
+            "data": {
+                "type": "integer",
+                "minimum": -1,
+                "maximum": 65535
+            },
+            "forms": [
+                {
+                    "href": "mqtt://broker.com",
+                    "contentType": "application/json",
+                    "op": "subscribeevent",
+                    "mqv:filter": "application/deviceid/sensor/concentration",
+                    "mqv:controlPacket": "subscribe"
+                },
+                {
+                    "cov:method": "GET",
+                    "href": "coap://example.com/sensor/gasconcentration",
+                    "contentType": "application/json",
+                    "op": "subscribeevent",
+                    "subprotocol": "cov:observe"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,5 @@
+{
+    "op": "subscribeevent",
+    "href": "https://mylamp.example.com/overheating",
+    "subprotocol": "longpoll"
+}

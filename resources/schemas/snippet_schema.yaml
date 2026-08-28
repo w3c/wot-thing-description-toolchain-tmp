@@ -1,0 +1,223 @@
+name: snippet_schema
+title: WoT Thing Description ReSpec Snippet Schema
+description: >-
+  LinkML schema for managing JSON-LD example snippets rendered inline in the
+  W3C Web of Things (WoT) Thing Description (TD) specification. Defines
+  the structure of the snippet manifest used by the WoTIS toolchain to
+  control ReSpec example generation, including display filtering, layout
+  selection, validation gating, and multi-snippet composition (tabbed and
+  toggle views).
+id: https://w3c.github.io/wot-thing-description/snippets
+version: "2.0"
+license: https://spdx.org/licenses/MIT.html
+
+contributors:
+  - orcid:0000-0000-0000-0000
+
+created_by: https://orcid.org/0000-0000-0000-0000
+created_on: "2025-06-01"
+last_updated_on: "2026-08-28"
+
+prefixes:
+  linkml:
+    prefix_prefix: linkml
+    prefix_reference: https://w3id.org/linkml/
+  snippet:
+    prefix_prefix: snippet
+    prefix_reference: https://w3c.github.io/wot-thing-description/snippets/
+
+default_range: string
+
+imports:
+  - linkml:types
+
+enums:
+  SnippetLayout:
+    description: >-
+      Determines the HTML wrapper element used when rendering a standalone
+      snippet in the ReSpec specification output.
+    permissible_values:
+      aside:
+        description: >-
+          Rendered as <aside class="example"> — the standard ReSpec example
+          block with automatic numbering and a visible title bar.
+      pre:
+        description: >-
+          Rendered as <pre class="example json"> — a preformatted code block
+          styled as an example, used for snippets that do not require the
+          full aside wrapper (e.g., inline schema fragments).
+
+  GroupLayout:
+    description: >-
+      Layout variant for snippet groups that combine multiple related JSON
+      examples into a single interactive display element.
+    permissible_values:
+      with-default:
+        description: >-
+          Renders a checkbox toggle between a compact view (without default
+          values) and an expanded view (with default values explicitly shown).
+          Used to illustrate how TD processors populate omitted fields with
+          their specification-defined defaults.
+
+classes:
+  SnippetManifest:
+    description: >-
+      Root container for the _snippets.yaml manifest file. Serves as the
+      single source of truth for all snippet metadata and group definitions
+      used during ReSpec specification generation. Each snippet entry maps
+      a JSON example to its rendering configuration.
+    tree_root: true
+    attributes:
+      snippets:
+        range: Snippet
+        multivalued: true
+        inlined: true
+        description: >-
+          Map of snippet names to their metadata. Each key corresponds to
+          a JSON file in the snippets directory (e.g., key "simple-td"
+          references "simple-td.json").
+      groups:
+        range: SnippetGroup
+        multivalued: true
+        inlined: true
+        description: >-
+          Map of group names to their composition definitions. Groups combine
+          multiple snippets into tabbed or toggle views for side-by-side
+          comparison in the specification.
+
+  Snippet:
+    description: >-
+      Metadata for a single JSON-LD example file rendered in the Thing Description
+      specification. Controls how the snippet is displayed, whether it is
+      validated against TD/TM JSON Schemas, and which portions of the JSON
+      structure are visible in the rendered output.
+    attributes:
+      name:
+        identifier: true
+        description: >-
+          Snippet stem name corresponding to the JSON filename without the
+          .json extension (e.g., "simple-td" for "simple-td.json").
+      id:
+        description: >-
+          HTML element ID assigned to the rendered example block. Enables
+          ReSpec cross-referencing via [[[#id]]] syntax within the
+          specification document. Required for snippets using aside layout.
+      title:
+        description: >-
+          Human-readable title displayed in the example block header.
+          Appears as the ReSpec example caption (e.g., "Thing Description
+          sample").
+      layout:
+        range: SnippetLayout
+        ifabsent: string(aside)
+        description: >-
+          HTML wrapper element for rendering. Defaults to "aside" which
+          produces a numbered ReSpec example block.
+      validate:
+        range: boolean
+        ifabsent: "true"
+        description: >-
+          Whether to validate the snippet JSON against the Thing Description
+          or Thing Model JSON Schema during the build process. Set to false
+          for partial snippets or protocol binding examples that are not
+          complete TD instances.
+      hide_paths:
+        range: string
+        multivalued: true
+        description: >-
+          Dot-notation paths identifying JSON subtrees to suppress in the
+          rendered output. Hidden subtrees are replaced with "// ..."
+          placeholder comments, allowing the specification to focus reader
+          attention on the relevant portions of a TD. Supports wildcard
+          segments (e.g., "properties.*.forms"). Mutually exclusive with
+          show_paths.
+      show_paths:
+        range: string
+        multivalued: true
+        description: >-
+          Dot-notation paths identifying JSON subtrees to retain in the
+          rendered output. All other subtrees are replaced with "// ..."
+          placeholder comments. This is the inverse of hide_paths and is
+          used when only a small portion of a TD is relevant to the
+          surrounding specification text. Supports wildcard segments.
+          Mutually exclusive with hide_paths.
+
+  TabItem:
+    description: >-
+      Represents a single tab within a tabbed snippet group. Each tab
+      displays one snippet variant and provides a labeled button for
+      switching between views.
+    attributes:
+      snippet:
+        required: true
+        description: >-
+          Reference to a snippet name (without .json extension) that
+          provides the content for this tab. Must correspond to a key
+          in the snippets section of the manifest.
+      label:
+        description: >-
+          Display text for the tab selector button. Defaults to the
+          snippet name if omitted.
+      tab_class:
+        description: >-
+          CSS class applied to the tab content panel and selector button,
+          used by the JavaScript tab-switching logic. Auto-generated from
+          the snippet name (hyphens replaced with underscores) if omitted.
+      selected:
+        range: boolean
+        ifabsent: "false"
+        description: >-
+          Whether this tab is selected by default when the page loads.
+          Exactly one tab per group should be marked as selected.
+
+  SnippetGroup:
+    description: >-
+      Defines a composition of multiple related snippets rendered together
+      as a single interactive example in the specification. Supports two
+      layout variants: tabbed (side-by-side tabs for comparing protocol
+      bindings or serialization formats) and with-default (checkbox toggle
+      between compact and expanded views showing default value population).
+    attributes:
+      name:
+        identifier: true
+        description: >-
+          Group identifier used as the key in the manifest and as the
+          argument to the %snippet('name')% rendering directive in the
+          specification template.
+      title:
+        required: true
+        description: >-
+          Title displayed in the example block header, shared across all
+          tabs or toggle views within the group.
+      layout:
+        range: GroupLayout
+        description: >-
+          Selects the group rendering variant. When set to "with-default",
+          renders a checkbox toggle between compact and expanded views.
+          When omitted, defaults to tabbed layout with tab selectors.
+      id:
+        description: >-
+          HTML element ID for the group container, enabling ReSpec
+          cross-referencing via [[[#id]]] syntax.
+      tabs:
+        range: TabItem
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Ordered list of tabs for the tabbed layout variant. Each tab
+          references a snippet and defines its selector label. Not used
+          with the with-default layout.
+      toggle_label:
+        ifabsent: "string(with Default Values)"
+        description: >-
+          Label text for the checkbox toggle control in the with-default
+          layout variant. Describes what the expanded view reveals
+          (e.g., "with Default Values", "with Context Expansion").
+      compact:
+        description: >-
+          Snippet name for the compact (default-off) view in the
+          with-default layout. References a key in the snippets section.
+      expanded:
+        description: >-
+          Snippet name for the expanded (default-on) view in the
+          with-default layout. References a key in the snippets section.

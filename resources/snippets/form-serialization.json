@@ -1,0 +1,24 @@
+{
+    "@context": "https://www.w3.org/ns/wot-next/td",
+    "id": "urn:uuid:d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+    "title": "TemperatureSensor",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": "nosec_sc",
+    "properties": {
+        "temperature": {
+            "type": "number",
+            "forms": [
+                {
+                    "op": "writeproperty",
+                    "href": "http://mytemp.example.com:5683/temp",
+                    "contentType": "application/json",
+                    "htv:methodName": "POST"
+                }
+            ]
+        }
+    }
+}

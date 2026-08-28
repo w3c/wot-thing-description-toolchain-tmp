@@ -1,0 +1,121 @@
+{
+    "@context": "https://www.w3.org/ns/wot-next/td",
+    "id": "urn:uuid:a3c74e1f-8b2d-4c9a-b6f1-7d3e5a8c2f10",
+    "title": "ApiKeyBodyExample",
+    "securityDefinitions": {
+        "apikey_body": {
+            "scheme": "apikey",
+            "in": "body",
+            "name": "/auth/key"
+        }
+    },
+    "security": "apikey_body",
+    "description": "Example device demonstrating API key in body security",
+    "properties": {
+        "color": {
+            "description": "Color setting of the device",
+            "type": "object",
+            "properties": {
+                "brightness": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                },
+                "rgb": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                },
+                "auth": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "key"
+                    ]
+                }
+            },
+            "required": [
+                "brightness",
+                "rgb",
+                "auth"
+            ],
+            "forms": [
+                {
+                    "href": "https://example.com/color",
+                    "contentType": "application/json"
+                }
+            ]
+        }
+    },
+    "actions": {
+        "on": {
+            "description": "Turn the device on",
+            "input": {
+                "auth": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "key"
+                    ]
+                }
+            },
+            "required": [
+                "auth"
+            ],
+            "forms": [
+                {
+                    "href": "https://example.com/on",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "off": {
+            "description": "Turn the device off",
+            "input": {
+                "auth": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "key"
+                    ]
+                }
+            },
+            "required": [
+                "auth"
+            ],
+            "forms": [
+                {
+                    "href": "https://example.com/off",
+                    "contentType": "application/json"
+                }
+            ]
+        }
+    },
+    "events": {
+        "statusChange": {
+            "data": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "https://example.com/events/statusChange"
+                }
+            ]
+        }
+    }
+}

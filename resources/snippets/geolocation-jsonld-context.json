@@ -1,0 +1,43 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "schema": "https://schema.org#"
+        }
+    ],
+    "id": "urn:uuid:f8b5d2e6-7a9c-4d3f-e4b6-8c0a2f4d7b9e",
+    "title": "GeoContextDevice",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": "nosec_sc",
+    "properties": {
+        "position": {
+            "jsonld:context": {
+                "schema": "https://schema.org/",
+                "long": "schema:longitude",
+                "lat": "schema:latitude",
+                "height": "schema:elevation"
+            },
+            "type": "object",
+            "forms": [
+                {
+                    "href": "https://robot.example.com/position"
+                }
+            ],
+            "properties": {
+                "long": {
+                    "type": "number"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "height": {
+                    "type": "number"
+                }
+            }
+        }
+    }
+}

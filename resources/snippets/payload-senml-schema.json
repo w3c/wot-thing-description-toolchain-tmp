@@ -1,0 +1,48 @@
+{
+    "type": "array",
+    "items": [
+        {
+            "type": "object",
+            "properties": {
+                "bn": {
+                    "type": "string",
+                    "const": "example/light"
+                }
+            }
+        },
+        {
+            "type": "object",
+            "properties": {
+                "n": {
+                    "type": "string",
+                    "const": "level"
+                },
+                "v": {
+                    "@type": [
+                        "iot:LevelData"
+                    ],
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                }
+            }
+        },
+        {
+            "type": "object",
+            "properties": {
+                "n": {
+                    "type": "string",
+                    "const": "time"
+                },
+                "v": {
+                    "@type": [
+                        "iot:TransitionTimeData"
+                    ],
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                }
+            }
+        }
+    ]
+}

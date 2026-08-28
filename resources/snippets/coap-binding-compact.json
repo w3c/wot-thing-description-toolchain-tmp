@@ -1,0 +1,56 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "cov": "http://www.example.org/coap-binding#"
+        }
+    ],
+    "id": "urn:uuid:bd472149-0b41-4dc9-80c0-977f39dc7e77",
+    "title": "MyLampThing",
+    "description": "MyLampThing uses JSON serialization",
+    "securityDefinitions": {
+        "psk_sc": {
+            "scheme": "psk"
+        }
+    },
+    "security": [
+        "psk_sc"
+    ],
+    "properties": {
+        "status": {
+            "description": "Shows the current status of the lamp",
+            "type": "string",
+            "readOnly": true,
+            "forms": [
+                {
+                    "href": "coaps://mylamp.example.com/status"
+                }
+            ]
+        }
+    },
+    "actions": {
+        "toggle": {
+            "description": "Turn on or off the lamp",
+            "forms": [
+                {
+                    "href": "coaps://mylamp.example.com/toggle"
+                }
+            ]
+        }
+    },
+    "events": {
+        "overheating": {
+            "description": "Lamp reaches a critical temperature (overheating)",
+            "data": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "coaps://mylamp.example.com/oh",
+                    "cov:methodName": "GET",
+                    "subprotocol": "cov:observe"
+                }
+            ]
+        }
+    }
+}

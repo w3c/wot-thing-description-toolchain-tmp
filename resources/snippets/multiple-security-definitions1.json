@@ -1,0 +1,49 @@
+{
+    "@context": "https://www.w3.org/ns/wot-next/td",
+    "id": "urn:uuid:e7ab8c53-2f6b-4a3e-d0c5-1b7c9e2a6d54",
+    "title": "MultipleSecurityDefinitionsExample",
+    "securityDefinitions": {
+        "basic_sc": {
+            "scheme": "basic"
+        },
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": "basic_sc",
+    "description": "Example with multiple security definitions and per-interaction override",
+    "properties": {
+        "status": {
+            "type": "string",
+            "forms": [
+                {
+                    "href": "https://mylamp.example.com/status"
+                }
+            ]
+        }
+    },
+    "actions": {
+        "toggle": {
+            "description": "Toggle the lamp",
+            "forms": [
+                {
+                    "href": "https://mylamp.example.com/toggle"
+                }
+            ]
+        }
+    },
+    "events": {
+        "overheating": {
+            "description": "Overheating event",
+            "data": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "https://mylamp.example.com/oh",
+                    "security": "nosec_sc"
+                }
+            ]
+        }
+    }
+}

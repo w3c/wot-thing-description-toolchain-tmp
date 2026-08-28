@@ -1,0 +1,15 @@
+<aside class="example with-default"{{ ' id="%s"' % id if id }}>
+  <div class="marker">
+    <span class="example-title">{{ title }}</span>
+  </div>
+  <div class="with-default-control">
+    <input type="checkbox" />
+    <span><i>{{ toggle_label }}</i></span>
+  </div>
+  <pre class="json">
+{{ compact_body | safe }}
+  </pre>
+  <pre class="json">
+{{ expanded_body | safe }}
+  </pre>
+</aside>

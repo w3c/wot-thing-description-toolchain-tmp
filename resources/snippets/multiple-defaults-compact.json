@@ -1,0 +1,16 @@
+{
+    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
+    "title": "MyLampThing",
+    "properties": {
+        "status": {
+            "type": "string",
+            "forms": [
+                {
+                    "href": "https://mylamp.example.com/status",
+                    "contentType": "application/json"
+                }
+            ]
+        }
+    }
+}

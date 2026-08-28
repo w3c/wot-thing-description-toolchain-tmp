@@ -1,0 +1,33 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "htv": "http://www.w3.org/2011/http#"
+        }
+    ],
+    "id": "urn:uuid:d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f80",
+    "title": "WeatherService",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": "nosec_sc",
+    "properties": {
+        "weather": {
+            "type": "object",
+            "uriVariables": {
+                "city": {
+                    "type": "string",
+                    "description": "City name to find the weather information for"
+                }
+            },
+            "forms": [
+                {
+                    "href": "http://example.org/weather/{city}",
+                    "htv:methodName": "GET"
+                }
+            ]
+        }
+    }
+}

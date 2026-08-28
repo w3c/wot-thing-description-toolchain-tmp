@@ -1,0 +1,73 @@
+{
+    "@context": "https://www.w3.org/ns/wot-next/td",
+    "@type": "Thing",
+    "id": "urn:uuid:1b37933b-3212-4dad-9c2c-74c6042c3e2b",
+    "title": "MyThing",
+    "titles": {
+        "en": "MyThing",
+        "de": "MeinDing"
+    },
+    "description": "Human readable information.",
+    "descriptions": {
+        "en": "Human readable information.",
+        "de": "Menschenlesbare Informationen."
+    },
+    "support": "mailto:support@example.com",
+    "version": {
+        "instance": "1.0.0"
+    },
+    "created": "2018-11-14T19:10:23.824Z",
+    "modified": "2019-06-01T09:12:43.124Z",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": "nosec_sc",
+    "base": "https://servient.example.com/",
+    "properties": {
+        "status": {
+            "type": "string",
+            "forms": [
+                {
+                    "href": "https://servient.example.com/status"
+                }
+            ]
+        }
+    },
+    "actions": {
+        "toggle": {
+            "forms": [
+                {
+                    "href": "https://servient.example.com/toggle"
+                }
+            ]
+        }
+    },
+    "events": {
+        "overheating": {
+            "data": {
+                "type": "string"
+            },
+            "forms": [
+                {
+                    "href": "https://servient.example.com/overheating"
+                }
+            ]
+        }
+    },
+    "links": [
+        {
+            "rel": "service-doc",
+            "href": "https://servient.example.com/docs",
+            "type": "application/pdf"
+        }
+    ],
+    "forms": [
+        {
+            "op": "readallproperties",
+            "href": "https://servient.example.com/properties",
+            "contentType": "application/json"
+        }
+    ]
+}

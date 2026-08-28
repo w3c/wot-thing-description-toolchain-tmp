@@ -1,0 +1,14 @@
+{
+    "forms": [
+        {
+            "href": "http://example.com/properties/temperature",
+            "op": "readproperty",
+            "contentType": "application/json"
+        },
+        {
+            "href": "coap://example.com/properties/temperature",
+            "op": "readproperty",
+            "contentType": "text/plain;charset=utf-8"
+        }
+    ]
+}

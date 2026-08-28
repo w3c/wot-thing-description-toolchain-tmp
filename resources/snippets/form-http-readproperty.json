@@ -1,0 +1,5 @@
+{
+    "href": "http://example.com/props/temperature",
+    "op": "readproperty",
+    "htv:methodName": "GET"
+}

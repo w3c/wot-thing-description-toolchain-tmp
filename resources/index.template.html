@@ -1394,57 +1394,7 @@
           </li>
         </ul>
 
-        <aside class="example with-default" id="example-context-expansion">
-          <div class="marker">
-            <span class="example-title">TD with htv prefix and context expansion</span>
-          </div>
-          <div class="with-default-control">
-            <input type="checkbox" />
-            <span><i>with Context Expansion</i></span>
-          </div>
-          <pre class="json">
-{
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
-    "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
-    "title": "MyLampThing",
-    //...
-    "properties": {
-        "status": {
-            "type": "string",
-            "forms": [{
-                "href": "https://mylamp.example.com/status",
-                "htv:methodName": "GET",
-                "op": "readproperty",
-                "contentType": "application/json"
-            }]
-        }
-    }
-}
-        </pre
-          >
-          <pre class="json">
-{
-    "@context": ["https://www.w3.org/2022/wot/td/v1.1", {
-        "htv": "http://www.w3.org/2011/http#"
-    }],
-    "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
-    "title": "MyLampThing",
-    //...
-    "properties": {
-        "status": {
-            "type": "string",
-            "forms": [{
-                "href": "https://mylamp.example.com/status",
-                "htv:methodName": "GET",
-                "op": "readproperty",
-                "contentType": "application/json"
-            }]
-        }
-    }
-}
-        </pre
-          >
-        </aside>
+        %snippet('context-expansion')%
 
         <p>
           Note that the default values and the expansion mechanisms can be applied in a sequence. For example, the lack
@@ -1461,66 +1411,7 @@
           and the fully expanded TD after applying all default values and expansion mechanisms.
         </p>
 
-        <aside class="example with-default" id="example-multiple-defaults-and-expansions">
-          <div class="marker">
-            <span class="example-title">TD with multiple default value and expansion mechanisms</span>
-          </div>
-          <div class="with-default-control">
-            <input type="checkbox" />
-            <span><i>with Defaults and Expansions</i></span>
-          </div>
-          <pre class="json">
-{
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
-    "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
-    "title": "MyLampThing",
-    //...
-    "properties": {
-        "status": {
-            "type": "string",
-            "forms": [{
-                "href": "https://mylamp.example.com/status",
-                "contentType": "application/json"
-            }]
-        }
-    }
-}
-  </pre
-          >
-          <pre class="json">
-{
-    "@context": ["https://www.w3.org/2022/wot/td/v1.1", {
-        "htv": "http://www.w3.org/2011/http#"
-    }],
-    "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
-    "title": "MyLampThing",
-    //...
-    "properties": {
-        "status": {
-            "type": "string",
-            "readOnly": false,
-            "writeOnly": false,
-            "forms": [
-                {
-                  "href": "https://mylamp.example.com/status",
-                  "htv:methodName": "GET",
-                  "op": "readproperty",
-                  "contentType": "application/json"
-                },
-                {
-                  "href": "https://mylamp.example.com/status",
-                  "htv:methodName": "PUT",
-                  "op": "writeproperty",
-                  "contentType": "application/json"
-                }
-            ]
-        }
-    }
-}
-
-  </pre
-          >
-        </aside>
+        %snippet('multiple-defaults')%
       </section>
     </section>
 
@@ -1670,112 +1561,7 @@
           these omitted members identically as if they were explicitly present with a given <a>Default Value</a>.
         </p>
 
-        <aside class="example with-default">
-          <div class="marker">
-            <span class="example-title">TD with Default Values that can be omitted</span>
-          </div>
-          <div class="with-default-control">
-            <input type="checkbox" />
-            <span><i>with Default Values</i></span>
-          </div>
-          <pre class="json">
-{
-    "@context": "https://www.w3.org/ns/wot-next/td",
-    "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
-    "title": "MyLampThing",
-    "securityDefinitions": {
-        "basic_sc": {
-            "scheme": "basic"
-        }
-    },
-    "security": "basic_sc",
-    "properties": {
-        "status": {
-            "type": "string",
-            "forms": [{
-                "href": "https://mylamp.example.com/status"
-            }]
-        }
-    },
-    "actions": {
-        "toggle": {
-            "forms": [{
-                "href": "https://mylamp.example.com/toggle"
-            }]
-        }
-    },
-    "events": {
-        "overheating": {
-            "data": {
-                "type": "string"
-            },
-            "forms": [{
-                "href": "https://mylamp.example.com/oh",
-                "subprotocol": "longpoll"
-            }]
-        }
-    }
-}
-</pre
-          >
-          <pre class="json">
-{
-    "@context": "https://www.w3.org/ns/wot-next/td",
-    "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
-    "title": "MyLampThing",
-    "securityDefinitions": {
-        "basic_sc": {
-            "scheme": "basic",
-            "in": "header"
-        }
-    },
-    "security": "basic_sc",
-    "properties": {
-        "status": {
-            "type": "string",
-            "readOnly": false,
-            "writeOnly": false,
-            "observable": false,
-            "forms": [{
-                "op": [
-                    "readproperty",
-                    "writeproperty"
-                ],
-                "href": "https://mylamp.example.com/status",
-                "contentType": "application/json"
-            }]
-        }
-    },
-    "actions": {
-        "toggle": {
-            "safe": false,
-            "idempotent": false,
-            "forms": [{
-                "op": "invokeaction",
-                "href": "https://mylamp.example.com/toggle",
-                "contentType": "application/json"
-            }]
-        }
-    },
-    "events": {
-        "overheating": {
-            "data": {
-                "type": "string",
-                "readOnly": false,
-                "writeOnly": false
-            },
-            "forms": [{
-                "op": "subscribeevent",
-                "href": "https://mylamp.example.com/oh",
-                "contentType": "application/json",
-                "subprotocol": "longpoll"
-            }]
-        }
-    }
-}
-</pre
-          >
-        </aside>
+        %snippet('td-default-values')%
 
         <p>
           Please note that, depending on the <a>Protocol Binding</a> used, additional protocol-specific
@@ -3980,7 +3766,7 @@
             <code>dimmable</code> and <code>RGB</code> capabilities.
           </p>
 
-          %snippet_group('thing-model-composition')%
+          %snippet('thing-model-composition')%
 
           <p>
             Such composition can be introduced by the usage of the <code>links</code> container.
@@ -4007,7 +3793,7 @@
             <a>Thing Descriptions</a>. An example based on Smart Ventilation is given here:
           </p>
 
-          %snippet_group('td-smart-ventilator')%
+          %snippet('td-smart-ventilator')%
 
           <p>
             A single TD can also be generated which contains the interaction definitions of the top level/parent
@@ -4121,7 +3907,7 @@
             replacement and to transform the intended value type.
           </p>
 
-          %snippet_group('td-from-tm')%
+          %snippet('td-from-tm')%
         </section>
       </section>
 
@@ -4206,7 +3992,7 @@
           <code>"rel": "type"</code> (also see Section <a href="#link"></a>), as shown in the following example:
         </p>
 
-        %snippet_group('linking-td-to-tm')%
+        %snippet('linking-td-to-tm')%
 
         <p>
           Please note that a TD can only be an instance of one TM at a time. That means for Thing Descriptions:
@@ -4899,146 +4685,7 @@
           </li>
         </ul>
 
-        <aside class="example with-default">
-          <div class="marker">
-            <span class="example-title">MyLampThing with CoAP Protocol Binding</span>
-          </div>
-          <div class="with-default-control">
-            <input type="checkbox" />
-            <span><i>with Default Values</i></span>
-          </div>
-          <pre class="json">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "cov": "http://www.example.org/coap-binding#"
-        }
-    ],
-    "id": "urn:uuid:bd472149-0b41-4dc9-80c0-977f39dc7e77",
-    "title": "MyLampThing",
-    "description": "MyLampThing uses JSON serialization",
-    "securityDefinitions": {
-        "psk_sc": {
-            "scheme": "psk"
-        }
-    },
-    "security": [
-        "psk_sc"
-    ],
-    "properties": {
-        "status": {
-            "description": "Shows the current status of the lamp",
-            "type": "string",
-            "readOnly":true,
-            "forms": [
-                {
-                    "href": "coaps://mylamp.example.com/status"
-                }
-            ]
-        }
-    },
-    "actions": {
-        "toggle": {
-            "description": "Turn on or off the lamp",
-            "forms": [
-                {
-                    "href": "coaps://mylamp.example.com/toggle"
-                }
-            ]
-        }
-    },
-    "events": {
-        "overheating": {
-            "description": "Lamp reaches a critical temperature (overheating)",
-            "data": {
-                "type": "string"
-            },
-            "forms": [
-                {
-                    "href": "coaps://mylamp.example.com/oh",
-                    "cov:methodName": "GET",
-                    "subprotocol": "cov:observe"
-                }
-            ]
-        }
-    }
-}
-  </pre
-          >
-          <pre class="json">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "cov": "http://www.example.org/coap-binding#"
-        }
-    ],
-    "id": "urn:uuid:bd472149-0b41-4dc9-80c0-977f39dc7e77",
-    "title": "MyLampThing",
-    "description": "MyLampThing uses JSON serialization",
-    "securityDefinitions": {
-        "psk_sc": {
-            "scheme": "psk"
-        }
-    },
-    "security": [
-        "psk_sc"
-    ],
-    "properties": {
-        "status": {
-            "description": "Shows the current status of the lamp",
-            "type": "string",
-            "forms": [
-                {
-                    "op": "readproperty",
-                    "href": "coaps://mylamp.example.com/status",
-                    "cov:methodName": "GET",
-                    "contentType": "application/json"
-                }
-            ],
-            "observable": false,
-            "readOnly": true
-        }
-    },
-    "actions": {
-        "toggle": {
-            "description": "Turn on or off the lamp",
-            "forms": [
-                {
-                    "href": "coaps://mylamp.example.com/toggle",
-                    "cov:methodName": "POST",
-                    "op": "invokeaction",
-                    "contentType": "application/json"
-                }
-            ],
-            "safe": false,
-            "idempotent": false
-        }
-    },
-    "events": {
-        "overheating": {
-            "description": "Lamp reaches a critical temperature (overheating)",
-            "data": {
-                "type": "string"
-            },
-            "forms": [
-                {
-                    "href": "coaps://mylamp.example.com/oh",
-                    "subprotocol": "cov:observe",
-                    "op": [
-                        "subscribeevent",
-                        "unsubscribeevent"
-                    ],
-                    "contentType": "application/json"
-                }
-            ]
-        }
-    }
-}
-  </pre
-          >
-        </aside>
+        %snippet('coap-binding')%
       </section>
 
       <section id="myLightSensor-example-mqtt">
@@ -5059,85 +4706,7 @@
             <a href="https://w3c.github.io/wot-binding-templates/bindings/protocols/mqtt/index.html">MQTT Binding</a>
           </li>
         </ul>
-        <aside class="example with-default">
-          <div class="marker">
-            <span class="example-title">MyIlluminanceSensor with MQTT Protocol Binding</span>
-          </div>
-          <div class="with-default-control">
-            <input type="checkbox" />
-            <span><i>with Default Values</i></span>
-          </div>
-          <pre class="json">
-{
-  "@context": [
-    "https://www.w3.org/ns/wot-next/td",
-    {
-    "mqv": "http://www.example.org/mqtt-binding#"
-    }
-  ],
-  "title": "MyIlluminanceSensor",
-  "id": "urn:uuid:9489991a-7622-45b6-8437-f858b59835d4",
-  "securityDefinitions": {
-      "nosec_sc": {
-          "scheme": "nosec"
-      }
-  },
-  "security": [
-      "nosec_sc"
-  ],
-  "events": {
-      "illuminance": {
-          "data": {
-              "type": "integer"
-          },
-          "forms": [
-              {
-                  "href": "mqtt://broker.com:1883/",
-                  "contentType": "text/plain",
-                  "mqv:filter": "mySensor/illuminance"
-              }
-          ]
-      }
-  }
-}
-          </pre>
-          <pre class="json">
-{
-  "@context": [
-    "https://www.w3.org/ns/wot-next/td",
-    {
-      "mqv": "http://www.example.org/mqtt-binding#"
-    }
-  ],
-  "title": "MyIlluminanceSensor",
-  "id": "urn:uuid:9489991a-7622-45b6-8437-f858b59835d4",
-  "securityDefinitions": {
-      "nosec_sc": {
-          "scheme": "nosec"
-      }
-  },
-  "security": [
-      "nosec_sc"
-  ],
-  "events": {
-      "illuminance": {
-          "data": {
-              "type": "integer"
-          },
-          "forms": [
-              {
-                  "href": "mqtt://broker.com:1883/",
-                  "contentType": "text/plain",
-                  "op":["subscribeevent","unsubscribeevent"],
-                  "mqv:controlPacket": "subscribe",
-                  "mqv:filter": "mySensor/illuminance"
-              }
-          ]
-      }
-  }
-}
-          </pre>
-        </aside>
+        %snippet('mqtt-binding')%
       </section>
 
       <section id="sensor-example-webhook">
@@ -5168,7 +4737,7 @@
           </li>
         </ul>
 
-        %snippet_group('temperature-sensor-event')%
+        %snippet('temperature-sensor-event')%
 
         <p class="note">
           Instead of a periodic POST request to the Thing, the <a>Consumer</a> may provide response data with
@@ -5197,102 +4766,7 @@
           </li>
         </ul>
 
-        <pre class="example json" title="Multiprotocol TD of a Lamp with one Protocol per Form">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "cov": "http://www.example.org/coap-binding#",
-            "mqv": "http://www.example.org/mqtt-binding#",
-            "htv": "http://www.w3.org/2011/http#"
-        }
-    ],
-    "title": "LampThing",
-    "id": "urn:dev:ops:32473-WoTLamp-1234",
-    "securityDefinitions": {
-        "nosec_sc": {
-            "scheme": "nosec"
-        }
-    },
-    "security": ["nosec_sc"],
-    "properties": {
-        "switchState": {
-            "type": "boolean",
-            "readOnly": true,
-            "observable": false,
-            "forms": [
-                {
-                    "href": "http://example.com/light/switchstate",
-                    "op": "readproperty",
-                    "contentType": "application/json",
-                    "htv:methodName":"GET"
-                }
-            ]
-        },
-        "brightness": {
-            "type": "number",
-            "readOnly": true,
-            "observable": false,
-            "forms": [
-                {
-                    "href": "coap://example.com/light/brightness",
-                    "op": "readproperty",
-                    "contentType": "application/json",
-                    "cov:method": "GET"
-                }
-            ]
-        }
-    },
-    "actions": {
-        "switchLight": {
-            "input":  {
-                "type": "boolean"
-            },
-            "forms": [
-                {
-                    "href": "http://example.com/switch/state",
-                    "op": "invokeaction",
-                    "contentType": "application/json",
-                    "htv:methodName":"POST"
-                }
-            ]
-        },
-        "setBrightness": {
-            "input":  {
-                "type": "number",
-                "maximum":255
-            },
-            "forms": [
-                {
-                    "href": "coap://example.com/light/brightness",
-                    "op": "invokeaction",
-                    "contentType": "application/json",
-                    "cov:method": "POST"
-                }
-            ]
-        }
-    },
-    "events":{
-        "concentration": {
-            "title": "Gas Concentration Event Stream",
-            "data":{
-                "type": "integer",
-                "minimum": -1,
-                "maximum": 65535
-            },
-            "forms": [
-                {
-                    "href": "mqtt://broker.com",
-                    "contentType": "application/json",
-                    "op": "subscribeevent",
-                    "mqv:filter": "application/deviceid/sensor/concentration",
-                    "mqv:controlPacket": "subscribe"
-                }
-            ]
-        }
-    }
-}
-        </pre>
+        %snippet('multiprotocol-single')%
       </section>
 
       <section id="lamp-example-multiprotocol-complex">
@@ -5320,128 +4794,7 @@
           </li>
         </ul>
 
-        <pre class="example json" title="Multiprotocol TD of a Lamp with Multiple Protocols per Form">
-{
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td",
-        {
-            "cov": "http://www.example.org/coap-binding#",
-            "mqv": "http://www.example.org/mqtt-binding#",
-            "htv": "http://www.w3.org/2011/http#"
-        }
-    ],
-    "title": "Lamp",
-    "id": "urn:dev:ops:32473-WoTLamp-5678",
-    "securityDefinitions": {
-        "nosec_sc": {
-            "scheme": "nosec"
-        }
-    },
-    "security": ["nosec_sc"],
-    "properties": {
-        "switchState": {
-            "type": "boolean",
-            "readOnly": true,
-            "observable": false,
-            "forms": [
-                {
-                    "href": "http://example.com/light/switchstate",
-                    "op": "readproperty",
-                    "contentType": "application/json",
-                    "htv:methodName":"GET"
-                },
-                {
-                    "href": "coap://example.com/light/switchstate",
-                    "op": "readproperty",
-                    "contentType": "application/json",
-                    "cov:method": "GET"
-                }
-            ]
-        },
-        "brightness": {
-            "type": "number",
-            "readOnly": true,
-            "observable": true,
-            "forms": [
-                {
-                    "href": "http://example.com/light/switchstate",
-                    "op": "readproperty",
-                    "contentType": "application/json",
-                    "htv:methodName":"GET"
-                },
-                {
-                    "href": "coap://example.com/light/switchstate",
-                    "op": "readproperty",
-                    "contentType": "application/json",
-                    "cov:method": "GET"
-                },
-                {
-                    "href": "mqtt://broker.com",
-                    "mqv:filter": "application/deviceid/sensor/brightness",
-                    "op": "observeproperty",
-                    "mqv:controlPacket": "subscribe"
-                }
-            ]
-        }
-    },
-    "actions": {
-        "switchLight": {
-            "input":  {
-                "type": "boolean"
-            },
-            "forms": [
-                {
-                    "href": "http://example.com/switch/state",
-                    "op": "invokeaction",
-                    "contentType": "application/json",
-                    "htv:methodName":"POST"
-                }
-            ]
-        },
-        "setBrightness": {
-            "input":  {
-                "type": "number",
-                "maximum":255
-            },
-            "forms": [
-                {
-                    "href": "coap://example.com/light/brightness",
-                    "op": "invokeaction",
-                    "contentType": "application/json",
-                    "cov:method": "POST"
-                }
-            ]
-        }
-    },
-    "events":{
-        "concentration": {
-            "title": "Gas Concentration Event Stream",
-            "data":{
-                "type": "integer",
-                "minimum": -1,
-                "maximum": 65535
-            },
-            "forms": [
-                {
-                    "href": "mqtt://broker.com",
-                    "contentType": "application/json",
-                    "op": "subscribeevent",
-                    "mqv:filter": "application/deviceid/sensor/concentration",
-                    "mqv:controlPacket": "subscribe"
-                },
-                {
-                    "cov:method": "GET",
-                    "href": "coap://example.com/sensor/gasconcentration",
-                    "contentType": "application/json",
-                    "op": "subscribeevent",
-                    "subprotocol": "cov:observe"
-                }
-            ]
-        }
-    }
-}
-              </pre
-        >
+        %snippet('multiprotocol-mixed')%
       </section>
     </section>
 

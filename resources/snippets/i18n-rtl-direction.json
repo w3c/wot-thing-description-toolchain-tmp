@@ -1,0 +1,43 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/wot-next/td",
+        {
+            "@language": "ar-EG",
+            "@direction": "rtl"
+        }
+    ],
+    "title": "شيء يخصني يقيس درجة الحرارة",
+    "description": "شيء يقيس درجة الحرارة و يظهر حالته",
+    "id": "urn:uuid:c5e2a9b3-4d6f-4a0c-b1e3-5f7d9c1a4e6b",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "security": "nosec_sc",
+    "properties": {
+        "temp": {
+            "title": "درجة الحرارة",
+            "type": "boolean",
+            "forms": [
+                {
+                    "href": "https://example.com/temp"
+                }
+            ]
+        },
+        "status": {
+            "title": "حالة",
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                }
+            },
+            "forms": [
+                {
+                    "href": "https://example.com/status"
+                }
+            ]
+        }
+    }
+}

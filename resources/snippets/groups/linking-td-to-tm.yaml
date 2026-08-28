@@ -1,9 +1,0 @@
-title: Linking Thing Description to a Thing Model Definition
-tabs:
-  - snippet: smart-pump-tm
-    label: Thing Model
-    tab_class: thingmodel
-    selected: true
-  - snippet: smart-pump-td
-    label: Thing Description
-    tab_class: thingdescription
