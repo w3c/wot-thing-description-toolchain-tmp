@@ -32,5 +32,7 @@ validate: true
                 // @hide-end
             ]
         }
+    // @hide-start
+    // @hide-end
     }
 }

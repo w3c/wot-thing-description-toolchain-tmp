@@ -15,12 +15,7 @@ title: An electric drive includes two motors.
     // @hide-end
     "title": "Electric Drive",
     // @hide-start
-    "properties": {
-        "speed": {
-            "type": "number",
-            "forms": [{ "href": "coaps://drive.example.com/speed" }]
-        }
-    },
+    "properties": {},
     // @hide-end
     "links": [{
         "rel": "item",

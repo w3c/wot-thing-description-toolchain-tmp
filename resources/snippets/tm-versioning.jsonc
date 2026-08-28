@@ -12,4 +12,6 @@ title: Thing Model versioning
     "title": "Lamp Thing Model",
     "description": "Lamp Thing Description Model",
     "version": {"model": "1.0.0"}
+    // @hide-start
+    // @hide-end
 }

@@ -29,6 +29,11 @@ validate: true
             "height": "schema:elevation"
         },
         "type": "object",
+        "forms": [
+            // @hide-start
+            {"href": "https://robot.example.com/position"}
+            // @hide-end
+        ],
         "properties": {
             "long": { "type": "number" },
             "lat": { "type": "number" },

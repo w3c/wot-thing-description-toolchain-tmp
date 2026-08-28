@@ -19,5 +19,4 @@ validate: false
 			"observable": true
 		}
 	}
-	...
 }

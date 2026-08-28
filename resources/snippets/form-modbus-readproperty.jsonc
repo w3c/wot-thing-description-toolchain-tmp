@@ -2,30 +2,11 @@
 ---
 layout: pre
 title: Binding instance of a readproperty operation to Modbus
+validate: false
 ---
 */
 {
-    // @hide-start
-    "@context": "https://www.w3.org/ns/wot-next/td",
-    "id": "urn:uuid:b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e",
-    "title": "ModbusDevice",
-    "securityDefinitions": {
-        "nosec_sc": { "scheme": "nosec" }
-    },
-    "security": "nosec_sc",
-    "properties": {
-        "coilValue": {
-            "type": "boolean",
-            "forms": [
-                {
-                    // @hide-end
-                    "href": "modbus+tcp://127.0.0.1:60000/1/4",
-                    "op": "readproperty",
-                    "modv:function": "readCoil"
-                    // @hide-start
-                }
-            ]
-        }
-    }
-    // @hide-end
+    "href": "modbus+tcp://127.0.0.1:60000/1/4",
+    "op": "readproperty",
+    "modv:function": "readCoil"
 }

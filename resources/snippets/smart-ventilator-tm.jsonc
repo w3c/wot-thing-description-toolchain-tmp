@@ -7,9 +7,7 @@ title: Smart Ventilator TM
     "@context": "https://www.w3.org/ns/wot-next/td",
     "@type": "tm:ThingModel",
     "title": "Smart Ventilator Thing Model",
-    "version": {
-        "model": "1.0.0"
-    },
+    "version": {"model": "1.0.0"},
     "links": [
         {
             "rel": "tm:submodel",

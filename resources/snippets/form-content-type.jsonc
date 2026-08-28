@@ -14,13 +14,12 @@ layout: pre
     "security": "nosec_sc",
     "properties": {
         "status": {
-            "type": "string",
             "forms": [
                 {
                     "href": "https://example.com/status",
-                    // @hide-end
-                    "contentType": "text/plain; charset=utf-8"
-                    // @hide-start
+    // @hide-end
+     "contentType": "text/plain; charset=utf-8"
+    // @hide-start
                 }
             ]
         }

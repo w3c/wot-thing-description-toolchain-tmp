@@ -19,5 +19,4 @@ validate: false
 			"observable": "{{THERMOSTATE_TEMPERATURE_OBSERVABLE}}"
 		}
 	}
-	...
 }

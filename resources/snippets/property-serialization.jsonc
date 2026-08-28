@@ -57,5 +57,10 @@ validate: true
                 // @hide-end
             ]
         }
+    },
+    // @hide-start
+    "actions": {
+
     }
+    // @hide-end
 }

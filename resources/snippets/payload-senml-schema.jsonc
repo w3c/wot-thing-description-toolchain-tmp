@@ -25,9 +25,7 @@ title: Data Schema for SenML Payload Example
                     "const": "level"
                 },
                 "v": {
-                    "@type": [
-                        "iot:LevelData"
-                    ],
+                    "@type": ["iot:LevelData"],
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 255
@@ -42,9 +40,7 @@ title: Data Schema for SenML Payload Example
                     "const": "time"
                 },
                 "v": {
-                    "@type": [
-                        "iot:TransitionTimeData"
-                    ],
+                    "@type": ["iot:TransitionTimeData"],
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 65535

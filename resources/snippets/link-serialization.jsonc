@@ -17,11 +17,11 @@ title: Sample of a Link serialization
     },
     "security": "nosec_sc",
     // @hide-end
-    "links": [
-        {
+    "links": [{
             "rel": "controlledBy",
             "href": "https://servient.example.com/things/lampController",
             "type": "application/td+json"
-        }
-    ]
+        }]
+    // @hide-start
+    // @hide-end
 }

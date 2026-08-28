@@ -24,9 +24,7 @@ title: Thing Model sample
     "events": {
         "overheating": {
             "description": "Lamp reaches a critical temperature (overheating)",
-            "data": {
-                "type": "string"
-            }
+            "data": {"type": "string"}
         }
     }
 }

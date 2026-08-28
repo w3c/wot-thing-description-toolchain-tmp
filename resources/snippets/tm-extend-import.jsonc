@@ -6,18 +6,14 @@ title: Smart Lamp Control Thing Model with extend and import mechanism
 ---
 */
 {
-    "@context": [
-        "https://www.w3.org/ns/wot-next/td"
-    ],
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
     "@type": "tm:ThingModel",
     "title": "Smart Lamp Control",
-    "links": [
-        {
+    "links": [{
             "rel": "extends",
             "href": "http://example.com/BasicOnOffTM",
             "type": "application/tm+json"
-        }
-    ],
+        }],
     "properties": {
         "status": {
             "tm:ref": "http://example.com/LampTM.tm.jsonld#/properties/status"

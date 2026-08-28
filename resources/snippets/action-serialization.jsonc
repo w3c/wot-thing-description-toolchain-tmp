@@ -49,4 +49,6 @@ validate: true
             ]
         }
     }
+    // @hide-start
+    // @hide-end
 }
