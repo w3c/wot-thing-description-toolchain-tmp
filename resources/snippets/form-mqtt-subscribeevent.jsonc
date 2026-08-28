@@ -1,6 +1,7 @@
 /*
 ---
 layout: pre
+id: form-mqtt-subscribeevent
 title: Binding instance of a subscribeevent operation to MQTT
 validate: false
 ---

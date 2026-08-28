@@ -1,6 +1,7 @@
 /*
 ---
 layout: pre
+id: form-http-readproperty
 title: Binding instance of a readproperty operation to HTTP
 validate: false
 ---

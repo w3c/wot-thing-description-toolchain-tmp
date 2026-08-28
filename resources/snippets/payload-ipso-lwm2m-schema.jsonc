@@ -1,6 +1,7 @@
 /*
 ---
 layout: pre
+id: payload-ipso-lwm2m-schema
 validate: false
 title: Data Schema for IPSO/LWM2M Payload Example
 ---

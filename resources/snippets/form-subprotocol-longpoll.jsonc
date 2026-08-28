@@ -1,6 +1,7 @@
 /*
 ---
 layout: pre
+id: form-subprotocol-longpoll
 title: Subprotocol usage for subscribing events
 validate: false
 ---

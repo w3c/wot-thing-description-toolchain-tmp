@@ -1,6 +1,7 @@
 /*
 ---
 layout: pre
+id: payload-ocf-batch-schema
 validate: false
 title: Data Schema for OCF Batch Payload Example
 ---

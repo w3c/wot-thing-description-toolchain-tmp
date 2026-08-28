@@ -1,6 +1,7 @@
 /*
 ---
 layout: pre
+id: payload-ocf-batch
 validate: false
 title: OCF Batch Example
 ---

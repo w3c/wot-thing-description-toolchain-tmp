@@ -1,6 +1,7 @@
 /*
 ---
 layout: pre
+id: payload-json-object-schema
 validate: false
 title: DataSchema for Simple JSON Object Payload
 ---

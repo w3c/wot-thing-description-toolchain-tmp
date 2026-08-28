@@ -1,6 +1,7 @@
 /*
 ---
 layout: pre
+id: payload-senml
 validate: false
 title: SenML Payload Example
 ---

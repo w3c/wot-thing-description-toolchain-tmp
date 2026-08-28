@@ -1,6 +1,7 @@
 /*
 ---
 layout: pre
+id: payload-json-object
 validate: false
 title: Simple JSON Object Payload
 ---

@@ -1,6 +1,7 @@
 /*
 ---
 layout: pre
+id: form-http-invokeaction
 title: Binding instance of an invokeaction operation to HTTP
 validate: false
 ---
