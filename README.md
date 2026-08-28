@@ -23,6 +23,7 @@ Step 2: Generate the final WoT TD specification document using the generated WoT
 
 - Python 3.14. [Download and install Python](https://www.python.org/downloads/).
 - The [uv](https://docs.astral.sh/uv/) package manager.
+- [Graphviz](https://graphviz.org/download/) — the `dot` command must be on your PATH. Required for generating class-hierarchy diagrams.
 
 ## Quick Start
 
