@@ -1,6 +1,6 @@
 /*
 ---
-# HTML id attribute for the example block (used for cross-references)
+# REQUIRED: HTML id attribute for the example block (used for cross-references)
 id: my-example-id
 
 # Title shown above the example in the rendered spec
