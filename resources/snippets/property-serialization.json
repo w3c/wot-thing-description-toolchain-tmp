@@ -36,10 +36,7 @@
                     "maxItems": 3
                 }
             },
-            "required": [
-                "brightness",
-                "rgb"
-            ],
+            "required": ["brightness", "rgb"],
             "forms": [
                 {
                     "href": "https://smartlamp.example.com/status"

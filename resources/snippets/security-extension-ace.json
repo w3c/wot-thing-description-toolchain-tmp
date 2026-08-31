@@ -14,10 +14,7 @@
             "description": "ACE security scheme configuration",
             "ace:as": "coaps://as.example.com/token",
             "ace:audience": "coaps://rs.example.com",
-            "ace:scopes": [
-                "limited",
-                "special"
-            ],
+            "ace:scopes": ["limited", "special"],
             "ace:cnonce": true
         }
     },

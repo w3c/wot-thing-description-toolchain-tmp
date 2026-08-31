@@ -23,10 +23,7 @@
                 },
                 "unit": {
                     "type": "string",
-                    "enum": [
-                        "fahrenheit_value",
-                        "celsius_value"
-                    ],
+                    "enum": ["fahrenheit_value", "celsius_value"],
                     "description": "Desired unit for the temperature value"
                 }
             },

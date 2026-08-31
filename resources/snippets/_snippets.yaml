@@ -8,6 +8,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - actions.*.forms.*
   basic-on-off-tm:
     id: td-model-example-basic-on-off
     title: Basic On/Off Thing Model Definition
@@ -38,6 +39,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - properties.*.forms.*
   dataschema-serialization:
     id: dataschema-serialization-sample
     title: Sample of a DataSchema serialization
@@ -53,6 +55,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - events.*.forms.*
   form-additional-responses:
     id: form-additionalResponses
     layout: pre
@@ -114,6 +117,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - actions.takePhoto.output
   form-serialization:
     id: form-serialization-sample
     title: Sample of a Form serialization
@@ -132,6 +136,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - properties.*
   geolocation-jsonld-context:
     id: saref-geolocation-annotation-example-3
     layout: pre
@@ -322,6 +327,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - properties.*.forms.*
     - actions
   saref-state-annotation:
     id: saref-state-annotation-example
@@ -333,12 +339,16 @@ snippets:
   security-apikey-body-simplified:
     id: security-apikey-body-simplified
     layout: pre
-    hide_paths:
-    - '@context'
-    - id
-    - title
-    - description
-    - events
+    show_paths:
+      - securityDefinitions
+      - security
+      - properties.color.type
+      - properties.color.properties.*.type
+      - properties.color.properties.auth
+      - properties.color.required
+      - properties.color.forms.href
+      - actions.*.required
+      - actions.*.forms.href
   security-apikey-body:
     id: security-apikey-body
     layout: pre
@@ -393,6 +403,9 @@ snippets:
     hide_paths:
     - id
     - title
+    - securityDefinitions.*.description
+    - properties.*.type
+    - actions.*.description
     - events
   security-in-forms:
     id: security-security-forms
@@ -428,6 +441,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - properties.*.forms.*
   simple-td:
     id: simple-thing-description-sample
     title: Thing Description sample
@@ -477,6 +491,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - properties.*.forms.*
   temp-sensor-event-no-urivars:
     layout: pre
   temp-sensor-event-urivars:
@@ -539,6 +554,7 @@ snippets:
     layout: pre
     hide_paths:
     - '@context'
+    - properties
   urivar-city-unit:
     id: form-uriVariables-city-unit
     layout: pre
@@ -547,6 +563,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - properties.weather.type
   urivar-city:
     id: form-uriVariables-city
     layout: pre
@@ -555,6 +572,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - properties.weather.type
   urivar-lat-long:
     id: form-uriVariables-lat-long
     layout: pre
@@ -563,6 +581,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - properties.weather.type
   urivar-thing-level:
     id: td-forms-urivariables-thing-example
     layout: pre
@@ -572,6 +591,7 @@ snippets:
     - title
     - securityDefinitions
     - security
+    - properties.*.forms.*
   ventilation-td:
     title: Ventilation TD
   ventilation-tm:

@@ -48,13 +48,28 @@ Paths use dot-separated keys to target nested JSON properties:
 - Nested: `properties.temperature.forms`, `properties.lampState.type`
 - Wildcard: `properties.*.forms` (matches any property name)
 
-Example: to show only the `forms` array of a specific property:
+### Wildcards
+
+Use `*` to match any key at a given depth:
 
 ```yaml
+# Hide the forms array inside every property
+my-snippet:
+  hide_paths:
+    - properties.*.forms
+```
+
+```yaml
+# Show only the forms array of every property (everything else becomes // ...)
 my-snippet:
   show_paths:
-    - properties.temperature.forms
+    - properties.*.forms
 ```
+
+### Collapse vs hide
+
+- `properties.*.forms` → entire `"forms"` key hidden (removed from output)
+- `properties.*.forms.*` → `"forms": [// ...]` (key visible, contents collapsed)
 
 ## Snippet Groups/Composition
 

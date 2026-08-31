@@ -41,11 +41,7 @@
         },
         "unitSystem": {
             "type": "string",
-            "enum": [
-                "metric",
-                "imperial",
-                "uscustomary"
-            ],
+            "enum": ["metric", "imperial", "uscustomary"],
             "description": "System of Measurement that will be used for the values"
         }
     },
