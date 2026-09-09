@@ -610,9 +610,6 @@ def generate_respec_spec(
     section_ids = list(cfg.section_schemas.keys())
     sections_content = process_fragments(section_ids, sections_content, cfg.glossary_path)
 
-    # Escape literal percent signs so assemble()'s placeholder replacement is safe.
-    sections_content = [s.replace('%', '%%') for s in sections_content]
-
     rendered_template = None
     if cfg.snippets_dir.is_dir():
         from ..specgen.snippets import validate_all_snippets
