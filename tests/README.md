@@ -18,7 +18,7 @@ uv run pytest tests/ -v
 | `test_spec_content_rendering.py` | Do the HTML rendering functions produce the expected markup? Uses fake input, does not read generated files. |
 | `test_default_assignments.py` | Do the correct slots carry default-value assignments, and do enum value hints render as `<code>`-wrapped HTML? |
 | `tmp/test_assertion_inventory.py` | Does our assertion id set match the upstream one in `resources/upstream/assertions.csv`? Reports only, never fails. |
-| `tmp/test_spec_html_vs_golden.py` | Does the generated spec HTML match `resources/upstream/html/index.html` inside the four sections the pipeline generates? Fails today, so it is not run in CI. Also holds two integrity checks on the generated file alone (unique ids, resolvable in-page links). |
+| `tmp/test_spec_html_vs_golden.py` | Does the generated spec HTML match `resources/upstream/html/index.html` inside the four sections the pipeline generates? Still fails today, the report at the end of the run lists the differences. Also holds two integrity checks on the generated file alone (unique ids, resolvable in-page links). |
 
 Helper modules, not test files: `baselines.py` (reads the known-failure lists,
 derives TD 2.0 samples from TD 1.1 ones), `rejections.py` (groups schema
