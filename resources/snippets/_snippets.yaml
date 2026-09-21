@@ -22,7 +22,7 @@ snippets:
   context-expansion-expanded:
     validate: false
   context-extensions:
-    id: td-context-ns-thing-optional
+    id: example-td-context-ns-thing-optional
     layout: pre
     hide_paths:
     - id
@@ -57,7 +57,7 @@ snippets:
     - security
     - events.*.forms.*
   form-additional-responses:
-    id: form-additionalResponses
+    id: example-form-additionalResponses
     layout: pre
     hide_paths:
     - '@context'
@@ -66,7 +66,7 @@ snippets:
     - securityDefinitions
     - security
   form-content-media-encoding:
-    id: form-contentMediaType-contentEncoding
+    id: example-form-contentMediaType-contentEncoding
     layout: pre
     hide_paths:
     - '@context'
@@ -75,7 +75,7 @@ snippets:
     - securityDefinitions
     - security
   form-content-type:
-    id: form-contentType
+    id: example-form-contentType
     layout: pre
     show_paths:
     - properties.status.forms.contentType
@@ -109,7 +109,7 @@ snippets:
     - securityDefinitions
     - security
   form-response:
-    id: form-response
+    id: example-form-response
     layout: pre
     hide_paths:
     - '@context'
@@ -154,7 +154,7 @@ snippets:
     - securityDefinitions
     - security
   i18n-default-language:
-    id: td-context-default-language
+    id: example-td-context-default-language
     layout: pre
     hide_paths:
     - id
@@ -372,7 +372,7 @@ snippets:
       - security
       - properties.status.forms.href
   security-apikey:
-    id: security-apikey
+    id: example-security-apikey
     layout: pre
     show_paths:
       - securityDefinitions
@@ -389,7 +389,7 @@ snippets:
     - actions
     - events
   security-combo-oneof:
-    id: security-comboSecurityScheme
+    id: example-security-comboSecurityScheme
     layout: pre
     hide_paths:
     - '@context'
@@ -408,7 +408,7 @@ snippets:
     - actions.*.description
     - events
   security-in-forms:
-    id: security-security-forms
+    id: example-security-security-forms
     layout: pre
     hide_paths:
     - '@context'
@@ -434,7 +434,7 @@ snippets:
     - description
     - events
   semantic-version-units:
-    id: semantic-annotations-example-version-units
+    id: example-semantic-annotations-example-version-units
     layout: pre
     hide_paths:
     - id
