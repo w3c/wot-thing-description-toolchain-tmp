@@ -580,15 +580,6 @@ classes:
           spec_default: true
         slot_uri: hctl:isSuccess
         range: boolean
-      contentType:
-        description: >-
-          Assign a content type based on a media type (e.g., text/plain) and potential parameters
-          (e.g., charset=utf-8) for the media type [RFC2046].
-        annotations:
-          spec_description: >-
-            Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
-        slot_uri: hctl:forContentType
-        range: string
       schema:
         description: >-
           Used to define the output data schema for an additional response if it differs from the default
@@ -598,4 +589,13 @@ classes:
           spec_description: >-
             Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a `DataSchema` object, the name of a previous definition given in a `schemaDefinitions` map must be used.
         slot_uri: hctl:hasAdditionalOutputSchema
+        range: string
+      contentType:
+        description: >-
+          Assign a content type based on a media type (e.g., text/plain) and potential parameters
+          (e.g., charset=utf-8) for the media type [RFC2046].
+        annotations:
+          spec_description: >-
+            Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
+        slot_uri: hctl:forContentType
         range: string
