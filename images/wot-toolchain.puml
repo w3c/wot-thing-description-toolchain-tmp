@@ -1,0 +1,53 @@
+@startuml
+!theme plain
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName "Inter, Segoe UI, Helvetica Neue, sans-serif"
+skinparam defaultFontSize 13
+skinparam defaultFontColor #2D3748
+skinparam arrowColor #94A3B8
+skinparam arrowThickness 1.5
+
+skinparam package {
+  FontSize 14
+  FontStyle bold
+  FontColor #2D3748
+  BorderThickness 2.5
+  BorderColor #E2E8F0
+}
+
+skinparam rectangle {
+  FontSize 13
+  FontColor #2D3748
+  BorderThickness 1
+  BorderColor #CBD5E1
+  StereotypeFontSize 0
+  StereotypeFontColor transparent
+}
+
+package "Source Models" as pkg_input #F5F3FF {
+  rectangle "WoT LinkML Schema Modules\n\n<size:11><color:#718096>td-linkml · hctl-linkml · wotsec-linkml · jsonschema-linkml</color></size>" as schemas
+  rectangle "Static ReSpec Template & Jinja Templates\n\n<size:11><color:#718096>resources/index.template.html · resources/jinja_templates/</color></size>" as templates
+  rectangle "TD/TM JSON Snippets\n\n<size:11><color:#718096>with _snippets.yaml metadata</color></size>" as snippets
+}
+
+package "Generation Pipeline" as pkg_gen #F0F4F8 {
+  rectangle "LinkML Resource Generation + Postprocessors" as resource_generation #EBF2FA
+  rectangle "Snippet Rendering + ReSpec Specification Generation" as specification_generation #EBF2FA
+}
+
+package "Generated Artifacts" as pkg_out #FDF2F8 {
+  rectangle "WoT Resource Artifacts\n\n<size:11><color:#718096>JSON Schema · JSON-LD Context · SHACL · OWL · TypeScript</color></size>" as resource_artifacts
+  rectangle "Generated ReSpec index.html + Assertion CSV\n\n<size:11><color:#718096>vocabulary tables · assertions · rendered snippets</color></size>" as index_html
+}
+
+' Two arrows from each source model type
+schemas --> resource_generation
+schemas --> specification_generation
+templates --> specification_generation
+snippets --> specification_generation
+resource_generation --> resource_artifacts
+specification_generation --> index_html
+@enduml
