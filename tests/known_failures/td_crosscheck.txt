@@ -1,8 +1,0 @@
-# Samples where the generated schema and the W3C schema give different
-# verdicts (TD 1.1: REC1.1 schema, TD 2.0: wot-next schema).
-# One entry per line: <version>/<path relative to tests/data/>, where
-# <version> is td11 or td20. Both versions share the same sample files;
-# the td20 variant is derived by rewriting @context (as_td20 in baselines.py).
-# Marked xfail(strict): when a divergence is fixed, remove its line here.
-#
-# Baseline: the generated schema rejects every valid TD that the W3C schema accepts.

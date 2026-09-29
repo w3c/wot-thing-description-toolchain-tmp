@@ -1,0 +1,205 @@
+schema_version: 1
+upstream:
+  repository: w3c/wot-thing-description
+  artifact: resources/upstream/html/index.html
+policy: >-
+  Entries are limited to reviewed corrections that preserve normative meaning.
+divergences:
+  - id: html-thing-title-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-core-vocabulary-definition
+      table: Vocabulary Terms in Thing Level
+      row_id: td-vocab-title--Thing
+      column: 3
+    rationale: ThingShape permits xsd:string or rdf:langString for title.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-interaction-affordance-uri-variables-spacing
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-core-vocabulary-definition
+      table: Vocabulary Terms in InteractionAffordance Level
+      row_id: td-vocab-uriVariables--InteractionAffordance
+      column: 1
+    rationale: Corrects the missing space in uriVariablesand.
+    expected_generated:
+      text: Define URI template variables according to [RFC6570] as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the href upon the execution of the operation. If the same variable is both declared in Thing level uriVariables and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
+  - id: html-property-observable-punctuation
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-core-vocabulary-definition
+      table: Vocabulary Terms in PropertyAffordance Level
+      row_id: td-vocab-observable--PropertyAffordance
+      column: 1
+    rationale: Applies consistent terminal punctuation.
+    expected_generated:
+      text: A hint that indicates whether Servients hosting the Thing and Intermediaries should provide a Protocol Binding that supports the observeproperty and unobserveproperty operations for this Property. Also see [[#interaction-semantics]] for further information on the usage patterns and implications.
+  - id: html-data-schema-type-punctuation
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-data-schema-vocabulary-definition
+      table: Vocabulary Terms in DataSchema Level
+      row_id: td-vocab-at-type--DataSchema
+      column: 1
+    rationale: Applies consistent terminal punctuation.
+    expected_generated:
+      text: JSON-LD keyword to label the object with semantic tags (or types).
+  - id: html-data-schema-read-only-punctuation
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-data-schema-vocabulary-definition
+      table: Vocabulary Terms in DataSchema Level
+      row_id: td-vocab-readOnly--DataSchema
+      column: 1
+    rationale: Applies consistent terminal punctuation.
+    expected_generated:
+      text: Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false). Also see [[#interaction-semantics]] for further information on the usage patterns and implications.
+  - id: html-data-schema-write-only-punctuation
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-data-schema-vocabulary-definition
+      table: Vocabulary Terms in DataSchema Level
+      row_id: td-vocab-writeOnly--DataSchema
+      column: 1
+    rationale: Applies consistent terminal punctuation.
+    expected_generated:
+      text: Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false). Also see [[#interaction-semantics]] for further information on the usage patterns and implications.
+  - id: html-link-relation-alternate
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-hypermedia-vocabulary-definition
+      table: Best practice relation type table
+      row_id: alternate
+      column: 2
+    rationale: Uses grammatically complete relation text and current RDF/Turtle terminology.
+    expected_generated:
+      text: Points to an alternative representation of the Thing, for example RDF/Turtle or an HTML document.
+  - id: html-link-relation-type
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-hypermedia-vocabulary-definition
+      table: Best practice relation type table
+      row_id: type
+      column: 2
+    rationale: Uses grammatically complete relation text.
+    expected_generated:
+      text: Indicates that the Thing is an instance of the target resource, such as a Thing Model.
+  - id: html-link-relation-proxy-to
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-hypermedia-vocabulary-definition
+      table: Best practice relation type table
+      row_id: proxy-to
+      column: 2
+    rationale: Uses grammatically complete relation text.
+    expected_generated:
+      text: Target resource provides the address of a proxy. Additional security metadata can be provided using the proxy field in a SecurityScheme.
+  - id: html-link-relation-collection
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-hypermedia-vocabulary-definition
+      table: Best practice relation type table
+      row_id: collection
+      column: 2
+    rationale: Corrects the plural noun error.
+    expected_generated:
+      text: Points to a collection of Things.
+  - id: html-link-relation-item
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-hypermedia-vocabulary-definition
+      table: Best practice relation type table
+      row_id: item
+      column: 2
+    rationale: Uses grammatically complete relation text.
+    expected_generated:
+      text: "Points to a Thing that is a member of the current Thing’s collection."
+  - id: html-form-content-coding-punctuation
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-hypermedia-vocabulary-definition
+      table: Vocabulary Terms in Form Level
+      row_id: td-vocab-contentCoding--Form
+      column: 1
+    rationale: Corrects duplicate terminal punctuation.
+    expected_generated:
+      text: Content coding values indicate an encoding transformation that has been or can be applied to a representation. Content codings are primarily used to allow a representation to be compressed or otherwise usefully transformed without losing the identity of its underlying media type and without loss of information. Examples of content coding include "gzip", "deflate", etc.
+  - id: html-assertion-op-for-action-comma
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: assertion
+      assertion_id: td-op-for-action
+    rationale: Applies standard list punctuation without changing the requirement.
+    expected_generated:
+      text: When a Form instance is within an ActionAffordance instance, the value assigned to op MUST either be invokeaction, queryaction, cancelaction, or an Array containing a combination of these terms.
+  - id: html-assertion-bidi-isolation-punctuation
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: assertion
+      assertion_id: td-processor-bidi-isolation
+    rationale: Applies terminal punctuation without changing the requirement.
+    expected_generated:
+      text: TD Processors SHOULD take care to use bidi isolation when presenting strings to users, particularly when embedding in surrounding text (e.g., for Web user interface).
+  - id: html-assertion-bearer-format-punctuation
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: assertion
+      assertion_id: td-security-bearer-format-extensions
+    rationale: Applies terminal punctuation without changing the requirement.
+    expected_generated:
+      text: Other formats and algorithms for bearer tokens MAY be specified in vocabulary extensions.
+  - id: html-assertion-oauth-client-flow-comma
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: assertion
+      assertion_id: td-security-oauth2-client-flow
+    rationale: Applies introductory comma punctuation without changing the requirement.
+    expected_generated:
+      text: For the client flow, token vocabulary term MUST be included.
+  - id: html-assertion-oauth-client-flow-no-auth-comma
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: assertion
+      assertion_id: td-security-oauth2-client-flow-no-auth
+    rationale: Applies introductory comma punctuation without changing the requirement.
+    expected_generated:
+      text: For the client flow, authorization vocabulary term MUST NOT be included.
+  - id: html-assertion-oauth-code-flow-comma
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: assertion
+      assertion_id: td-security-oauth2-code-flow
+    rationale: Applies introductory comma punctuation without changing the requirement.
+    expected_generated:
+      text: For the code flow, both authorization and token vocabulary terms MUST be included.

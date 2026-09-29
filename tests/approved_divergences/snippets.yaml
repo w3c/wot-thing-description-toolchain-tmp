@@ -1,0 +1,81 @@
+schema_version: 1
+upstream:
+  repository: w3c/wot-thing-description
+  artifact: resources/upstream/html/index.html
+policy: >-
+  Entries are limited to complete generated TD or TM examples that differ from
+  illustrative upstream inline examples.
+divergences:
+  - id: snippet-multiple-security-definitions1
+    category: complete-example
+    review: approved
+    upstream_locator:
+      kind: example
+      example_id: multiple-security-definitions1
+    rationale: The generated complete TD supplies fields omitted by the upstream example.
+    expected_difference_paths:
+      - actions.toggle.description
+      - events.overheating.data
+      - events.overheating.description
+      - properties.status.type
+    expected_generated:
+      json_paths:
+        properties.status.type: string
+        actions.toggle.description: Toggle the lamp
+        events.overheating.data.type: string
+        events.overheating.description: Overheating event
+  - id: snippet-oauth2-scopes
+    category: complete-example
+    review: approved
+    upstream_locator:
+      kind: example
+      example_id: example-oauth2-scopes
+    rationale: The generated complete TD supplies fields omitted by the upstream example.
+    expected_difference_paths:
+      - actions.configure.description
+      - properties.status.type
+    expected_generated:
+      json_paths:
+        properties.status.type: string
+        actions.configure.description: Configure the device
+  - id: snippet-form-serialization-sample
+    category: complete-example
+    review: approved
+    upstream_locator:
+      kind: example
+      example_id: form-serialization-sample
+    rationale: The generated example places the write form on its Property affordance rather than showing an unscoped top-level fragment.
+    expected_difference_paths:
+      - forms
+      - properties
+    expected_generated:
+      json_paths:
+        properties.temperature.forms.0.op: writeproperty
+  - id: snippet-data-schema-serialization-sample
+    category: complete-example
+    review: approved
+    upstream_locator:
+      kind: example
+      example_id: dataschema-serialization-sample
+    rationale: The generated complete TD places the object data schema under the lampState Property affordance.
+    expected_difference_paths:
+      - properties.brightness
+      - properties.lampState
+      - properties.rgb
+      - properties.status
+      - type
+    expected_generated:
+      json_paths:
+        properties.lampState.type: object
+  - id: snippet-saref-geolocation-annotation-3
+    category: complete-example
+    review: approved
+    upstream_locator:
+      kind: example
+      example_id: saref-geolocation-annotation-example-3
+    rationale: The generated complete TD includes the Form required to expose the position Property affordance.
+    expected_difference_paths:
+      - properties.position.forms
+    expected_generated:
+      json_paths:
+        properties.position.forms.0.href: https://robot.example.com/position

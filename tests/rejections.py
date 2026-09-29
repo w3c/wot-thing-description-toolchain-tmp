@@ -1,5 +1,4 @@
-"""Where and why the generated schema rejected a sample, taken directly
-from the jsonschema validation errors."""
+"""Summarize JSON Schema validation failures."""
 import re
 from pathlib import Path
 

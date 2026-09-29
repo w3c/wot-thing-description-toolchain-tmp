@@ -1,11 +1,4 @@
-"""Helpers to compare the generated spec HTML with the manual golden HTML.
-
-Both files are ReSpec sources but serialized differently, so a plain text diff
-only reports formatting noise. The comparison works on the parsed DOM instead:
-sections by id, tables by caption, rows by their ``tr`` id. A table cell is
-compared as plain text with whitespace collapsed, inline markup is not compared
-because both files leave many links unresolved for ReSpec.
-"""
+"""Compare generated and upstream specification HTML by DOM structure."""
 from __future__ import annotations
 
 import re
@@ -46,6 +39,7 @@ def generated_sections_html(path: Path) -> str:
     # The template contains carriage returns and lxml writes them out as &#13;,
     # which only makes the snapshot diff harder to read.
     html = "".join(parts).replace("&#13;", "")
+    html = re.sub(r"[ \t]+(?=\n)", "", html)
     # bikeshed numbers repeated link ids (x, x①, x②, ...) and one change renumbers all later ones
     return re.sub(r'(id="[^"]*?)[\u2460-\u24ff]+"', r'\1"', html)
 

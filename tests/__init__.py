@@ -1,1 +1,1 @@
-"""Tests for thing-description-schema."""
+"""Tests for the WoT Toolchain."""

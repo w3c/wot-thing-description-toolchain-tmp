@@ -124,22 +124,11 @@ These failures exist in CI on `main`. A PR that does not touch the Form class or
 
 The pipeline aborts on any snippet validation ERROR. Fix before declaring the change complete.
 
-### Known-Failures Baseline
+### Failure Policy
 
-Everything that currently fails on purpose is listed under `tests/known_failures/`:
-
-| File | Used by |
-|---|---|
-| `td_gate.txt` | `test_td_instance_gate.py` |
-| `td_crosscheck.txt` | `test_td_crosscheck.py` |
-| `spec_structure.txt` | `test_golden_form_structure.py`, via `conftest.py` |
-
-This directory is transitional. Every list must shrink to empty, then the
-directory is deleted. Rules:
-- List only valid TD files (`*-valid.jsonld`), never invalid ones.
-- Each entry must correspond to a tracked issue.
-- Fixing a gap removes its entry — the list can only shrink.
-- An xfail turning into an XPASS breaks CI — remove the entry from the baseline file.
+The suite has no accepted failures. A generated-schema rejection of a valid
+sample, a generated-versus-upstream schema mismatch, or an HTML-structure
+regression fails the relevant test directly.
 
 ### Golden Files
 

@@ -1,10 +1,4 @@
-"""Validate that cross-references in the template resolve to known IDs.
-
-Checks two directions:
-1. Every [[[#X]]] ReSpec cross-reference in the template resolves to either
-   a snippet/group id or an inline id="X" in the template HTML.
-2. All snippet IDs in the manifest are unique.
-"""
+"""Validate snippet references and manifest IDs in the specification template."""
 
 from __future__ import annotations
 

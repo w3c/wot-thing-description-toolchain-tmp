@@ -22,6 +22,8 @@ def _normalize_range_name(rng: str) -> str:
         return ""
     if rng in ["Any", "linkml:Any"]:
         return "any type"
+    if rng == "langString":
+        return "rdf:langString"
     if rng == "uri":
         return "anyURI"
     if rng == "datetime":
@@ -131,6 +133,8 @@ _XSD_BASE = "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#"
 def _link(name: str, sv: SchemaView) -> str:
     if name == "any type":
         return name
+    if name == "rdf:langString":
+        return f"<code>{name}</code>"
     if name in ("Array", "Map"):
         return f"<a>{name}</a>"
     if name in sv.all_classes():
@@ -258,12 +262,16 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
             raw_desc = str(getattr(ann["spec_description"], "value", ann["spec_description"]))
         desc_html = _strip_outer_p(process_description(raw_desc))
         desc = (desc_html or "").replace("'", "&#39;")
+        slot_alias = getattr(slot_def, "alias", None)
+        # A LinkML alias is the serialized JSON member name.
+        if slot_alias:
+            display_name = slot_alias
         # special case for the name defined in wot_security.yaml, name is a reserved keyword in LinkML.
-        if slot_name == "@name":
+        elif slot_name == "@name":
             display_name = "name"
         else:
             display_name = slot_name
-        assertion_id = make_slot_assertion_id(schema_prefix, class_name, slot_name) if schema_prefix else ""
+        assertion_id = make_slot_assertion_id(schema_prefix, class_name, display_name) if schema_prefix else ""
         rows.append({
             "slot_name": display_name,
             "assertion_id": assertion_id,

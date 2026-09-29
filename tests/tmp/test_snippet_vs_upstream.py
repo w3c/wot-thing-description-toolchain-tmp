@@ -1,21 +1,14 @@
-"""Compare generated snippet HTML against upstream inline examples.
-
-Matches examples by their ``id`` attribute and tabbed groups by their
-``example-title`` text.  JSON content is parsed and compared semantically
-so formatting differences (indentation, key ordering) are ignored.
-
-All differences produce **warnings**, never assertion failures — the
-upstream snippet examples do not all have an ID while the snippets in the toolchain MUST have an ID.
-"""
+"""Compare generated snippets with upstream inline examples."""
 from __future__ import annotations
 
 import json
 import re
-import warnings
+from collections.abc import Callable
 from pathlib import Path
 
 import lxml.html
 import pytest
+import yaml
 from lxml.html import HtmlElement
 
 from .spec_html_compare import normalize_text, parse_html
@@ -24,13 +17,23 @@ TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent.parent
 UPSTREAM_PATH = REPO_ROOT / "resources" / "upstream" / "html" / "index.html"
 GENERATED_PATH = REPO_ROOT / "resources" / "gens" / "index.html"
+APPROVED_DIVERGENCES_PATH = TESTS_DIR.parent / "approved_divergences" / "snippets.yaml"
+_MISSING = object()
 
+_JSON_STRING_RE = re.compile(r'"(?:[^"\\]|\\.)*"')
 _JSONC_COMMENT_RE = re.compile(
-    r'"(?:[^"\\]|\\.)*"'
-    r"|/\*.*?\*/"
-    r"|//[^\n]*",
-    re.DOTALL,
+    _JSON_STRING_RE.pattern + r"|/\*.*?\*/" r"|//[^\n]*", re.DOTALL
 )
+_ELLIPSIS_OBJECT_RE = re.compile(
+    r"\{\s*(?://\s*\.\.\.\s*|/\*\s*\.\.\.\s*\*/\s*)\}", re.MULTILINE
+)
+_ELLIPSIS_ARRAY_RE = re.compile(r"\[\s*(?://\s*\.\.\.\s*|\.\.\.\s*)\]", re.MULTILINE)
+_ELLIPSIS_BLOCK_VALUE_RE = re.compile(r":\s*/\*\s*\.\.\.\s*\*/")
+_ELLIPSIS_LINE_VALUE_RE = re.compile(
+    r":\s*//\s*\.\.\.\s*,?\s*(?=\n)", re.MULTILINE
+)
+_ELLIPSIS_LINE_RE = re.compile(r"^\s*(?://\s*)?\.\.\.\s*$", re.MULTILINE)
+_TRAILING_COMMA_RE = re.compile(r",\s*([}\]])")
 
 
 def _strip_jsonc(text: str) -> str:
@@ -39,8 +42,37 @@ def _strip_jsonc(text: str) -> str:
     return _JSONC_COMMENT_RE.sub(_keep_strings, text)
 
 
+def _transform_outside_json_strings(text: str, transform: Callable[[str], str]) -> str:
+    """Apply a JSONC syntax transform without changing string literals."""
+    parts: list[str] = []
+    start = 0
+    for match in _JSON_STRING_RE.finditer(text):
+        parts.append(transform(text[start:match.start()]))
+        parts.append(match.group())
+        start = match.end()
+    parts.append(transform(text[start:]))
+    return "".join(parts)
+
+
+def _normalize_illustrative_tokens(text: str) -> str:
+    text = _ELLIPSIS_OBJECT_RE.sub("{}", text)
+    text = _ELLIPSIS_ARRAY_RE.sub("[]", text)
+    text = _ELLIPSIS_BLOCK_VALUE_RE.sub(": null", text)
+    text = _ELLIPSIS_LINE_VALUE_RE.sub(": null,", text)
+    return _ELLIPSIS_LINE_RE.sub("", text)
+
+
+def _normalize_illustrative_jsonc(text: str) -> str:
+    """Make upstream's ellipsis notation comparable as JSONC placeholders."""
+    normalized = _transform_outside_json_strings(text, _normalize_illustrative_tokens)
+    normalized = _strip_jsonc(normalized)
+    return _transform_outside_json_strings(
+        normalized, lambda chunk: _TRAILING_COMMA_RE.sub(r"\1", chunk)
+    )
+
+
 def _try_parse_json(text: str) -> object | None:
-    cleaned = _strip_jsonc(text).strip()
+    cleaned = _normalize_illustrative_jsonc(text).strip()
     if not cleaned:
         return None
     try:
@@ -49,8 +81,63 @@ def _try_parse_json(text: str) -> object | None:
         return None
 
 
+def test_illustrative_jsonc_normalization_preserves_string_literals() -> None:
+    source = """
+    {
+      "literal_trailing": "example,}",
+      "literal_line_comment": "// ...",
+      "literal_block_comment": "/*...*/",
+      "literal_array": "[...]",
+      "object_placeholder": {/*...*/},
+      "array_placeholder": [// ...],
+      "value_placeholder": /*...*/,
+    }
+    """
+
+    assert _try_parse_json(source) == {
+        "literal_trailing": "example,}",
+        "literal_line_comment": "// ...",
+        "literal_block_comment": "/*...*/",
+        "literal_array": "[...]",
+        "object_placeholder": {},
+        "array_placeholder": [],
+        "value_placeholder": None,
+    }
+
+
 def _canonical_json(obj: object) -> str:
     return json.dumps(obj, sort_keys=True, indent=2)
+
+
+def _path_value(document: object, path: str) -> object:
+    value = document
+    for segment in path.split("."):
+        if isinstance(value, dict):
+            value = value.get(segment, _MISSING)
+        elif isinstance(value, list) and segment.isdigit():
+            index = int(segment)
+            value = value[index] if index < len(value) else _MISSING
+        else:
+            return _MISSING
+        if value is _MISSING:
+            return _MISSING
+    return value
+
+
+def _difference_paths(upstream: object, generated: object, path: str = "") -> list[str]:
+    """Return the precise JSON paths that differ between two examples."""
+    if isinstance(upstream, dict) and isinstance(generated, dict):
+        differences: list[str] = []
+        for key in sorted(set(upstream) | set(generated)):
+            child_path = f"{path}.{key}" if path else key
+            if key not in upstream or key not in generated:
+                differences.append(child_path)
+            else:
+                differences.extend(_difference_paths(upstream[key], generated[key], child_path))
+        return differences
+    if upstream != generated:
+        return [path]
+    return []
 
 
 def _extract_pre_text(element: HtmlElement) -> str:
@@ -98,23 +185,10 @@ def generated_tree():
 
 
 @pytest.fixture(scope="module")
-def shared_example_ids(upstream_tree, generated_tree):
-    upstream_ids = set(_examples_by_id(upstream_tree))
-    generated_ids = set(_examples_by_id(generated_tree))
-    shared = sorted(upstream_ids & generated_ids)
-    only_upstream = upstream_ids - generated_ids
-    only_generated = generated_ids - upstream_ids
-    if only_upstream:
-        warnings.warn(
-            f"Examples only in upstream (no generated match): {sorted(only_upstream)}",
-            stacklevel=1,
-        )
-    if only_generated:
-        warnings.warn(
-            f"Examples only in generated (not in upstream): {sorted(only_generated)}",
-            stacklevel=1,
-        )
-    return shared
+def approved_snippet_divergences() -> dict[str, dict]:
+    with APPROVED_DIVERGENCES_PATH.open(encoding="utf-8") as divergence_file:
+        divergences = yaml.safe_load(divergence_file)["divergences"]
+    return {entry["upstream_locator"]["example_id"]: entry for entry in divergences}
 
 
 def _compare_example_json(example_id: str, upstream_el: HtmlElement, generated_el: HtmlElement) -> list[str]:
@@ -188,20 +262,39 @@ def _compare_example_json(example_id: str, upstream_el: HtmlElement, generated_e
     "td-model-example-smart-lamp-control",
     "td-model-example-tmRef",
 ])
-def test_example_json_matches_upstream(upstream_tree, generated_tree, example_id):
+def test_example_json_matches_upstream(
+    upstream_tree, generated_tree, approved_snippet_divergences, example_id
+):
     upstream_examples = _examples_by_id(upstream_tree)
     generated_examples = _examples_by_id(generated_tree)
 
     if example_id not in upstream_examples:
-        warnings.warn(f"[{example_id}] not found in upstream")
-        return
+        pytest.fail(f"[{example_id}] not found in upstream")
     if example_id not in generated_examples:
-        warnings.warn(f"[{example_id}] not found in generated output")
+        pytest.fail(f"[{example_id}] not found in generated output")
+
+    upstream_el = upstream_examples[example_id]
+    generated_el = generated_examples[example_id]
+    diffs = _compare_example_json(example_id, upstream_el, generated_el)
+    entry = approved_snippet_divergences.get(example_id)
+    if not diffs:
+        assert entry is None, f"approved snippet divergence '{example_id}' is stale"
         return
 
-    diffs = _compare_example_json(example_id, upstream_examples[example_id], generated_examples[example_id])
-    for d in diffs:
-        warnings.warn(d)
+    assert entry is not None, "\n".join(diffs)
+    upstream_json = _try_parse_json(_extract_pre_text(upstream_el))
+    generated_json = _try_parse_json(_extract_pre_text(generated_el))
+    assert upstream_json is not None, f"[{example_id}] expected upstream JSONC to parse"
+    assert generated_json is not None, f"[{example_id}] expected generated JSONC to parse"
+    assert _difference_paths(upstream_json, generated_json) == entry["expected_difference_paths"], (
+        f"approved snippet divergence '{example_id}' no longer has the expected semantic differences"
+    )
+    for path, expected in entry["expected_generated"]["json_paths"].items():
+        actual = _path_value(generated_json, path)
+        assert actual == expected, (
+            f"approved snippet divergence '{example_id}' no longer has the expected generated value "
+            f"at '{path}': expected {expected!r}, got {actual!r}"
+        )
 
 
 TABBED_GROUP_TITLES = [
@@ -219,33 +312,29 @@ def test_tabbed_group_matches_upstream(upstream_tree, generated_tree, group_titl
     generated_groups = _tabbed_groups_by_title(generated_tree)
 
     if group_title not in upstream_groups:
-        warnings.warn(f"[{group_title}] tabbed group not found in upstream")
-        return
+        pytest.fail(f"[{group_title}] tabbed group not found in upstream")
     if group_title not in generated_groups:
-        warnings.warn(f"[{group_title}] tabbed group not found in generated output")
-        return
+        pytest.fail(f"[{group_title}] tabbed group not found in generated output")
 
     upstream_tabs = _tab_contents(upstream_groups[group_title])
     generated_tabs = _tab_contents(generated_groups[group_title])
 
     if len(upstream_tabs) != len(generated_tabs):
-        warnings.warn(
+        pytest.fail(
             f"[{group_title}] tab count differs: upstream={len(upstream_tabs)}, generated={len(generated_tabs)}"
         )
-        return
 
     for i, (up_text, gen_text) in enumerate(zip(upstream_tabs, generated_tabs)):
         up_json = _try_parse_json(up_text)
         gen_json = _try_parse_json(gen_text)
         if up_json is not None and gen_json is not None:
-            if _canonical_json(up_json) != _canonical_json(gen_json):
-                warnings.warn(
-                    f"[{group_title}] tab {i} JSON content differs\n"
-                    f"--- UPSTREAM ---\n{_canonical_json(up_json)}\n"
-                    f"--- GENERATED ---\n{_canonical_json(gen_json)}"
-                )
-        elif normalize_text(up_text) != normalize_text(gen_text):
-            warnings.warn(
+            assert _canonical_json(up_json) == _canonical_json(gen_json), (
+                f"[{group_title}] tab {i} JSON content differs\n"
+                f"--- UPSTREAM ---\n{_canonical_json(up_json)}\n"
+                f"--- GENERATED ---\n{_canonical_json(gen_json)}"
+            )
+        else:
+            assert normalize_text(up_text) == normalize_text(gen_text), (
                 f"[{group_title}] tab {i} text content differs\n"
                 f"--- UPSTREAM ---\n{up_text.strip()}\n"
                 f"--- GENERATED ---\n{gen_text.strip()}"
@@ -255,7 +344,6 @@ def test_tabbed_group_matches_upstream(upstream_tree, generated_tree, group_titl
 def test_example_count_parity(upstream_tree, generated_tree):
     upstream_count = len(upstream_tree.cssselect("aside.example, pre.example"))
     generated_count = len(generated_tree.cssselect("aside.example, pre.example"))
-    if upstream_count != generated_count:
-        warnings.warn(
-            f"Example count differs: upstream={upstream_count}, generated={generated_count}"
-        )
+    assert upstream_count == generated_count, (
+        f"Example count differs: upstream={upstream_count}, generated={generated_count}"
+    )

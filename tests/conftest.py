@@ -1,15 +1,8 @@
-"""Shared test options, the rejection summary and the spec-structure
-known-failures baseline."""
+"""Provide shared pytest options and test reporting."""
 import os
-from pathlib import Path
-
 import pytest
 
-from .baselines import load_baseline
 from .rejections import defined_at
-
-TESTS_DIR = Path(__file__).resolve().parent
-SPEC_STRUCTURE_BASELINE = TESTS_DIR / "known_failures" / "spec_structure.txt"
 
 
 def pytest_addoption(parser):
@@ -22,7 +15,6 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     config.rejections = {}
-    config.new_failures = []
     config.spec_html_findings = []
 
 
@@ -30,12 +22,6 @@ def pytest_configure(config):
 def rejections(request):
     """{(td version, schema location): {"count": n, "example": message}}"""
     return request.config.rejections
-
-
-@pytest.fixture
-def new_failures(request):
-    """One line per failure that is not covered by the baseline lists."""
-    return request.config.new_failures
 
 
 @pytest.fixture
@@ -50,9 +36,8 @@ def spec_html_findings(request):
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
-    fails = config.new_failures
     html_findings = config.spec_html_findings
-    if not config.rejections and not fails and not html_findings:
+    if not config.rejections and not html_findings:
         return
     versions = sorted({v for v, _ in config.rejections})
     # regroup per schema location, with per-version counts and one example message
@@ -64,10 +49,6 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     ordered = sorted(locations.items(), key=lambda kv: -kv[1]["total"])
 
     # plain text for the terminal
-    if fails:
-        terminalreporter.write_line("NEW failures, not in the baseline lists:")
-        for rec in fails:
-            terminalreporter.write_line("  " + rec)
     if ordered:
         terminalreporter.write_line(f"rejected valid samples by schema location ({' / '.join(versions)}):")
         for spath, loc in ordered:
@@ -85,11 +66,6 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     if not step_summary:
         return
     md = ["## Test gates report", ""]
-    if fails:
-        md.append("### New failures, not in the baseline lists")
-        md.append("")
-        md += [f"- `{rec}`" for rec in fails]
-        md.append("")
     if ordered:
         md.append("### Rejected valid samples, by the schema location that rejected them")
         md.append("")
@@ -111,15 +87,3 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         md.append("")
     with open(step_summary, "a", encoding="utf-8") as fh:
         fh.write("\n".join(md) + "\n")
-
-
-def pytest_collection_modifyitems(config, items):
-    """xfail the ReSpec/HTML tests listed in the spec-structure baseline.
-
-    A fix makes a listed test XPASS (strict), which fails until its line is
-    removed, so the list can only shrink.
-    """
-    listed = load_baseline(SPEC_STRUCTURE_BASELINE)
-    for item in items:
-        if item.nodeid in listed:
-            item.add_marker(pytest.mark.xfail(strict=True, reason="known spec-content gap"))

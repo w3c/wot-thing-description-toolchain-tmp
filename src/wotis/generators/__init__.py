@@ -15,6 +15,7 @@ from .. import (SCHEMA_PATH, GENS_PATH, GENERATORS,
                 RESPEC_TEMPLATE_PATH, FINAL_SPEC_PATH,
                 CORE_SCHEMA_PLACEHOLDER, ASSERTION_PATH)
 from ..postprocessors.jsonschema_postprocessor import post_process_jsonschema
+from ..postprocessors.shacl_postprocessor import post_process_shacl
 from .visualization import generate_visualizations
 from .respec import generate_respec_spec
 
@@ -45,7 +46,9 @@ def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: P
     elif generator == 'shacl':
         logging.info("Proceeding with LinkML to SHACL conversion")
         shacl_generator = ShaclGenerator(schema_view.schema, mergeimports=False, closed=True, suffix='Shape')
-        (output_dir / 'shapes.shacl.ttl').write_text(shacl_generator.serialize())
+        raw_shacl = shacl_generator.serialize()
+        processed_shacl = post_process_shacl(raw_shacl, schema_view)
+        (output_dir / 'shapes.shacl.ttl').write_text(processed_shacl, encoding='utf-8')
         logging.info(f"SHACL shapes saved to {output_dir / 'shapes.shacl.ttl'}")
 
     elif generator == 'owl':

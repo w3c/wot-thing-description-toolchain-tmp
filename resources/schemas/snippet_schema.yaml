@@ -1,20 +1,14 @@
 name: snippet_schema
 title: WoT Thing Description ReSpec Snippet Schema
 description: >-
-  LinkML schema for managing JSON-LD example snippets rendered inline in the
-  W3C Web of Things (WoT) Thing Description (TD) specification. Defines
-  the structure of the snippet manifest used by the WoTIS toolchain to
-  control ReSpec example generation, including display filtering, layout
-  selection, validation gating, and multi-snippet composition (tabbed and
-  toggle views).
+  LinkML schema for snippet metadata used by the WoT Toolchain to render
+  examples in the Thing Description specification.
 id: https://w3c.github.io/wot-thing-description/snippets
 version: "2.0"
-license: https://spdx.org/licenses/MIT.html
-
+license: MIT
+created_by: mailto:mahda.noura@siemens.com
 contributors:
-  - orcid:0000-0000-0000-0000
-
-created_by: https://orcid.org/0000-0000-0000-0000
+  - mailto:mahda.noura@siemens.com
 created_on: "2025-06-01"
 last_updated_on: "2026-08-28"
 
@@ -25,9 +19,7 @@ prefixes:
   snippet:
     prefix_prefix: snippet
     prefix_reference: https://w3c.github.io/wot-thing-description/snippets/
-
 default_range: string
-
 imports:
   - linkml:types
 
@@ -46,7 +38,6 @@ enums:
           Rendered as <pre class="example json"> — a preformatted code block
           styled as an example, used for snippets that do not require the
           full aside wrapper (e.g., inline schema fragments).
-
   GroupLayout:
     description: >-
       Layout variant for snippet groups that combine multiple related JSON
@@ -84,7 +75,6 @@ classes:
           Map of group names to their composition definitions. Groups combine
           multiple snippets into tabbed or toggle views for side-by-side
           comparison in the specification.
-
   Snippet:
     description: >-
       Metadata for a single JSON-LD example file rendered in the Thing Description
@@ -141,7 +131,6 @@ classes:
           used when only a small portion of a TD is relevant to the
           surrounding specification text. Supports wildcard segments.
           Mutually exclusive with hide_paths.
-
   TabItem:
     description: >-
       Represents a single tab within a tabbed snippet group. Each tab
@@ -169,7 +158,6 @@ classes:
         description: >-
           Whether this tab is selected by default when the page loads.
           Exactly one tab per group should be marked as selected.
-
   SnippetGroup:
     description: >-
       Defines a composition of multiple related snippets rendered together

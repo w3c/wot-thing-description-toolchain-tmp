@@ -2,23 +2,36 @@ id: https://www.w3.org/2019/wot/hypermedia
 name: hypermedia
 title: Hypermedia Controls Ontology
 description: >-
-  LinkML schema for modelling the TD Hypermedia Control information model, in particular links and forms.
-version: "1.1-11-May-2026"
+  LinkML schema for the Hypermedia Controls vocabulary of the W3C Web of Things (WoT) Thing Description 2.0 model.
+version: "2.0"
 license: MIT
-contributors: Mahda_Noura
+created_by: mailto:mahda.noura@siemens.com
+contributors:
+  - https://vcharpenay.link/#me
+  - mailto:mahda.noura@siemens.com
+created_on: "2023-12-05"
+last_updated_on: "2026-09-29"
 see_also:
-  - https://www.w3.org/TR/wot-thing-description11/#sec-hypermedia-vocabulary-definition
+  - https://w3c.github.io/wot-thing-description/
+  - https://w3c.github.io/wot-thing-description/#sec-hypermedia-vocabulary-definition
+annotations:
+  dcterms:publisher:
+    value:
+      "@type": schema:Organization
+      schema:name: W3C Web of Things Working Group
+      schema:url: https://www.w3.org/WoT/WG/
+
 prefixes:
+  bcp47: https://tools.ietf.org/html/bcp47
+  dcterms: http://purl.org/dc/terms/
   hctl: https://www.w3.org/2019/wot/hypermedia#
   linkml: https://w3id.org/linkml/
   xsd: http://www.w3.org/2001/XMLSchema#
   td: https://www.w3.org/2019/wot/td#
-  bcp47: https://tools.ietf.org/html/bcp47
   tm: https://www.w3.org/2019/wot/tm#
-
+default_prefix: hctl
 imports:
   - linkml:types
-
 
 enums:
   LinkRelationType:
@@ -26,70 +39,73 @@ enums:
       Best practice relation type values recommended for use within WoT Thing Description or Thing Model instances.
     permissible_values:
       icon:
-        description: Imports an icon associated to the Thing
+        description: Imports an icon associated to the Thing (e.g., for UI purposes).
         comments:
           - "Occurrence - 0..*"
           - "Source - IANA Link Relation"
       service-doc:
-        description: Relation to resource that provides documentation about the Thing
+        description: Relation to a resource that provide (human-readable) documentation or descriptions.
         comments:
           - "Occurrence - 0..*"
           - "Source - IANA Link Relation"
       alternate:
-        description: Alternative representation of the Thing
+        description: Points to an alternative representation of the Thing, for example RDF/Turtle or an HTML document.
         comments:
           - "Occurrence - 0..*"
           - "Source - IANA Link Relation"
       type:
-        description: Indicate that the Thing is an instance of the target resource
+        description: Indicates that the Thing is an instance of the target resource, such as a Thing Model.
         comments:
           - "Occurrence - 0..1"
           - "Source - IANA Link Relation"
       tm:extends:
-        description: Extends the existing definition of the target resource
+        description: Extends an existing definition of the target resource such as a Thing Model. Only applicable for Thing Model definitions.
         comments:
           - "Occurrence - 0..1"
           - "Source - W3C WoT Thing Model"
       tm:submodel:
-        description: Compose one or multiple Thing Models
+        description: Used to compose one or multiple Thing Models. Only applicable for Thing Model definitions.
         comments:
           - "Occurrence - 0..*"
           - "Source - W3C WoT Thing Model"
       manifest:
-        description: Point to web app manifest
+        description: Point to the web app manifest of a web application which provides, e.g., a user interface with which a user can interact with the Thing (also see [APPMANIFEST]).
         comments:
           - "Occurrence - 0..*"
           - "Source - IANA Link Relation"
       proxy-to:
-        description: Target resource provides the address of a proxy
+        description: Target resource provides the address of a proxy. Additional security metadata can be provided using the proxy field in a SecurityScheme.
         comments:
           - "Occurrence - 0..*"
-          - "Source - W3C WoT Security"
+          - "Source - W3C WoT Security and WoT Binding Template"
       collection:
-        description: Points to a collection of Things that the current Thing is part of
+        description: Points to a collection of Things.
         comments:
           - "Occurrence - 0..1"
           - "Source - IANA Link Relation"
       item:
-        description: Points to a Thing being a member of a collection Thing
+        description: Points to a Thing that is a member of the current Thing's collection.
         comments:
           - "Occurrence - 0..*"
           - "Source - IANA Link Relation"
       predecessor-version:
-        description: Points to a previous TD or TM version of the same Thing
+        description: Points to a previous Thing Description or Thing Model version.
         comments:
           - "Occurrence - 0..1"
           - "Source - IANA Link Relation"
       controlledBy:
-        description: Refers to the Thing that controls the context Thing
+        description: Refers to a Thing that controls the context Thing.
         comments:
           - "Occurrence - 0..*"
           - "Source - W3C Thing Description"
   SubprotocolList:
     permissible_values:
       longpoll:
+        description: Long polling subprotocol.
       websub:
+        description: WebSub subprotocol.
       sse:
+        description: Server-Sent Events subprotocol.
   OperationType:
     description: >-
       Well-known operation types for WoT interaction model. The list of possible operation types of a form is fixed. 
@@ -101,90 +117,91 @@ enums:
       - "No correlation implies no payload is required or expected"
     permissible_values:
       readproperty:
-        description: Identifies the read operation on Property Affordances to retrieve the corresponding data
+        description: Identifies the read operation on Property Affordances to retrieve the corresponding data.
         comments:
           - Thing to Consumer - All fields in the Property Affordance without "writeOnly":true
           - Consumer to Thing - No correlation
       writeproperty:
-        description: Identifies the write operation on Property Affordances to update the corresponding data
+        description: Identifies the write operation on Property Affordances to update the corresponding data.
         comments:
           - Consumer to Thing - All fields in the Property Affordance without "readOnly":true
           - Thing to Consumer - No correlation, additionalResponses can be used in the form level
       observeproperty:
         description: >-
           Identifies the observe operation on Property Affordances to be notified with the new data when the 
-          Property is updated
+          Property is updated.
         comments:
           - Thing to Consumer - All fields in the Property Affordance without "writeOnly":true
           - Consumer to Thing - No correlation
       unobserveproperty:
-        description: Identifies the unobserve operation on Property Affordances to stop the corresponding notifications
+        description: Identifies the unobserve operation on Property Affordances to stop the corresponding notifications.
         comments:
           - No payload correlation in either direction
       invokeaction:
-        description: Identifies the invoke operation on Action Affordances to perform the corresponding action
+        description: Identifies the invoke operation on Action Affordances to perform the corresponding action.
         comments:
           - Consumer to Thing - Value of the input key
           - Thing to Consumer - Value of the output key
       queryaction:
-        description: Identifies the querying operation on Action Affordances to get the status of the corresponding action
+        description: Identifies the querying operation on Action Affordances to get the status of the corresponding action.
         comments:
           - No correlation, additionalResponses can be used in the form level
       cancelaction:
-        description: Identifies the cancel operation on Action Affordances to cancel the ongoing corresponding action
+        description: Identifies the cancel operation on Action Affordances to cancel the ongoing corresponding action.
         comments:
           - No correlation, additionalResponses can be used in the form level
       subscribeevent:
         description: >-
-          Identifies the subscribe operation on Event Affordances to be notified by the Thing when the event occurs
+          Identifies the subscribe operation on Event Affordances to be notified by the Thing when the event occurs.
         comments:
           - Consumer to Thing - Value of the subscription key with all fields without "readOnly":true
           - Thing to Consumer - Value of the subscription key with all fields without "writeOnly":true
       unsubscribeevent:
-        description: Identifies the unsubscribe operation on Event Affordances to stop the corresponding notifications
+        description: Identifies the unsubscribe operation on Event Affordances to stop the corresponding notifications.
         comments:
           - Consumer to Thing - Value of the subscription key with all fields without "readOnly":true
           - Thing to Consumer - Value of the subscription key with all fields without "writeOnly":true
       readallproperties:
         description: >-
           Identifies the readallproperties operation on a Thing to retrieve the data of all Properties in a 
-          single interaction
+          single interaction.
       writeallproperties:
         description: >-
           Identifies the writeallproperties operation on a Thing to update the data of all writable Properties 
-          in a single interaction
+          in a single interaction.
       readmultipleproperties:
         description: >-
           Identifies the readmultipleproperties operation on a Thing to retrieve the data of selected Properties 
-          in a single interaction
+          in a single interaction.
       writemultipleproperties:
         description: >-
           Identifies the writemultipleproperties operation on a Thing to update the data of selected writable 
-          Properties in a single interaction
+          Properties in a single interaction.
       observeallproperties:
         description: >-
           Identifies the observeallproperties operation on Properties to be notified with new data when any 
-          Property is updated
+          Property is updated.
       unobserveallproperties:
         description: >-
           Identifies the unobserveallproperties operation on Properties to stop notifications from all Properties 
-          in a single interaction
+          in a single interaction.
       queryallactions:
         description: >-
-          Identifies the queryallactions operation on a Thing to get the status of all Actions in a single interaction
+          Identifies the queryallactions operation on a Thing to get the status of all Actions in a single interaction.
       subscribeallevents:
         description: >-
           Identifies the subscribeallevents operation on Events to subscribe to notifications from all Events in 
-          a single interaction
+          a single interaction.
       unsubscribeallevents:
         description: >-
           Identifies the unsubscribeallevents operation on Events to unsubscribe from notifications from all Events 
-          in a single interaction
+          in a single interaction.
 
 slots:
   op:
     description: >-
       Indicates the operation type (e.g., readproperty, writeproperty, observeproperty, etc.)
+    slot_uri: hctl:hasOperationType
     annotations:
       spec_description: >-
         Indicates the semantic intention of performing the operation(s) described by the form. For example, the Property interaction allows get and set operations. The protocol binding may contain a form for the get operation and a different form for the set operation. The op attribute indicates which form is for which and allows the client to select the correct form for the operation required. op can be assigned one or more interaction verb(s) each representing a semantic intention of an operation.
@@ -194,35 +211,39 @@ slots:
         multivalued: true
         minimum_cardinality: 1
   href:
-    description: Target IRI of a link or submission target of a form.
+    description: Target URI of a submission target of a Form. See the note on URI/IRI.
     slot_uri: hctl:hasTarget
     range: uri
     required: true
   contentCoding:
     description: >-
       Content coding values indicate an encoding transformation that has been or can be applied to a representation. Content codings are primarily used to allow a representation to be compressed or otherwise usefully transformed without losing the identity of its underlying media type and without loss of information. Examples of content coding include "gzip", "deflate", etc.
+    slot_uri: hctl:forContentCoding
     range: string
   contentType:
     description: >-
       Assign a content type based on a media type (e.g., text/plain) and potential parameters 
       (e.g., charset=utf-8) for the media type [RFC2046].
+    slot_uri: hctl:forContentType
     annotations:
       spec_description: >-
         Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
-    slot_uri: hctl:forContentType
     range: string
   response:
     description: >-
       This optional term can be used if, e.g., the output communication metadata differ from input metadata (e.g., output contentType differ from the input contentType). The response name contains metadata that is only valid for the primary response messages.
+    slot_uri: hctl:returns
     range: ExpectedResponse
   additionalResponses:
     description: >-
-      This optional term can be used if additional expected responses are possible, e.g. for error reporting. Each additional response needs to be distinguished from others in some way (for example, by specifying a protocol-specific error code), and may also have its own data schema.
+      This optional term can be used if additional expected responses are possible, e.g., for error reporting. Each additional response needs to be distinguished from others in some way (for example, by specifying a protocol-specific error code), and may also have its own data schema.
+    slot_uri: hctl:additionalReturns
     multivalued: true
     range: AdditionalExpectedResponse
   subprotocol:
     description: >-
       Indicates the exact protocol that should be used for additional notifications.
+    slot_uri: hctl:forSubProtocol
     annotations:
       spec_description: >-
         Indicates the exact mechanism by which an interaction will be accomplished for a given protocol when there are multiple options. For example, for HTTP and Events, it indicates which of several available mechanisms should be used for asynchronous notifications such as long polling (`longpoll`), WebSub [[websub]] (websub), Server-Sent Events (`sse`) [[html]] (also known as EventSource). Please note that there is no restriction on the subprotocol selection and other mechanisms can also be announced by this subprotocol term.
@@ -234,11 +255,11 @@ slots:
 
 classes:
   Link:
-    class_uri: hctl:Link
     description: >-
       A link can be viewed as a statement of the form
       "**_link context_** has a **_relation type_** resource at **_link target_**",
       where the optional **_target attributes_** may further describe the resource.
+    class_uri: hctl:Link
     rules:
       - preconditions:
           slot_conditions:
@@ -285,12 +306,11 @@ classes:
                 header: Explanation
               - field: "comment:Source"
                 header: Source of value origin
-
     extra_slots:
       allowed: true
     attributes:
       href:
-        description: Target IRI of a link or submission target of a form.
+        description: Target URI of a submission target of a Form. See the note on URI/IRI.
         slot_uri: hctl:hasTarget
         range: uri
         required: true
@@ -342,7 +362,7 @@ classes:
         range: uri
         annotations:
           spec_description: >-
-            Target IRI of a link or submission target of a form.
+            Target URI of a link.
       type:
         range: string
       hreflang:
@@ -351,11 +371,10 @@ classes:
           - range: string
             multivalued: true
             minimum_cardinality: 1
-
   Form:
-    class_uri: hctl:Form
     description: >-
       A form hypermedia control that describes how an operation can be performed.
+    class_uri: hctl:Form
     annotations:
       jsonschema_form_variants:
         value:
@@ -430,59 +449,6 @@ classes:
                   As a Form but not just the `href` defines how to execute the interaction, `href` of multiple Forms *MAY* point to the same resource, where the different Forms represent different operations on that resource.
               - text: |
                   For example, in a TD with the HTTP Binding, two Forms with HTTP GET and PUT methods can point to the same resource but represent different operations such as `readproperty` and `writeproperty`.
-      spec_subsections:
-        value:
-          - id: sec-response-usage
-            title: Response-related Terms Usage
-            content:
-              - type: paragraph
-                segments:
-                  - text: |
-                      The optional `response` name-value pair can be used to provide metadata for the expected response message. With the core vocabulary, it can include only content type information, but TD Context Extensions could be applied.
-                  - id: td-expectedResponse-default-contentType
-                    text: |
-                      If no `response` name-value pair is provided, it *MUST* be assumed that the content type of the response is equal to the content type assigned to the Form instance.
-                  - text: |
-                      Note that `contentType` within an `ExpectedResponse` Class does not have a Default Value.
-              - type: markdown
-                text: |
-                  In some cases additional responses might be possible. One example of this is error responses but in some cases there might also be additional successful responses. In this case, the `response` name-value pair is still used for the primary response but `additionalResponses` may also be provided, whose value is an array of `AdditionalExpectedResponse` objects. Each additional response must be distinguished in some way from the primary response, either by `contentType` or by protocol-specific settings such as error code header values. Each additional response may also have a data schema which can differ from the normal output data schema for the interaction.
-              - type: paragraph
-                segments:
-                  - text: |
-                      In some use cases, input and output data might be represented in a different form, for instance an Action that accepts JSON, but returns an image. In such a case, the optional `response` key-value pair can describe the content type of the expected response.
-                  - id: td-expectedResponse-contentType
-                    text: |
-                      If the content type of the expected response differs from the content type of the form, the `Form` instance *MUST* include a name-value pair with the name `response`.
-                  - text: |
-                      As there is no default value defined, the following assertions apply:
-              - type: list
-                items:
-                  - id: td-expectedResponse-missing-contentType
-                    text: |
-                      If there is no `contentType` value defined in a `response` object within a form, a Consumer *MUST* expect that the respective response does not contain any payload.
-                  - id: td-expectedResponse-defined-contentType
-                    text: |
-                      If a content type is defined in the `response` object within a form, a Consumer *MUST* expect a response containing a payload in the respective format, e.g., an image in the case of `image/jpeg`.
-              - type: markdown
-                text: "Similar considerations apply to additional responses:"
-              - type: list
-                items:
-                  - id: td-additionalExpectedResponse-contentType
-                    text: |
-                      If the content type of an additional expected response differs from the content type of the form, the `Form` instance *MUST* include an entry in the array associated with the name `additionalResponses`.
-                  - id: td-additionalExpectedResponse-missing-contentType
-                    text: |
-                      If there is no `contentType` value defined in an additional expected response object, a Consumer *MUST* expect that the respective response does not contain any payload.
-                  - id: td-additionalExpectedResponse-schema
-                    text: |
-                      If the data schema of an additional expected response differs from the output data schema of the interaction, the `Form` *MUST* include an entry in the array associated with the name `additionalResponses` that includes a value for the name `schema`.
-                  - id: td-additionalExpectedResponse-noSchemaWithoutPayload
-                    text: |
-                      The `schema` of an additional expected response object *MUST NOT* be defined when there is no `contentType` present.
-              - type: markdown
-                text: |
-                  The different cases on the variation of request and response are explained above. The tables at [contentType-usage](#contentType-usage) summarize these cases in a concise manner.
     extra_slots:
       allowed: true
     slots:
@@ -495,7 +461,6 @@ classes:
       - additionalResponses
       - subprotocol
       - op
-
     slot_usage:
       op:
         annotations:
@@ -532,7 +497,7 @@ classes:
         range: uri
         annotations:
           spec_description: >-
-            Target IRI of a link or submission target of a form.
+            [Target URI](#dfn-target-uri) of a submission target of a [Form](#form). See the [note on URI/IRI](#note-uri-iri).
       contentCoding:
         range: string
       subprotocol:
@@ -558,18 +523,66 @@ classes:
           - range: string
             multivalued: true
             minimum_cardinality: 1
-
   ExpectedResponse:
-    class_uri: hctl:ExpectedResponse
     description: Communication metadata describing the expected response message for the primary response.
+    class_uri: hctl:ExpectedResponse
+    annotations:
+      spec_content:
+        value:
+          - type: paragraph
+            segments:
+              - text: |
+                  The optional `response` name-value pair can be used to provide metadata for the expected response message. With the core vocabulary, it can include only content type information, but TD Context Extensions could be applied.
+              - id: td-expectedResponse-default-contentType
+                text: |
+                  If no `response` name-value pair is provided, it *MUST* be assumed that the content type of the response is equal to the content type assigned to the Form instance.
+              - text: |
+                  Note that `contentType` within an `ExpectedResponse` Class does not have a Default Value.
+          - type: paragraph
+            segments:
+              - text: |
+                  In some use cases, input and output data might be represented in a different form, for instance an Action that accepts JSON, but returns an image. In such a case, the optional `response` key-value pair can describe the content type of the expected response. As there is no default value defined, the following assertions apply:
+          - type: list
+            items:
+              - id: td-expectedResponse-missing-contentType
+                text: |
+                  If there is no `contentType` value defined in a `response` object within a form, a Consumer *MUST* expect that the respective response does not contain any payload.
+              - id: td-expectedResponse-defined-contentType
+                text: |
+                  If a content type is defined in the `response` object within a form, a Consumer *MUST* expect a response containing a payload in the respective format, e.g., an image in the case of `image/jpeg`.
     extra_slots:
       allowed: true
     slots:
       - contentType
-
   AdditionalExpectedResponse:
-    class_uri: hctl:AdditionalExpectedResponse
     description: Communication metadata describing the expected response message for additional responses.
+    class_uri: hctl:AdditionalExpectedResponse
+    annotations:
+      spec_content:
+        value:
+          - type: paragraph
+            segments:
+              - text: |
+                  In some cases additional responses might be possible. One example of this is error responses but in some cases there might also be additional successful responses. In this case, the `response` name-value pair is still used for the primary response but `additionalResponses` may also be provided, whose value is an array of `AdditionalExpectedResponse` objects. Each additional response must be distinguished in some way from the primary response, either by `contentType` or by protocol-specific settings such as error code header values. Each additional response may also have a data schema which can differ from the normal output data schema for the interaction.
+          - type: markdown
+            text: "Similar expected response, additional responses have the following considerations:"
+          - type: list
+            items:
+              - id: td-additionalExpectedResponse-contentType
+                text: |
+                  If the content type of an additional expected response differs from the content type of the form, the `Form` instance *MUST* include an entry in the array associated with the name `additionalResponses`.
+              - id: td-additionalExpectedResponse-missing-contentType
+                text: |
+                  If there is no `contentType` value defined in an additional expected response object, a Consumer *MUST* expect that the respective response does not contain any payload.
+              - id: td-additionalExpectedResponse-schema
+                text: |
+                  If the data schema of an additional expected response differs from the output data schema of the interaction, the `Form` *MUST* include an entry in the array associated with the name `additionalResponses` that includes a value for the name `schema`.
+              - id: td-additionalExpectedResponse-noSchemaWithoutPayload
+                text: |
+                  The `schema` of an additional expected response object *MUST NOT* be defined when there is no `contentType` present.
+          - type: markdown
+            text: |
+              The different cases on the variation of request and response are explained above. The tables at [contentType-usage](#contentType-usage) summarize these cases in a concise manner.
     extra_slots:
       allowed: true
     attributes:

@@ -86,7 +86,7 @@ The checks include:
 
 `resources/upstream/html/index.html` and `resources/upstream/assertions.csv` are upstream reference files used for TD specification and assertion-inventory comparison. `tests/snapshots/` contains this toolchain's generated-output snapshots; update them only with `uv run pytest tests/test_golden_diff.py --update-goldens` after reviewing an intended change.
 
-Expected validation differences are listed in `tests/known_failures/`. Each listed case is an `xfail(strict=True)` baseline: when it starts passing, the test fails until the entry is removed. A new, unlisted validation difference fails the relevant test.
+The test suite has no accepted validation differences. A generated-schema rejection of a valid sample or a mismatch with the W3C reference schema fails the relevant test directly.
 
 See [tests/README.md](tests/README.md) for the complete test inventory and the upstream reference files used by each check.
 

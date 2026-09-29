@@ -1,10 +1,4 @@
-"""Snapshot diff: the generated artifacts must match the committed snapshots
-under tests/snapshots/. A snapshot is our own last output, so this says whether
-the output changed without us noticing, not whether it is correct. If a change
-is intended, update the snapshots with:
-
-    uv run pytest tests/test_golden_diff.py --update-goldens
-"""
+"""Check generated artifacts against committed snapshots."""
 from __future__ import annotations
 
 import difflib

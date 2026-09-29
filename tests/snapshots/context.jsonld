@@ -4,14 +4,14 @@
       "@id": "@context"
     },
     "@name": {
-      "@id": "@name"
+      "@id": "wotsec:name"
     },
     "@type": {
       "@id": "@type"
     },
     "@vocab": "https://www.w3.org/2019/wot/td#",
     "APIKeySecurityScheme": {
-      "@id": "APIKeySecurityScheme"
+      "@id": "wotsec:APIKeySecurityScheme"
     },
     "ActionAffordance": {
       "@id": "ActionAffordance"
@@ -32,33 +32,25 @@
       "@id": "jsonschema:ArraySchema"
     },
     "AutoSecurityScheme": {
-      "@id": "AutoSecurityScheme"
+      "@id": "wotsec:AutoSecurityScheme"
     },
     "BasicSecurityScheme": {
-      "@id": "BasicSecurityScheme"
+      "@id": "wotsec:BasicSecurityScheme"
     },
     "BearerSecurityScheme": {
-      "@id": "BearerSecurityScheme"
+      "@id": "wotsec:BearerSecurityScheme"
     },
     "BooleanSchema": {
       "@id": "jsonschema:BooleanSchema"
     },
     "ComboSecurityScheme": {
-      "@context": {
-        "allOf": {
-          "@id": "allOf"
-        },
-        "oneOf": {
-          "@id": "oneOf"
-        }
-      },
-      "@id": "ComboSecurityScheme"
+      "@id": "wotsec:ComboSecurityScheme"
     },
     "DataSchema": {
       "@id": "jsonschema:DataSchema"
     },
     "DigestSecurityScheme": {
-      "@id": "DigestSecurityScheme"
+      "@id": "wotsec:DigestSecurityScheme"
     },
     "EventAffordance": {
       "@id": "EventAffordance"
@@ -72,23 +64,23 @@
     "IntegerSchema": {
       "@context": {
         "exclusiveMaximum": {
-          "@id": "exclusiveMaximum",
+          "@id": "jsonschema:exclusiveMaximum",
           "@type": "xsd:integer"
         },
         "exclusiveMinimum": {
-          "@id": "exclusiveMinimum",
+          "@id": "jsonschema:exclusiveMinimum",
           "@type": "xsd:integer"
         },
         "maximum": {
-          "@id": "maximum",
+          "@id": "jsonschema:maximum",
           "@type": "xsd:integer"
         },
         "minimum": {
-          "@id": "minimum",
+          "@id": "jsonschema:minimum",
           "@type": "xsd:integer"
         },
         "multipleOf": {
-          "@id": "multipleOf",
+          "@id": "jsonschema:multipleOf",
           "@type": "xsd:integer"
         }
       },
@@ -104,7 +96,7 @@
       "@id": "MultiLanguage"
     },
     "NoSecurityScheme": {
-      "@id": "NoSecurityScheme"
+      "@id": "wotsec:NoSecurityScheme"
     },
     "NullSchema": {
       "@id": "jsonschema:NullSchema"
@@ -113,19 +105,19 @@
       "@id": "jsonschema:NumberSchema"
     },
     "OAuth2SecurityScheme": {
-      "@id": "OAuth2SecurityScheme"
+      "@id": "wotsec:OAuth2SecurityScheme"
     },
     "ObjectSchema": {
       "@id": "jsonschema:ObjectSchema"
     },
     "PSKSecurityScheme": {
-      "@id": "PSKSecurityScheme"
+      "@id": "wotsec:PSKSecurityScheme"
     },
     "PropertyAffordance": {
       "@id": "PropertyAffordance"
     },
     "SecurityScheme": {
-      "@id": "SecurityScheme"
+      "@id": "wotsec:SecurityScheme"
     },
     "StringSchema": {
       "@id": "jsonschema:StringSchema"
@@ -134,14 +126,14 @@
       "@id": "Thing"
     },
     "VersionInfo": {
-      "@id": "versionInfo"
+      "@id": "VersionInfo"
     },
     "actions": {
       "@id": "hasActionAffordance",
       "@type": "@id"
     },
     "additionalResponses": {
-      "@id": "additionalResponses",
+      "@id": "hctl:additionalReturns",
       "@type": "@id"
     },
     "alg": {
@@ -150,18 +142,17 @@
         "meaning": "@id",
         "text": "skos:notation"
       },
-      "@id": "alg"
+      "@id": "wotsec:alg"
     },
     "allOf": {
-      "@id": "allOf",
-      "@type": "@id"
+      "@id": "wotsec:allOf"
     },
     "anchor": {
       "@id": "hctl:hasAnchor",
       "@type": "xsd:anyURI"
     },
     "authorization": {
-      "@id": "authorization",
+      "@id": "wotsec:authorization",
       "@type": "xsd:anyURI"
     },
     "base": {
@@ -177,11 +168,11 @@
       "@type": "@id"
     },
     "const": {
-      "@id": "const",
+      "@id": "jsonschema:const",
       "@type": "@id"
     },
     "contentCoding": {
-      "@id": "contentCoding"
+      "@id": "hctl:forContentCoding"
     },
     "contentEncoding": {
       "@context": {
@@ -216,7 +207,7 @@
     },
     "dcterms": "http://purl.org/dc/terms/",
     "default": {
-      "@id": "default",
+      "@id": "jsonschema:default",
       "@type": "@id"
     },
     "description": {
@@ -227,7 +218,7 @@
       "@type": "@id"
     },
     "enum": {
-      "@id": "enum",
+      "@id": "jsonschema:enum",
       "@type": "@id"
     },
     "events": {
@@ -235,11 +226,11 @@
       "@type": "@id"
     },
     "exclusiveMaximum": {
-      "@id": "exclusiveMaximum",
+      "@id": "jsonschema:exclusiveMaximum",
       "@type": "xsd:decimal"
     },
     "exclusiveMinimum": {
-      "@id": "exclusiveMinimum",
+      "@id": "jsonschema:exclusiveMinimum",
       "@type": "xsd:decimal"
     },
     "flow": {
@@ -248,7 +239,7 @@
         "meaning": "@id",
         "text": "skos:notation"
       },
-      "@id": "flow"
+      "@id": "wotsec:flow"
     },
     "foaf": "http://xmlns.com/foaf/0.1/",
     "format": {
@@ -257,7 +248,7 @@
         "meaning": "@id",
         "text": "skos:notation"
       },
-      "@id": "format"
+      "@id": "wotsec:format"
     },
     "forms": {
       "@id": "hasForm",
@@ -280,7 +271,7 @@
       "@type": "xsd:boolean"
     },
     "identity": {
-      "@id": "identity"
+      "@id": "wotsec:identity"
     },
     "in": {
       "@context": {
@@ -288,7 +279,7 @@
         "meaning": "@id",
         "text": "skos:notation"
       },
-      "@id": "in"
+      "@id": "wotsec:in"
     },
     "input": {
       "@id": "hasInputSchema",
@@ -311,7 +302,7 @@
       "@type": "@id"
     },
     "maxItems": {
-      "@id": "maxItems",
+      "@id": "jsonschema:maxItems",
       "@type": "xsd:nonNegativeInteger"
     },
     "maxLength": {
@@ -319,11 +310,11 @@
       "@type": "xsd:nonNegativeInteger"
     },
     "maximum": {
-      "@id": "maximum",
+      "@id": "jsonschema:maximum",
       "@type": "xsd:decimal"
     },
     "minItems": {
-      "@id": "minItems",
+      "@id": "jsonschema:minItems",
       "@type": "xsd:nonNegativeInteger"
     },
     "minLength": {
@@ -331,7 +322,7 @@
       "@type": "xsd:nonNegativeInteger"
     },
     "minimum": {
-      "@id": "minimum",
+      "@id": "jsonschema:minimum",
       "@type": "xsd:decimal"
     },
     "model": {
@@ -342,7 +333,7 @@
       "@type": "xsd:dateTime"
     },
     "multipleOf": {
-      "@id": "multipleOf",
+      "@id": "jsonschema:multipleOf",
       "@type": "xsd:decimal"
     },
     "name": "@id",
@@ -351,11 +342,10 @@
       "@type": "xsd:boolean"
     },
     "oneOf": {
-      "@id": "oneOf",
-      "@type": "@id"
+      "@id": "wotsec:oneOf"
     },
     "op": {
-      "@id": "op"
+      "@id": "hctl:hasOperationType"
     },
     "output": {
       "@id": "hasOutputSchema",
@@ -373,7 +363,7 @@
       "@type": "@id"
     },
     "proxy": {
-      "@id": "proxy",
+      "@id": "wotsec:proxy",
       "@type": "xsd:anyURI"
     },
     "qop": {
@@ -382,16 +372,16 @@
         "meaning": "@id",
         "text": "skos:notation"
       },
-      "@id": "qop"
+      "@id": "wotsec:qop"
     },
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "readOnly": {
-      "@id": "readOnly",
+      "@id": "jsonschema:readOnly",
       "@type": "xsd:boolean"
     },
     "refresh": {
-      "@id": "refresh",
+      "@id": "wotsec:refresh",
       "@type": "xsd:anyURI"
     },
     "rel": {
@@ -401,7 +391,7 @@
       "@id": "jsonschema:required"
     },
     "response": {
-      "@id": "response",
+      "@id": "hctl:returns",
       "@type": "@id"
     },
     "safe": {
@@ -424,10 +414,11 @@
       "@id": "scheme"
     },
     "scopes": {
-      "@id": "scopes"
+      "@id": "wotsec:scopes"
     },
     "security": {
-      "@id": "hasSecurityConfiguration"
+      "@id": "hasSecurityConfiguration",
+      "@type": "@id"
     },
     "securityDefinitions": {
       "@id": "definesSecurityScheme",
@@ -444,7 +435,7 @@
         "meaning": "@id",
         "text": "skos:notation"
       },
-      "@id": "subprotocol"
+      "@id": "hctl:forSubProtocol"
     },
     "subscription": {
       "@id": "hasSubscriptionSchema",
@@ -472,7 +463,7 @@
     },
     "tm": "https://www.w3.org/2019/wot/tm#",
     "token": {
-      "@id": "token",
+      "@id": "wotsec:token",
       "@type": "xsd:anyURI"
     },
     "type": {
@@ -495,10 +486,9 @@
       "@id": "versionInfo",
       "@type": "@id"
     },
-    "wot": "https://www.w3.org/2019/wot/security#",
     "wotsec": "https://www.w3.org/2019/wot/security#",
     "writeOnly": {
-      "@id": "writeOnly",
+      "@id": "jsonschema:writeOnly",
       "@type": "xsd:boolean"
     },
     "xml": {

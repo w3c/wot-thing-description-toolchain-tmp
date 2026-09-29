@@ -1,72 +1,160 @@
 id: https://www.w3.org/2019/wot/security
 name: wot_security
-title: WoT Security Schema
-description: LinkML Schema for modelling the Thing Description security mechanisms .
-version: "1.1-11-May-2026"
+title: Security mechanisms for the Web of Things
+description: >-
+  LinkML schema for the Security vocabulary of the W3C Web of Things (WoT) Thing Description 2.0 model.
+version: "2.0"
 license: MIT
-contributors: Mahda_Noura
+created_by: mailto:mahda.noura@siemens.com
+contributors:
+  - mailto:michael.mccool@intel.com
+  - https://vcharpenay.link/#me
+created_on: "2023-12-05"
+last_updated_on: "2026-09-29"
 see_also:
+  - https://www.w3.org/TR/wot-thing-description11/
   - https://www.w3.org/TR/wot-thing-description11/#sec-security-vocabulary-definition
+annotations:
+  dcterms:publisher:
+    value:
+      "@type": schema:Organization
+      schema:name: W3C Web of Things Working Group
+      schema:url: https://www.w3.org/WoT/WG/
+
 prefixes:
-  wot: https://www.w3.org/2019/wot/security#
+  wotsec: https://www.w3.org/2019/wot/security#
+  skos: http://www.w3.org/2004/02/skos/core#
   linkml: https://w3id.org/linkml/
   xsd: http://www.w3.org/2001/XMLSchema#
   td: https://www.w3.org/2019/wot/td#
-default_prefix: wot
+  dcterms: http://purl.org/dc/terms/
+default_prefix: wotsec
 imports:
   - linkml:types
 
+enums:
+  SecuritySchemeList:
+    description: Identification of the security mechanism being configured.
+    permissible_values:
+      nosec:
+        description: No authentication or other security mechanism is required.
+      combo:
+        description: A combination of named security schemes using oneOf or allOf.
+      basic:
+        description: HTTP Basic authentication using a username and password.
+      digest:
+        description: HTTP Digest Access Authentication.
+      bearer:
+        description: Bearer token authentication independent of OAuth 2.0.
+      psk:
+        description: Pre-shared key authentication, for example TLS-PSK.
+      oauth2:
+        description: OAuth 2.0 authentication.
+      apikey:
+        description: API key authentication using an opaque access token.
+      auto:
+        description: Security parameters are negotiated by the underlying protocol at runtime.
+  SecurityLocationType:
+    description: Specifies the location where security authentication information should be provided
+    permissible_values:
+      header:
+        description: The parameter will be given in a header provided by the protocol
+      query:
+        description: The parameter will be appended to the URI as a query parameter
+      body:
+        description: The parameter will be provided in the body of the request payload
+      cookie:
+        description: The parameter is stored in a cookie
+      uri:
+        description: The parameter is embedded in the URI itself using a URI template variable
+      auto:
+        description: The location is determined as part of the protocol, or negotiated
+  algList:
+    description: Examples of encoding, encryption, or digest algorithms for bearer tokens.
+    permissible_values:
+      ES256:
+        description: ECDSA using the P-256 curve and SHA-256.
+      ES512-256:
+        description: Algorithm identifier listed as an example by TD 1.1.
+  QoPType:
+    description: Quality of protection options for digest security
+    permissible_values:
+      auth:
+        description: Authentication only
+      auth-int:
+        description: Authentication with integrity protection
+  BearerFormat:
+    description: Format specifications for bearer tokens
+    permissible_values:
+      jwt:
+        description: JSON Web Token (RFC7519)
+      jws:
+        description: JSON Web Signature (RFC7797)
+      cwt:
+        description: CBOR Web Token (RFC8392)
+      jwe:
+        description: JSON Web Encryption (RFC7516)
+  OAuth2Flow:
+    description: OAuth 2.0 authorization flows
+    permissible_values:
+      code:
+        description: Authorization code flow
+      client:
+        description: Client credentials flow
 
 slots:
   scheme:
     description: Identification of the security mechanism being configured.
     required: true
     range: SecuritySchemeList
-
   alg:
     description: Encoding, encryption, or digest algorithm (e.g., ES256, ES512-256).
+    slot_uri: wotsec:alg
     annotations:
       spec_description: >-
         Encoding, encryption, or digest algorithm.
     range: algList
-
   flow:
     description: Authorization flow.
+    slot_uri: wotsec:flow
     range: OAuth2Flow
-
   format:
     description: Specifies format of security authentication information.
+    slot_uri: wotsec:format
     range: BearerFormat
-
   identity:
     description: Identifier providing information which can be used for selection or confirmation.
+    slot_uri: wotsec:identity
     range: string
-
   in:
     description: Specifies the location of security authentication information.
+    slot_uri: wotsec:in
+    annotations:
+      skos:note: >-
+        The API Key security scheme maps the JSON member `in` to `wotsec:apikeyIn`, while Basic, Digest, and Bearer schemes map it to `wotsec:in`.
     range: SecurityLocationType
     comments:
       - Default value should be provided by implementations
-
-  #this is the name in wot_Security, however it is modelled like this because in LinkML name is a reserved key!
   "@name":
+    #this is the name in wot_Security, modelled like this because in LinkML name is a reserved key
     description: >-
       Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.
+    slot_uri: wotsec:name
     annotations:
       spec_description: >-
         Name for query, header, cookie, or uri parameters.
     range: string
-
   qop:
     description: Quality of protection.
+    slot_uri: wotsec:qop
     range: QoPType
     comments:
       - This feature is at risk.
-
   scopes:
     description: >-
       Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an 
       authorization server and associated with forms in order to identify what resources a client may access and how.
+    slot_uri: wotsec:scopes
     annotations:
       spec_description: >-
         Set of authorization scope identifiers provided as an array. 
@@ -78,37 +166,46 @@ slots:
         multivalued: true
     comments:
       - This feature is at risk.
-
   proxy:
     description: >-
       URI of the proxy server this security configuration provides access to. If not given, the corresponding 
       security configuration is for the endpoint.
+    slot_uri: wotsec:proxy
     range: uri
     comments:
       - This feature is at risk.
-
   authorization:
     description: URI of the authorization server.
+    slot_uri: wotsec:authorization
     range: uri
-
   refresh:
     description: URI of the refresh server.
+    slot_uri: wotsec:refresh
     range: uri
-
   token:
     description: URI of the token server.
+    slot_uri: wotsec:token
     range: uri
-
-
-  allOf:
+  security_oneOf:
     description: >-
-      Array of two or more strings identifying other named security scheme definitions, all of which must be 
-      satisfied for access.
-    range: SecurityScheme
+      Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, will allow access. Only one may be chosen for use.
+    alias: oneOf
+    slot_uri: wotsec:oneOf
+    annotations:
+      skos:note: >-
+        In a Combo security scheme, `oneOf` maps to `wotsec:oneOf` rather than the distinct `jsonschema:oneOf` term.
+    range: string
     multivalued: true
     minimum_value: 2
-
-
+  security_allOf:
+    description: >-
+      Array of two or more strings identifying other named security scheme definitions, all of which must be
+      satisfied for access.
+    alias: allOf
+    slot_uri: wotsec:allOf
+    range: string
+    multivalued: true
+    minimum_value: 2
 classes:
   SecurityScheme:
     description: >-
@@ -116,6 +213,7 @@ classes:
       within a Vocabulary included in the Thing Description. For all security schemes, any keys, passwords, or other 
       sensitive information directly providing access MUST NOT be stored in the TD and should instead be shared and 
       stored out-of-band via other mechanisms.
+    class_uri: wotsec:SecurityScheme
     annotations:
       jsonschema_oneof_dispatch:
         value:
@@ -190,7 +288,7 @@ classes:
                 text: |
                   If a value of `auto` is set for the `in` field of a `SecurityScheme`, then the name field *SHOULD NOT* be set.
               - text: |
-                  In this case, the application of the `SecurityScheme` is subject to the respective specification for the given protocol (e.g. [[RFC8288]] when using the `BasicSecurityScheme` with HTTP).
+                  In this case, the application of the `SecurityScheme` is subject to the respective specification for the given protocol (e.g. [[RFC7617]] when using the `BasicSecurityScheme` with HTTP).
           - type: markdown
             text: |
               If multiple parameters are needed for a security scheme, repeat the security scheme definition for each parameter and combine them using a combo security scheme and `allOf`. In some cases parameters may not actually be secret but a user may wish to leave them out of the TD to help protect privacy. As an example of this, some security mechanisms require both a client identifier and a secret key. In theory, the client identifier is public however it may be hard to update and pose a tracking risk. In such a case it can be provided as an additional security parameter so it does not appear in the TD.
@@ -236,15 +334,14 @@ classes:
           - range: string
             multivalued: true
             minimum_cardinality: 1
-
-
   NoSecurityScheme:
-    is_a: SecurityScheme
     description: >-
       A security configuration indicating there is no authentication or other mechanism required to access the resource.
+    class_uri: wotsec:NoSecurityScheme
+    is_a: SecurityScheme
     annotations:
       spec_description: >-
-        A security configuration corresponding to identified by the Vocabulary Term `nosec` (i.e., "scheme": "nosec"), indicating there is no authentication or other mechanism required to access the resource.
+        A security configuration identified by the Vocabulary Term `nosec` (i.e., "scheme": "nosec"), indicating there is no authentication or other mechanism required to access the resource.
     extra_slots:
       allowed: true
     slot_usage:
@@ -252,15 +349,15 @@ classes:
         range: string
         equals_string_in:
           - nosec
-
   AutoSecurityScheme:
-    is_a: SecurityScheme
     description: >-
       An automatic authentication security configuration identified by the term auto. This scheme indicates that the security 
       parameters are going to be negotiated by the underlying protocols at runtime.
+    class_uri: wotsec:AutoSecurityScheme
+    is_a: SecurityScheme
     annotations:
       spec_description: >-
-        An automatic authentication security configuration identified by the term `auto` (i.e., "scheme": "auto"). This scheme indicates that the security parameters are going to be negotiated by the underlying protocols at runtime, subject to the respective specifications for the protocol (e.g. [[RFC8288]] for Basic Authentication when using HTTP).
+        An automatic authentication security configuration identified by the term `auto` (i.e., "scheme": "auto"). This scheme indicates that the security parameters are going to be negotiated by the underlying protocols at runtime, subject to the respective specifications for the protocol (e.g. [[RFC7617]] for Basic Authentication when using HTTP).
     extra_slots:
       allowed: true
     slot_usage:
@@ -268,11 +365,11 @@ classes:
         range: string
         equals_string_in:
           - auto
-
   ComboSecurityScheme:
-    is_a: SecurityScheme
     description: >-
       A combination of other security schemes. Exactly one of either oneOf or allOf vocabulary terms MUST be included.
+    class_uri: wotsec:ComboSecurityScheme
+    is_a: SecurityScheme
     annotations:
       spec_intro_content:
         value:
@@ -288,28 +385,18 @@ classes:
     extra_slots:
       allowed: true
     slots:
-      - oneOf
-      - allOf
+      - security_oneOf
+      - security_allOf
     slot_usage:
       scheme:
         range: string
         equals_string_in:
           - combo
-      oneOf:
-        description: >-
-          Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, will allow access. Only one may be chosen for use.
-        range: string
-        multivalued: true
-        minimum_value: 2
-      allOf:
-        range: string
-        multivalued: true
-        minimum_value: 2
-
   BasicSecurityScheme:
-    is_a: SecurityScheme
     description: >-
       Basic Authentication security configuration using an unencrypted username and password.
+    class_uri: wotsec:BasicSecurityScheme
+    is_a: SecurityScheme
     annotations:
       spec_description: >-
         Basic Authentication [[RFC7617]] security configuration identified by the Vocabulary Term `basic` (i.e., "scheme": "basic"), using an unencrypted username and password.
@@ -335,12 +422,12 @@ classes:
                 - body
                 - cookie
                 - auto
-
   DigestSecurityScheme:
-    is_a: SecurityScheme
     description: >-
       Digest Access Authentication security configuration. This scheme is similar to basic authentication but with 
       added features to avoid man-in-the-middle attacks.
+    class_uri: wotsec:DigestSecurityScheme
+    is_a: SecurityScheme
     annotations:
       spec_description: >-
         Digest Access Authentication [[RFC7616]] security configuration identified by the Vocabulary Term `digest` (i.e., "scheme": "digest").
@@ -377,12 +464,12 @@ classes:
               values:
                 - auth
                 - auth-int
-
   APIKeySecurityScheme:
-    is_a: SecurityScheme
     description: >-
       API key authentication security configuration identified by the term apikey. This scheme is to be used when the 
       access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.
+    class_uri: wotsec:APIKeySecurityScheme
+    is_a: SecurityScheme
     annotations:
       spec_description: >-
         API key authentication security configuration identified by the Vocabulary Term `apikey` (i.e., "scheme": "apikey"). 
@@ -400,6 +487,7 @@ classes:
         equals_string_in:
           - apikey
       in:
+        slot_uri: wotsec:apikeyIn
         required: true
         range: SecurityLocationType
         annotations:
@@ -414,11 +502,11 @@ classes:
                 - cookie
                 - uri
                 - auto
-
   BearerSecurityScheme:
-    is_a: SecurityScheme
     description: >-
       Bearer Token security configuration for situations where bearer tokens are used independently of OAuth2.
+    class_uri: wotsec:BearerSecurityScheme
+    is_a: SecurityScheme
     annotations:
       spec_intro_content:
         value:
@@ -474,12 +562,12 @@ classes:
                 - cwt
                 - jwe
                 - jws
-
   PSKSecurityScheme:
-    is_a: SecurityScheme
     description: >-
       Pre-shared key authentication security configuration. This is meant to identify that a standard is used for 
       pre-shared keys such as TLS-PSK.
+    class_uri: wotsec:PSKSecurityScheme
+    is_a: SecurityScheme
     annotations:
       spec_description: >-
         Pre-shared key authentication security configuration identified by the Vocabulary Term `psk` (i.e., "scheme": "psk"). 
@@ -494,11 +582,11 @@ classes:
         range: string
         equals_string_in:
           - psk
-
   OAuth2SecurityScheme:
-    is_a: SecurityScheme
     description: >-
       OAuth 2.0 authentication security configuration for systems conformant with RFC6749 and RFC8252.
+    class_uri: wotsec:OAuth2SecurityScheme
+    is_a: SecurityScheme
     annotations:
       spec_description: >-
         OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]], 
@@ -538,76 +626,3 @@ classes:
             multivalued: true
       flow:
         required: true
-
-enums:
-  SecuritySchemeList:
-    description: Identification of the security mechanism being configured.
-    permissible_values:
-      nosec:
-        description:
-      combo:
-        description:
-      basic:
-        description:
-      digest:
-        description:
-      bearer:
-        description:
-      psk:
-        description:
-      oauth2:
-        description:
-      apikey:
-        description:
-      auto:
-        description:
-  SecurityLocationType:
-    description: Specifies the location where security authentication information should be provided
-    permissible_values:
-      header:
-        description: The parameter will be given in a header provided by the protocol
-      query:
-        description: The parameter will be appended to the URI as a query parameter
-      body:
-        description: The parameter will be provided in the body of the request payload
-      cookie:
-        description: The parameter is stored in a cookie
-      uri:
-        description: The parameter is embedded in the URI itself using a URI template variable
-      auto:
-        description: The location is determined as part of the protocol, or negotiated
-  algList:
-    description: TODO
-    permissible_values:
-      ES256:
-        description: TODO
-      ES512-256:
-        description: TODO
-
-  QoPType:
-    description: Quality of protection options for digest security
-    permissible_values:
-      auth:
-        description: Authentication only
-      auth-int:
-        description: Authentication with integrity protection
-
-  BearerFormat:
-    description: Format specifications for bearer tokens
-    permissible_values:
-      jwt:
-        description: JSON Web Token (RFC7519)
-      jws:
-        description: JSON Web Signature (RFC7797)
-      cwt:
-        description: CBOR Web Token (RFC8392)
-      jwe:
-        description: JSON Web Encryption (RFC7516)
-
-  OAuth2Flow:
-    description: OAuth 2.0 authorization flows
-    permissible_values:
-      code:
-        description: Authorization code flow
-      client:
-        description: Client credentials flow

@@ -1,6 +1,4 @@
-"""Shared helpers for the TD sample tests: baseline lists and the
-td11 -> td20 sample derivation."""
-from pathlib import Path
+"""Derive TD 2.0 samples from TD 1.1 samples."""
 
 TD_VERSIONS = ("td11", "td20")
 
@@ -9,20 +7,6 @@ TD11_CONTEXT_URLS = {
     "https://www.w3.org/2022/wot/td/v1.1",
 }
 TD20_CONTEXT_URL = "https://www.w3.org/ns/wot-next/td"
-
-
-def load_baseline(path: Path) -> set[str]:
-    """Read a known-failure list: one entry per line, '#' comments ignored."""
-    if not path.exists():
-        return set()
-    entries = set()
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if line and not line.startswith("#"):
-            entries.add(line.split()[0])
-    return entries
-
-
 def as_td20(instance):
     """The td20 variant is the same document with the td11 context URL(s)
     replaced by the wot-next one."""
