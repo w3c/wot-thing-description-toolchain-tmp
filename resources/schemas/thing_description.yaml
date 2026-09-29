@@ -41,9 +41,16 @@ slots:
     required: true
     exactly_one_of:
       - range: ThingContextUri
-      - range: ThingContextUri
-        multivalued: true
+      - multivalued: true
         minimum_cardinality: 1
+        any_of:
+          - range: uri
+          - range: Any
+        has_member:
+          equals_string_in:
+            - "https://www.w3.org/2019/wot/td/v1"
+            - "https://www.w3.org/2022/wot/td/v1.1"
+            - "https://www.w3.org/ns/wot-next/td"
 
   "@type":
     description: JSON-LD keyword to label the object with semantic tags (or types).
@@ -407,11 +414,6 @@ classes:
     slot_usage:
       "@context":
         required: true
-        exactly_one_of:
-          - range: ThingContextUri
-          - range: ThingContextUri
-            multivalued: true
-            minimum_cardinality: 1
       "@type":
         range: string
         exactly_one_of:
@@ -759,4 +761,4 @@ enums:
     permissible_values:
       "https://www.w3.org/2019/wot/td/v1":
       "https://www.w3.org/2022/wot/td/v1.1":
-      "http://www.w3.org/ns/td":
+      "https://www.w3.org/ns/wot-next/td":

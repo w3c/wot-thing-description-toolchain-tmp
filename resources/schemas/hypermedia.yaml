@@ -566,7 +566,6 @@ classes:
         range: string
       subprotocol:
         range: string
-        pattern: ^(longpoll|websub|sse)$
         annotations:
           spec_type_values:
             value:

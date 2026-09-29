@@ -3,6 +3,12 @@
   "@type": "Thing",
   "id": "urn:example:thing:actions1",
   "title": "Example Thing with Actions",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": ["nosec_sc"],
   "actions": {
     "toggle": {
       "forms": [{

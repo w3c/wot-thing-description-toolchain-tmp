@@ -49,6 +49,24 @@ Each entry: **what the gap is**, **which artifact(s) affected**, **current worka
 ### 7. Known schema-vs-instance gaps (from known-failures baselines)
 The file `tests/known_failures/td_gate.txt` tracks valid TD instances that the generated JSON Schema wrongly rejects. These represent JSON Schema generator fidelity gaps. Each entry must link to a GitHub issue.
 
+### 9. No oneOf dispatch on a discriminator slot
+**Symptom:** W3C `securityScheme` is a oneOf over the known schemes plus `additionalSecurityScheme` with a prefixed `scheme`; the generator does not use `designates_type` for this.
+**Artifact:** `jsonschema.json`
+**Workaround:** `jsonschema_postprocessor.py` → `_build_oneof_dispatch()`, driven by the `jsonschema_oneof_dispatch` annotation
+**LinkML issue:** none found (2026-09-09)
+
+### 10. No form variants per affordance type
+**Symptom:** W3C has one form definition per location (root, property, action, event) with its own `op` values; the generator emits a single Form.
+**Artifact:** `jsonschema.json`
+**Workaround:** `jsonschema_postprocessor.py` → `_build_form_variants()`, driven by the `jsonschema_form_variants` annotation; the base branch takes the forms without `op`
+**LinkML issue:** none found (2026-09-09)
+
+### 11. Inlined dict slots always allow the object form
+**Symptom:** For `titles`/`descriptions` the generator emits `anyOf` of the object form and the SimpleDict string form; W3C allows only the string form.
+**Artifact:** `jsonschema.json`
+**Workaround:** `jsonschema_postprocessor.py` → `_fix_additional_props_anyof()`, keeps only the string form for a key + one string value class
+**LinkML issue:** none found (2026-09-09)
+
 ---
 
 ## SHACL Generator

@@ -164,10 +164,13 @@ def _build_oneof_dispatch(schema: dict, sv: SchemaView, config: TransformConfig)
 
         one_of_list = sorted(subclass_refs, key=lambda x: x["$ref"])
 
+        # W3C additionalSecurityScheme: a prefixed scheme, so the catch-all does not overlap the known schemes (KNOWN_LINKML_GAPS.md #9).
         if dispatch.include_unknown:
             one_of_list.append({
                 "type": "object",
-                "description": f"Additional {cls_name} not covered by known subclasses"
+                "description": f"Additional {cls_name} not covered by known subclasses",
+                "properties": {dispatch.discriminator: {"type": "string", "pattern": ".+:.*"}},
+                "required": [dispatch.discriminator],
             })
 
         defs[cls_name] = {"oneOf": one_of_list}
@@ -215,8 +218,11 @@ def _build_form_variants(schema: dict, config: TransformConfig) -> None:
             defs[variant_def_name] = variant_def
             variant_refs.append({"$ref": f"#/$defs/{variant_def_name}"})
 
+        # The base branch takes only forms without op, otherwise a form with op also matches a variant and oneOf fails (KNOWN_LINKML_GAPS.md #10).
         defs[cls_name] = {
-            "oneOf": variant_refs + [{"$ref": f"#/$defs/{base_name}"}]
+            "oneOf": variant_refs + [
+                {"$ref": f"#/$defs/{base_name}", "not": {"required": [fv.op_slot]}}
+            ]
         }
 
         thing_props = schema.get('properties', {})
@@ -313,6 +319,16 @@ def _resolve_refs(schema: dict, sv: SchemaView) -> None:
                 return ref[len(prefix):]
         return None
 
+    def _is_string_map(cls_name: str | None) -> bool:
+        if cls_name is None:
+            return False
+        try:
+            slots = sv.class_induced_slots(cls_name)
+        except Exception:
+            return False
+        non_id = [s for s in slots if not getattr(s, 'identifier', False)]
+        return len(slots) == 2 and len(non_id) == 1 and non_id[0].range == 'string'
+
     def _fix_additional_props_anyof(obj: dict) -> None:
         if 'additionalProperties' not in obj:
             return
@@ -325,7 +341,12 @@ def _resolve_refs(schema: dict, sv: SchemaView) -> None:
 
         for item in items:
             if isinstance(item, dict) and '$ref' in item and '__identifier_optional' in item['$ref']:
-                obj['additionalProperties'] = {'$ref': item['$ref'].replace('__identifier_optional', '')}
+                base = item['$ref'].replace('__identifier_optional', '')
+                # W3C titles/descriptions are string maps, LinkML also emits the object form, keep only the string form (KNOWN_LINKML_GAPS.md #11).
+                if _is_string_map(_extract_ref_name(base)):
+                    obj['additionalProperties'] = {'type': 'string'}
+                else:
+                    obj['additionalProperties'] = {'$ref': base}
                 return
 
         refs = [i for i in items if isinstance(i, dict) and '$ref' in i]

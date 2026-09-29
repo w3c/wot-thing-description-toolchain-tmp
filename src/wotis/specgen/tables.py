@@ -145,6 +145,8 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
     choices = None
     if usage:
         choices = getattr(usage, "exactly_one_of", None) or getattr(usage, "any_of", None)
+    if not choices:
+        choices = getattr(slot_def, "exactly_one_of", None) or getattr(slot_def, "any_of", None)
     if choices:
         all_enums = sv.all_enums()
         pretty = []

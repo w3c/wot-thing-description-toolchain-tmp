@@ -114,7 +114,7 @@ jobs:
         run: uv run pytest tests/tmp/test_assertion_inventory.py -v
 
       - name: Default assignments
-        run: uv run pytest tests/test_default_assignments.py -v
+        run: uv run pytest tests/tmp/test_default_assignments.py -v
 
   golden-diff:
     name: Golden diff
