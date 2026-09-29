@@ -146,7 +146,7 @@ def test_assertion_spans_match(golden_tree, generated_tree, spec_html_findings) 
 
 # These ids do not exist in the ReSpec source, ReSpec creates them at render
 RENDER_TIME_ID_PREFIXES = ("bib-", "dfn-")
-RENDER_TIME_IDS = {"class-definitions", "namespaces"}
+RENDER_TIME_IDS = {"class-definitions", "namespaces", "semantic-annotations"}
 
 
 def test_ids_are_unique(generated_tree) -> None:

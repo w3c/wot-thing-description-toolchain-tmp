@@ -104,11 +104,8 @@ jobs:
       - name: Spec HTML structure tests
         run: uv run pytest tests/test_spec_content_rendering.py tests/test_golden_form_structure.py -v
 
-      # Disabled: the generated HTML still differs from the upstream golden. Some
-      # differences are real schema gaps, some are only markup because the
-      # golden is older than the generator. Enable again after they are fixed.
-      # - name: Spec HTML vs upstream golden
-      #   run: uv run pytest tests/tmp/test_spec_html_vs_golden.py -v
+      - name: Spec HTML vs upstream golden
+        run: uv run pytest tests/tmp/test_spec_html_vs_golden.py -v
 
       - name: Assertion inventory vs upstream
         run: uv run pytest tests/tmp/test_assertion_inventory.py -v

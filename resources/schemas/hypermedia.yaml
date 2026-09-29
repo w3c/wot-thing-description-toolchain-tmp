@@ -432,35 +432,6 @@ classes:
                   For example, in a TD with the HTTP Binding, two Forms with HTTP GET and PUT methods can point to the same resource but represent different operations such as `readproperty` and `writeproperty`.
       spec_subsections:
         value:
-          - id: sec-op-data-schema-mapping
-            title: Mapping op Values to Data Schemas
-            class: informative
-            content:
-              - type: markdown
-                text: |
-                  Protocols that can be used with TDs follow request-response or eventing mechanisms. The Data Schema of an affordance generally correlates with the `op` keywords used in `forms`. The table below informatively summarizes the available data schema related terms with the `op` keywords.
-              - type: list
-                items:
-                  - text: Consumer to Thing applies for messages sent by the Consumer to the Thing, such as the value for writing a property.
-                  - text: Thing to Consumer applies for messages sent by the Thing to the Consumer, such as the value of a property value as the result of reading a property.
-                  - text: In case that there is no correlation with the data schema and the operation, it implies that no payload is required for executing the operation or no payload is expected as a result of the operation.
-              - type: enum_table
-                enum: OperationType
-                caption: Mapping op Values to Data Schemas
-                require_comments: true
-                columns:
-                  - field: name
-                    header: Operation Type
-                  - field: "comment:Consumer to Thing"
-                    header: Consumer to Thing DataSchema Correlation
-                  - field: "comment:Thing to Consumer"
-                    header: Thing to Consumer DataSchema Correlation
-              - type: note
-                title: writeproperty and observeproperty relationship
-                text: Writing to a property does not necessarily mean that a new value will be sent to the Consumer observing the property. It depends on the protocol and implementation.
-              - type: note
-                title: Further Data Schemas mappings
-                text: Further specification of how to map operations to data schemas, as well as mapping meta operations such as `readallproperties` can be found in the respective protocol specification of the [[WOT-BINDING-TEMPLATES]].
           - id: sec-response-usage
             title: Response-related Terms Usage
             content:
@@ -608,15 +579,6 @@ classes:
           spec_default: true
         slot_uri: hctl:isSuccess
         range: boolean
-      contentType:
-        description: >-
-          Assign a content type based on a media type (e.g., text/plain) and potential parameters
-          (e.g., charset=utf-8) for the media type [RFC2046].
-        annotations:
-          spec_description: >-
-            Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
-        slot_uri: hctl:forContentType
-        range: string
       schema:
         description: >-
           Used to define the output data schema for an additional response if it differs from the default
@@ -626,4 +588,13 @@ classes:
           spec_description: >-
             Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a `DataSchema` object, the name of a previous definition given in a `schemaDefinitions` map must be used.
         slot_uri: hctl:hasAdditionalOutputSchema
+        range: string
+      contentType:
+        description: >-
+          Assign a content type based on a media type (e.g., text/plain) and potential parameters
+          (e.g., charset=utf-8) for the media type [RFC2046].
+        annotations:
+          spec_description: >-
+            Assign a content type based on a media type (e.g., `text/plain`) and potential parameters (e.g., `charset=utf-8`) for the media type [[RFC2046]].
+        slot_uri: hctl:forContentType
         range: string

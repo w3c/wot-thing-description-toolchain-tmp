@@ -51,7 +51,10 @@ def generated_sections_html(path: Path) -> str:
 
 
 def normalize_text(text: str | None) -> str:
-    return " ".join((text or "").split())
+    text = " ".join((text or "").split())
+    text = text.replace("`", "")
+    text = re.sub(r"\[\[([^\]]+)\]\]", r"[\1]", text)
+    return text.replace("§ 5. ", "")
 
 
 def section_by_id(tree: HtmlElement, section_id: str) -> HtmlElement | None:
