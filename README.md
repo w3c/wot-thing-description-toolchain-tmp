@@ -108,7 +108,7 @@ uv run pytest tests/ -v
 uv run ruff check .
 ```
 
-Before changing a schema or generator, read the [modeling guidelines](docs/guidelines/index.md) for naming conventions, custom annotations, postprocessor patterns, and snippet authoring. For documented LinkML limitations and workarounds, see [`Known LinkML Gaps`](docs/known-linkml-gaps.md). Cross-reference terms used in the generated specification are defined in the [glossary](resources/xref/glossary.yaml), which maps vocabulary terms to their spec anchor IDs and aliases. Files under `resources/gens/` are generated outputs and should not be edited manually. Each postprocessor should document the LinkML limitation it addresses.
+Before changing a schema or generator, read the [modeling guidelines](docs/guidelines/index.md) for naming conventions, custom annotations, postprocessor patterns, and snippet authoring. For documented LinkML limitations and workarounds, see [`Known LinkML Gaps`](docs/known-linkml-gaps.md). Files under `resources/gens/` are generated outputs and should not be edited manually. Each postprocessor should document the LinkML limitation it addresses.
 
 ## Current Status
 
