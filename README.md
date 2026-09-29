@@ -1,129 +1,123 @@
-# WoTIS - Web of Things Integrated Schemas
+<div align="center">
 
-WoTIS - work in progress!
+<img src="images/wot-logo.png" alt="Web of Things" width="200">
 
-The aim of this repository is to simplify the current tooling required for generating the WoT Thing Description (TD) specification and related resources.
-WoTIS toolchain is a python-based project designed to automate the generation of:
- 1) WoT resources: [SHACL Shapes](https://www.w3.org/TR/shacl/), [JSON Schema](https://json-schema.org/specification), [JSON-LD context](https://www.w3.org/TR/json-ld11/), [RDF](https://www.w3.org/TR/rdf11-concepts/), and Mermaid diagrams
- 2) Documentation: TD specification and ontology specifications
+# WoT Toolchain
 
-This project leverages [LinkML](https://linkml.io/linkml/) for modelling the [Web of Things Thing Description](https://www.w3.org/TR/wot-thing-description11/) information model.
+**LinkML-based generation of Web of Things artifacts.**
 
-## Process Overview
+[![CI](https://github.com/w3c/wot-thing-description-toolchain-tmp/actions/workflows/main.yaml/badge.svg?branch=main)](https://github.com/w3c/wot-thing-description-toolchain-tmp/actions/workflows/main.yaml)
+[![W3C WoT TD](https://img.shields.io/badge/W3C-WoT%20Thing%20Description-005A9C?logo=w3c&logoColor=white)](https://www.w3.org/WoT/)
+[![Python 3.14](https://img.shields.io/badge/python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![LinkML](https://img.shields.io/badge/schema--driven-LinkML-2D6A4F?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFKADAAQAAAABAAAAFAAAAACy3fD9AAAD7UlEQVQ4EX1UYWwURRSeNzu3t3ctJwrt9VQiILGRSAzaaIJ/1CjVPyaKPWNMRf9pQqjJebXSFrbXohwHxDSEhEaDEotaAqap8QcxqVEjRn8QNQ0m0kCVQu9soRze3e7tzjxnNt3L2lbfj31v3/veN2/mzRsg/yHx/tw6XddbK9Vqr8V5FAhCWGNFg7GMAHrmSlfHH8ulwmLn3blc440ydiKFBCH0O0r5WXSwQCIS6UITImwBAltQiCmDuQemd+2aC3L8izAxkG2xOTGpBsM73PJnpmmKINi3HzVNNsHqXxKCP68J2l0w07/4sRphfG/uPscV+8OUpK72vnXeB/yfbtx38H7Xdt+NRoyOy50dvyssVZ/bTTPqctGnAetWZA2Zg5sfPHo0qmLLyYbBwYbm9440F7pSPzOg/ZZlDUhfWGE9wqpW106A/PjX7tQ55ay41W0XZ+YPI5HeRXLnoUORuXnr+PVS5WEVKuxOnyVAzxeLlaT6p7KSEBH4GDNix5TDE0TLCRuvrurP9vgupdUCUCVbXYSHLGp878d0oB9wAU+1jYxodDpfuocAXs+nXy/4AJmGxHWJQ2hmdSb7mk+W6M/1cTBue2Dl/NtjLZ+rvntypSf1pzSsbyan72ICRDNFuLgQW1CCEtfhOmMf2QiHGwdy+dVcbHRdnnpi1Y1N2+LjR6ZuRmXB5Fc/T57NFLrOBkaBrBBIi37A1xKgxQwjM18uz1oCT0u/cCDS/krTcLysG63y52Mfq7QQWASKKykSYckqa+XXQADEcaqha73pLk2IEzpAX8XsOHENI4ZMrsF8AxgYCLTM5EjJ7YLXMT8op8zLEFRecXmeJmL7HqlVyzmXKiQNAU4NLw2ZsZaF2BjFMJ0QiHfEc7m6IEA2Rm5aUxzEBBDS8BahmhxA9YPW9uOntzZ6OeaELvvADas4SfPpdIlSmMAKeTZASIkcViRQCfg8M8rjP9kWeUfT8WnBy+OfjD75zPub0onCmpbUJdO0vItdr5MhTvAFWaW3otwoYwT2Xn1zx5IXJZk8Wdne9m23a2svyias4VgZDWHxh5FbB9arFT3CS52dM/KEhhwLB5uz2RX1Gh1O4LoBGV96+l6dhLzc9vWngpNTug4kEqFNtgv31giVMbsnPcYQvpi1yYfq7CbMZHUhd1m11jxmhI36A7ZNviyXxFAsFD2jgN6hBzMaM/sfkdt/Q87npKaxUQPCv623CzcV5kIsFhNVbWOVO89pKAr5ns59wVxlLyFUTjXfl+f+bpWP6ePyzWvgCxdPk90jFPJA6Ve31LHxCzt32goflGUJgwA18OdmZrwrtbmpqXQymeTB+GL7H5S4pwvLuAY7AAAAAElFTkSuQmCC&logoColor=white)](https://linkml.io/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-0B7A75)](https://opensource.org/licenses/MIT)
 
-Below is a simplified overview of the process:
+</div>
 
-Step 1: Generate WoT resources using WoTIS
+The WoT Toolchain is a work area for moving Web of Things (WoT) resource generation to LinkML schema modules. It is intended to replace the manual maintenance of WoT resources — SHACL shapes, JSON Schema, JSON-LD context files, OWL ontologies — and the `index.html` specification generation currently handled by the [existing toolchain](https://github.com/w3c/wot-thing-description/tree/main/toolchain) in the [W3C WoT Thing Description repository](https://github.com/w3c/wot-thing-description).
 
-Step 2: Generate the final WoT TD specification document using the generated WoT resources along with a static `index.html`
+The toolchain models WoT resources in LinkML and generates the related artifacts from the same schema modules. Its aim is to prevent drift between those resources and the generated HTML sections of the [WoT Thing Description specification](https://www.w3.org/TR/wot-thing-description/).
 
-<img title="WoT Toolchain Overview" src="images/toolchain.svg">
+> [!IMPORTANT]
+> This work area is in progress. The toolchain is intended to be integrated into the official [TD](https://github.com/w3c/wot-thing-description/) repository after review and Working Group consensus.
 
-## Prerequisites
+## Usage
 
-- Python 3.14. [Download and install Python](https://www.python.org/downloads/).
-- The [uv](https://docs.astral.sh/uv/) package manager.
-- [Graphviz](https://graphviz.org/download/) — the `dot` command must be on your PATH. Required for generating class-hierarchy diagrams.
+Requirements:
 
-## Quick Start
-
-Clone the repository and navigate to the project directory:
+- Python 3.14, as declared in `pyproject.toml`;
+- [uv](https://docs.astral.sh/uv/); and
+- [Graphviz](https://graphviz.org/), required by `generate-wot-resources` to generate class-hierarchy diagrams for the index.html.
 
 ```bash
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
 uv sync
-pre-commit install
-```
-
-`pre-commit install` activates commit hooks (ruff linting, LinkML schema lint). If `pre-commit` is not installed: `pip install pre-commit` or `uv tool install pre-commit`.
-
-Install the package or run it by executing:
-
-```bash
-uv run wotis
-```
-
-## Usage
-
-See the list of all WoTIS commands:
-
-```bash
-wotis --help
-```
-
-Generate WoT resources (RDF, JSON-LD Context, SHACL Shapes, and JSON Schema) from a default LinkML schema:
-
-```
-wotis generate-wot-resources [OPTIONS]
-
-Options:
-  -i, --input_schema TEXT  Path to the input schema specified as LinkML yaml.
-                           [default: resources/schemas/thing_description.yaml]
-  -d, --generate_docs      Boolean for generating the final TD Respec-based
-                           HTML specification.
-  --assertions-csv FILE    Path for the storing assertion inventory CSV.
-                           [default: resources/gens/assertions.csv]
-  --extra-asserts FILE     Path to extra-asserts.html with additional testing
-                           assertions to merge into the assertion inventory.
-  --help                   Show this message and exit.
-```
-
-### Examples
-
-Generate all standard WoT resources (JSON-LD, JSON Schema, etc.) using the default schema:
-
-```bash
-wotis generate-wot-resources
-```
-
-Generate the custom W3C-style TD specification:
-
-```bash
-wotis generate-wot-resources -d
-```
-
-## Validation
-
-The tests check the generated artifacts. Generate them first, then run pytest:
-
-```bash
+uv run pre-commit install
 uv run wotis generate-wot-resources -d
 uv run pytest tests/ -v
 ```
 
-This validates Thing Description instances against the generated JSON Schema,
-compares the verdicts with the W3C schemas, and compares the generated JSON
-Schema, JSON-LD context and spec HTML with the reference files. See
-[tests/README.md](tests/README.md) for what each test file checks.
+`wotis` is the Python command-line interface installed from this checkout by `uv sync`. `generate-wot-resources` generates the resource artifacts; `-d` additionally generates the ReSpec TD specification and its assertion CSV inventory. Run `uv run wotis --help` to view the available command and options.
 
-## Project Structure
+Generated files are written under `resources/gens/`. Do not edit them directly.
 
+## How It Works
+
+The source models are maintained manually by the WoT Working Group:
+
+- **WoT LinkML schema modules** — the root module [`td-linkml`](resources/schemas/thing_description.yaml) imports [`hctl-linkml`](resources/schemas/hypermedia.yaml), [`wotsec-linkml`](resources/schemas/wot_security.yaml), and [`jsonschema-linkml`](resources/schemas/jsonschema.yaml)
+- **Static ReSpec template and Jinja templates** — `resources/index.template.html` and `resources/jinja_templates/`
+- **TD/TM JSON snippets** — example snippets with `_snippets.yaml` metadata
+
+From these source models, the generation pipeline has two paths:
+
+1. **LinkML resource generation + postprocessors** takes the schema modules and produces the following WoT resource artifacts under `resources/gens/`:
+   - **JSON Schema** (`jsonschema/jsonschema.json`) — validation of TD and TM JSON representations
+   - **JSON-LD context** (`jsonldcontext/context.jsonld`) — TD JSON-LD terms, types, and containers
+   - **SHACL shapes** (`shacl/shapes.shacl.ttl`) — validation of RDF representations of TD and TM instances
+   - **OWL ontology** (`owl/ontology.owl.ttl`) — TD vocabulary terms and relationships
+   - **TypeScript definitions** (`typescript/`) — type definitions for [node-wot](https://github.com/eclipse-thingweb/node-wot)
+   - **Visualizations** (`visualization/`) — class-hierarchy diagrams
+
+2. **Snippet rendering + ReSpec specification generation**, enabled by `-d`, takes the schema modules, `resources/index.template.html`, Jinja templates, and the TD/TM JSON snippets. It produces:
+   - **Generated ReSpec `index.html`** — vocabulary tables, assertions, and rendered TD/TM example snippets
+   - **Assertion CSV inventory** (`assertions/`) — inventory of assertions in the TD specification
+
+![WoT Toolchain generation flow](images/wot-toolchain.svg)
+
+Postprocessors are custom Python functions in [`src/wotis/postprocessors/`](src/wotis/postprocessors/). They modify a raw LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`KNOWN_LINKML_GAPS.md`](KNOWN_LINKML_GAPS.md) records each known limitation and workaround.
+
+## Testing
+
+Run the complete checks after generating artifacts:
+
+```bash
+uv run pytest tests/ -v
 ```
-resources/
-  schemas/                 # LinkML YAML schemas (inputs)
-  index.template.html      # ReSpec template with static spec prose
-  xref/glossary.yaml       # Term definitions for cross-references
-  jinja_templates/         # Jinja2 templates for vocabulary tables
-  gens/                    # Generated outputs (not committed)
-src/wotis/
-  cli.py                   # CLI entry point
-  generators/              # Pipeline orchestration and all generators
-    __init__.py             # run_pipeline + LinkML resource generators
-    respec.py               # ReSpec specification generation
-    visualization.py        # Graphviz diagram generation
-  specgen/                 # Table rendering, assertions, Bikeshed processing
-  postprocessors/          # JSON Schema, JSON-LD, SHACL postprocessing
-  preprocessing/           # Schema preprocessing
-tests/
+
+The checks include:
+
+- `tests/test_td_instance_gate.py`: validates valid and invalid TD/TM 2.0 test instances against the generated JSON Schema.
+- `tests/test_td_crosscheck.py`: compares generated-schema validation verdicts with the upstream W3C TD schemas manually specified in `resources/upstream/schemas/`.
+- `tests/test_golden_diff.py`: compares generated JSON Schema, JSON-LD context, and generated specification sections with machine-updatable snapshots in `tests/snapshots/`.
+- `tests/test_golden_form_structure.py` and `tests/test_spec_content_rendering.py`: check generated ReSpec structure and rendering behavior.
+- `tests/test_snippet_schema.py` and `tests/test_snippet_crossrefs.py`: validate snippet metadata, source files, and ReSpec cross-references.
+
+`resources/upstream/html/index.html` and `resources/upstream/assertions.csv` are upstream reference files used for TD specification and assertion-inventory comparison. `tests/snapshots/` contains this toolchain's generated-output snapshots; update them only with `uv run pytest tests/test_golden_diff.py --update-goldens` after reviewing an intended change.
+
+Expected validation differences are listed in `tests/known_failures/`. Each listed case is an `xfail(strict=True)` baseline: when it starts passing, the test fails until the entry is removed. A new, unlisted validation difference fails the relevant test.
+
+See [tests/README.md](tests/README.md) for the complete test inventory and the upstream reference files used by each check.
+
+## Development
+
+Useful commands:
+
+```bash
+# Generate resource artifacts only
+uv run wotis generate-wot-resources
+
+# Generate resource artifacts and the ReSpec TD specification
+uv run wotis generate-wot-resources -d
+
+# Run the complete test suite
+uv run pytest tests/ -v
+
+# Check linting
+uv run ruff check .
 ```
 
-## Default Paths
+Before changing a schema or generator, read the [LinkML schema authoring guide](resources/schemas/README.md) for modeling conventions and slot patterns, and [`KNOWN_LINKML_GAPS.md`](KNOWN_LINKML_GAPS.md) for documented LinkML limitations and their workarounds. Files under `resources/gens/` are generated outputs and should not be edited manually. Each postprocessor should document the LinkML limitation it addresses.
 
-- LinkML schema: `resources/schemas/thing_description.yaml`
-- Generated WoT resources: `resources/gens`
-- Generated full LinkML schema: `resources/gens/linkml`
+## Current Status
+
+Current work focuses on JSON Schema parity, generated TD specification vocabulary tables, snippet validation, and assertion inventory comparison with the upstream TD repository. SHACL and OWL artifacts are generated; deeper automated consistency checks for those artifacts are not currently part of the test gates.
 
 ## Contributing
 
-We welcome contributions! Please fork the repository, create a branch, and submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
+Contributions, issue reports, and review are welcome. Keep each change focused, generate the affected artifacts, and run the relevant checks before opening a pull request. For schema and generated-output changes, describe the compatibility impact in the pull request.
+
+## License
+
+Licensed under the MIT License.
