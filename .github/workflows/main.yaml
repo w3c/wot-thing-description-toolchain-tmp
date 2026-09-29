@@ -66,7 +66,7 @@ jobs:
       - name: Upload generated resources
         uses: actions/upload-artifact@v7
         with:
-          name: generated-resources
+          name: WoT TD artifacts
           path: resources/gens/
           if-no-files-found: error
 
@@ -92,7 +92,7 @@ jobs:
       - name: Download generated resources
         uses: actions/download-artifact@v8
         with:
-          name: generated-resources
+          name: WoT TD artifacts
           path: resources/gens/
 
       - name: TD instance gate
@@ -128,7 +128,7 @@ jobs:
       - name: Download generated resources
         uses: actions/download-artifact@v8
         with:
-          name: generated-resources
+          name: WoT TD artifacts
           path: resources/gens/
 
       - name: Golden diff
