@@ -235,42 +235,50 @@ Column `field` values:
 All text fields go through the same pipeline regardless of block type:
 
 - `*MUST*`, `*SHOULD*`, `*MAY*`, etc. → `<em>MUST</em>` (RFC 2119 keywords)
-- `[[SPEC-NAME]]` → ReSpec bibliographic reference
-- Known terms (e.g., `Thing Description`, `TD Processors`) → cross-reference links via the glossary
+- `[[SPEC-NAME]]` → ReSpec bibliographic reference (see below)
+- Known terms (e.g., `Thing Description`, `TD Processors`) → cross-reference links via the glossary (see below)
 
 No HTML needed in text fields — write plain text with these conventions.
 
+#### Bibliographic references (`[[SPEC-NAME]]`)
+
+ReSpec handles these — write `[[RFC3986]]` or `[[wot-architecture11]]` in any text field and ReSpec auto-generates the bibliography entry and link. The spec database is built into ReSpec; no local configuration needed. Use `[[?SPEC-NAME]]` (with `?`) for informative (non-normative) references.
+
+These are **document-level references** to external specifications. They appear in the "References" section at the end of the generated spec.
+
 #### Glossary — cross-reference term linking
 
-Cross-reference terms used in generated spec text are defined in `resources/xref/glossary.yaml`. The glossary maps vocabulary terms to their spec anchor IDs, enabling automatic linking — any occurrence of a known term in `spec_description`, `spec_content`, or `spec_intro_content` text becomes a clickable `<a>` link to the term's definition.
+The glossary (`resources/xref/glossary.yaml`) handles **term-level cross-referencing** — linking occurrences of vocabulary terms in spec text to their definitions. Any occurrence of a known term in `spec_description`, `spec_content`, or `spec_intro_content` text becomes a clickable `<a>` link.
 
-**Structure:**
+The toolchain generates a Bikeshed `<pre class=anchors>` block from the glossary, which Bikeshed/ReSpec uses to resolve term references during spec processing.
+
+**Two entry types — internal and external terms:**
 
 ```yaml
 terms:
-  Thing Description:           # canonical term name (case-sensitive match)
-    id: dfn-td                 # anchor ID within the spec (local link → #dfn-td)
+  # Internal term — links to an anchor within this spec
+  Thing Description:
+    id: dfn-td                 # → <a href="#dfn-td">Thing Description</a>
     aliases: ["TDs", "TD"]     # alternative forms that also get linked
 
-  anyURI:                      # external term — links outside the spec
+  # External term — links to a definition in another W3C spec
+  anyURI:
     href: "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"
-    aliases: []
+    aliases: []                # → <a href="https://...#anyURI">anyURI</a>
 ```
 
-**Two entry types:**
+| Field | What it links to |
+|-------|------------------|
+| `id` | An anchor within this spec (`#id`) — for WoT vocabulary terms, class names, and concepts defined in this document |
+| `href` | A full URL to an external spec — for datatypes, concepts, or terms defined elsewhere (e.g., XML Schema datatypes, WoT Architecture terms) |
 
-| Field | Effect |
-|-------|--------|
-| `id` | Local link — term becomes `<a href="#id">term</a>` pointing to a `<dfn>` or section anchor within the spec |
-| `href` | External link — term links to a full URL (e.g., W3C XML Schema datatypes) |
-
-Both support `aliases` — alternative spellings or plural forms that should link to the same target.
+Both support `aliases` — alternative spellings or plural forms that link to the same target. Matching is case-sensitive against canonical name + aliases.
 
 **When to edit the glossary:**
 
-- Adding a new class or concept to the spec that other sections reference by name → add an entry with the `id` matching the HTML anchor.
-- Referencing an external W3C definition (e.g., an XML Schema datatype) → add an `href` entry.
-- A term appears unlinked in generated HTML → check if it's missing from the glossary or if the casing doesn't match (matching is case-sensitive against canonical name + aliases).
+- Adding a new class or concept to the spec that other sections reference by name → add an `id` entry matching the HTML anchor.
+- Referencing an external definition (e.g., an XML Schema datatype, a term from WoT Architecture) → add an `href` entry.
+- A term appears unlinked in generated HTML → check if it's missing from the glossary or if the casing doesn't match.
 
 #### Full example
 
