@@ -1,11 +1,6 @@
-# WoT Schemas
+# WoT LinkML Schema Authoring Guide
 
-The WoT Schemas contains the single, main source of data for all the provided WoT resources.
-
-The WoT Schema provides YAML files in [LinkML](https://linkml.io) format as its primary information source, which contain specific classes with their attributes
-and respective information like attributes' datatypes or cardinalities.
-
-These YAML files are then used to create the necessary WoT resource files.
+The WoT LinkML schemas under this directory are the single source of truth for all generated WoT resources. Each YAML file follows the [LinkML](https://linkml.io) format and defines classes, slots, types, and enumerations that drive JSON Schema, JSON-LD context, SHACL, OWL, and specification generation.
 
 ## Annotations
 
@@ -172,18 +167,27 @@ SomeInternalClass:
     jsonschema_exclude: true
 ```
 
-## Native LinkML Features Used for JSON Schema
+## Native LinkML Features for JSON Schema
 
-These native LinkML features generate correct JSON Schema constructs without custom annotations. Prefer these over `jsonschema_*` annotations when possible.
+Prefer native LinkML constructs over `jsonschema_*` annotations whenever possible. The following patterns produce correct JSON Schema output without custom postprocessing.
 
-| LinkML Feature | JSON Schema Output | Example Use |
-|---|---|---|
-| `mixins` | Mixin slots included in class properties | `PropertyAffordance` inherits `DataSchema` slots |
-| `rules` with `preconditions`/`postconditions` | `if`/`then` conditional schemas | Link with `rel: "icon"` requires `sizes` |
-| Multivalued inlined slots with identifier keys | `additionalProperties` pattern | `securityDefinitions`, `properties`, `actions`, `events` |
-| `exactly_one_of` with two range branches | `oneOf` with single-value and array variants | `@type`: string or array of strings |
-| `minimum_cardinality: 1` on multivalued branch | `minItems: 1` in array variant | Ensuring non-empty arrays in `oneOf` |
-| `extra_slots: allowed: true` | `additionalProperties: true` | All schema classes allowing extension |
-| `minimum_value: N` | `minimum: N` | `minItems`, `NonNegativeInteger` |
-| `minimum_value: 0` + `none_of: [{equals_number: 0}]` | `exclusiveMinimum: 0` (after postprocessor simplification) | `multipleOf` must be > 0 |
-| `enum` definitions with `permissible_values` | Inlined `{"type": "string", "enum": [...]}` | `DataSchemaType`, `contentEncodingList` |
+**Inheritance and composition:**
+
+- `mixins` — mixin slots are included in the class properties. Example: `PropertyAffordance` inherits `DataSchema` slots.
+- `rules` with `preconditions`/`postconditions` — generates `if`/`then` conditional schemas. Example: a `Link` with `rel: "icon"` requires `sizes`.
+
+**Cardinality and value constraints:**
+
+- `exactly_one_of` with two range branches — generates a `oneOf` with single-value and array variants. Example: `@type` accepts a string or an array of strings.
+- `minimum_cardinality: 1` on a multivalued branch — generates `minItems: 1` in the array variant.
+- `minimum_value: N` — generates `minimum: N`.
+- `minimum_value: 0` combined with `none_of: [{equals_number: 0}]` — generates `exclusiveMinimum: 0` after postprocessor simplification. Example: `multipleOf` must be > 0.
+
+**Extensibility and maps:**
+
+- `extra_slots: allowed: true` — generates `additionalProperties: true`. Used on all schema classes to allow extension.
+- Multivalued inlined slots with identifier keys — generates the `additionalProperties` map pattern. Example: `securityDefinitions`, `properties`, `actions`, `events`.
+
+**Enumerations:**
+
+- `enum` definitions with `permissible_values` — generates inlined `{"type": "string", "enum": [...]}`. Example: `DataSchemaType`, `contentEncodingList`.
