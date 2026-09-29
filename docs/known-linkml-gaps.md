@@ -1,6 +1,5 @@
 # Known LinkML Generator Gaps
 
-Gaps confirmed from postprocessors, `issues.txt`, and cross-artifact comparison.
 Before writing a new postprocessor, run `/check-linkml <feature>` — a gap here may be fixed in a newer LinkML version.
 
 Each entry: **what the gap is**, **which artifact(s) affected**, **current workaround**, **LinkML issue if known**.
@@ -43,8 +42,8 @@ Each entry: **what the gap is**, **which artifact(s) affected**, **current worka
 
 ## JSON Schema Generator
 
-### 6. JSON Schema postprocessor is currently empty
-`src/wotis/postprocessors/json_schema_postprocessor.py` exists but is empty — no active fixes yet. All current JSON Schema correctness is handled entirely by the generator. If a new JSON Schema postprocessor fix is needed, it goes here.
+### 6. JSON Schema generator cannot express all W3C TD structural patterns
+The JSON Schema postprocessor (`src/wotis/postprocessors/jsonschema_postprocessor.py`) contains active transforms that compensate for generator gaps — including subclass flattening, oneOf dispatch, form variants, type normalization, identifier slot removal, ref resolution, and metadata cleanup. Gaps #9, #10, and #11 below document specific transforms; additional undocumented transforms (`_normalize_types`, `_simplify_exclusive_minimum`, `_remove_identifier_slots`, `_remove_excluded_defs`, `_resolve_refs`, `_clean_metadata`) handle structural adjustments the generator cannot produce natively.
 
 ### 7. Known schema-vs-instance gaps (from known-failures baselines)
 The file `tests/known_failures/td_gate.txt` tracks valid TD instances that the generated JSON Schema wrongly rejects. These represent JSON Schema generator fidelity gaps. Each entry must link to a GitHub issue.

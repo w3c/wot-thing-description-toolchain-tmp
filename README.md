@@ -66,7 +66,7 @@ From these source models, the generation pipeline has two paths:
 
 ![WoT Toolchain generation flow](images/wot-toolchain.svg)
 
-Postprocessors are custom Python functions in [`src/wotis/postprocessors/`](src/wotis/postprocessors/). They modify a raw LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`KNOWN_LINKML_GAPS.md`](KNOWN_LINKML_GAPS.md) records each known limitation and workaround.
+Postprocessors are custom Python functions in [`src/wotis/postprocessors/`](src/wotis/postprocessors/). They modify a raw LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`Known LinkML Gaps`](docs/known-linkml-gaps.md) records each known limitation and workaround.
 
 ## Testing
 
@@ -108,7 +108,7 @@ uv run pytest tests/ -v
 uv run ruff check .
 ```
 
-Before changing a schema or generator, read the [LinkML schema authoring guide](resources/schemas/README.md) for modeling conventions and slot patterns, and [`KNOWN_LINKML_GAPS.md`](KNOWN_LINKML_GAPS.md) for documented LinkML limitations and their workarounds. Files under `resources/gens/` are generated outputs and should not be edited manually. Each postprocessor should document the LinkML limitation it addresses.
+Before changing a schema or generator, read the [modeling guidelines](docs/guidelines/index.md) for naming conventions, custom annotations, postprocessor patterns, and snippet authoring. For documented LinkML limitations and workarounds, see [`Known LinkML Gaps`](docs/known-linkml-gaps.md). Cross-reference terms used in the generated specification are defined in the [glossary](resources/xref/glossary.yaml), which maps vocabulary terms to their spec anchor IDs and aliases. Files under `resources/gens/` are generated outputs and should not be edited manually. Each postprocessor should document the LinkML limitation it addresses.
 
 ## Current Status
 

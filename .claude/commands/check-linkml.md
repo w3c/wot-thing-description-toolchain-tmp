@@ -1,6 +1,6 @@
 Check whether a LinkML feature exists natively before writing a postprocessor. Usage: `/check-linkml <feature or question>`
 
-The goal is to prevent postprocessors for things LinkML already supports. First check `KNOWN_LINKML_GAPS.md` — if the gap is already documented there, skip to the conclusion. Otherwise run all steps below.
+The goal is to prevent postprocessors for things LinkML already supports. First check `docs/known-linkml-gaps.md` — if the gap is already documented there, skip to the conclusion. Otherwise run all steps below.
 
 **Step 1 — LinkML metamodel docs (what is valid in LinkML YAML schemas):**
 
@@ -79,4 +79,4 @@ Based on the above, answer:
 - Is there an open PR that adds it? (link it, note expected release)
 - Is it genuinely missing from both schema language and generator? (only then: postprocessor is justified)
 
-State clearly: **USE LINKML NATIVE** or **POSTPROCESSOR JUSTIFIED** with reasoning. If justified, add the gap to `KNOWN_LINKML_GAPS.md`.
+State clearly: **USE LINKML NATIVE** or **POSTPROCESSOR JUSTIFIED** with reasoning. If justified, add the gap to `docs/known-linkml-gaps.md`.

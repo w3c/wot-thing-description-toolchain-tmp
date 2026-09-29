@@ -25,7 +25,7 @@ resources/schemas/          ← SOURCE OF TRUTH (edit here, not in gens/)
   hypermedia.yaml           ← HCTL vocabulary
   wot_security.yaml         ← security vocabulary
   jsonschema.yaml           ← JSON Schema vocabulary
-  README.md                 ← annotation rules (read before touching annotations)
+  README.md                 ← points to docs/guidelines/ (read before touching schemas)
 
 src/wotis/
   cli.py                    ← entry point: wotis generate-wot-resources [-d]
@@ -41,9 +41,8 @@ src/wotis/
     assertions.py           ← assertion CSV output
 
 resources/snippets/         ← TD/TM code examples shown in the spec
-  *.jsonc                   ← individual snippet files
-  groups/*.yaml             ← tabbed example groups
-  TEMPLATE.jsonc            ← copy this when adding a snippet
+  *.json                    ← individual snippet files
+  _snippets.yaml            ← snippet metadata (id, title, hide_paths, etc.)
 
 tests/
   manual_goldens/           ← authoritative hand-verified reference outputs
@@ -70,41 +69,13 @@ If `pre-commit` is not installed: `uv tool install pre-commit` or `pip install p
 
 ## The Postprocessor Pattern
 
-Postprocessors in `postprocessors/` exist **only** for aspects that LinkML cannot currently model. They are not the default solution — they are the last resort.
-
-**Before writing a postprocessor:**
-1. Check `KNOWN_LINKML_GAPS.md` — if the gap is already documented, use the existing workaround pattern.
-2. If not documented: run `/check-linkml <feature>` to search docs and GitHub issues.
-3. If LinkML supports it natively, model it in the schema — no postprocessor.
-4. Only if LinkML genuinely cannot express it: write a postprocessor, add a comment citing the LinkML limitation (link to the issue/PR), add a `TODO: remove when LinkML #NNNN is merged` note, and add the gap to `KNOWN_LINKML_GAPS.md`.
-
-**When a postprocessor is justified:**
-- Add it to the relevant file in `postprocessors/`.
-- Comment must cite: the W3C requirement satisfied AND the LinkML gap that forces this approach.
-- Test the postprocessor directly, not only via the full pipeline.
+See [Postprocessor Conventions](docs/guidelines/postprocessor-conventions.md) for when and how to write postprocessors. See [Known LinkML Gaps](docs/known-linkml-gaps.md) for documented generator limitations.
 
 Never edit files under `resources/gens/` directly — they are overwritten on every run.
 
 ## Custom LinkML Annotations
 
-Annotations in `annotations:` blocks within the schema YAML files drive HTML spec generation. Full examples are in `resources/schemas/README.md`.
-
-| Annotation | Scope | Purpose |
-|---|---|---|
-| `spec_description` | slot | Overrides `description` in spec vocabulary tables |
-| `spec_default` | slot | Marks slot as having a default value |
-| `spec_exclude` | slot | Hides slot from spec tables (internal fields only) |
-| `spec_content` | class | Rich content blocks (notes, paragraphs, lists) after vocabulary table |
-| `spec_intro_content` | class | Same as `spec_content`, rendered before the table |
-| `spec_subsections` | class | Subsections after class content |
-| `spec_type_values` | slot | Allowed/example values in the type column |
-
-**Annotation rules:**
-- `spec_description`: use `[[RFC####]]` for bibliography refs (not bare URLs); use backticks for inline code.
-- Segment `id` values inside `spec_content` / `spec_intro_content` become assertion anchors — follow pattern `td-{kebab-case}`, must be unique per file.
-- `spec_type_values` with `mode: one_of` must be exhaustive.
-- A slot with `spec_exclude: true` must not carry any other `spec_*` annotation.
-- When `spec_description` is added, update the base `description` to match (minus markup).
+See [WoT Custom Annotations](docs/guidelines/wot-custom-annotations.md) for the full annotation API, examples, and decision principles. See [LinkML Naming Conventions](docs/guidelines/linkml-naming-conventions.md) for schema structural rules, `inlined`/`identifier` patterns, and checklists.
 
 ## Testing and Quality
 
@@ -147,7 +118,7 @@ These failures exist in CI on `main`. A PR that does not touch the Form class or
 |---|---|
 | `DeprecationWarning` from `owlgen.py` lines 244/247/250 | **Ignore** — known LinkML 1.10.0 noise; issues #3190/#3191 |
 | `WARNING:linkml.generators.owlgen: Multiple owl types` | **Ignore** — known OWL gen behavior, not a bug |
-| `WARNING: Failed to parse JSON in snippet: *.jsonc` | **Investigate** — snippet has invalid JSONC syntax |
+| `WARNING: Failed to parse JSON in snippet: *.json` | **Investigate** — snippet has invalid JSON syntax |
 | `ERROR:root:Snippet validation error: FILE: PATH — MESSAGE` | **Fix** — snippet fails JSON Schema validation; pipeline aborts |
 | Any other `ERROR:` line | **Fix** — generation failed |
 
@@ -191,7 +162,7 @@ A change is complete when all of these hold:
 
 1. `uv run wotis generate-wot-resources -d` exits without ERROR.
 2. `uv run pytest tests/ -v` passes (xfail acceptable, no new unexpected failures).
-3. Snippets in `resources/snippets/` validate against the generated JSON Schema — run `/validate-snippets`. Every `.jsonc` linked to a changed class or slot must pass; `validate: false` is only acceptable for non-TD/TM examples.
+3. Snippets in `resources/snippets/` validate against the generated JSON Schema — run `/validate-snippets`. Every `.json` linked to a changed class or slot must pass; `validate: false` is only acceptable for non-TD/TM examples.
 4. HTML output is correct — see below.
 
 #### HTML Correctness
@@ -263,12 +234,13 @@ When reviewing HTML changes, do not evaluate the entire document — scope the c
 - `spec_description` and base `description` must stay in sync.
 - Use `see_also` to link to relevant W3C spec sections.
 
-### Snippets (`.jsonc`)
+### Snippets (`.json`)
 
 - Every snippet must be a complete, valid TD or TM.
-- Use `// @hide-start` / `// @hide-end` to hide boilerplate (e.g., `securityDefinitions`).
-- The JSONC front-matter `id` must be unique across all snippets.
-- Set `validate: false` only for non-TD/TM snippets (e.g., partial JSON Schema examples).
+- Metadata (id, title, hide_paths, show_paths) lives in `_snippets.yaml`, not in the JSON file.
+- Snippet `id` must be unique across all snippets and not conflict with IDs in `index.template.html`.
+- Set `validate: false` only for non-TD/TM snippets (e.g., partial examples).
+- See [Snippet Authoring Guide](docs/guidelines/snippet-authoring.md) for worked examples.
 
 ## General Project Conventions
 
@@ -298,7 +270,7 @@ Files with high concurrent-edit risk. Check for in-progress PRs before touching.
 
 1. JSON Schema correctness — all td11 + td20 instance validations pass.
 2. HTML spec correctness — structure and vocabulary tables match `tests/manual_goldens/html/`.
-3. Snippet validity — all `.jsonc` files validate against the generated JSON Schema.
+3. Snippet validity — all `.json` files validate against the generated JSON Schema.
 4. Assertion CSVs — assertions match anchors in `index.html`.
 
 Out of scope for now: automated ontology/SHACL consistency (manual_goldens exist as reference only).

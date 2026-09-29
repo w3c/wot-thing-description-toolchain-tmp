@@ -62,10 +62,9 @@ Check:
 ```bash
 uv run wotis generate-wot-resources -d 2>&1 | grep -iE "snippet|ERROR|WARNING"
 ```
-- Every `.jsonc` must have a unique `id` in its front-matter.
-- `// @hide-start` / `// @hide-end` used only for boilerplate, not to mask invalid sections.
+- Every snippet must have a unique `id` in `_snippets.yaml`.
 - `validate: false` only for non-TD/TM snippets.
-- Groups in `resources/snippets/groups/*.yaml` reference existing `.jsonc` files?
+- Group entries in `_snippets.yaml` reference existing `.json` snippet files?
 
 **Step 6 — CI pipeline review (if `.github/workflows/` changed).**
 
