@@ -5,7 +5,9 @@
 
 ---
 
-Quick reference for LinkML features used in WoT schemas. For detailed conventions, see [docs/guidelines/](guidelines/index.md).
+Quick reference for LinkML features used in WoT schemas. 
+For detailed LinkML documentation, see [LinkML docs](https://linkml.io/linkml/).
+For detailed WoT LinkML conventions, see [docs/guidelines/](guidelines/index.md).
 
 ---
 
