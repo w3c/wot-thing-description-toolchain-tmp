@@ -6,7 +6,6 @@ from typing import Optional
 
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.shaclgen import ShaclGenerator
-from linkml.generators.owlgen import OwlSchemaGenerator
 from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml_runtime.utils.schemaview import SchemaView
@@ -15,8 +14,10 @@ from .. import (SCHEMA_PATH, GENS_PATH, GENERATORS,
                 RESPEC_TEMPLATE_PATH, FINAL_SPEC_PATH,
                 CORE_SCHEMA_PLACEHOLDER, ASSERTION_PATH)
 from ..postprocessors.jsonschema_postprocessor import post_process_jsonschema
+from ..postprocessors.jsonld_context_postprocessor import post_process_jsonld_context
 from ..postprocessors.shacl_postprocessor import post_process_shacl
 from .visualization import generate_visualizations
+from .owl import generate_owl_vocabularies
 from .respec import generate_respec_spec
 
 
@@ -52,15 +53,19 @@ def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: P
         logging.info(f"SHACL shapes saved to {output_dir / 'shapes.shacl.ttl'}")
 
     elif generator == 'owl':
-        logging.info("Proceeding with LinkML to OWL conversion")
-        owl_generator = OwlSchemaGenerator(schema_view.schema)
-        (output_dir / 'ontology.owl.ttl').write_text(owl_generator.serialize())
-        logging.info(f"OWL ontology saved to {output_dir / 'ontology.owl.ttl'}")
+        logging.info("Proceeding with LinkML to module-scoped OWL vocabulary conversion")
+        generate_owl_vocabularies(output_dir)
+        logging.info(f"OWL vocabularies saved to {output_dir}")
 
     elif generator == 'jsonldcontext':
         logging.info("Proceeding with LinkML to JSON-LD Context conversion")
-        context_generator = ContextGenerator(schema_view.schema, mergeimports=True)
-        (output_dir / 'context.jsonld').write_text(context_generator.serialize())
+        context_generator = ContextGenerator(
+            schema_view.schema,
+            mergeimports=True,
+            fix_multivalue_containers=True,
+        )
+        context = post_process_jsonld_context(schema_view, context_generator.serialize())
+        (output_dir / 'context.jsonld').write_text(context)
         logging.info(f"JSON-LD context saved to {output_dir / 'context.jsonld'}")
 
     elif generator == 'linkml':

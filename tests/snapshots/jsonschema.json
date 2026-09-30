@@ -3,10 +3,6 @@
     "APIKeySecurityScheme": {
       "additionalProperties": true,
       "properties": {
-        "@name": {
-          "description": "Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.",
-          "type": "string"
-        },
         "@type": {
           "description": "JSON-LD keyword to label the object with semantic tags (or types).",
           "oneOf": [
@@ -43,6 +39,10 @@
             "uri",
             "auto"
           ],
+          "type": "string"
+        },
+        "name": {
+          "description": "Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.",
           "type": "string"
         },
         "proxy": {
@@ -210,10 +210,6 @@
     "BasicSecurityScheme": {
       "additionalProperties": true,
       "properties": {
-        "@name": {
-          "description": "Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.",
-          "type": "string"
-        },
         "@type": {
           "description": "JSON-LD keyword to label the object with semantic tags (or types).",
           "oneOf": [
@@ -252,6 +248,10 @@
           ],
           "type": "string"
         },
+        "name": {
+          "description": "Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.",
+          "type": "string"
+        },
         "proxy": {
           "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.",
           "type": "string"
@@ -272,10 +272,6 @@
     "BearerSecurityScheme": {
       "additionalProperties": true,
       "properties": {
-        "@name": {
-          "description": "Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.",
-          "type": "string"
-        },
         "@type": {
           "description": "JSON-LD keyword to label the object with semantic tags (or types).",
           "oneOf": [
@@ -334,6 +330,10 @@
             "uri",
             "auto"
           ],
+          "type": "string"
+        },
+        "name": {
+          "description": "Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.",
           "type": "string"
         },
         "proxy": {
@@ -609,10 +609,6 @@
     "DigestSecurityScheme": {
       "additionalProperties": true,
       "properties": {
-        "@name": {
-          "description": "Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.",
-          "type": "string"
-        },
         "@type": {
           "description": "JSON-LD keyword to label the object with semantic tags (or types).",
           "oneOf": [
@@ -649,6 +645,10 @@
             "uri",
             "auto"
           ],
+          "type": "string"
+        },
+        "name": {
+          "description": "Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.",
           "type": "string"
         },
         "proxy": {

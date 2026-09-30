@@ -8,35 +8,81 @@ Each entry: **what the gap is**, **which artifact(s) affected**, **current worka
 
 ## JSON-LD Context Generator
 
-### 1. `@container: @language` not set for `langString` slots
-**Symptom:** Slots with `range: langString` or `exactly_one_of` branches with `langString` range are emitted without `@container: @language`, making multilingual values serialize incorrectly.
+### 1. Language maps are not derived from `langString` alternatives
+**Symptom:** The context generator does not derive `@container: "@language"`
+for WoT multilingual values from a `langString` alternative or the
+`MultiLanguage` value model.
 **Artifact:** `context.jsonld`
-**Workaround:** `jsonld_context_postprocessor.py` → `process_langstring_conditions()`
-**LinkML issue:** unknown — run `/check-linkml langString @language container`
+**Status:** Open. The current context retains LinkML's generated indexed-map
+representation; it must not be changed until the TD language-map mapping is
+specified and tested with expansion and compaction.
+**LinkML issue:** unknown — report as "derive JSON-LD language containers from
+language-keyed LinkML maps".
 
-### 2. `@container: @set` not set for multivalued slots
-**Symptom:** Multivalued slots missing `@container: @set` in the context, causing JSON-LD framing to treat arrays as singletons.
+### 2. Multivalue containers are now natively supported
+**Status:** Resolved in LinkML 1.11.0.post278.dev0+26ebff6d.
+**Finding:** `ContextGenerator(fix_multivalue_containers=True)` emits
+`@container: "@set"` for multivalued lists and `@container: "@index"` for
+inlined dictionary-valued slots.
 **Artifact:** `context.jsonld`
-**Workaround:** `jsonld_context_postprocessor.py` → `process_multivalued_slots()`
-**LinkML issue:** unknown — run `/check-linkml multivalued @set container`
+**Required action:** Keep the generator option enabled and maintain regression
+tests for list and map serialization.
+**LinkML reference:** [JSON-LD context generator options](https://linkml.io/linkml/cli/generate.html)
 
-### 3. `@container: @index` + `@type: @id` not set for inlined dict-keyed slots
-**Symptom:** Slots that are `inlined: true`, `multivalued: true`, and not `inlined_as_list` (i.e., keyed dicts like `securityDefinitions`) are not emitted with `@container: @index` and `@type: @id`.
+### 3. JSON-LD index predicates are not generated for keyed maps
+**Symptom:** LinkML now emits `@container: "@index"` for an inlined keyed
+map, but it cannot emit the RDF predicate carried by the JSON map key, for
+example `@index: "td:hasInstanceConfiguration"` or
+`@index: "jsonschema:propertyName"`.
 **Artifact:** `context.jsonld`
-**Workaround:** `jsonld_context_postprocessor.py` → `process_inlined_slot()`
-**LinkML issue:** unknown — run `/check-linkml inlined dict index container`
+**WoT requirement:** TD JSON-LD expansion and compaction must preserve names
+from `securityDefinitions`, `schemaDefinitions`, affordance maps, and nested
+Data Schema `properties` maps as RDF statements.
+**Current limitation:** The LinkML `instantiates` metaslot does not inform the
+current JSON-LD context generator's `@index` value.
+**Workaround:** A small WoT context-composition adapter reads an explicit
+schema-declared index predicate until LinkML can generate it natively.
+**LinkML issue:** unknown — report as "support an `@index` predicate for
+inlined keyed maps, sourced from LinkML schema metadata".
 
-### 4. `@type` not set for default-range slots
-**Symptom:** Slots whose range equals the schema `default_range` do not get `@type` set in the context entry.
+### 3a. Scoped context mappings cannot express class-specific JSON terms
+**Symptom:** LinkML supports a slot `alias`, and the JSON Schema and JSON-LD
+context generators use it as an emitted JSON key. However, the context
+generator only generates class-scoped context entries for range overrides. It
+cannot scope a different alias or RDF predicate to a class.
+An alias also cannot represent the WoT security member `name`: it collides
+with the identifier slot that represents a security-definition map key.
 **Artifact:** `context.jsonld`
-**Workaround:** `jsonld_context_postprocessor.py` (default range block)
-**LinkML issue:** unknown — run `/check-linkml default_range @type context`
+**WoT requirement:** The JSON key `name` has different RDF mappings by
+location: `td:name` for affordance-map keys, `wotsec:name` inside security
+schemes, and `jsonschema:propertyName` for nested object-schema keys.
+**Workaround:** Derive module contexts from the range class ancestry, using a
+class URI prefix only when the class owns induced slots in that vocabulary.
+Exclude the containing slot's vocabulary; require exactly one remaining
+prefix. Use an explicit `jsonld_context` annotation only when a slot value is
+an object and its range is insufficient to identify its vocabulary. No current
+TD slot needs this override. The composition step is modeled on the upstream
+context merger.
+**LinkML issue:** unknown — report as "support class-scoped JSON-LD term
+definitions for aliases and slot URIs, not only range coercion overrides".
 
-### 5. `@type` handling for `exactly_one_of` with mixed ranges
-**Symptom:** Slots with `exactly_one_of` branches with different ranges emit no `@type`; with a single uniform range, the XSD type must be constructed manually.
+### 4. Context coercion for default ranges requires review
+**Symptom:** Slots whose range equals the schema `default_range` may not get a
+JSON-LD `@type` coercion in the generated context.
 **Artifact:** `context.jsonld`
-**Workaround:** `jsonld_context_postprocessor.py` → `process_exactly_one_of()`
-**LinkML issue:** unknown — run `/check-linkml exactly_one_of range context type`
+**Status:** Open. No coercion is added outside LinkML output until the required
+TD JSON-LD representation is confirmed with round-trip tests.
+**LinkML issue:** unknown — report as "emit JSON-LD coercion for slots using a
+schema default range".
+
+### 5. JSON-LD coercion for `exactly_one_of` ranges requires review
+**Symptom:** Slots with `exactly_one_of` ranges require a TD-specific decision
+about whether a JSON-LD coercion is valid.
+**Artifact:** `context.jsonld`
+**Status:** Open. No synthetic coercion is added because mixed ranges cannot be
+represented by one JSON-LD `@type` value.
+**LinkML issue:** unknown — report as "support conditional JSON-LD context
+coercion for LinkML unions where it is semantically valid".
 
 ---
 

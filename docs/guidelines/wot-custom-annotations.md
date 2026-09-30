@@ -54,6 +54,87 @@ Before reaching for a `jsonschema_*` annotation, verify that native LinkML const
 
 - `enum` definitions with `permissible_values` — generates inlined `{"type": "string", "enum": [...]}`. Example: `DataSchemaType`, `contentEncodingList`.
 
+## JSON-LD Context Annotations (`jsonld_*`)
+
+Use native LinkML `inlined`, `multivalued`, and
+`fix_multivalue_containers=True` for JSON-LD list and dictionary containers.
+The annotations below declare only mappings that the current LinkML context
+generator cannot express.
+
+### Scoped context inference
+
+The context composer derives a scoped vocabulary from the range class and its
+ancestors or mixins. A class is a candidate only when its declared `class_uri`
+prefix also owns at least one induced slot. The containing slot's `slot_uri`
+prefix is excluded. For example, `DataSchema` owns `jsonschema:` slots, and
+`PropertyAffordance` explicitly mixes it in; a TD `properties` value therefore
+receives the JSON Schema scoped context.
+
+Inference is accepted only when exactly one external vocabulary remains.
+Multiple candidates fail generation rather than selecting one arbitrarily.
+This avoids scoping generic classes such as `linkml:Any`, which do not own
+vocabulary terms.
+
+### `jsonld_context`
+
+**What it does:** explicitly selects a scoped vocabulary only when it cannot
+be inferred from the range, such as a slot whose range is `Any`.
+
+```yaml
+external_configuration:
+  annotations:
+    jsonld_context: example
+```
+
+The context composer resolves `example` through the schema prefixes and builds
+the nested context from slots mapped to that namespace. It does not contain a
+hardcoded list of TD paths or vocabulary terms.
+
+No current TD slot requires this override. Add it only after confirming that
+the value is an object whose terms need a scoped vocabulary.
+
+### `jsonld_index`
+
+**What it does:** declares the RDF predicate represented by keys in an
+inlined dictionary-valued slot. LinkML generates `@container: "@index"`
+natively but does not currently generate this predicate.
+
+```yaml
+schemaDefinitions:
+  annotations:
+    jsonld_index: td:hasInstanceConfiguration
+```
+
+Use an explicit CURIE. The value becomes the JSON-LD term definition's
+`@index` field.
+
+### `json_key`
+
+**What it does:** renders an internal LinkML slot name as a different public
+JSON key in generated JSON Schema and JSON-LD contexts.
+
+```yaml
+"@name":
+  annotations:
+    json_key: name
+```
+
+### `jsonld_keyword`
+
+Maps a JSON member to a JSON-LD keyword. Use it only for JSON-LD keywords
+defined by the TD data model, such as `id`, `@context`, and `@type`.
+
+```yaml
+id:
+  annotations:
+    jsonld_keyword: "@id"
+```
+
+Use this only when a LinkML reserved name requires an internal escape name.
+Prefer native LinkML `alias` when it does not collide with another slot. The
+security `@name` slot cannot use `alias: name`, because security-scheme map
+entries already use an identifier slot named `name`.
+
 ---
 
 ## Spec Rendering Annotations (`spec_*`)

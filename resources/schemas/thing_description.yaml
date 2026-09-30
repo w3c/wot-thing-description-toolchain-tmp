@@ -102,6 +102,8 @@ enums:
 slots:
   "@context":
     description: JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
+    annotations:
+      jsonld_keyword: "@context"
     required: true
     exactly_one_of:
       - range: ThingContextUri
@@ -117,6 +119,8 @@ slots:
             - "https://www.w3.org/ns/wot-next/td"
   "@type":
     description: JSON-LD keyword to label the object with semantic tags (or types).
+    annotations:
+      jsonld_keyword: "@type"
     range: string
     exactly_one_of:
       - range: string
@@ -128,6 +132,7 @@ slots:
       Identifier of the Thing in form of a URI RFC3986 (e.g., stable URI, temporary and mutable URI,
       URI with local IP address, URN, etc.).
     annotations:
+      jsonld_keyword: "@id"
       spec_description: >-
         Identifier of the Thing in form of a URI [[RFC3986]] (e.g., stable URI, temporary and mutable URI,
         URI with local IP address, URN, etc.).
@@ -179,6 +184,8 @@ slots:
     description: >-
       All Property-based Interaction Affordances of the Thing.
     slot_uri: td:hasPropertyAffordance
+    annotations:
+      jsonld_index: td:name
     range: PropertyAffordance
     multivalued: true
     inlined: true
@@ -186,6 +193,8 @@ slots:
     description: >-
       All Action-based Interaction Affordances of the Thing.
     slot_uri: td:hasActionAffordance
+    annotations:
+      jsonld_index: td:name
     range: ActionAffordance
     multivalued: true
     inlined: true
@@ -193,6 +202,8 @@ slots:
     description: >-
       All Event-based Interaction Affordances of the Thing.
     slot_uri: td:hasEventAffordance
+    annotations:
+      jsonld_index: td:name
     range: EventAffordance
     multivalued: true
     inlined: true
@@ -224,13 +235,14 @@ slots:
       spec_description: >-
         Set of security definition names, chosen from those defined in `securityDefinitions`.
         These must all be satisfied for access to resources.
-    range: Any
+    range: string
   securityDefinitions:
     description: >-
       Set of named security configurations (definitions only).
       Not actually applied unless names are used in a security name-value pair.
     slot_uri: td:definesSecurityScheme
     annotations:
+      jsonld_index: td:hasInstanceConfiguration
       spec_description: >-
         Set of named security configurations (definitions only).
         Not actually applied unless names are used in a `security` name-value pair.
@@ -252,6 +264,7 @@ slots:
       Set of named data schemas. To be used in a schema name-value pair inside an AdditionalExpectedResponse object.
     slot_uri: td:schemaDefinitions
     annotations:
+      jsonld_index: td:hasInstanceConfiguration
       spec_description: >-
         Set of named data schemas. To be used in a schema name-value pair inside an `AdditionalExpectedResponse` object.
     range: DataSchema
@@ -267,6 +280,7 @@ slots:
       level, the Interaction Affordance level variable takes precedence.
     slot_uri: td:hasUriTemplateSchema
     annotations:
+      jsonld_index: td:name
       spec_description: >-
         Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations.
         The Thing level `uriVariables` can be used in Thing level forms or in Interaction Affordances.

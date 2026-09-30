@@ -427,6 +427,8 @@ classes:
     slot_usage:
       properties:
         slot_uri: jsonschema:properties
+        annotations:
+          jsonld_index: jsonschema:propertyName
         description: Data schema nested definitions.
         range: DataSchema
         inlined: true

@@ -56,7 +56,7 @@ From these source models, the generation pipeline has two paths:
    - **JSON Schema** (`jsonschema/jsonschema.json`) — validation of TD and TM JSON representations
    - **JSON-LD context** (`jsonldcontext/context.jsonld`) — TD JSON-LD terms, types, and containers
    - **SHACL shapes** (`shacl/shapes.shacl.ttl`) — validation of RDF representations of TD and TM instances
-   - **OWL ontology** (`owl/ontology.owl.ttl`) — TD vocabulary terms and relationships
+   - **OWL ontologies** (`owl/td.ttl`, `owl/hctl.ttl`, `owl/wotsec.ttl`, `owl/jsonschema.ttl`) — WoT vocabulary terms and relationships
    - **TypeScript definitions** (`typescript/`) — type definitions for [node-wot](https://github.com/eclipse-thingweb/node-wot)
    - **Visualizations** (`visualization/`) — class-hierarchy diagrams
 

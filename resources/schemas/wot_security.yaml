@@ -141,6 +141,7 @@ slots:
       Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.
     slot_uri: wotsec:name
     annotations:
+      json_key: name
       spec_description: >-
         Name for query, header, cookie, or uri parameters.
     range: string

@@ -304,6 +304,27 @@ def _remove_identifier_slots(schema: dict, sv: SchemaView) -> None:
                     defn.pop('required', None)
 
 
+def _apply_json_keys(schema: dict, schema_view: SchemaView) -> None:
+    aliases = {
+        slot.name: _get_annotation_value(slot, 'json_key')
+        for slot in schema_view.all_slots().values()
+        if _get_annotation_value(slot, 'json_key')
+    }
+    for defn in schema.get('$defs', {}).values():
+        if not isinstance(defn, dict):
+            continue
+        properties = defn.get('properties', {})
+        required = defn.get('required', [])
+        for source_name, json_key in aliases.items():
+            if source_name not in properties:
+                continue
+            if json_key in properties:
+                raise ValueError(f'JSON key conflict: {source_name} and {json_key}')
+            properties[json_key] = properties.pop(source_name)
+            if source_name in required:
+                required[required.index(source_name)] = json_key
+
+
 def _resolve_refs(schema: dict, sv: SchemaView) -> None:
     valid_def_names = set(schema.get('$defs', {}).keys())
 
@@ -416,6 +437,7 @@ def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     _normalize_types(schema)
     _simplify_exclusive_minimum(schema)
     _remove_identifier_slots(schema, schema_view)
+    _apply_json_keys(schema, schema_view)
     _remove_excluded_defs(schema, schema_view, config)
     _resolve_refs(schema, schema_view)
     _clean_metadata(schema)
