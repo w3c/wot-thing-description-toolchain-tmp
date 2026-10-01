@@ -65,6 +65,8 @@ TD slot needs this override. The composition step is modeled on the upstream
 context merger.
 **LinkML issue:** unknown — report as "support class-scoped JSON-LD term
 definitions for aliases and slot URIs, not only range coercion overrides".
+See [JSON-LD Context Composition](guidelines/jsonld-context-composition.md)
+for the complete inference algorithm and generated-context contract.
 
 ### 4. Context coercion for default ranges requires review
 **Symptom:** Slots whose range equals the schema `default_range` may not get a

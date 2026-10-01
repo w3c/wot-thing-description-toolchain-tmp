@@ -144,7 +144,7 @@ def _record_property(
     schema_view: SchemaView,
     namespace: str,
 ) -> None:
-    if not slot_def.slot_uri:
+    if not slot_def.slot_uri or (slot_def.alias or slot_def.name).startswith("@"):
         return
     iri = _slot_iri(slot_def, schema_view, namespace)
     if iri is None or not str(iri).startswith(namespace):

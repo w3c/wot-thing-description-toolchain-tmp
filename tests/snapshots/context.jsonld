@@ -880,9 +880,6 @@
       "@id": "jsonschema:multipleOf",
       "@type": "xsd:decimal"
     },
-    "name": {
-      "@id": "wotsec:name"
-    },
     "observable": {
       "@id": "isObservable",
       "@type": "xsd:boolean"

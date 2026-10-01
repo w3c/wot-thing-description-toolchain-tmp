@@ -136,12 +136,11 @@ slots:
     comments:
       - Default value should be provided by implementations
   "@name":
-    #this is the name in wot_Security, modelled like this because in LinkML name is a reserved key
     description: >-
       Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.
+    alias: name
     slot_uri: wotsec:name
     annotations:
-      json_key: name
       spec_description: >-
         Name for query, header, cookie, or uri parameters.
     range: string
@@ -315,20 +314,20 @@ classes:
     extra_slots:
       allowed: true
     attributes:
-      name:
+      security_scheme_key:
         identifier: true
         range: string
         description: Name of the security scheme definition.
         annotations:
           spec_exclude: true
     slots:
-      - "@type"
+      - atType
       - description
       - descriptions
       - proxy
       - scheme
     slot_usage:
-      "@type":
+      atType:
         range: string
         exactly_one_of:
           - range: string

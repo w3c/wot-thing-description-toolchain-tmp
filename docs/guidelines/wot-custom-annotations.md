@@ -54,7 +54,7 @@ Before reaching for a `jsonschema_*` annotation, verify that native LinkML const
 
 - `enum` definitions with `permissible_values` — generates inlined `{"type": "string", "enum": [...]}`. Example: `DataSchemaType`, `contentEncodingList`.
 
-## JSON-LD Context Annotations (`jsonld_*`)
+## JSON-LD Context Mappings
 
 Use native LinkML `inlined`, `multivalued`, and
 `fix_multivalue_containers=True` for JSON-LD list and dictionary containers.
@@ -108,32 +108,12 @@ schemaDefinitions:
 Use an explicit CURIE. The value becomes the JSON-LD term definition's
 `@index` field.
 
-### `json_key`
-
-**What it does:** renders an internal LinkML slot name as a different public
-JSON key in generated JSON Schema and JSON-LD contexts.
-
-```yaml
-"@name":
-  annotations:
-    json_key: name
-```
-
-### `jsonld_keyword`
-
-Maps a JSON member to a JSON-LD keyword. Use it only for JSON-LD keywords
-defined by the TD data model, such as `id`, `@context`, and `@type`.
-
-```yaml
-id:
-  annotations:
-    jsonld_keyword: "@id"
-```
-
-Use this only when a LinkML reserved name requires an internal escape name.
-Prefer native LinkML `alias` when it does not collide with another slot. The
-security `@name` slot cannot use `alias: name`, because security-scheme map
-entries already use an identifier slot named `name`.
+The fixed TD JSON-LD members `@context`, `@type`, and `id` are handled by the
+context composer rather than custom schema annotations. `id` maps to `@id` and
+must remain optional in generated JSON Schema; do not use `identifier: true`.
+The security parameter member uses the native `alias: name`; its private map
+key has a distinct internal name and is suppressed structurally from generated
+public artifacts.
 
 ---
 

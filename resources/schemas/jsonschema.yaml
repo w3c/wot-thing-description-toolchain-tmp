@@ -275,7 +275,7 @@ classes:
         annotations:
           spec_exclude: true
     slots:
-      - "@type"
+      - atType
       - title
       - titles
       - description
@@ -291,7 +291,7 @@ classes:
       - format
       - type
     slot_usage:
-      "@type":
+      atType:
         range: string
         exactly_one_of:
           - range: string

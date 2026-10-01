@@ -9,6 +9,24 @@ from rdflib.namespace import SH
 from linkml_runtime.utils.schemaview import SchemaView
 
 
+def _jsonld_keyword_paths(schema_view: SchemaView) -> set[URIRef]:
+    namespace = schema_view.schema.prefixes[schema_view.schema.default_prefix].prefix_reference
+    return {
+        URIRef(schema_view.expand_curie(slot.slot_uri))
+        if slot.slot_uri
+        else URIRef(f"{namespace}{slot.name}")
+        for slot in schema_view.all_slots().values()
+        if (slot.alias or slot.name).startswith("@")
+    }
+
+
+def _remove_jsonld_keyword_properties(graph: Graph, schema_view: SchemaView) -> None:
+    for path in _jsonld_keyword_paths(schema_view):
+        for property_shape in list(graph.subjects(SH.path, path)):
+            graph.remove((None, SH.property, property_shape))
+            graph.remove((property_shape, None, None))
+
+
 def _langstring_unions(schema_view: SchemaView) -> dict[tuple[URIRef, URIRef], list[URIRef]]:
     unions: dict[tuple[URIRef, URIRef], list[URIRef]] = {}
     for class_definition in schema_view.all_classes().values():
@@ -43,6 +61,8 @@ def _langstring_unions(schema_view: SchemaView) -> dict[tuple[URIRef, URIRef], l
 def post_process_shacl(raw_shacl: str, schema_view: SchemaView) -> str:
     graph = Graph()
     graph.parse(data=raw_shacl, format="turtle")
+
+    _remove_jsonld_keyword_properties(graph, schema_view)
 
     for (class_uri, path), datatypes in _langstring_unions(schema_view).items():
         for node_shape in graph.subjects(SH.targetClass, class_uri):

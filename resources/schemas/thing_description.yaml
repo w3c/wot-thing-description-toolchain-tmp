@@ -100,10 +100,9 @@ enums:
         description: WoT Thing Description 2.0 JSON-LD context URI.
 
 slots:
-  "@context":
+  atContext:
+    alias: "@context"
     description: JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.
-    annotations:
-      jsonld_keyword: "@context"
     required: true
     exactly_one_of:
       - range: ThingContextUri
@@ -117,10 +116,9 @@ slots:
             - "https://www.w3.org/2019/wot/td/v1"
             - "https://www.w3.org/2022/wot/td/v1.1"
             - "https://www.w3.org/ns/wot-next/td"
-  "@type":
+  atType:
+    alias: "@type"
     description: JSON-LD keyword to label the object with semantic tags (or types).
-    annotations:
-      jsonld_keyword: "@type"
     range: string
     exactly_one_of:
       - range: string
@@ -132,7 +130,6 @@ slots:
       Identifier of the Thing in form of a URI RFC3986 (e.g., stable URI, temporary and mutable URI,
       URI with local IP address, URN, etc.).
     annotations:
-      jsonld_keyword: "@id"
       spec_description: >-
         Identifier of the Thing in form of a URI [[RFC3986]] (e.g., stable URI, temporary and mutable URI,
         URI with local IP address, URN, etc.).
@@ -399,8 +396,8 @@ classes:
 
               If not specified otherwise (e.g., through a TD Context Extension), the request data of the `readmultipleproperties` operation is an Array that contains the intended `PropertyAffordances` instance names, which is serialized to the content type specified by the `Form` instance.
     slots:
-      - "@context"
-      - "@type"
+      - atContext
+      - atType
       - id
       - title
       - titles
@@ -422,9 +419,9 @@ classes:
       - schemaDefinitions
       - uriVariables
     slot_usage:
-      "@context":
+      atContext:
         required: true
-      "@type":
+      atType:
         range: string
         exactly_one_of:
           - range: string
@@ -498,7 +495,7 @@ classes:
         annotations:
           spec_exclude: true
     slots:
-      - "@type"
+      - atType
       - title
       - titles
       - description
@@ -506,7 +503,7 @@ classes:
       - forms
       - uriVariables
     slot_usage:
-      "@type":
+      atType:
         range: string
         exactly_one_of:
           - range: string
