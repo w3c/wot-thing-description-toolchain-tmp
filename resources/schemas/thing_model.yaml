@@ -1,0 +1,96 @@
+id: https://www.w3.org/2019/wot/tm
+name: thing_model
+title: Thing Model Schema
+description: |-
+  LinkML schema for the Thing Model vocabulary of the W3C Web of Things (WoT) Thing Description 1.1 model.
+version: "1.1"
+license: MIT
+created_by: mailto:mahda.noura@siemens.com
+created_on: "2026-10-01"
+last_updated_on: "2026-10-05"
+see_also:
+  - https://www.w3.org/TR/wot-thing-description11/
+annotations:
+  dcterms:publisher:
+    value:
+      "@type": schema:Organization
+      schema:name: W3C Web of Things Working Group
+      schema:url: https://www.w3.org/WoT/WG/
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  tm: https://www.w3.org/2019/wot/tm#
+  td: https://www.w3.org/2019/wot/td#
+  owl: http://www.w3.org/2002/07/owl#
+  rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  xsd: http://www.w3.org/2001/XMLSchema#
+  rdfs: http://www.w3.org/2000/01/rdf-schema#
+  vann: http://purl.org/vocab/vann/
+  dcterms: http://purl.org/dc/terms/
+  schema: http://schema.org/
+default_range: string
+default_prefix: tm
+imports:
+  - linkml:types
+
+classes:
+  ThingModel:
+    class_uri: tm:ThingModel
+    description: >-
+      A Thing Model is a description for a class of Things that have the same
+      capabilities. It describes the Properties, Actions, and Events and common
+      metadata that are shared for an entire group of Things. Compared to a
+      Thing Description, a Thing Model does not contain enough information to
+      identify or interact with a Thing instance.
+    annotations:
+      rdfs:isDefinedBy:
+        value: https://www.w3.org/2019/wot/tm
+      skos:inScheme:
+        value: https://www.w3.org/2019/wot/tm
+    attributes:
+      optional:
+        description: >-
+          Constraint that provides references to declarations in the Thing Model
+          that are optional and do not necessarily need to be implemented when
+          Thing Description instances are derived from this Thing Model. The value
+          of tm:optional MUST provide JSON Pointer references to the required
+          interaction model definitions.
+        slot_uri: tm:optional
+        implements:
+          - owl:DatatypeProperty
+        multivalued: true
+        range: string
+        annotations:
+          rdfs:isDefinedBy:
+            value: https://www.w3.org/2019/wot/tm
+          skos:inScheme:
+            value: https://www.w3.org/2019/wot/tm
+      required:
+        description: >-
+          Constraint that provides references to declarations in the Thing Model
+          that are mandatory and must be present when Thing Description instances
+          are derived from this Thing Model. The reference value is a JSON Pointer.
+        slot_uri: tm:required
+        implements:
+          - owl:DatatypeProperty
+        multivalued: true
+        range: string
+        annotations:
+          rdfs:isDefinedBy:
+            value: https://www.w3.org/2019/wot/tm
+          skos:inScheme:
+            value: https://www.w3.org/2019/wot/tm
+      ref:
+        description: >-
+          Provides a reference to an existing (external or local) definition that
+          is copied into a newly defined definition. The reference value is based
+          on three parts: an (optional) URI-reference, '#' sign, and JSON Pointer value.
+        slot_uri: tm:ref
+        implements:
+          - owl:DatatypeProperty
+        range: string
+        annotations:
+          rdfs:isDefinedBy:
+            value: https://www.w3.org/2019/wot/tm
+          skos:inScheme:
+            value: https://www.w3.org/2019/wot/tm

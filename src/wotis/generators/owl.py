@@ -15,6 +15,7 @@ from rdflib.namespace import NamespaceManager
 SCHEMA_DIR = Path("resources/schemas")
 MODULES = (
     ("thing_description.yaml", "td.ttl"),
+    ("thing_model.yaml", "tm.ttl"),
     ("hypermedia.yaml", "hctl.ttl"),
     ("wot_security.yaml", "wotsec.ttl"),
     ("jsonschema.yaml", "jsonschema.ttl"),
