@@ -2,8 +2,8 @@ id: https://www.w3.org/2019/wot/td
 name: things_description
 title: Thing Description Schema
 description: |-
-  LinkML schema for the core vocabulary of the W3C Web of Things (WoT) Thing Description 2.0 model.
-version: "2.0"
+  LinkML schema for the core vocabulary of the W3C Web of Things (WoT) Thing Description 1.1 model.
+version: "1.1"
 license: MIT
 created_by: mailto:mahda.noura@siemens.com
 contributors:
@@ -137,7 +137,7 @@ slots:
   version:
     description: >-
       Provides version information.
-    slot_uri: td:versionInfo
+    slot_uri: td:hasVersionInfo
     range: VersionInfo
   created:
     description: >-
@@ -692,11 +692,11 @@ classes:
         range: DataSchema
         inlined: true
   VersionInfo:
+    class_uri: td:VersionInfo
     description: >-
       Metadata of a Thing that provides version information about the TD document.
       If required, additional version information such as firmware and hardware version
       (term definitions outside of the TD namespace) can be extended via the TD Context Extension mechanism.
-    #A. CLEAN DESCRIPTION FOR SHACL/RDF
     extra_slots:
       allowed: true
     annotations:
@@ -712,12 +712,16 @@ classes:
         description: >-
           Provides a version indicator of this TD.
         slot_uri: td:instance
+        implements:
+          - owl:DatatypeProperty
         range: string
         required: true
       model:
         description: >-
           Provides a version indicator of the underlying TM.
         slot_uri: td:model
+        implements:
+          - owl:DatatypeProperty
         range: string
   MultiLanguage:
     description: >-
