@@ -33,6 +33,7 @@ class PropertyDefinition:
     domains: set[URIRef] = field(default_factory=set)
     ranges: set[URIRef] = field(default_factory=set)
     is_object_property: bool = False
+    sub_property_of: URIRef | None = None
 
 
 def generate_owl_vocabularies(output_dir: Path, schema_dir: Path = SCHEMA_DIR) -> None:
@@ -157,7 +158,14 @@ def _record_property(
     range_iri, is_object_property = _range_iri(slot_def.range, schema_view)
     if range_iri is not None:
         property_def.ranges.add(range_iri)
+    for impl in slot_def.implements or []:
+        if impl.endswith("ObjectProperty"):
+            is_object_property = True
+        elif impl.endswith("DatatypeProperty"):
+            is_object_property = False
     property_def.is_object_property = property_def.is_object_property or is_object_property
+    if slot_def.subproperty_of and property_def.sub_property_of is None:
+        property_def.sub_property_of = URIRef(schema_view.expand_curie(slot_def.subproperty_of))
 
 
 def _class_iri(class_def: ClassDefinition, schema_view: SchemaView) -> URIRef | None:
@@ -251,6 +259,8 @@ def _property_block(property_def: PropertyDefinition, ontology_iri: URIRef, mana
         (RDF.type, property_type),
         (RDFS.label, Literal(_local_name(property_def.iri))),
     ]
+    if property_def.sub_property_of is not None:
+        predicates.append((RDFS.subPropertyOf, property_def.sub_property_of))
     if property_def.description:
         predicates.append((RDFS.comment, Literal(property_def.description, lang="en")))
     predicates.extend((SCHEMA.domainIncludes, domain) for domain in sorted(property_def.domains, key=str))
