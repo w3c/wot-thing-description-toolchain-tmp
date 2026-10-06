@@ -1,9 +1,9 @@
 id: https://www.w3.org/2019/wot/td
 name: things_description
-title: Thing Description Schema
+title: Thing Description Ontology
 description: |-
-  LinkML schema for the core vocabulary of the W3C Web of Things (WoT) Thing Description 1.1 model.
-version: "1.1"
+  Ontology for the W3C Web of Things Thing Description vocabulary.
+version: "2.0"
 license: MIT
 created_by: mailto:mahda.noura@siemens.com
 contributors:
@@ -151,8 +151,10 @@ slots:
     range: datetime
   support:
     description: >-
-      Provides information about the TD maintainer as URI scheme (e.g., mailto [RFC6068], tel [RFC3966], https [RFC9112]).
+      Provides information about the TD maintainer as URI scheme (e.g., mailto, tel, https).
     slot_uri: td:supportContact
+    implements:
+      - owl:AnnotationProperty
     annotations:
       spec_description: >-
         Provides information about the TD maintainer as URI scheme
@@ -162,9 +164,7 @@ slots:
     range: uri
   base:
     description: >-
-      Define the absolute base URI that is used for all relative URI references throughout a TD document. In TD instances,
-      all relative URIs are resolved relative to the base URI using the algorithm defined in RFC3986. Also see the note
-      about the type of base URI.
+      Define the base URI that is used for all relative URI references throughout a TD document.
     slot_uri: td:baseURI
     annotations:
       spec_description: >-
@@ -177,10 +177,32 @@ slots:
 
         Also see [the note](#note-uri-iri) about the type of base URI.
     range: uri
+  # -- OWL-only properties ------------------------------------------------
+  # These slots exist to emit OWL ObjectProperties that appear in
+  # the ontology but have no key in compacted JSON-LD. They serve as
+  # parent properties (via subproperty_of) or as ontology concepts
+  # referenced only in JSON-LD index mappings.
+  hasInteractionAffordance:
+    description: >-
+      Offers an affordance to interact with the Thing.
+    slot_uri: td:hasInteractionAffordance
+    implements:
+      - owl:ObjectProperty
+    range: InteractionAffordance
+  hasInstanceConfiguration:
+    description: >-
+      Instantiation, as used here, is a form of non-symmetric equivalence
+      between a scheme and a configuration: whatever statement on the scheme
+      is also true of the configuration but not vice-versa.
+    slot_uri: td:hasInstanceConfiguration
+    implements:
+      - owl:ObjectProperty
+  # -- end OWL-only properties --------------------------------------------
   properties:
     description: >-
       All Property-based Interaction Affordances of the Thing.
     slot_uri: td:hasPropertyAffordance
+    subproperty_of: td:hasInteractionAffordance
     annotations:
       jsonld_index: td:name
     range: PropertyAffordance
@@ -190,6 +212,7 @@ slots:
     description: >-
       All Action-based Interaction Affordances of the Thing.
     slot_uri: td:hasActionAffordance
+    subproperty_of: td:hasInteractionAffordance
     annotations:
       jsonld_index: td:name
     range: ActionAffordance
@@ -199,6 +222,7 @@ slots:
     description: >-
       All Event-based Interaction Affordances of the Thing.
     slot_uri: td:hasEventAffordance
+    subproperty_of: td:hasInteractionAffordance
     annotations:
       jsonld_index: td:name
     range: EventAffordance
@@ -214,7 +238,6 @@ slots:
     description: >-
       Set of form hypermedia controls that describe how an operation can be performed.
       Forms are serializations of Protocol Bindings.
-      Thing level forms are used to describe endpoints for a group of interaction affordances.
     slot_uri: td:hasForm
     annotations:
       spec_description: >-
@@ -269,12 +292,7 @@ slots:
     inlined: true
   uriVariables:
     description: >-
-      Define URI template variables according to RFC6570 as collection based on DataSchema declarations.
-      The Thing level uriVariables can be used in Thing level forms or in Interaction Affordances.
-      The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable
-      needs to be serialized to a string inside the href upon the execution of the operation.
-      If the same variable is both declared in Thing level uriVariables and in Interaction Affordance
-      level, the Interaction Affordance level variable takes precedence.
+      Define URI template variables according to RFC6570 as collection based on schema specifications.
     slot_uri: td:hasUriTemplateSchema
     annotations:
       jsonld_index: td:name
@@ -499,11 +517,13 @@ classes:
       name:
         identifier: true
         description: >-
-          Name of the interaction affordance.
+          Indexing property to store entity names when serializing them in a JSON-LD @index container.
         slot_uri: td:name
         range: string
         annotations:
           spec_exclude: true
+          spec_description: >-
+            Name of the interaction affordance.
     slots:
       - atType
       - title
@@ -565,8 +585,7 @@ classes:
       observable:
         description: >-
           A hint that indicates whether Servients hosting the Thing and Intermediaries should provide a Protocol Binding
-          that supports the observeproperty and unobserveproperty operations for this Property. Also see Interaction
-          Semantics for further information on the usage patterns and implications.
+          that supports the observeproperty and unobserveproperty operations for this Property.
         annotations:
           spec_default: true
           spec_description: >-
@@ -604,38 +623,50 @@ classes:
     attributes:
       input:
         description: >-
-          Used to define the input data schema of the Action.
+          Used to define the input data schema of the action.
         slot_uri: td:hasInputSchema
         range: DataSchema
         inlined: true
+        annotations:
+          spec_description: >-
+            Used to define the input data schema of the Action.
       output:
         description: >-
-          Used to define the output data schema of the Action.
+          Used to define the output data schema of the action.
         slot_uri: td:hasOutputSchema
         range: DataSchema
         inlined: true
+        annotations:
+          spec_description: >-
+            Used to define the output data schema of the Action.
       safe:
         description: >-
-          Signals if the Action is safe (=true) or not.
+          Signals if the action is safe (=true) or not.
           Used to signal if there is no internal state (cf. resource state) is changed when invoking an Action.
-          In that case responses can be cached as example.
         annotations:
           spec_default: true
+          spec_description: >-
+            Signals if the Action is safe (=true) or not.
+            Used to signal if there is no internal state (cf. resource state) is changed when invoking an Action.
+            In that case responses can be cached as example.
         slot_uri: td:isSafe
         range: boolean
       idempotent:
         description: >-
-          Indicates whether the Action is idempotent (=true) or not.
-          Informs whether the Action can be called repeatedly with the same result, if present, based on the same input.
+          Indicates whether the action is idempotent (=true) or not.
+          Informs whether the action can be called repeatedly with the same result, if present, based on the same input.
         annotations:
           spec_default: true
+          spec_description: >-
+            Indicates whether the Action is idempotent (=true) or not.
+            Informs whether the Action can be called repeatedly with the same result, if present, based on the same input.
         slot_uri: td:isIdempotent
         range: boolean
       synchronous:
         description: >-
           Indicates whether the action is synchronous (=true) or not.
-          A synchronous action means that the response contains all information about the result
-          and no further querying about the status is needed.
+          A synchronous action means that the response of action contains all the information about the result of the action
+          and no further querying about the status of the action is needed.
         annotations:
           spec_description: >-
             Indicates whether the action is synchronous (=true) or not.
@@ -726,6 +757,9 @@ classes:
           - owl:DatatypeProperty
         range: string
         required: true
+        annotations:
+          spec_description: >-
+            Provides a version indicator of this TD instance.
       model:
         description: >-
           Provides a version indicator of the underlying TM.
