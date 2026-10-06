@@ -108,93 +108,112 @@ enums:
         description: Server-Sent Events subprotocol.
   OperationType:
     description: >-
-      Well-known operation types for WoT interaction model. The list of possible operation types of a form is fixed. 
-      As of this version of the specification, it only includes the well-known types necessary to implement the WoT 
+      Well-known operation types for WoT interaction model. The list of possible operation types of a form is fixed.
+      As of this version of the specification, it only includes the well-known types necessary to implement the WoT
       interaction model.
+    enum_uri: td:OperationType
     comments:
       - "Consumer to Thing applies for messages sent by the Consumer to the Thing"
       - "Thing to Consumer applies for messages sent by the Thing to the Consumer"
       - "No correlation implies no payload is required or expected"
     permissible_values:
       readproperty:
+        meaning: td:readProperty
         description: Identifies the read operation on Property Affordances to retrieve the corresponding data.
         comments:
           - Thing to Consumer - All fields in the Property Affordance without "writeOnly":true
           - Consumer to Thing - No correlation
       writeproperty:
+        meaning: td:writeProperty
         description: Identifies the write operation on Property Affordances to update the corresponding data.
         comments:
           - Consumer to Thing - All fields in the Property Affordance without "readOnly":true
           - Thing to Consumer - No correlation, additionalResponses can be used in the form level
       observeproperty:
+        meaning: td:observeProperty
         description: >-
-          Identifies the observe operation on Property Affordances to be notified with the new data when the 
+          Identifies the observe operation on Property Affordances to be notified with the new data when the
           Property is updated.
         comments:
           - Thing to Consumer - All fields in the Property Affordance without "writeOnly":true
           - Consumer to Thing - No correlation
       unobserveproperty:
+        meaning: td:unobserveProperty
         description: Identifies the unobserve operation on Property Affordances to stop the corresponding notifications.
         comments:
           - No payload correlation in either direction
       invokeaction:
+        meaning: td:invokeAction
         description: Identifies the invoke operation on Action Affordances to perform the corresponding action.
         comments:
           - Consumer to Thing - Value of the input key
           - Thing to Consumer - Value of the output key
       queryaction:
+        meaning: td:queryAction
         description: Identifies the querying operation on Action Affordances to get the status of the corresponding action.
         comments:
           - No correlation, additionalResponses can be used in the form level
       cancelaction:
+        meaning: td:cancelAction
         description: Identifies the cancel operation on Action Affordances to cancel the ongoing corresponding action.
         comments:
           - No correlation, additionalResponses can be used in the form level
       subscribeevent:
+        meaning: td:subscribeEvent
         description: >-
           Identifies the subscribe operation on Event Affordances to be notified by the Thing when the event occurs.
         comments:
           - Consumer to Thing - Value of the subscription key with all fields without "readOnly":true
           - Thing to Consumer - Value of the subscription key with all fields without "writeOnly":true
       unsubscribeevent:
+        meaning: td:unsubscribeEvent
         description: Identifies the unsubscribe operation on Event Affordances to stop the corresponding notifications.
         comments:
           - Consumer to Thing - Value of the subscription key with all fields without "readOnly":true
           - Thing to Consumer - Value of the subscription key with all fields without "writeOnly":true
       readallproperties:
+        meaning: td:readAllProperties
         description: >-
-          Identifies the readallproperties operation on a Thing to retrieve the data of all Properties in a 
+          Identifies the readallproperties operation on a Thing to retrieve the data of all Properties in a
           single interaction.
       writeallproperties:
+        meaning: td:writeAllProperties
         description: >-
-          Identifies the writeallproperties operation on a Thing to update the data of all writable Properties 
+          Identifies the writeallproperties operation on a Thing to update the data of all writable Properties
           in a single interaction.
       readmultipleproperties:
+        meaning: td:readMultipleProperties
         description: >-
-          Identifies the readmultipleproperties operation on a Thing to retrieve the data of selected Properties 
+          Identifies the readmultipleproperties operation on a Thing to retrieve the data of selected Properties
           in a single interaction.
       writemultipleproperties:
+        meaning: td:writeMultipleProperties
         description: >-
-          Identifies the writemultipleproperties operation on a Thing to update the data of selected writable 
+          Identifies the writemultipleproperties operation on a Thing to update the data of selected writable
           Properties in a single interaction.
       observeallproperties:
+        meaning: td:observeAllProperties
         description: >-
-          Identifies the observeallproperties operation on Properties to be notified with new data when any 
+          Identifies the observeallproperties operation on Properties to be notified with new data when any
           Property is updated.
       unobserveallproperties:
+        meaning: td:unobserveAllProperties
         description: >-
-          Identifies the unobserveallproperties operation on Properties to stop notifications from all Properties 
+          Identifies the unobserveallproperties operation on Properties to stop notifications from all Properties
           in a single interaction.
       queryallactions:
+        meaning: td:queryAllActions
         description: >-
           Identifies the queryallactions operation on a Thing to get the status of all Actions in a single interaction.
       subscribeallevents:
+        meaning: td:subscribeAllEvents
         description: >-
-          Identifies the subscribeallevents operation on Events to subscribe to notifications from all Events in 
+          Identifies the subscribeallevents operation on Events to subscribe to notifications from all Events in
           a single interaction.
       unsubscribeallevents:
+        meaning: td:unsubscribeAllEvents
         description: >-
-          Identifies the unsubscribeallevents operation on Events to unsubscribe from notifications from all Events 
+          Identifies the unsubscribeallevents operation on Events to unsubscribe from notifications from all Events
           in a single interaction.
 
 slots:
