@@ -15,14 +15,6 @@ see_also:
   - https://www.w3.org/TR/wot-thing-description11/
   - https://www.w3.org/TR/wot-thing-description11/#sec-data-schema-vocabulary-definition
 annotations:
-  dcterms:license:
-    value: http://purl.org/NET/rdflicense/cc-by4.0
-  dcterms:author:
-    value: mailto:mahda.noura@siemens.com
-  dcterms:contributor:
-    value:
-      - https://vcharpenay.link/#me
-      - mailto:mahda.noura@siemens.com
   dcterms:publisher:
     value:
       "@type": schema:Organization

@@ -14,14 +14,6 @@ last_updated_on: "2026-10-05"
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
 annotations:
-  dcterms:license:
-    value: http://purl.org/NET/rdflicense/cc-by4.0
-  dcterms:author:
-    value: mailto:mahda.noura@siemens.com
-  dcterms:contributor:
-    value:
-      - mailto:sebastian.kaebisch@siemens.com
-      - https://vcharpenay.link/#me
   dcterms:publisher:
     value:
       "@type": schema:Organization
