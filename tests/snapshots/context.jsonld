@@ -203,6 +203,9 @@
           "@id": "jsonschema:exclusiveMinimum",
           "@type": "xsd:integer"
         },
+        "format": {
+          "@id": "jsonschema:format"
+        },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -248,6 +251,9 @@
           "@id": "jsonschema:properties",
           "@index": "jsonschema:propertyName",
           "@type": "@id"
+        },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
         },
         "readOnly": {
           "@id": "jsonschema:readOnly",
@@ -348,6 +354,9 @@
           "@id": "jsonschema:exclusiveMinimum",
           "@type": "xsd:integer"
         },
+        "format": {
+          "@id": "jsonschema:format"
+        },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -393,6 +402,9 @@
           "@id": "jsonschema:properties",
           "@index": "jsonschema:propertyName",
           "@type": "@id"
+        },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
         },
         "readOnly": {
           "@id": "jsonschema:readOnly",
@@ -463,6 +475,9 @@
           "@id": "jsonschema:exclusiveMinimum",
           "@type": "xsd:integer"
         },
+        "format": {
+          "@id": "jsonschema:format"
+        },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -508,6 +523,9 @@
           "@id": "jsonschema:properties",
           "@index": "jsonschema:propertyName",
           "@type": "@id"
+        },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
         },
         "readOnly": {
           "@id": "jsonschema:readOnly",
@@ -575,12 +593,7 @@
     },
     "foaf": "http://xmlns.com/foaf/0.1/",
     "format": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
-      "@id": "wotsec:format"
+      "@id": "jsonschema:format"
     },
     "forms": {
       "@container": "@set",
@@ -636,6 +649,13 @@
         }
       },
       "@id": "hasForm",
+      "@type": "@id"
+    },
+    "hasInstanceConfiguration": {
+      "@id": "hasInstanceConfiguration"
+    },
+    "hasInteractionAffordance": {
+      "@id": "hasInteractionAffordance",
       "@type": "@id"
     },
     "hctl": "https://www.w3.org/2019/wot/hypermedia#",
@@ -707,6 +727,9 @@
           "@id": "jsonschema:exclusiveMinimum",
           "@type": "xsd:integer"
         },
+        "format": {
+          "@id": "jsonschema:format"
+        },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -752,6 +775,9 @@
           "@id": "jsonschema:properties",
           "@index": "jsonschema:propertyName",
           "@type": "@id"
+        },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
         },
         "readOnly": {
           "@id": "jsonschema:readOnly",
@@ -936,6 +962,9 @@
           "@id": "jsonschema:exclusiveMinimum",
           "@type": "xsd:integer"
         },
+        "format": {
+          "@id": "jsonschema:format"
+        },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -981,6 +1010,9 @@
           "@id": "jsonschema:properties",
           "@index": "jsonschema:propertyName",
           "@type": "@id"
+        },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
         },
         "readOnly": {
           "@id": "jsonschema:readOnly",
@@ -1059,6 +1091,9 @@
           "@id": "jsonschema:exclusiveMinimum",
           "@type": "xsd:integer"
         },
+        "format": {
+          "@id": "jsonschema:format"
+        },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -1105,6 +1140,9 @@
           "@index": "jsonschema:propertyName",
           "@type": "@id"
         },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
+        },
         "readOnly": {
           "@id": "jsonschema:readOnly",
           "@type": "xsd:boolean"
@@ -1129,6 +1167,9 @@
       "@id": "hasPropertyAffordance",
       "@index": "td:name",
       "@type": "@id"
+    },
+    "propertyName": {
+      "@id": "jsonschema:propertyName"
     },
     "proxy": {
       "@id": "wotsec:proxy",
@@ -1216,6 +1257,9 @@
           "@id": "jsonschema:exclusiveMinimum",
           "@type": "xsd:integer"
         },
+        "format": {
+          "@id": "jsonschema:format"
+        },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -1261,6 +1305,9 @@
           "@id": "jsonschema:properties",
           "@index": "jsonschema:propertyName",
           "@type": "@id"
+        },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
         },
         "readOnly": {
           "@id": "jsonschema:readOnly",
@@ -1330,6 +1377,11 @@
           "@id": "wotsec:flow"
         },
         "format": {
+          "@context": {
+            "description": "skos:prefLabel",
+            "meaning": "@id",
+            "text": "skos:notation"
+          },
           "@id": "wotsec:format"
         },
         "identity": {
@@ -1436,6 +1488,9 @@
           "@id": "jsonschema:exclusiveMinimum",
           "@type": "xsd:integer"
         },
+        "format": {
+          "@id": "jsonschema:format"
+        },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -1481,6 +1536,9 @@
           "@id": "jsonschema:properties",
           "@index": "jsonschema:propertyName",
           "@type": "@id"
+        },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
         },
         "readOnly": {
           "@id": "jsonschema:readOnly",
@@ -1589,6 +1647,9 @@
           "@id": "jsonschema:exclusiveMinimum",
           "@type": "xsd:integer"
         },
+        "format": {
+          "@id": "jsonschema:format"
+        },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -1635,6 +1696,9 @@
           "@index": "jsonschema:propertyName",
           "@type": "@id"
         },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
+        },
         "readOnly": {
           "@id": "jsonschema:readOnly",
           "@type": "xsd:boolean"
@@ -1662,7 +1726,7 @@
     },
     "vann": "http://purl.org/vocab/vann/",
     "version": {
-      "@id": "versionInfo",
+      "@id": "hasVersionInfo",
       "@type": "@id"
     },
     "wotsec": "https://www.w3.org/2019/wot/security#",

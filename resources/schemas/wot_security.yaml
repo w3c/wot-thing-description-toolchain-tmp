@@ -1,10 +1,10 @@
-id: https://www.w3.org/2019/wot/security
+id: https://www.w3.org/2019/wot/security#
 name: wot_security
-title: Security mechanisms for the Web of Things
+title: WoT Security
 description: >-
-  LinkML schema for the Security vocabulary of the W3C Web of Things (WoT) Thing Description 2.0 model.
-version: "2.0"
-license: MIT
+  LinkML schema for the Security vocabulary of the W3C Web of Things (WoT) Thing Description 1.1 model.
+version: "1.1"
+license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
 contributors:
   - mailto:michael.mccool@intel.com
@@ -15,6 +15,14 @@ see_also:
   - https://www.w3.org/TR/wot-thing-description11/
   - https://www.w3.org/TR/wot-thing-description11/#sec-security-vocabulary-definition
 annotations:
+  dcterms:license:
+    value: http://purl.org/NET/rdflicense/cc-by4.0
+  dcterms:author:
+    value: mailto:mahda.noura@siemens.com
+  dcterms:contributor:
+    value:
+      - mailto:michael.mccool@intel.com
+      - https://vcharpenay.link/#me
   dcterms:publisher:
     value:
       "@type": schema:Organization
@@ -118,10 +126,6 @@ slots:
     description: Authorization flow.
     slot_uri: wotsec:flow
     range: OAuth2Flow
-  format:
-    description: Specifies format of security authentication information.
-    slot_uri: wotsec:format
-    range: BearerFormat
   identity:
     description: Identifier providing information which can be used for selection or confirmation.
     slot_uri: wotsec:identity
@@ -524,7 +528,21 @@ classes:
       - "@name"
       - in
       - alg
-      - format
+    attributes:
+      format:
+        description: Specifies format of security authentication information.
+        slot_uri: wotsec:format
+        range: BearerFormat
+        annotations:
+          spec_default: true
+          spec_type_values:
+            value:
+              mode: examples
+              values:
+                - jwt
+                - cwt
+                - jwe
+                - jws
     slot_usage:
       scheme:
         range: string
@@ -551,17 +569,6 @@ classes:
               values:
                 - ES256
                 - ES512-256
-      format:
-        annotations:
-          spec_default: true
-          spec_type_values:
-            value:
-              mode: examples
-              values:
-                - jwt
-                - cwt
-                - jwe
-                - jws
   PSKSecurityScheme:
     description: >-
       Pre-shared key authentication security configuration. This is meant to identify that a standard is used for 

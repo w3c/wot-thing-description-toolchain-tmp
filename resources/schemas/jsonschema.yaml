@@ -1,10 +1,10 @@
-id: https://www.w3.org/2019/wot/json-schema
+id: https://www.w3.org/2019/wot/json-schema#
 name: jsonschema
 title: JSON Schema in RDF
 description: >-
-  LinkML schema for the Data Schema vocabulary of the W3C Web of Things (WoT) Thing Description 2.0 model.
-version: "2.0"
-license: MIT
+  LinkML schema for the Data Schema vocabulary of the W3C Web of Things (WoT) Thing Description 1.1 model.
+version: "1.1"
+license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
 contributors:
   - https://vcharpenay.link/#me
@@ -12,9 +12,17 @@ contributors:
 created_on: "2023-12-05"
 last_updated_on: "2026-09-29"
 see_also:
-  - https://w3c.github.io/wot-thing-description/
-  - https://w3c.github.io/wot-thing-description/#sec-data-schema-vocabulary-definition
+  - https://www.w3.org/TR/wot-thing-description11/
+  - https://www.w3.org/TR/wot-thing-description11/#sec-data-schema-vocabulary-definition
 annotations:
+  dcterms:license:
+    value: http://purl.org/NET/rdflicense/cc-by4.0
+  dcterms:author:
+    value: mailto:mahda.noura@siemens.com
+  dcterms:contributor:
+    value:
+      - https://vcharpenay.link/#me
+      - mailto:mahda.noura@siemens.com
   dcterms:publisher:
     value:
       "@type": schema:Organization
@@ -39,10 +47,7 @@ types:
     uri: xsd:nonNegativeInteger
     base: integer
     minimum_value: 0
-  decimal:
-    description: A decimal number
-    uri: xsd:decimal
-    base: float
+
 
 enums:
   contentEncodingList:
@@ -139,6 +144,14 @@ slots:
       skos:note: >-
         The upstream JSON Schema ontology defines `jsonschema:allOf`, but the current TD 2.0 Data Schema vocabulary table does not list it; confirm its inclusion with the WoT Working Group.
       spec_exclude: true
+  propertyName:
+    description: >-
+      Used to store the indexing name in the parent object when this schema appears as a property of an object schema.
+    slot_uri: jsonschema:propertyName
+    range: string
+    annotations:
+      spec_exclude: true
+      owl_domain: DataSchema
   type:
     description: >-
       Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null).
@@ -335,11 +348,11 @@ classes:
     attributes:
       minItems:
         slot_uri: jsonschema:minItems
-        description: Defines the minimum number of items that have to be in the array
+        description: Defines the minimum number of items that have to be in the array.
         range: NonNegativeInteger
       maxItems:
         slot_uri: jsonschema:maxItems
-        description: Defines the maximum number of items that have to be in the array
+        description: Defines the maximum number of items that have to be in the array.
         range: NonNegativeInteger
     slots:
       - items

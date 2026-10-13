@@ -1,10 +1,10 @@
-id: https://www.w3.org/2019/wot/hypermedia
+id: https://www.w3.org/2019/wot/hypermedia#
 name: hypermedia
-title: Hypermedia Controls Ontology
+title: Hypermedia Controls
 description: >-
-  LinkML schema for the Hypermedia Controls vocabulary of the W3C Web of Things (WoT) Thing Description 2.0 model.
-version: "2.0"
-license: MIT
+  LinkML schema for the Hypermedia Controls vocabulary of the W3C Web of Things (WoT) Thing Description 1.1 model.
+version: "1.1"
+license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
 contributors:
   - https://vcharpenay.link/#me
@@ -12,9 +12,17 @@ contributors:
 created_on: "2023-12-05"
 last_updated_on: "2026-09-29"
 see_also:
-  - https://w3c.github.io/wot-thing-description/
-  - https://w3c.github.io/wot-thing-description/#sec-hypermedia-vocabulary-definition
+  - https://www.w3.org/TR/wot-thing-description11/
+  - https://www.w3.org/TR/wot-thing-description11/#sec-hypermedia-vocabulary-definition
 annotations:
+  dcterms:license:
+    value: http://purl.org/NET/rdflicense/cc-by4.0
+  dcterms:author:
+    value: mailto:mahda.noura@siemens.com
+  dcterms:contributor:
+    value:
+      - https://vcharpenay.link/#me
+      - mailto:mahda.noura@siemens.com
   dcterms:publisher:
     value:
       "@type": schema:Organization

@@ -420,4 +420,7 @@ def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     _resolve_refs(schema, schema_view)
     _clean_metadata(schema)
 
+    if schema_view.schema.title:
+        schema["title"] = schema_view.schema.title
+
     return schema

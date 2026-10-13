@@ -1,10 +1,10 @@
 id: https://www.w3.org/2019/wot/td
-name: things_description
-title: Thing Description Ontology
+name: thing_description
+title: Thing Description
 description: |-
   Ontology for the W3C Web of Things Thing Description vocabulary.
-version: "2.0"
-license: MIT
+version: "1.1"
+license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
 contributors:
   - https://vcharpenay.link/#me
@@ -15,6 +15,15 @@ last_updated_on: "2026-09-29"
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
 annotations:
+  dcterms:license:
+    value: http://purl.org/NET/rdflicense/cc-by4.0
+  dcterms:author:
+    value: mailto:mahda.noura@siemens.com
+  dcterms:contributor:
+    value:
+      - https://vcharpenay.link/#me
+      - http://purl.org/net/mpoveda
+      - http://maxime-lefrancois.info/me#
   dcterms:publisher:
     value:
       "@type": schema:Organization
@@ -51,35 +60,10 @@ types:
       A number can be an integer or a decimal number
     uri: xsd:decimal
     base: decimal
-  integer:
-    description: >-
-      An integer number
-    uri: xsd:integer
-    base: int
-  boolean:
-    description: >-
-      A boolean value (true or false)
-    uri: xsd:boolean
-    base: bool
-  string:
-    description: >-
-      A character string
-    uri: xsd:string
-    base: str
   langString:
     description: >-
       A language-tagged RDF string.
     uri: rdf:langString
-    base: str
-  uri:
-    description: >-
-      A URI
-    uri: xsd:anyURI
-    base: str
-  datetime:
-    description: >-
-      A date and time value
-    uri: xsd:dateTime
     base: str
   bcp47_string:
     description: A string conforming to the BCP 47 language tag syntax.
@@ -143,15 +127,19 @@ slots:
     description: >-
       Provides information when the TD instance was created.
     slot_uri: dcterms:created
+    implements:
+      - owl:AnnotationProperty
     range: datetime
   modified:
     description: >-
       Provides information when the TD instance was last modified.
     slot_uri: dcterms:modified
+    implements:
+      - owl:AnnotationProperty
     range: datetime
   support:
     description: >-
-      Provides information about the TD maintainer as URI scheme (e.g., mailto, tel, https).
+      Provides information about the TD maintainer as URI scheme (e.g., mailto [[RFC6068]], tel [[RFC3966]], https [[RFC9112]]).
     slot_uri: td:supportContact
     implements:
       - owl:AnnotationProperty
@@ -165,6 +153,8 @@ slots:
   base:
     description: >-
       Define the base URI that is used for all relative URI references throughout a TD document.
+      In TD instances, all relative URIs are resolved relative to the base URI using the algorithm defined in [RFC3986]. 
+      base does not affect the URIs used in @context and the IRIs used within Linked Data graphs that are relevant when semantic processing is applied to TD instances.
     slot_uri: td:baseURI
     annotations:
       spec_description: >-
@@ -180,7 +170,7 @@ slots:
   # -- OWL-only properties ------------------------------------------------
   # These slots exist to emit OWL ObjectProperties that appear in
   # the ontology but have no key in compacted JSON-LD. They serve as
-  # parent properties (via subproperty_of) or as ontology concepts
+  # parent properties (via is_a) or as ontology concepts
   # referenced only in JSON-LD index mappings.
   hasInteractionAffordance:
     description: >-
@@ -202,7 +192,7 @@ slots:
     description: >-
       All Property-based Interaction Affordances of the Thing.
     slot_uri: td:hasPropertyAffordance
-    subproperty_of: td:hasInteractionAffordance
+    is_a: hasInteractionAffordance
     annotations:
       jsonld_index: td:name
     range: PropertyAffordance
@@ -212,7 +202,7 @@ slots:
     description: >-
       All Action-based Interaction Affordances of the Thing.
     slot_uri: td:hasActionAffordance
-    subproperty_of: td:hasInteractionAffordance
+    is_a: hasInteractionAffordance
     annotations:
       jsonld_index: td:name
     range: ActionAffordance
@@ -222,7 +212,7 @@ slots:
     description: >-
       All Event-based Interaction Affordances of the Thing.
     slot_uri: td:hasEventAffordance
-    subproperty_of: td:hasInteractionAffordance
+    is_a: hasInteractionAffordance
     annotations:
       jsonld_index: td:name
     range: EventAffordance
@@ -238,6 +228,7 @@ slots:
     description: >-
       Set of form hypermedia controls that describe how an operation can be performed.
       Forms are serializations of Protocol Bindings.
+      The array cannot be empty.
     slot_uri: td:hasForm
     annotations:
       spec_description: >-
@@ -256,7 +247,6 @@ slots:
       spec_description: >-
         Set of security definition names, chosen from those defined in `securityDefinitions`.
         These must all be satisfied for access to resources.
-    range: string
   securityDefinitions:
     description: >-
       A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
@@ -293,6 +283,7 @@ slots:
   uriVariables:
     description: >-
       Define URI template variables according to RFC6570 as collection based on schema specifications.
+      The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema.
     slot_uri: td:hasUriTemplateSchema
     annotations:
       jsonld_index: td:name
@@ -310,7 +301,6 @@ slots:
     description: >-
       Title of the TD element (Thing, interaction affordance or data schema).
     slot_uri: td:title
-    subproperty_of: dcterms:title
     annotations:
       spec_description: >-
         Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
@@ -318,9 +308,8 @@ slots:
   titles:
     description: >-
       Title of the TD element (Thing, interaction affordance or data schema) with language tag.
-      By convention, a language tag must be added to the object of titleInLanguage triples. Otherwise, use title.
+      By convention, a language tag must be added to the object of 'titleInLanguage' triples. Otherwise, use 'title'.
     slot_uri: td:titleInLanguage
-    subproperty_of: dcterms:title
     annotations:
       spec_description: >-
         Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
@@ -332,7 +321,6 @@ slots:
     description: >-
       Description of the TD element (Thing, interaction affordance, security scheme or data schema).
     slot_uri: td:description
-    subproperty_of: dcterms:description
     annotations:
       spec_description: >-
         Provides additional (human-readable) information based on a default language.
@@ -340,9 +328,8 @@ slots:
   descriptions:
     description: >-
       Description of the TD element (Thing, interaction affordance, security scheme or data schema) with language tag.
-      By convention, a language tag must be added to the object of descriptionInLanguage triples. Otherwise, use description.
+      By convention, a language tag must be added to the object of 'descriptionInLanguage' triples. Otherwise, use 'description'.
     slot_uri: td:descriptionInLanguage
-    subproperty_of: dcterms:description
     annotations:
       spec_description: >-
         Can be used to support (human-readable) information in different languages.
@@ -595,6 +582,7 @@ classes:
       forms:
         description: >-
           Set of form hypermedia controls that describe how an operation can be performed.
+          Forms are serializations of Protocol Bindings. The array cannot be empty.
         slot_uri: td:hasForm
         range: Form
         multivalued: true
@@ -643,6 +631,7 @@ classes:
         description: >-
           Signals if the action is safe (=true) or not.
           Used to signal if there is no internal state (cf. resource state) is changed when invoking an Action.
+          In that case responses can be cached as example.
         annotations:
           spec_default: true
           spec_description: >-
@@ -708,8 +697,7 @@ classes:
     attributes:
       subscription:
         description: >-
-          Defines data that needs to be passed upon subscription,
-          e.g., filters or message format for setting up Webhooks.
+          Defines data that needs to be passed upon subscription, e.g., filters or message format for setting up Webhooks.
         slot_uri: td:hasSubscriptionSchema
         range: DataSchema
         inlined: true
@@ -727,8 +715,7 @@ classes:
         inlined: true
       cancellation:
         description: >-
-          Defines any data that needs to be passed to cancel a subscription,
-          e.g., a specific message to remove a Webhook.
+          Defines any data that needs to be passed to cancel a subscription, e.g., a specific message to remove a Webhook.
         slot_uri: td:hasCancellationSchema
         range: DataSchema
         inlined: true
@@ -751,7 +738,7 @@ classes:
     attributes:
       instance:
         description: >-
-          Provides a version indicator of this TD.
+          Provides a version indicator of this TD instance.
         slot_uri: td:instance
         implements:
           - owl:DatatypeProperty
@@ -759,7 +746,7 @@ classes:
         required: true
         annotations:
           spec_description: >-
-            Provides a version indicator of this TD instance.
+            Provides a version indicator of this TD.
       model:
         description: >-
           Provides a version indicator of the underlying TM.

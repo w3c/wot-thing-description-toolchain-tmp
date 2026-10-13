@@ -1,16 +1,27 @@
 id: https://www.w3.org/2019/wot/tm
 name: thing_model
-title: Thing Model Schema
+title: Thing Model
 description: |-
   LinkML schema for the Thing Model vocabulary of the W3C Web of Things (WoT) Thing Description 1.1 model.
 version: "1.1"
-license: MIT
+license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
+contributors:
+  - mailto:sebastian.kaebisch@siemens.com
+  - https://vcharpenay.link/#me
 created_on: "2026-10-01"
 last_updated_on: "2026-10-05"
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
 annotations:
+  dcterms:license:
+    value: http://purl.org/NET/rdflicense/cc-by4.0
+  dcterms:author:
+    value: mailto:mahda.noura@siemens.com
+  dcterms:contributor:
+    value:
+      - mailto:sebastian.kaebisch@siemens.com
+      - https://vcharpenay.link/#me
   dcterms:publisher:
     value:
       "@type": schema:Organization
