@@ -79,6 +79,73 @@ def _module_namespace(schema: SchemaDefinition) -> str:
     return str(prefix.prefix_reference)
 
 
+def _preprocess_for_gen_owl(schema: SchemaDefinition, namespace: str, view: SchemaView) -> SchemaDefinition:
+    """Return a deep-copy of *schema* prepared for gen-owl consumption.
+
+    Two transformations are applied in-memory (schemas on disk are unchanged):
+
+    1. **Slot rename** — For every top-level slot whose ``slot_uri`` expands to
+       an IRI within *namespace*, rename the slot to the IRI local name and
+       clear ``slot_uri``.  This makes gen-owl emit the correct OWL property IRI
+       (e.g. ``td:hasForm`` instead of ``td:forms``) once it is mature enough to
+       replace the custom generator sections.
+
+    2. **Constraint clearing** — Clear ``exactly_one_of``, ``any_of``,
+       ``all_of``, ``minimum_value``, ``maximum_value``, ``minimum_cardinality``,
+       ``maximum_cardinality``, and ``exact_cardinality`` on all slots and class
+       attributes.  Gen-owl converts these to blank-node ``owl:Restriction``
+       axioms that are absent from the upstream WoT TD ontology and that our
+       custom generator deliberately omits.
+
+    This function is the integration hook for the long-term goal of replacing
+    the custom generator incrementally as gen-owl gains features (named
+    individuals for enums, module scoping, CURIE-keyed annotation metadata).
+    It is not called from the active generation path yet.
+    """
+    s = copy.deepcopy(schema)
+
+    # 1. Rename top-level slots whose slot_uri local name differs from slot name.
+    renames: dict[str, str] = {}
+    for slot_name, slot_def in list(s.slots.items()):
+        if not slot_def.slot_uri:
+            continue
+        try:
+            expanded = view.expand_curie(slot_def.slot_uri)
+        except Exception:
+            continue
+        if expanded.startswith(namespace):
+            new_name = expanded.split("#")[-1].split("/")[-1]
+            if new_name != slot_name:
+                renames[slot_name] = new_name
+
+    for old_name, new_name in renames.items():
+        slot_def = s.slots.pop(old_name)
+        slot_def.name = new_name
+        slot_def.slot_uri = None
+        s.slots[new_name] = slot_def
+
+    # Update class slot references to use new names.
+    for class_def in s.classes.values():
+        if class_def.slots:
+            class_def.slots = [renames.get(sn, sn) for sn in class_def.slots]
+
+    # 2. Clear constraint fields that gen-owl converts to blank-node restrictions.
+    _constraint_fields = (
+        "exactly_one_of", "any_of", "all_of",
+        "minimum_value", "maximum_value",
+        "minimum_cardinality", "maximum_cardinality", "exact_cardinality",
+    )
+    for slot_def in s.slots.values():
+        for f in _constraint_fields:
+            setattr(slot_def, f, [] if f.endswith("_of") else None)
+    for class_def in s.classes.values():
+        for attr_def in (class_def.attributes or {}).values():
+            for f in _constraint_fields:
+                setattr(attr_def, f, [] if f.endswith("_of") else None)
+
+    return s
+
+
 def _namespace_manager(schema: SchemaDefinition) -> NamespaceManager:
     manager = NamespaceManager(Graph())
     manager.bind(schema.default_prefix, Namespace(_module_namespace(schema)), replace=True)
@@ -130,6 +197,27 @@ def _local_enums(
     return dict(sorted(enums.items(), key=lambda item: str(item[0])))
 
 
+def _ancestor_slot_uris(class_def: ClassDefinition, schema_view: SchemaView) -> set[str]:
+    """Return slot URIs declared by any ancestor class (via is_a or mixins), excluding self."""
+    uris: set[str] = set()
+    ancestors = schema_view.class_parents(class_def.name, mixins=True)
+    for ancestor_name in ancestors:
+        ancestor = schema_view.get_class(ancestor_name)
+        if ancestor is None:
+            continue
+        for slot_def in (ancestor.attributes or {}).values():
+            if slot_def.slot_uri:
+                uris.add(slot_def.slot_uri)
+        for slot_name in ancestor.slots or []:
+            slot = schema_view.get_slot(slot_name)
+            if slot and slot.slot_uri:
+                uris.add(slot.slot_uri)
+        for slot_def in (ancestor.slot_usage or {}).values():
+            if slot_def.slot_uri:
+                uris.add(slot_def.slot_uri)
+    return uris
+
+
 def _local_properties(
     local_schema: SchemaDefinition,
     merged_view: SchemaView,
@@ -142,7 +230,11 @@ def _local_properties(
     for class_def in local_schema.classes.values():
         class_iri = _class_iri(class_def, merged_view)
         domain = class_iri if class_iri in classes else None
+        ancestor_slot_uris = _ancestor_slot_uris(class_def, merged_view)
         for slot_def in _class_slots(class_def, merged_view, set(local_schema.slots)):
+            # skip if an ancestor already declares this slot — ancestor domain subsumes subclass
+            if slot_def.slot_uri and slot_def.slot_uri in ancestor_slot_uris:
+                continue
             _record_property(properties, slot_def, domain, merged_view, namespace)
     return dict(sorted(properties.items(), key=lambda item: str(item[0])))
 
