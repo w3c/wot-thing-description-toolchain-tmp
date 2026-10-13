@@ -258,6 +258,12 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
             raw_desc = str(getattr(usage_ann["spec_description"], "value", usage_ann["spec_description"]))
         elif usage and getattr(usage, "description", None):
             raw_desc = usage.description
+        elif slot_name in class_def.attributes:
+            attr_ann = getattr(class_def.attributes[slot_name], "annotations", None) or {}
+            if "spec_description" in attr_ann:
+                raw_desc = str(getattr(attr_ann["spec_description"], "value", attr_ann["spec_description"]))
+            elif getattr(class_def.attributes[slot_name], "description", None):
+                raw_desc = class_def.attributes[slot_name].description
         elif "spec_description" in ann:
             raw_desc = str(getattr(ann["spec_description"], "value", ann["spec_description"]))
         desc_html = _strip_outer_p(process_description(raw_desc))

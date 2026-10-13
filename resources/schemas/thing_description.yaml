@@ -519,10 +519,13 @@ classes:
             multivalued: true
             minimum_cardinality: 1
       forms:
+        range: Form
+        multivalued: true
+        required: true
+        minimum_cardinality: 1
         annotations:
           spec_description: >-
             Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. The array cannot be empty.
-        required: true
       uriVariables:
         description: >-
           Define URI template variables according to RFC6570 as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the href upon the execution of the operation. If the same variable is both declared in Thing level uriVariables and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
@@ -570,17 +573,6 @@ classes:
             A hint that indicates whether Servients hosting the Thing and Intermediaries should provide a Protocol Binding that supports the `observeproperty` and `unobserveproperty` operations for this Property. Also see [[[#interaction-semantics]]] for further information on the usage patterns and implications.
         slot_uri: td:isObservable
         range: boolean
-      forms:
-        description: >-
-          Set of form hypermedia controls that describe how an operation can be performed.
-          Forms are serializations of Protocol Bindings. The array cannot be empty.
-        slot_uri: td:hasForm
-        range: Form
-        multivalued: true
-        required: true
-        minimum_cardinality: 1
-        annotations:
-          spec_exclude: true
   ActionAffordance:
     description: >-
       An Interaction Affordance that allows to invoke a function of the Thing,
