@@ -88,6 +88,42 @@ coercion for LinkML unions where it is semantically valid".
 
 ---
 
+## OWL Generator
+
+### 10. `gen-owl` uses slot name (not `slot_uri`) as OWL property IRI
+
+**Symptom:** `gen-owl` emits `td:forms`, `td:actions`, `td:input` etc. — the
+slot name in the default namespace — instead of the correct OWL IRIs
+`td:hasForm`, `td:hasActionAffordance`, `td:hasInputSchema` declared in the
+WoT TD ontology.
+
+**Root cause:** LinkML's built-in OWL generator derives each property IRI by
+combining the schema default namespace with the slot name (or `alias`). The
+`slot_uri` metaslot is a semantic mapping annotation ("this slot represents
+this external concept") but `gen-owl` does not use it as the emitted IRI.
+
+**Design rationale — 3-way split is intentional:**
+- Slot name → JSON key (e.g. `forms` in JSON Schema, `forms` in JSON)
+- `slot_uri` → OWL property IRI (e.g. `td:hasForm` in the OWL ontology)
+- JSON-LD context bridges them: `"forms": {"@id": "td:hasForm"}`
+
+The upstream `index.html` (spec table) and the published JSON-LD context both
+follow this same pattern — JSON terms (`forms`, `actions`) map to OWL IRIs
+(`td:hasForm`, `td:hasActionAffordance`) only via context, not by name equality.
+Changing slot names to match OWL local names would break JSON output.
+
+**Conclusion:** `gen-owl` cannot replace the custom `owl.py` generator for WoT
+TD. The custom generator reads `slot_uri` and uses it as the OWL property IRI,
+which is the correct behavior for this vocabulary.
+
+**Artifact affected:** `*.ttl` (OWL ontology files for all modules)
+**Workaround:** Custom `src/wotis/generators/owl.py` — reads `slot_uri`,
+emits it as the property IRI for OWL output.
+**LinkML issue:** By design — `gen-owl` intentionally uses slot name for
+property IRI. WoT's split naming convention is outside the generator's scope.
+
+---
+
 ## JSON Schema Generator
 
 ### 6. JSON Schema generator cannot express all W3C TD structural patterns
