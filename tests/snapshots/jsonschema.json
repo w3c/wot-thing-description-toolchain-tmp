@@ -98,6 +98,7 @@
           "items": {
             "$ref": "#/$defs/Form"
           },
+          "minItems": 1,
           "type": "array"
         },
         "idempotent": {
@@ -729,6 +730,7 @@
           "items": {
             "$ref": "#/$defs/Form"
           },
+          "minItems": 1,
           "type": "array"
         },
         "subscription": {
