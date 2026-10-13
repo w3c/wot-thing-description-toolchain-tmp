@@ -4,6 +4,8 @@ from __future__ import annotations
 import difflib
 import json
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -13,6 +15,18 @@ from .tmp.spec_html_compare import generated_sections_html
 TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent
 GOLDENS_DIR = TESTS_DIR / "snapshots"
+
+
+@pytest.fixture(scope="session", autouse=True)
+def regenerate_artifacts():
+    venv_bin = Path(sys.executable).parent
+    wotis_bin = venv_bin / "wotis"
+    subprocess.run(
+        [str(wotis_bin), "generate-wot-resources", "-d"],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+    )
 
 def _normalize_json(path: Path) -> str:
     data = json.loads(path.read_text(encoding="utf-8"))
