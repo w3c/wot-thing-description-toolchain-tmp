@@ -173,20 +173,28 @@ slots:
   authorization:
     description: URI of the authorization server.
     slot_uri: wotsec:authorization
+    implements:
+      - owl:ObjectProperty
     range: uri
   refresh:
     description: URI of the refresh server.
     slot_uri: wotsec:refresh
+    implements:
+      - owl:ObjectProperty
     range: uri
   token:
     description: URI of the token server.
     slot_uri: wotsec:token
+    implements:
+      - owl:ObjectProperty
     range: uri
   security_oneOf:
     description: >-
       Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, will allow access. Only one may be chosen for use.
     alias: oneOf
     slot_uri: wotsec:oneOf
+    implements:
+      - owl:ObjectProperty
     annotations:
       skos:note: >-
         In a Combo security scheme, `oneOf` maps to `wotsec:oneOf` rather than the distinct `jsonschema:oneOf` term.
@@ -199,6 +207,8 @@ slots:
       satisfied for access.
     alias: allOf
     slot_uri: wotsec:allOf
+    implements:
+      - owl:ObjectProperty
     range: string
     multivalued: true
     minimum_value: 2
