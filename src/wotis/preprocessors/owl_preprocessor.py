@@ -1,4 +1,4 @@
-"""In-memory schema preprocessing for OWL generation."""
+"""In-memory schema transforms before passing to gen-owl. Schemas on disk unchanged."""
 from __future__ import annotations
 
 import copy
@@ -6,6 +6,7 @@ import copy
 from linkml_runtime.linkml_model.meta import SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
+# gen-owl converts these to blank-node owl:Restriction axioms not present in the WoT TD ontology.
 _CONSTRAINT_FIELDS = (
     "exactly_one_of", "any_of", "all_of",
     "minimum_value", "maximum_value",
@@ -14,21 +15,7 @@ _CONSTRAINT_FIELDS = (
 
 
 def preprocess_for_gen_owl(schema: SchemaDefinition, namespace: str, view: SchemaView) -> SchemaDefinition:
-    """Return a deep-copy of *schema* prepared for gen-owl consumption.
-
-    Two transformations applied in-memory (schemas on disk unchanged):
-
-    1. Slot rename — slot_uri local name within namespace → slot.name, slot_uri cleared.
-       Makes gen-owl emit correct OWL property IRIs (e.g. td:hasForm not td:forms).
-
-    2. Constraint clearing — exactly_one_of, any_of, all_of, minimum_value, maximum_value,
-       minimum_cardinality, maximum_cardinality, exact_cardinality cleared on all slots and
-       class attributes. Gen-owl converts these to blank-node owl:Restriction axioms absent
-       from the upstream WoT TD ontology.
-
-    Integration hook for incrementally replacing the custom OWL generator as gen-owl matures.
-    Not on the active generation path.
-    """
+    """Prepare schema for gen-owl: rename slots to slot_uri local names, clear OWL restrictions."""
     s = copy.deepcopy(schema)
     s = _rename_slots(s, namespace, view)
     s = _clear_constraints(s)
@@ -36,6 +23,7 @@ def preprocess_for_gen_owl(schema: SchemaDefinition, namespace: str, view: Schem
 
 
 def _rename_slots(s: SchemaDefinition, namespace: str, view: SchemaView) -> SchemaDefinition:
+    # slot_uri local name → slot.name so gen-owl emits td:hasForm instead of td:forms
     renames: dict[str, str] = {}
     for slot_name, slot_def in list(s.slots.items()):
         if not slot_def.slot_uri:
