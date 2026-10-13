@@ -1,0 +1,18 @@
+# Canonical @prefix declarations emitted in every generated OWL/Turtle file.
+# These appear regardless of whether they are used in the content.
+# Any additional prefixes found in generated content are appended automatically.
+# Edit this list to add or remove canonical prefix declarations.
+canonical_prefixes:
+  - rdf
+  - xml
+  - xsd
+  - foaf
+  - rdfs
+  - owl
+  - vann
+  - dcterms
+  - schema
+  - skos
+  - hctl
+  - wotsec
+  - jsonschema
