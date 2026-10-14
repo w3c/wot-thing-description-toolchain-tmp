@@ -1,14 +1,4 @@
-"""Post-process gen-owl TTL output into per-module OWL vocabulary files.
-
-Takes per-module TTL produced by gen-owl (via owl_preprocessor) and:
-- Strips linkml: namespace subjects (internal model artefacts)
-- Strips linkml: ranges (linkml:Any, linkml:uri)
-- Fixes skos:inScheme to point to the actual module ontology IRI
-- Removes self-referential and backward skos:exactMatch triples
-- Removes gen-owl enum artifacts (fragment IRIs, permissible_values triples, unionOf)
-- Removes empty blank-node subClassOf restrictions
-- Adds owl:Ontology headers per module (from schema metadata)
-"""
+"""Post-process gen-owl TTL into per-module OWL vocabulary files."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -30,15 +20,7 @@ def postprocess_owl(
     schema_dir: Path,
     output_dir: Path,
 ) -> None:
-    """Clean and write a single per-module OWL vocabulary file.
-
-    Args:
-        module_ttl: Turtle string from gen-owl for this module.
-        schema_file: Schema YAML filename (e.g. 'thing_description.yaml').
-        output_file: Output TTL filename (e.g. 'td.ttl').
-        schema_dir: Directory containing schema YAML files.
-        output_dir: Directory to write output TTL files.
-    """
+    """Clean gen-owl output and write per-module OWL vocabulary file."""
     g = Graph()
     g.parse(data=module_ttl, format="turtle")
 
@@ -83,12 +65,7 @@ def _strip_linkml_subjects(g: Graph) -> None:
 
 
 def _strip_foreign_subjects(g: Graph, sv: SchemaView) -> None:
-    """Remove triples for classes/properties not in this module's namespace.
-
-    gen-owl with merge_imports=True emits definitions for all merged classes
-    (needed for range resolution). Strip any subject whose IRI is outside the
-    local module namespace so only local vocabulary appears in the output.
-    """
+    """Remove subjects outside this module's namespace."""
     local_ns = _module_namespace(sv)
     onto_iri = str(_ontology_iri(sv))
     to_remove = [
@@ -112,10 +89,7 @@ def _strip_empty_blank_node_restrictions(g: Graph) -> None:
 
 
 def _strip_linkml_ranges(g: Graph) -> None:
-    """Remove rdfs:range triples where the range is a linkml: IRI.
-
-    Demotes ObjectProperty to DatatypeProperty when the linkml range was the only one.
-    """
+    """Remove linkml: ranges; demote to DatatypeProperty if no range remains."""
     linkml_ranged_props: set[URIRef] = set()
     for s, _, o in list(g.triples((None, RDFS.range, None))):
         if isinstance(o, URIRef) and str(o).startswith(LINKML_NS):
@@ -138,7 +112,7 @@ def _fix_in_scheme(g: Graph, sv: SchemaView) -> None:
 
 
 def _clean_enum_artifacts(g: Graph) -> None:
-    """Remove gen-owl enum artifacts not present in the upstream WoT ontology."""
+    """Remove gen-owl enum artifacts (double-# PVs, unionOf, NamedIndividual)."""
     pv_subjects = {
         s for s in g.subjects()
         if isinstance(s, URIRef) and s.count("#") > 1
@@ -171,11 +145,7 @@ def _remove_rdf_list(g: Graph, node) -> None:
 
 
 def _convert_enum_subclasses_to_individuals(g: Graph, sv: SchemaView) -> None:
-    """Convert PV subclasses to named individuals for enums with enum_uri.
-
-    gen-owl emits PVs as owl:Class + rdfs:subClassOf EnumClass.
-    Upstream WoT ontology expects rdf:type EnumClass (individuals, not classes).
-    """
+    """Convert PV subclasses to rdf:type individuals (upstream pattern)."""
     ns = _module_namespace(sv)
     for edef in sv.schema.enums.values():
         if not edef.enum_uri:
@@ -190,7 +160,7 @@ def _convert_enum_subclasses_to_individuals(g: Graph, sv: SchemaView) -> None:
 
 
 def _strip_orphan_blank_nodes(g: Graph) -> None:
-    """Remove blank nodes not referenced as object by any other triple."""
+    """Remove blank nodes unreferenced as object."""
     from rdflib import BNode as RDFBNode
     all_objects = set(g.objects())
     to_remove = [
@@ -204,12 +174,7 @@ def _strip_orphan_blank_nodes(g: Graph) -> None:
 
 
 def _strip_implicit_enum_classes(g: Graph, sv: SchemaView) -> None:
-    """Remove OWL classes generated from enums without an explicit enum_uri.
-
-    Even after per-module processing, gen-owl may emit a class for enums that
-    still lack enum_uri after _assign_enum_uris (e.g. enums with no matching
-    sub-schema namespace). Strip those and demote any affected ObjectProperties.
-    """
+    """Remove OWL classes for enums without enum_uri; demote affected properties."""
     from linkml_runtime.utils.formatutils import camelcase
 
     ns = _module_namespace(sv)
