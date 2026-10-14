@@ -296,6 +296,7 @@ slots:
     annotations:
       spec_description: >-
         Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
+      rdfs:subPropertyOf: dcterms:title
     range: string
   titles:
     description: >-
@@ -306,6 +307,7 @@ slots:
       spec_description: >-
         Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
         Also see [=MultiLanguage=].
+      rdfs:subPropertyOf: dcterms:title
     inlined: true
     multivalued: true
     range: MultiLanguage
@@ -316,6 +318,7 @@ slots:
     annotations:
       spec_description: >-
         Provides additional (human-readable) information based on a default language.
+      rdfs:subPropertyOf: dcterms:description
     range: string
   descriptions:
     description: >-
@@ -326,6 +329,7 @@ slots:
       spec_description: >-
         Can be used to support (human-readable) information in different languages.
         Also see [=MultiLanguage=].
+      rdfs:subPropertyOf: dcterms:description
     inlined: true
     multivalued: true
     range: MultiLanguage
