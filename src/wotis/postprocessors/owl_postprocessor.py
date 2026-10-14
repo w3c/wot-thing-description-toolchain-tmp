@@ -46,6 +46,7 @@ def postprocess_owl(
     _strip_foreign_subjects(g, ns, onto_iri)
     _strip_linkml_ranges(g)
     _fix_in_scheme(g, onto_iri)
+    _fix_subproperty_literals(g, sv_merged)
     _clean_exact_match(g)
     _clean_enum_artifacts(g)
     _convert_enum_subclasses_to_individuals(g, sv_merged)
@@ -181,6 +182,17 @@ def _strip_orphan_blank_nodes(g: Graph) -> None:
         _remove_rdf_list(g, s)
         for triple in list(g.triples((s, None, None))):
             g.remove(triple)
+
+
+def _fix_subproperty_literals(g: Graph, sv: SchemaView) -> None:
+    """Convert rdfs:subPropertyOf Literal objects (gen-owl bug) to URIRef."""
+    for s, _, o in list(g.triples((None, RDFS.subPropertyOf, None))):
+        if not isinstance(o, Literal):
+            continue
+        expanded = sv.expand_curie(str(o))
+        if expanded and expanded != str(o):
+            g.remove((s, RDFS.subPropertyOf, o))
+            g.add((s, RDFS.subPropertyOf, URIRef(expanded)))
 
 
 def _clean_exact_match(g: Graph) -> None:
