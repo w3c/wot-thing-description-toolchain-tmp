@@ -14,12 +14,6 @@
       "@id": "linkml:Any"
     },
     "ArraySchema": {
-      "@context": {
-        "items": {
-          "@id": "jsonschema:items",
-          "@type": "@id"
-        }
-      },
       "@id": "jsonschema:ArraySchema"
     },
     "AutoSecurityScheme": {
@@ -807,7 +801,8 @@
       "@id": "instance"
     },
     "items": {
-      "@id": "jsonschema:items"
+      "@id": "jsonschema:items",
+      "@type": "@id"
     },
     "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
     "language_tag": "@id",

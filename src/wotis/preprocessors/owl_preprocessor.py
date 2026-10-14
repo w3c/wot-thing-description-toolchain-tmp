@@ -1,4 +1,4 @@
-"""In-memory schema transforms before passing to gen-owl. Schemas on disk unchanged."""
+"""In-memory schema transforms before gen-owl. Disk schemas unchanged."""
 from __future__ import annotations
 
 import copy
@@ -19,12 +19,7 @@ _LIST_CONSTRAINT_FIELDS_EXTRA = ("equals_string_in", "equals_number_in")
 
 
 def preprocess_for_gen_owl(schema_path: str) -> str:
-    """Return YAML string of schema ready for gen-owl.
-
-    Merges imports for type resolution, then restricts output to vocabulary
-    originating in this module only. JSON-LD artifacts and discriminator slots
-    are stripped before gen-owl sees the schema.
-    """
+    """Return YAML string of schema ready for gen-owl."""
     view = SchemaView(schema_path, merge_imports=True)
     local_view = SchemaView(schema_path, merge_imports=False)
     local_schema_id = local_view.schema.id
@@ -51,6 +46,7 @@ def preprocess_for_gen_owl(schema_path: str) -> str:
     _strip_jsonld_slots(s)
     _strip_no_uri_original_slots(s, original_no_uri_slots)
     _strip_discriminator_slots(s, view)
+    _strip_non_ontological_enums(s)
     _infer_ranges_from_branches(s)
     _clear_constraints(s)
     _strip_schema_metadata(s)
@@ -63,12 +59,7 @@ def _namespace(view: SchemaView) -> str:
 
 
 def _assign_enum_uris(s: SchemaDefinition, schema_path: str, view: SchemaView) -> None:
-    """Set enum_uri on enums that lack one, using the sub-schema they originate from.
-
-    After merge_imports=True, view.schema.imports is empty (imports were flattened).
-    We load the root schema unmerged to recover the original imports list, then
-    walk each sub-schema to build an enum-name → namespace map.
-    """
+    """Set enum_uri on enums that lack one, using originating sub-schema namespace."""
     import os
     from linkml_runtime.utils.formatutils import camelcase
 
@@ -141,7 +132,7 @@ def _apply_renames(s: SchemaDefinition, renames: dict[str, str]) -> None:
 
 
 def _promote_attributes(s: SchemaDefinition, view: SchemaView) -> None:
-    """Promote class attributes to top-level slots so gen-owl emits global rdfs:range."""
+    """Promote class attributes to top-level slots for global rdfs:range."""
     for cls_name, cls_def in s.classes.items():
         if not cls_def.attributes:
             continue
@@ -179,16 +170,7 @@ def _strip_non_local(
     view: SchemaView,
     local_ns: str,
 ) -> None:
-    """Remove top-level slots and enums not originating in this module.
-
-    Classes from imported schemas are kept so gen-owl can resolve ranges.
-    The postprocessor filters out non-local class triples by namespace.
-
-    After merge_imports=True, every definition carries from_schema. Keep only
-    slots/enums whose from_schema matches the module being processed — unless
-    the enum's expanded enum_uri falls in the local namespace (cross-module
-    enums like OperationType defined in hypermedia.yaml but with td: URI).
-    """
+    """Keep only slots/enums from this module (or with local-namespace enum_uri)."""
     slots_to_remove = [
         name for name, slot in s.slots.items()
         if slot.from_schema != local_schema_id
@@ -223,10 +205,7 @@ def _strip_non_local(
 
 
 def _strip_jsonld_slots(s: SchemaDefinition) -> None:
-    """Remove slots that are JSON-LD keywords (alias starts with '@').
-
-    These are serialization artifacts (@context, @type) with no OWL counterpart.
-    """
+    """Remove JSON-LD keyword slots (@context, @type) — no OWL counterpart."""
     to_remove = [
         name for name, slot in s.slots.items()
         if (slot.alias or "").startswith("@") or name.startswith("@")
@@ -245,11 +224,7 @@ def _strip_jsonld_slots(s: SchemaDefinition) -> None:
 
 
 def _strip_discriminator_slots(s: SchemaDefinition, view: SchemaView) -> None:
-    """Remove slots with no slot_uri whose range is an enum with no enum_uri.
-
-    This pattern identifies JSON type discriminator fields (e.g. scheme: nosec/basic/...).
-    They carry no OWL semantics and have no upstream ontology counterpart.
-    """
+    """Remove JSON discriminator slots (no slot_uri, range is enum without enum_uri)."""
     implicit_enum_names = {
         name for name, edef in s.enums.items() if not edef.enum_uri
     }
@@ -270,13 +245,20 @@ def _strip_discriminator_slots(s: SchemaDefinition, view: SchemaView) -> None:
                 del cls_def.slot_usage[k]
 
 
-def _strip_no_uri_classes(s: SchemaDefinition, no_uri_classes: set[str]) -> None:
-    """Remove classes with no class_uri and refs to them.
+def _strip_non_ontological_enums(s: SchemaDefinition) -> None:
+    """Remove enums without enum_uri — JSON Schema validation only, no OWL counterpart."""
+    to_remove = [name for name, edef in s.enums.items() if not edef.enum_uri]
+    for name in to_remove:
+        del s.enums[name]
 
-    Classes like MultiLanguage are pure JSON-LD serialization artifacts with no
-    OWL counterpart. Their attributes must not be promoted. Slots that reference
-    them as range get range cleared (gen-owl will emit DatatypeProperty).
-    """
+    removed = set(to_remove)
+    for slot_def in s.slots.values():
+        if slot_def.range in removed:
+            slot_def.range = "string"
+
+
+def _strip_no_uri_classes(s: SchemaDefinition, no_uri_classes: set[str]) -> None:
+    """Remove classes without class_uri and clear refs to them."""
     for name in list(no_uri_classes):
         s.classes.pop(name, None)
 
@@ -292,12 +274,7 @@ def _strip_no_uri_classes(s: SchemaDefinition, no_uri_classes: set[str]) -> None
 
 
 def _strip_no_uri_original_slots(s: SchemaDefinition, original_no_uri_slots: set[str]) -> None:
-    """Remove top-level slots that had no slot_uri in the original (unmerged) schema.
-
-    After renames, slots that previously had slot_uri now have slot_uri=None but
-    their name changed (e.g. id→hasVersionInfo). The original no-uri set identifies
-    slots that never had an OWL mapping (e.g. 'id'). Strip those.
-    """
+    """Remove slots that never had a slot_uri in the unmerged schema."""
     to_remove = [name for name in s.slots if name in original_no_uri_slots]
     for name in to_remove:
         del s.slots[name]
@@ -314,14 +291,7 @@ def _strip_no_uri_original_slots(s: SchemaDefinition, original_no_uri_slots: set
 
 
 def _strip_schema_metadata(s: SchemaDefinition) -> None:
-    """Remove schema-level metadata before gen-owl sees it.
-
-    The postprocessor's _add_ontology_header reconstructs ontology metadata from
-    the unmerged schema view with proper RDF serialization. Stripping here prevents
-    gen-owl from emitting duplicates (title), LinkML metamodel predicates
-    (pav:createdOn/lastUpdatedOn/version), and broken Python repr strings
-    (JsonObj for publisher annotation).
-    """
+    """Strip schema metadata — postprocessor reconstructs from unmerged schema."""
     s.title = None
     s.description = None
     s.created_by = None
@@ -335,12 +305,7 @@ def _strip_schema_metadata(s: SchemaDefinition) -> None:
 
 
 def _infer_ranges_from_branches(s: SchemaDefinition) -> None:
-    """Set top-level range from union branches when all branches agree.
-
-    gen-owl emits "Guessing type" warnings for slots with no top-level range
-    but with any_of/exactly_one_of branches. If all branches share a single range,
-    promote it to the top level so gen-owl can determine ObjectProperty vs DatatypeProperty.
-    """
+    """Promote range from union branches when all agree on one range."""
     for slot_def in s.slots.values():
         if slot_def.range:
             continue

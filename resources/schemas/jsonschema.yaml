@@ -206,6 +206,7 @@ slots:
   items:
     description: Used to define the characteristics of an array.
     slot_uri: jsonschema:items
+    range: DataSchema
   maxItems:
     description: >-
       Defines the maximum number of items that have to be in the array.
