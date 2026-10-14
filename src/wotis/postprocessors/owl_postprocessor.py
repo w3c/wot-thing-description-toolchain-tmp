@@ -2,15 +2,29 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
-from linkml_runtime.linkml_model.meta import SchemaDefinition
+from linkml_runtime.linkml_model.meta import (
+    EnumDefinition,
+    Prefix,
+    SchemaDefinition,
+)
 from linkml_runtime.utils.schemaview import SchemaView
-from rdflib import Graph, Literal, Namespace, URIRef
+from rdflib import BNode, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SKOS, VANN, XSD
 
 SCHEMA = Namespace("http://schema.org/")
 LINKML = Namespace("https://w3id.org/linkml/")
 LINKML_NS = str(LINKML)
+
+_Enums = dict[str, EnumDefinition]
+_Prefixes = dict[str, Prefix]
+
+
+def _get_schema(sv: SchemaView) -> SchemaDefinition:
+    schema = sv.schema
+    assert schema is not None
+    return schema
 
 
 def postprocess_owl(
@@ -26,19 +40,19 @@ def postprocess_owl(
 
     sv = SchemaView(str(schema_dir / schema_file), merge_imports=False)
     sv_merged = SchemaView(str(schema_dir / schema_file), merge_imports=True)
+    ns = _module_namespace(sv)
+    onto_iri = _ontology_iri(sv)
 
-    _strip_linkml_subjects(g)
-    _strip_foreign_subjects(g, sv)
+    _strip_foreign_subjects(g, ns, onto_iri)
     _strip_linkml_ranges(g)
-    _fix_in_scheme(g, sv)
+    _fix_in_scheme(g, onto_iri)
     _clean_exact_match(g)
     _clean_enum_artifacts(g)
     _convert_enum_subclasses_to_individuals(g, sv_merged)
     _strip_orphan_blank_nodes(g)
     _strip_empty_blank_node_restrictions(g)
-    _strip_implicit_enum_classes(g, sv)
 
-    _add_ontology_header(g, sv)
+    _add_ontology_header(g, sv, ns, onto_iri)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     ttl = g.serialize(format="turtle")
@@ -46,7 +60,10 @@ def postprocess_owl(
 
 
 def _module_namespace(sv: SchemaView) -> str:
-    prefix = sv.schema.prefixes[sv.schema.default_prefix]
+    schema = _get_schema(sv)
+    dp = schema.default_prefix
+    assert dp is not None
+    prefix = cast(Prefix, cast(_Prefixes, schema.prefixes)[dp])
     ns = str(prefix.prefix_reference)
     if not ns.endswith(("#", "/")):
         ns += "#"
@@ -54,25 +71,17 @@ def _module_namespace(sv: SchemaView) -> str:
 
 
 def _ontology_iri(sv: SchemaView) -> URIRef:
-    return URIRef(sv.schema.id)
+    return URIRef(_get_schema(sv).id)
 
 
-def _strip_linkml_subjects(g: Graph) -> None:
-    to_remove = [s for s in set(g.subjects()) if str(s).startswith(LINKML_NS)]
-    for s in to_remove:
-        for triple in list(g.triples((s, None, None))):
-            g.remove(triple)
-
-
-def _strip_foreign_subjects(g: Graph, sv: SchemaView) -> None:
-    """Remove subjects outside this module's namespace."""
-    local_ns = _module_namespace(sv)
-    onto_iri = str(_ontology_iri(sv))
+def _strip_foreign_subjects(g: Graph, local_ns: str, onto_iri: URIRef) -> None:
+    """Remove subjects outside this module's namespace (includes linkml: subjects)."""
+    onto_str = str(onto_iri)
     to_remove = [
         s for s in set(g.subjects())
         if isinstance(s, URIRef)
         and not str(s).startswith(local_ns)
-        and str(s) != onto_iri
+        and str(s) != onto_str
     ]
     for s in to_remove:
         for triple in list(g.triples((s, None, None))):
@@ -80,12 +89,21 @@ def _strip_foreign_subjects(g: Graph, sv: SchemaView) -> None:
 
 
 def _strip_empty_blank_node_restrictions(g: Graph) -> None:
-    from rdflib import BNode as RDFBNode
     for s, p, o in list(g.triples((None, RDFS.subClassOf, None))):
-        if not isinstance(o, RDFBNode):
+        if not isinstance(o, BNode):
             continue
         if not list(g.triples((o, None, None))):
             g.remove((s, p, o))
+
+
+def _demote_to_datatype(g: Graph, props: set[URIRef]) -> None:
+    """Demote ObjectProperty→DatatypeProperty for props that lost their only range."""
+    for prop in props:
+        if list(g.objects(prop, RDFS.range)):
+            continue
+        if (prop, RDF.type, OWL.ObjectProperty) in g:
+            g.remove((prop, RDF.type, OWL.ObjectProperty))
+            g.add((prop, RDF.type, OWL.DatatypeProperty))
 
 
 def _strip_linkml_ranges(g: Graph) -> None:
@@ -95,17 +113,10 @@ def _strip_linkml_ranges(g: Graph) -> None:
         if isinstance(o, URIRef) and str(o).startswith(LINKML_NS):
             linkml_ranged_props.add(s)
             g.remove((s, RDFS.range, o))
-
-    for prop in linkml_ranged_props:
-        if list(g.objects(prop, RDFS.range)):
-            continue
-        if (prop, RDF.type, OWL.ObjectProperty) in g:
-            g.remove((prop, RDF.type, OWL.ObjectProperty))
-            g.add((prop, RDF.type, OWL.DatatypeProperty))
+    _demote_to_datatype(g, linkml_ranged_props)
 
 
-def _fix_in_scheme(g: Graph, sv: SchemaView) -> None:
-    onto_iri = _ontology_iri(sv)
+def _fix_in_scheme(g: Graph, onto_iri: URIRef) -> None:
     for s, p, o in list(g.triples((None, SKOS.inScheme, None))):
         g.remove((s, p, o))
         g.add((s, SKOS.inScheme, onto_iri))
@@ -135,19 +146,19 @@ def _clean_enum_artifacts(g: Graph) -> None:
         g.remove((s, RDF.type, OWL.NamedIndividual))
 
 
-def _remove_rdf_list(g: Graph, node) -> None:
+def _remove_rdf_list(g: Graph, node: BNode | URIRef | None) -> None:
     """Walk and remove an RDF list starting at node."""
     while node and node != RDF.nil:
         next_nodes = list(g.objects(node, RDF.rest))
         for t in list(g.triples((node, None, None))):
             g.remove(t)
-        node = next_nodes[0] if next_nodes else None
+        node = cast(BNode | URIRef | None, next_nodes[0] if next_nodes else None)
 
 
 def _convert_enum_subclasses_to_individuals(g: Graph, sv: SchemaView) -> None:
     """Convert PV subclasses to rdf:type individuals (upstream pattern)."""
-    ns = _module_namespace(sv)
-    for edef in sv.schema.enums.values():
+    schema = _get_schema(sv)
+    for edef in cast(_Enums, schema.enums).values():
         if not edef.enum_uri:
             continue
         enum_iri = URIRef(sv.expand_curie(edef.enum_uri))
@@ -161,11 +172,10 @@ def _convert_enum_subclasses_to_individuals(g: Graph, sv: SchemaView) -> None:
 
 def _strip_orphan_blank_nodes(g: Graph) -> None:
     """Remove blank nodes unreferenced as object."""
-    from rdflib import BNode as RDFBNode
     all_objects = set(g.objects())
     to_remove = [
         s for s in set(g.subjects())
-        if isinstance(s, RDFBNode) and s not in all_objects
+        if isinstance(s, BNode) and s not in all_objects
     ]
     for s in to_remove:
         _remove_rdf_list(g, s)
@@ -173,45 +183,13 @@ def _strip_orphan_blank_nodes(g: Graph) -> None:
             g.remove(triple)
 
 
-def _strip_implicit_enum_classes(g: Graph, sv: SchemaView) -> None:
-    """Remove OWL classes for enums without enum_uri; demote affected properties."""
-    from linkml_runtime.utils.formatutils import camelcase
-
-    ns = _module_namespace(sv)
-    implicit_iris: set[URIRef] = set()
-    for ename, edef in sv.schema.enums.items():
-        if edef.enum_uri:
-            continue
-        implicit_iris.add(URIRef(f"{ns}{camelcase(ename)}"))
-
-    enum_ranged_props: set[URIRef] = set()
-    for iri in implicit_iris:
-        for triple in list(g.triples((iri, None, None))):
-            g.remove(triple)
-        for s, _, _ in list(g.triples((None, RDFS.range, iri))):
-            enum_ranged_props.add(s)
-            g.remove((s, RDFS.range, iri))
-
-    for prop in enum_ranged_props:
-        if list(g.objects(prop, RDFS.range)):
-            continue
-        if (prop, RDF.type, OWL.ObjectProperty) in g:
-            g.remove((prop, RDF.type, OWL.ObjectProperty))
-            g.add((prop, RDF.type, OWL.DatatypeProperty))
-
-
 def _clean_exact_match(g: Graph) -> None:
     for s, p, o in list(g.triples((None, SKOS.exactMatch, None))):
         g.remove((s, p, o))
 
 
-def _add_ontology_header(g: Graph, sv: SchemaView) -> None:
-    schema = sv.schema
-    onto_iri = _ontology_iri(sv)
-    ns = _module_namespace(sv)
-
-    # rdflib's default schema: prefix maps to https://schema.org/; rebind to http://
-    g.bind("schema", SCHEMA, replace=True)
+def _add_ontology_header(g: Graph, sv: SchemaView, ns: str, onto_iri: URIRef) -> None:
+    schema = _get_schema(sv)
 
     g.add((onto_iri, RDF.type, OWL.Ontology))
     if schema.title:
@@ -234,7 +212,7 @@ def _add_ontology_header(g: Graph, sv: SchemaView) -> None:
         g.add((onto_iri, DCTERMS.publisher, publisher))
 
 
-def _publisher_node(g: Graph, schema: SchemaDefinition) -> URIRef | None:
+def _publisher_node(g: Graph, schema: SchemaDefinition) -> BNode | None:
     annotation = (schema.annotations or {}).get("dcterms:publisher")
     if annotation is None:
         return None
@@ -247,7 +225,6 @@ def _publisher_node(g: Graph, schema: SchemaDefinition) -> URIRef | None:
         return None
     if org_type != "schema:Organization" or not name or not url:
         return None
-    from rdflib import BNode
     node = BNode()
     g.add((node, RDF.type, SCHEMA.Organization))
     g.add((node, SCHEMA.name, Literal(name)))

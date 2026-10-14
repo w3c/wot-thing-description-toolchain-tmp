@@ -1,10 +1,19 @@
-"""In-memory schema transforms before gen-owl. Disk schemas unchanged."""
+"""In-memory schema transforms before gen-owl."""
 from __future__ import annotations
 
 import copy
+import os
+from typing import Any, cast
 
 from linkml_runtime.dumpers import yaml_dumper
-from linkml_runtime.linkml_model.meta import SchemaDefinition, SlotDefinition
+from linkml_runtime.linkml_model.meta import (
+    ClassDefinition,
+    EnumDefinition,
+    Prefix,
+    SchemaDefinition,
+    SlotDefinition,
+)
+from linkml_runtime.utils.formatutils import camelcase
 from linkml_runtime.utils.schemaview import SchemaView
 
 # Fields gen-owl converts to blank-node owl:Restriction axioms not present in the WoT TD ontology.
@@ -17,26 +26,54 @@ _SCALAR_CONSTRAINT_FIELDS = (
 )
 _LIST_CONSTRAINT_FIELDS_EXTRA = ("equals_string_in", "equals_number_in")
 
+_Slots = dict[str, SlotDefinition]
+_Classes = dict[str, ClassDefinition]
+_Enums = dict[str, EnumDefinition]
+_Prefixes = dict[str, Prefix]
+
+
+def _get_schema(view: SchemaView) -> SchemaDefinition:
+    schema = view.schema
+    assert schema is not None
+    return schema
+
+
+def _remove_slots(s: SchemaDefinition, names: set[str]) -> None:
+    """Remove named slots and all class references to them."""
+    slots = cast(_Slots, s.slots)
+    for name in names:
+        slots.pop(name, None)
+    for cls_def in cast(_Classes, s.classes).values():
+        if cls_def.slots:
+            cls_def.slots = [sn for sn in cls_def.slots if str(sn) not in names]
+        if cls_def.slot_usage:
+            su = cast(dict[str, SlotDefinition], cls_def.slot_usage)
+            for k in [k for k in su if k in names]:
+                del su[k]
+
 
 def preprocess_for_gen_owl(schema_path: str) -> str:
     """Return YAML string of schema ready for gen-owl."""
     view = SchemaView(schema_path, merge_imports=True)
     local_view = SchemaView(schema_path, merge_imports=False)
-    local_schema_id = local_view.schema.id
+    local_schema = _get_schema(local_view)
+    local_schema_id = local_schema.id
     namespace = _namespace(view)
 
-    # Collect original top-level slots with no slot_uri — pure implementation artifacts.
+    local_slots = cast(_Slots, local_schema.slots)
+    local_classes = cast(_Classes, local_schema.classes)
+
     original_no_uri_slots = {
-        name for name, slot in local_view.schema.slots.items()
+        name for name, slot in local_slots.items()
         if not slot.slot_uri
     }
-    # Classes with no class_uri have no OWL semantics (e.g. MultiLanguage).
     no_uri_classes = {
-        name for name, cls in local_view.schema.classes.items()
+        name for name, cls in local_classes.items()
         if not cls.class_uri
     }
 
-    s = copy.deepcopy(view.schema)
+    merged_schema = _get_schema(view)
+    s: SchemaDefinition = copy.deepcopy(merged_schema)
     _assign_enum_uris(s, schema_path, view)
     renames = _collect_renames(s, namespace, view)
     _apply_renames(s, renames)
@@ -54,51 +91,53 @@ def preprocess_for_gen_owl(schema_path: str) -> str:
 
 
 def _namespace(view: SchemaView) -> str:
-    prefix = view.schema.prefixes[view.schema.default_prefix]
+    schema = _get_schema(view)
+    dp = schema.default_prefix
+    assert dp is not None, f"Schema {schema.name} has no default_prefix"
+    prefix = cast(Prefix, cast(_Prefixes, schema.prefixes)[dp])
     return str(prefix.prefix_reference)
 
 
 def _assign_enum_uris(s: SchemaDefinition, schema_path: str, view: SchemaView) -> None:
     """Set enum_uri on enums that lack one, using originating sub-schema namespace."""
-    import os
-    from linkml_runtime.utils.formatutils import camelcase
-
     schema_dir = os.path.dirname(schema_path)
-
-    root_view = SchemaView(schema_path, merge_imports=False)
+    root_schema = _get_schema(SchemaView(schema_path, merge_imports=False))
 
     enum_to_ns: dict[str, str] = {}
 
-    def _walk(imports: list, base_dir: str) -> None:
+    def _walk(imports: list[str], base_dir: str) -> None:
         for import_name in imports:
             if import_name.startswith("linkml:"):
                 continue
             import_path = os.path.join(base_dir, import_name + ".yaml")
             if not os.path.exists(import_path):
                 continue
-            sub_view = SchemaView(import_path, merge_imports=False)
-            dp = sub_view.schema.default_prefix
-            if dp and dp in sub_view.schema.prefixes:
-                sub_ns = str(sub_view.schema.prefixes[dp].prefix_reference)
-                for ename in sub_view.schema.enums:
-                    if ename not in enum_to_ns:
-                        enum_to_ns[ename] = sub_ns
-            _walk(sub_view.schema.imports or [], os.path.dirname(import_path))
+            sub_schema = _get_schema(SchemaView(import_path, merge_imports=False))
+            dp = sub_schema.default_prefix
+            prefixes = cast(_Prefixes, sub_schema.prefixes)
+            if dp and dp in prefixes:
+                sub_ns = str(cast(Prefix, prefixes[dp]).prefix_reference)
+                for ename in cast(_Enums, sub_schema.enums):
+                    if str(ename) not in enum_to_ns:
+                        enum_to_ns[str(ename)] = sub_ns
+            sub_imports = cast(list[str], sub_schema.imports or [])
+            _walk(sub_imports, os.path.dirname(import_path))
 
-    _walk(root_view.schema.imports or [], schema_dir)
+    root_imports = cast(list[str], root_schema.imports or [])
+    _walk(root_imports, schema_dir)
 
-    for ename, edef in s.enums.items():
+    for ename, edef in cast(_Enums, s.enums).items():
         if edef.enum_uri:
             continue
-        ns = enum_to_ns.get(ename)
+        ns = enum_to_ns.get(str(ename))
         if ns is None:
             continue
-        edef.enum_uri = f"{ns}{camelcase(ename)}"
+        edef.enum_uri = f"{ns}{camelcase(str(ename))}"
 
 
 def _collect_renames(s: SchemaDefinition, namespace: str, view: SchemaView) -> dict[str, str]:
     renames: dict[str, str] = {}
-    for slot_name, slot_def in s.slots.items():
+    for slot_name, slot_def in cast(_Slots, s.slots).items():
         if not slot_def.slot_uri:
             continue
         try:
@@ -115,43 +154,47 @@ def _collect_renames(s: SchemaDefinition, namespace: str, view: SchemaView) -> d
 
 
 def _apply_renames(s: SchemaDefinition, renames: dict[str, str]) -> None:
+    slots = cast(_Slots, s.slots)
     for old_name, new_name in renames.items():
-        slot_def = s.slots.pop(old_name)
+        slot_def = slots.pop(old_name)
         slot_def.name = new_name
-        s.slots[new_name] = slot_def
+        slots[new_name] = slot_def
 
-    for class_def in s.classes.values():
+    for class_def in cast(_Classes, s.classes).values():
         if class_def.slots:
-            class_def.slots = [renames.get(sn, sn) for sn in class_def.slots]
+            class_def.slots = [renames.get(str(sn), str(sn)) for sn in class_def.slots]
         if class_def.slot_usage:
-            to_rename = {k: renames[k] for k in class_def.slot_usage if k in renames}
+            su = cast(dict[str, SlotDefinition], class_def.slot_usage)
+            to_rename = {k: renames[k] for k in su if k in renames}
             for old_key, new_key in to_rename.items():
-                v = class_def.slot_usage.pop(old_key)
+                v = su.pop(old_key)
                 v.name = new_key
-                class_def.slot_usage[new_key] = v
+                su[new_key] = v
 
 
 def _promote_attributes(s: SchemaDefinition, view: SchemaView) -> None:
     """Promote class attributes to top-level slots for global rdfs:range."""
-    for cls_name, cls_def in s.classes.items():
+    slots = cast(_Slots, s.slots)
+    for cls_name, cls_def in cast(_Classes, s.classes).items():
         if not cls_def.attributes:
             continue
         attr_to_slot: dict[str, str] = {}
-        for attr_name, attr_def in list(cls_def.attributes.items()):
+        for attr_name, attr_def in list(cast(dict[str, SlotDefinition], cls_def.attributes).items()):
             if not attr_def.slot_uri:
                 continue
             slot_name = _attr_slot_name(attr_name, attr_def, view)
             attr_to_slot[attr_name] = slot_name
-            if slot_name not in s.slots or attr_def.slot_uri:
+            if slot_name not in slots or attr_def.slot_uri:
                 promoted = copy.deepcopy(attr_def)
                 promoted.name = slot_name
-                s.slots[slot_name] = promoted
+                slots[slot_name] = promoted
             cls_def.slots = list(cls_def.slots or []) + [slot_name]
         cls_def.attributes = {}
         if cls_def.slot_usage:
+            su = cast(dict[str, SlotDefinition], cls_def.slot_usage)
             for old_name in attr_to_slot:
-                if old_name in cls_def.slot_usage:
-                    cls_def.slot_usage.pop(old_name)
+                if old_name in su:
+                    su.pop(old_name)
 
 
 def _attr_slot_name(attr_name: str, attr_def: SlotDefinition, view: SchemaView) -> str:
@@ -171,15 +214,16 @@ def _strip_non_local(
     local_ns: str,
 ) -> None:
     """Keep only slots/enums from this module (or with local-namespace enum_uri)."""
-    slots_to_remove = [
-        name for name, slot in s.slots.items()
+    slots = cast(_Slots, s.slots)
+    foreign_slots = {
+        name for name, slot in slots.items()
         if slot.from_schema != local_schema_id
-    ]
-    for name in slots_to_remove:
-        del s.slots[name]
+    }
+    _remove_slots(s, foreign_slots)
 
-    enums_to_remove = []
-    for name, enum in s.enums.items():
+    enums = cast(_Enums, s.enums)
+    enums_to_remove: list[str] = []
+    for name, enum in enums.items():
         if enum.from_schema == local_schema_id:
             continue
         if enum.enum_uri:
@@ -191,103 +235,68 @@ def _strip_non_local(
                 pass
         enums_to_remove.append(name)
     for name in enums_to_remove:
-        del s.enums[name]
-
-    # Remove slot references from classes that point to removed slots
-    remaining_slots = set(s.slots)
-    for cls_def in s.classes.values():
-        if cls_def.slots:
-            cls_def.slots = [sn for sn in cls_def.slots if sn in remaining_slots]
-        if cls_def.slot_usage:
-            dead_keys = [k for k in cls_def.slot_usage if k not in remaining_slots]
-            for k in dead_keys:
-                del cls_def.slot_usage[k]
+        del enums[name]
 
 
 def _strip_jsonld_slots(s: SchemaDefinition) -> None:
     """Remove JSON-LD keyword slots (@context, @type) — no OWL counterpart."""
-    to_remove = [
-        name for name, slot in s.slots.items()
+    slots = cast(_Slots, s.slots)
+    jsonld_slots = {
+        name for name, slot in slots.items()
         if (slot.alias or "").startswith("@") or name.startswith("@")
-    ]
-    for name in to_remove:
-        del s.slots[name]
-
-    removed = set(to_remove)
-    for cls_def in s.classes.values():
-        if cls_def.slots:
-            cls_def.slots = [sn for sn in cls_def.slots if sn not in removed]
-        if cls_def.slot_usage:
-            dead_keys = [k for k in cls_def.slot_usage if k in removed]
-            for k in dead_keys:
-                del cls_def.slot_usage[k]
+    }
+    _remove_slots(s, jsonld_slots)
 
 
 def _strip_discriminator_slots(s: SchemaDefinition, view: SchemaView) -> None:
     """Remove JSON discriminator slots (no slot_uri, range is enum without enum_uri)."""
+    enums = cast(_Enums, s.enums)
     implicit_enum_names = {
-        name for name, edef in s.enums.items() if not edef.enum_uri
+        name for name, edef in enums.items() if not edef.enum_uri
     }
-    to_remove = [
-        name for name, slot in s.slots.items()
+    slots = cast(_Slots, s.slots)
+    discriminator_slots = {
+        name for name, slot in slots.items()
         if not slot.slot_uri and slot.range in implicit_enum_names
-    ]
-    for name in to_remove:
-        del s.slots[name]
-
-    removed = set(to_remove)
-    for cls_def in s.classes.values():
-        if cls_def.slots:
-            cls_def.slots = [sn for sn in cls_def.slots if sn not in removed]
-        if cls_def.slot_usage:
-            dead_keys = [k for k in cls_def.slot_usage if k in removed]
-            for k in dead_keys:
-                del cls_def.slot_usage[k]
+    }
+    _remove_slots(s, discriminator_slots)
 
 
 def _strip_non_ontological_enums(s: SchemaDefinition) -> None:
     """Remove enums without enum_uri — JSON Schema validation only, no OWL counterpart."""
-    to_remove = [name for name, edef in s.enums.items() if not edef.enum_uri]
+    enums = cast(_Enums, s.enums)
+    to_remove = [name for name, edef in enums.items() if not edef.enum_uri]
     for name in to_remove:
-        del s.enums[name]
+        del enums[name]
 
     removed = set(to_remove)
-    for slot_def in s.slots.values():
+    for slot_def in cast(_Slots, s.slots).values():
         if slot_def.range in removed:
             slot_def.range = "string"
 
 
 def _strip_no_uri_classes(s: SchemaDefinition, no_uri_classes: set[str]) -> None:
     """Remove classes without class_uri and clear refs to them."""
+    classes = cast(_Classes, s.classes)
     for name in list(no_uri_classes):
-        s.classes.pop(name, None)
+        classes.pop(name, None)
 
-    for cls_def in s.classes.values():
+    for cls_def in classes.values():
         if cls_def.is_a in no_uri_classes:
             cls_def.is_a = None
         if cls_def.mixins:
-            cls_def.mixins = [m for m in cls_def.mixins if m not in no_uri_classes]
+            cls_def.mixins = [m for m in cls_def.mixins if str(m) not in no_uri_classes]
 
-    for slot_def in s.slots.values():
+    for slot_def in cast(_Slots, s.slots).values():
         if slot_def.range in no_uri_classes:
             slot_def.range = None
 
 
 def _strip_no_uri_original_slots(s: SchemaDefinition, original_no_uri_slots: set[str]) -> None:
     """Remove slots that never had a slot_uri in the unmerged schema."""
-    to_remove = [name for name in s.slots if name in original_no_uri_slots]
-    for name in to_remove:
-        del s.slots[name]
-
-    removed = set(to_remove)
-    for cls_def in s.classes.values():
-        if cls_def.slots:
-            cls_def.slots = [sn for sn in cls_def.slots if sn not in removed]
-        if cls_def.slot_usage:
-            dead_keys = [k for k in cls_def.slot_usage if k in removed]
-            for k in dead_keys:
-                del cls_def.slot_usage[k]
-
+    slots = cast(_Slots, s.slots)
+    present = {name for name in slots if name in original_no_uri_slots}
+    _remove_slots(s, present)
 
 
 def _strip_schema_metadata(s: SchemaDefinition) -> None:
@@ -306,7 +315,7 @@ def _strip_schema_metadata(s: SchemaDefinition) -> None:
 
 def _infer_ranges_from_branches(s: SchemaDefinition) -> None:
     """Promote range from union branches when all agree on one range."""
-    for slot_def in s.slots.values():
+    for slot_def in cast(_Slots, s.slots).values():
         if slot_def.range:
             continue
         branches = list(slot_def.any_of or []) + list(slot_def.exactly_one_of or [])
@@ -328,24 +337,28 @@ def _clear_slot_restrictions(slot: SlotDefinition) -> None:
     slot.multivalued = True
 
 
-def _keep_rdf_annotations(annotations: dict) -> dict:
-    """Keep only annotations whose keys are CURIEs (contain ':')."""
-    return {k: v for k, v in annotations.items() if ":" in k}
+_Annotations = dict[str, Any]
+
+
+def _rdf_annotations(obj: SlotDefinition | ClassDefinition | EnumDefinition) -> _Annotations:
+    """Return only CURIE-keyed annotations (semantic, not constraint metadata)."""
+    anns = cast(_Annotations, obj.annotations or {})
+    return {k: v for k, v in anns.items() if ":" in k}
 
 
 def _clear_constraints(s: SchemaDefinition) -> None:
-    for slot_def in s.slots.values():
+    for slot_def in cast(_Slots, s.slots).values():
         _clear_slot_restrictions(slot_def)
-        slot_def.annotations = _keep_rdf_annotations(slot_def.annotations or {})
-    for class_def in s.classes.values():
-        for attr_def in (class_def.attributes or {}).values():
+        slot_def.annotations = _rdf_annotations(slot_def)
+    for class_def in cast(_Classes, s.classes).values():
+        for attr_def in cast(dict[str, SlotDefinition], class_def.attributes or {}).values():
             _clear_slot_restrictions(attr_def)
-            attr_def.annotations = _keep_rdf_annotations(attr_def.annotations or {})
+            attr_def.annotations = _rdf_annotations(attr_def)
         class_def.slot_usage = {}
         class_def.rules = []
-        class_def.annotations = _keep_rdf_annotations(class_def.annotations or {})
-    for enum_def in s.enums.values():
-        enum_def.annotations = _keep_rdf_annotations(enum_def.annotations or {})
+        class_def.annotations = _rdf_annotations(class_def)
+    for enum_def in cast(_Enums, s.enums).values():
+        enum_def.annotations = _rdf_annotations(enum_def)
     for type_def in s.types.values():
         type_def.pattern = None
         type_def.structured_pattern = None
