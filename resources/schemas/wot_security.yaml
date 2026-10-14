@@ -151,6 +151,7 @@ slots:
       Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an 
       authorization server and associated with forms in order to identify what resources a client may access and how.
     slot_uri: wotsec:scopes
+    range: string
     annotations:
       spec_description: >-
         Set of authorization scope identifiers provided as an array. 

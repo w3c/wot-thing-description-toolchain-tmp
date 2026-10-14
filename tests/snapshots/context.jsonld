@@ -1038,7 +1038,8 @@
       "@id": "jsonschema:pattern"
     },
     "profile": {
-      "@id": "followsProfile"
+      "@id": "followsProfile",
+      "@type": "xsd:anyURI"
     },
     "properties": {
       "@container": "@index",

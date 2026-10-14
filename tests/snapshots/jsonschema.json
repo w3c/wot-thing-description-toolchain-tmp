@@ -1714,6 +1714,7 @@
     },
     "profile": {
       "description": "Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.",
+      "format": "uri",
       "oneOf": [
         {
           "format": "uri",

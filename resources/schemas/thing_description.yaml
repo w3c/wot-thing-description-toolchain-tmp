@@ -256,6 +256,7 @@ slots:
     description: >-
       Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.
     slot_uri: td:followsProfile
+    range: uri
     exactly_one_of:
       - range: uri
       - range: uri
