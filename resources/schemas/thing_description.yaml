@@ -112,8 +112,16 @@ slots:
   version:
     description: >-
       Provides version information.
-    slot_uri: td:hasVersionInfo
+    slot_uri: td:versionInfo
+    implements:
+      - owl:ObjectProperty
     range: VersionInfo
+    inlined: true
+    annotations:
+      rdfs:isDefinedBy:
+        value: https://www.w3.org/2019/wot/td
+      rdfs:seeAlso:
+        value: http://schema.org/version
   created:
     description: >-
       Provides information when the TD instance was created.
@@ -716,6 +724,10 @@ classes:
     extra_slots:
       allowed: true
     annotations:
+      rdfs:isDefinedBy:
+        value: https://www.w3.org/2019/wot/td
+      skos:inScheme:
+        value: https://www.w3.org/2019/wot/td
       spec_content:
         value:
           - type: markdown
@@ -733,6 +745,8 @@ classes:
         range: string
         required: true
         annotations:
+          rdfs:isDefinedBy:
+            value: https://www.w3.org/2019/wot/td
           spec_description: >-
             Provides a version indicator of this TD.
       model:
@@ -742,6 +756,9 @@ classes:
         implements:
           - owl:DatatypeProperty
         range: string
+        annotations:
+          rdfs:isDefinedBy:
+            value: https://www.w3.org/2019/wot/td
   MultiLanguage:
     description: >-
       A Map providing a set of human-readable texts in different languages identified by language tags as defined in BCP47.

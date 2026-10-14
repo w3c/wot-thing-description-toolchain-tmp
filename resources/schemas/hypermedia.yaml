@@ -112,6 +112,11 @@ enums:
       As of this version of the specification, it only includes the well-known types necessary to implement the WoT
       interaction model.
     enum_uri: td:OperationType
+    annotations:
+      rdfs:isDefinedBy:
+        value: https://www.w3.org/2019/wot/td
+      rdfs:subClassOf:
+        value: http://schema.org/Enumeration
     comments:
       - "Consumer to Thing applies for messages sent by the Consumer to the Thing"
       - "Thing to Consumer applies for messages sent by the Thing to the Consumer"

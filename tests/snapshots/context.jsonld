@@ -1722,7 +1722,7 @@
     },
     "vann": "http://purl.org/vocab/vann/",
     "version": {
-      "@id": "hasVersionInfo",
+      "@id": "versionInfo",
       "@type": "@id"
     },
     "wotsec": "https://www.w3.org/2019/wot/security#",

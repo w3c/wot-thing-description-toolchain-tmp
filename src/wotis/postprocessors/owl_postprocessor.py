@@ -47,9 +47,11 @@ def postprocess_owl(
     _strip_linkml_ranges(g)
     _fix_in_scheme(g, onto_iri)
     _fix_subproperty_literals(g, sv_merged)
+    _fix_uri_annotation_literals(g)
     _clean_exact_match(g)
     _clean_enum_artifacts(g)
     _convert_enum_subclasses_to_individuals(g, sv_merged)
+    _fix_aliased_labels(g)
     _strip_orphan_blank_nodes(g)
     _strip_empty_blank_node_restrictions(g)
 
@@ -193,6 +195,29 @@ def _fix_subproperty_literals(g: Graph, sv: SchemaView) -> None:
         if expanded and expanded != str(o):
             g.remove((s, RDFS.subPropertyOf, o))
             g.add((s, RDFS.subPropertyOf, URIRef(expanded)))
+
+
+def _fix_uri_annotation_literals(g: Graph) -> None:
+    """Convert Literal objects to URIRef for predicates that expect resources."""
+    _URI_PREDICATES = (RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf)
+    for pred in _URI_PREDICATES:
+        for s, _, o in list(g.triples((None, pred, None))):
+            if not isinstance(o, Literal):
+                continue
+            val = str(o)
+            if val.startswith(("http://", "https://", "urn:")):
+                g.remove((s, pred, o))
+                g.add((s, pred, URIRef(val)))
+
+
+def _fix_aliased_labels(g: Graph) -> None:
+    """When skos:prefLabel exists (from LinkML alias), use it as rdfs:label."""
+    for s, _, pref_label in list(g.triples((None, SKOS.prefLabel, None))):
+        for _, _, old_label in list(g.triples((s, RDFS.label, None))):
+            g.remove((s, RDFS.label, old_label))
+        lang = pref_label.language if isinstance(pref_label, Literal) else None
+        g.add((s, RDFS.label, Literal(str(pref_label), lang=lang)))
+        g.remove((s, SKOS.prefLabel, pref_label))
 
 
 def _clean_exact_match(g: Graph) -> None:

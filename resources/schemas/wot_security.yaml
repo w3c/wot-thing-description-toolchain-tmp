@@ -487,13 +487,15 @@ classes:
       allowed: true
     slots:
       - "@name"
-      - in
     slot_usage:
       scheme:
         range: string
         equals_string_in:
           - apikey
-      in:
+    attributes:
+      apikeyIn:
+        alias: in
+        description: Specifies the location of security authentication information.
         slot_uri: wotsec:apikeyIn
         required: true
         range: SecurityLocationType

@@ -48,15 +48,45 @@ tests: published schemas in `schemas/`, the assertion inventory in
 `assertions.csv`, assertion source in `extra-asserts.html`, and the
 hand-verified specification source in `html/index.html`.
 
-`snapshots/` contains machine-updatable snapshots of this toolchain's generated
-output. Update them only after reviewing an intentional change:
+### Snapshots
+
+Snapshot tests catch accidental changes to what this toolchain produces. The
+files in `tests/snapshots/` are committed copies of the toolchain's current
+generated output — `jsonschema.json` (the JSON Schema), `context.jsonld` (the
+JSON-LD context), and `spec-sections.html` (the specification HTML sections).
+OWL modules and SHACL shapes will be added here as they are introduced.
+
+`test_golden_diff.py` regenerates each artifact and checks it is
+character-for-character identical to the saved copy. Any difference — even a
+single extra space — is a test failure.
+
+**If a snapshot test fails and you did not change a schema or generator:** there
+is a bug. Do not update the snapshots to silence it. Investigate the cause.
+
+**If a snapshot test fails because you intentionally changed a schema or
+generator:** review the diff to confirm the artifact change is correct, then
+update the saved copies:
 
 ```bash
 uv run pytest tests/test_golden_diff.py --update-goldens
 ```
 
-Hand-verified reference outputs belong in `manual_goldens/` when present. They
-are authoritative and must not be updated by the snapshot command.
+Commit the updated `tests/snapshots/` files in the same commit as the schema or
+generator change. Do not edit files in `tests/snapshots/` by hand.
+
+### Pre-commit checks
+
+This repository uses [pre-commit](https://pre-commit.com/) hooks that run
+automatically when you run `git commit`. Two hooks are active:
+
+- **ruff** — checks and auto-fixes Python style in all `.py` files. If ruff
+  modifies a file, stage the changes and commit again.
+- **linkml-lint** — validates the four schema files under `resources/schemas/`
+  whenever any of them change. If lint fails, fix the schema error it reports
+  before committing.
+
+These checks are separate from the snapshot tests but serve the same purpose:
+prevent invalid or inconsistent changes from entering the repository unnoticed.
 
 ## Test Data
 

@@ -36,9 +36,9 @@ These are intentional or acceptable — remove from diff lists:
 | T4 | ✅ DONE | `td:schemaDefinitions` generated — intentional (TD 2.0 addition, no upstream ontology declaration)       | — |
 | T5 | ✅ DONE | `td:MultiLanguage` absent from td.ttl; `td:VersionInfo` retained (intentional)                           | — |
 | T6 | ✅ DONE | `dcterms:created` and `dcterms:modified` not re-declared in td.ttl — correct. These are external Dublin Core properties reused via JSON-LD context (`dct:created`, `dct:modified`). Upstream ontology intentionally omits them (standard RDF practice: don't re-declare external vocab). Slots remain in schema for JSON Schema and JSON-LD context generation. | — |
-| T7 | ❌ OPEN | `td:titleInLanguage` missing `rdfs:range xsd:string` and `rdfs:subPropertyOf dcterms:title` — upstream has `schema:rangeIncludes schema:Text` + subPropertyOf | Schema: add `range: string` and `subproperty_of` to `titles` slot |
-| T8 | ❌ OPEN | `td:descriptionInLanguage` missing `rdfs:range xsd:string` and `rdfs:subPropertyOf dcterms:description` — upstream has `schema:rangeIncludes schema:Text` + subPropertyOf | Schema: add `range: string` and `subproperty_of` to `descriptions` slot |
-| T9 | ❓ DECISION | `td:hasInstanceConfiguration` and `td:hasSecurityConfiguration` have no `rdfs:range` — matches upstream (upstream also has no range). Correct. | No action needed |
+| T7 | ✅ DONE | `td:titleInLanguage` has `rdfs:subPropertyOf dcterms:title`. Missing `rdfs:range xsd:string` acceptable — upstream uses soft `schema:rangeIncludes schema:Text` (accepted difference #6). | — |
+| T8 | ✅ DONE | `td:descriptionInLanguage` has `rdfs:subPropertyOf dcterms:description`. Missing `rdfs:range xsd:string` acceptable — same as T7. | — |
+| T9 | ✅ DONE | `td:hasInstanceConfiguration` and `td:hasSecurityConfiguration` have no `rdfs:range` — matches upstream. Correct. | — |
 
 ### hctl.ttl
 
@@ -65,24 +65,24 @@ These are intentional or acceptable — remove from diff lists:
 
 | # | Status | Issue | Fix Location |
 |---|--------|---|---|
-| W1 | ❌ OPEN | `wotsec:apikeyIn` missing — slot_usage override of `in` with `slot_uri: wotsec:apikeyIn` not emitted as separate property. Upstream has it as independent `owl:DatatypeProperty`. | Preprocessor: slot_usage with different slot_uri needs to produce a separate top-level slot |
+| W1 | ✅ DONE | `wotsec:apikeyIn` present as `owl:DatatypeProperty` with correct label `"in"` and range `xsd:string`. | — |
 | W2 | ✅ DONE | `wotsec:format` now present in wotsec.ttl. Root cause: `_promote_attributes` was wiping `slot_uri = None`. Fixed by preserving `slot_uri` during promotion. | Preprocessor: removed `slot_uri = None` from `_promote_attributes` |
-| W3 | ❓ INVESTIGATE | `wotsec:security_scheme_key` — may be needed for JSON-LD round-tripping. Present in generated output. | Needs decision |
+| W3 | ✅ CLOSED | `security_scheme_key` is internal scaffolding (`identifier: true`, no `slot_uri`, `spec_exclude: true`) — JSON map key for SecurityScheme, not an OWL concept. Correctly absent from generated wotsec.ttl. | No action needed |
 
 ### tm.ttl
 
 | # | Status | Issue | Fix Location |
 |---|--------|---|---|
-| M1 | ❌ OPEN | `tm:hasVersion` should be `td:hasVersion` — upstream target tm.ttl defines `tm:hasVersion` but upstream td.ttl defines `td:hasVersionInfo`. Target tm.ttl has its own `tm:hasVersion` (ObjectProperty) + `tm:Version` class. Need to decide: emit `tm:hasVersion`+`tm:Version` from TM module. | Schema: add Version class and hasVersion slot to thing_model.yaml |
-| M2 | ❌ OPEN | `tm:model` missing — defined in upstream td.ttl as `td:model` (DatatypeProperty, domain versionInfo). Target tm.ttl redefines as `tm:model`. | Schema: add model slot to thing_model.yaml |
-| M3 | ❌ OPEN | `tm:versionInfo` missing — upstream target has it as `owl:AnnotationProperty` with `rdfs:seeAlso schema:version`. | Schema: add versionInfo to thing_model.yaml |
+| M1 | ✅ DONE | Version vocabulary belongs in TD namespace — removed `tm:Version`, `tm:hasVersion`, `tm:model` from `thing_model.yaml`. Upstream `tm.ttl` also cleaned: removed duplicate version terms. JSON-LD context maps all version terms (`VersionInfo`, `version`, `model`, `instance`) to `td:` namespace. TD schema has `td:VersionInfo` class, `td:versionInfo` ObjectProperty, `td:instance`/`td:model` DatatypeProperties. | Schema: removed from thing_model.yaml, fixed in thing_description.yaml |
+| M2 | ✅ DONE | Covered by M1 — `td:model` lives in TD, not TM. | — |
+| M3 | ✅ DONE | Covered by M1 — `tm:versionInfo` was duplicate of TD concept. Removed from TM schema and upstream. | — |
 
 ### Cross-module
 
 | # | Status | Issue | Fix Location |
 |---|--------|---|---|
-| X1 | ❌ OPEN | `td:OperationType rdfs:subClassOf schema:Enumeration` missing from generated td.ttl — upstream has this. | Schema: add `is_a` or annotation to OperationType enum in hypermedia.yaml |
-| X2 | ❌ OPEN | `td:PropertyAffordance rdfs:subClassOf jsonschema:DataSchema` wrong for TD 1.1 — caused by `mixins: [DataSchema]` in thing_description.yaml. Can't remove mixin (breaks JSON Schema). | Preprocessor: strip DataSchema mixin before gen-owl |
+| X1 | ✅ DONE | `td:OperationType a owl:Class ; rdfs:subClassOf schema:Enumeration` now in generated td.ttl. Fixed by adding `rdfs:subClassOf` annotation to OperationType enum in hypermedia.yaml + adding `RDFS.subClassOf` to `_fix_uri_annotation_literals` URI predicates list. | Schema: annotation in hypermedia.yaml; Postprocessor: Literal→URIRef conversion |
+| X2 | ✅ DONE | `td:PropertyAffordance rdfs:subClassOf td:InteractionAffordance` only — no wrong `jsonschema:DataSchema` mixin in OWL output. | Preprocessor: strips DataSchema mixin before gen-owl |
 | X3 | ✅ DONE | `hctl:forSubProtocol` now present in hctl.ttl. Root cause: `_apply_renames` was wiping `slot_uri = None` after rename. Fixed by preserving `slot_uri` during rename. | Preprocessor: removed `slot_uri = None` from `_apply_renames` |
 | X4 | ✅ DONE | DataSchema `name` attribute had no `slot_uri` — gen-owl was emitting spurious `jsonschema:name`. Fixed: `_promote_attributes` now skips attributes without `slot_uri` (implementation artifacts with no OWL mapping). Existing `propertyName` top-level slot with `slot_uri: jsonschema:propertyName` already covers the OWL property. DataSchema `name` is not in TD 1.1 spec table — it's a JSON-LD `@index` artifact. | Preprocessor: skip no-`slot_uri` attributes in `_promote_attributes` |
 

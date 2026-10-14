@@ -78,14 +78,17 @@ def preprocess_for_gen_owl(schema_path: str) -> str:
     renames = _collect_renames(s, namespace, view)
     _apply_renames(s, renames)
     _strip_no_uri_classes(s, no_uri_classes)
+    _strip_foreign_mixins(s, namespace, view)
     _promote_attributes(s, view)
     _strip_non_local(s, local_schema_id, view, namespace)
     _strip_jsonld_slots(s)
     _strip_no_uri_original_slots(s, original_no_uri_slots)
     _strip_discriminator_slots(s, view)
     _strip_non_ontological_enums(s)
+    _fix_enum_pv_labels(s, view)
     _infer_ranges_from_branches(s)
     _clear_constraints(s)
+    _strip_dangling_slot_refs(s)
     _strip_schema_metadata(s)
     return yaml_dumper.dumps(s)
 
@@ -275,6 +278,31 @@ def _strip_non_ontological_enums(s: SchemaDefinition) -> None:
             slot_def.range = "string"
 
 
+def _fix_enum_pv_labels(s: SchemaDefinition, view: SchemaView) -> None:
+    """Rename PV keys to match meaning IRI local name for correct rdfs:label."""
+    from linkml_runtime.linkml_model.meta import PermissibleValue
+
+    for edef in cast(_Enums, s.enums).values():
+        if not edef.permissible_values:
+            continue
+        pvs = cast(dict[str, PermissibleValue], edef.permissible_values)
+        renames: list[tuple[str, str]] = []
+        for key, pv in pvs.items():
+            if not pv.meaning:
+                continue
+            try:
+                expanded = view.expand_curie(pv.meaning)
+            except Exception:
+                continue
+            local_name = str(expanded).split("#")[-1].split("/")[-1]
+            if local_name and local_name != key:
+                renames.append((key, local_name))
+        for old_key, new_key in renames:
+            pv = pvs.pop(old_key)
+            pv.text = new_key
+            pvs[new_key] = pv
+
+
 def _strip_no_uri_classes(s: SchemaDefinition, no_uri_classes: set[str]) -> None:
     """Remove classes without class_uri and clear refs to them."""
     classes = cast(_Classes, s.classes)
@@ -290,6 +318,28 @@ def _strip_no_uri_classes(s: SchemaDefinition, no_uri_classes: set[str]) -> None
     for slot_def in cast(_Slots, s.slots).values():
         if slot_def.range in no_uri_classes:
             slot_def.range = None
+
+
+def _strip_foreign_mixins(
+    s: SchemaDefinition, local_ns: str, view: SchemaView,
+) -> None:
+    """Strip mixins whose class_uri resolves to a foreign namespace."""
+    classes = cast(_Classes, s.classes)
+    for cls_def in classes.values():
+        if not cls_def.mixins:
+            continue
+        keep = []
+        for m in cls_def.mixins:
+            mixin_cls = classes.get(str(m))
+            if mixin_cls and mixin_cls.class_uri:
+                try:
+                    expanded = view.expand_curie(mixin_cls.class_uri)
+                    if not str(expanded).startswith(local_ns):
+                        continue
+                except Exception:
+                    pass
+            keep.append(m)
+        cls_def.mixins = keep
 
 
 def _strip_no_uri_original_slots(s: SchemaDefinition, original_no_uri_slots: set[str]) -> None:
@@ -324,6 +374,14 @@ def _infer_ranges_from_branches(s: SchemaDefinition) -> None:
         ranges = {b.range for b in branches if b.range}
         if len(ranges) == 1:
             slot_def.range = next(iter(ranges))
+
+
+def _strip_dangling_slot_refs(s: SchemaDefinition) -> None:
+    """Remove class slot references that have no matching top-level slot definition."""
+    existing = set(cast(_Slots, s.slots).keys())
+    for cls_def in cast(_Classes, s.classes).values():
+        if cls_def.slots:
+            cls_def.slots = [sn for sn in cls_def.slots if str(sn) in existing]
 
 
 def _clear_slot_restrictions(slot: SlotDefinition) -> None:
