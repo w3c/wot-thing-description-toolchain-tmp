@@ -1,14 +1,11 @@
 name: snippet_schema
-title: WoT Thing Description ReSpec Snippet Schema
+title: Snippet Metadata
 description: >-
-  LinkML schema for snippet metadata used by the WoT Toolchain to render
-  examples in the Thing Description specification.
+  Schema for the snippet metadata used to render examples in the Thing Description specification.
 id: https://w3c.github.io/wot-thing-description/snippets
 version: "2.0"
 license: MIT
 created_by: mailto:mahda.noura@siemens.com
-contributors:
-  - mailto:mahda.noura@siemens.com
 created_on: "2025-06-01"
 last_updated_on: "2026-08-28"
 

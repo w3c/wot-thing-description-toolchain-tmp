@@ -1,8 +1,8 @@
 id: https://www.w3.org/2019/wot/td
 name: thing_description
 title: Thing Description
-description: |-
-  Ontology for the W3C Web of Things Thing Description vocabulary.
+description: >-
+  Schema for the Thing Description vocabulary of the W3C Web of Things.
 version: "1.1"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
@@ -11,7 +11,7 @@ contributors:
   - http://purl.org/net/mpoveda
   - http://maxime-lefrancois.info/me#
 created_on: "2023-12-05"
-last_updated_on: "2026-09-29"
+last_updated_on: "2026-10-16"
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
 annotations:
@@ -113,13 +113,12 @@ slots:
     description: >-
       Provides version information.
     slot_uri: td:versionInfo
+    domain: Thing
     implements:
       - owl:ObjectProperty
     range: VersionInfo
     inlined: true
     annotations:
-      rdfs:isDefinedBy:
-        value: https://www.w3.org/2019/wot/td
       rdfs:seeAlso:
         value: http://schema.org/version
   created:
@@ -140,6 +139,7 @@ slots:
     description: >-
       Provides information about the TD maintainer as URI scheme (e.g., mailto [[RFC6068]], tel [[RFC3966]], https [[RFC9112]]).
     slot_uri: td:supportContact
+    domain: Thing
     implements:
       - owl:AnnotationProperty
     annotations:
@@ -155,6 +155,7 @@ slots:
       In TD instances, all relative URIs are resolved relative to the base URI using the algorithm defined in [RFC3986]. 
       base does not affect the URIs used in @context and the IRIs used within Linked Data graphs that are relevant when semantic processing is applied to TD instances.
     slot_uri: td:baseURI
+    domain: Thing
     annotations:
       spec_description: >-
         Define the absolute base URI that is used for all relative URI references throughout a TD document.
@@ -175,6 +176,7 @@ slots:
     description: >-
       Offers an affordance to interact with the Thing.
     slot_uri: td:hasInteractionAffordance
+    domain: Thing
     implements:
       - owl:ObjectProperty
     range: InteractionAffordance
@@ -184,6 +186,7 @@ slots:
       between a scheme and a configuration: whatever statement on the scheme
       is also true of the configuration but not vice-versa.
     slot_uri: td:hasInstanceConfiguration
+    domain: SecurityScheme
     implements:
       - owl:ObjectProperty
   # -- end OWL-only properties --------------------------------------------
@@ -191,6 +194,7 @@ slots:
     description: >-
       All Property-based Interaction Affordances of the Thing.
     slot_uri: td:hasPropertyAffordance
+    domain: Thing
     is_a: hasInteractionAffordance
     annotations:
       jsonld_index: td:name
@@ -201,6 +205,7 @@ slots:
     description: >-
       All Action-based Interaction Affordances of the Thing.
     slot_uri: td:hasActionAffordance
+    domain: Thing
     is_a: hasInteractionAffordance
     annotations:
       jsonld_index: td:name
@@ -211,6 +216,7 @@ slots:
     description: >-
       All Event-based Interaction Affordances of the Thing.
     slot_uri: td:hasEventAffordance
+    domain: Thing
     is_a: hasInteractionAffordance
     annotations:
       jsonld_index: td:name
@@ -221,6 +227,7 @@ slots:
     description: >-
       Provides Web links to arbitrary resources that relate to the specified Thing Description.
     slot_uri: td:hasLink
+    domain: Thing
     range: Link
     multivalued: true
   forms:
@@ -250,6 +257,7 @@ slots:
     description: >-
       A Thing may define abstract security schemes, used to configure the secure access of (a set of) affordance(s).
     slot_uri: td:definesSecurityScheme
+    domain: Thing
     annotations:
       jsonld_index: td:hasInstanceConfiguration
       spec_description: >-
@@ -264,6 +272,7 @@ slots:
     description: >-
       Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.
     slot_uri: td:followsProfile
+    domain: Thing
     range: uri
     exactly_one_of:
       - range: uri
@@ -273,6 +282,7 @@ slots:
     description: >-
       Set of named data schemas. To be used in a schema name-value pair inside an AdditionalExpectedResponse object.
     slot_uri: td:schemaDefinitions
+    domain: Thing
     annotations:
       jsonld_index: td:hasInstanceConfiguration
       spec_description: >-
@@ -510,6 +520,7 @@ classes:
         description: >-
           Indexing property to store entity names when serializing them in a JSON-LD @index container.
         slot_uri: td:name
+        domain: InteractionAffordance
         range: string
         annotations:
           spec_exclude: true
@@ -585,6 +596,7 @@ classes:
           spec_description: >-
             A hint that indicates whether Servients hosting the Thing and Intermediaries should provide a Protocol Binding that supports the `observeproperty` and `unobserveproperty` operations for this Property. Also see [[[#interaction-semantics]]] for further information on the usage patterns and implications.
         slot_uri: td:isObservable
+        domain: PropertyAffordance
         range: boolean
   ActionAffordance:
     description: >-
@@ -609,6 +621,7 @@ classes:
         description: >-
           Used to define the input data schema of the action.
         slot_uri: td:hasInputSchema
+        domain: ActionAffordance
         range: DataSchema
         inlined: true
         annotations:
@@ -618,6 +631,7 @@ classes:
         description: >-
           Used to define the output data schema of the action.
         slot_uri: td:hasOutputSchema
+        domain: ActionAffordance
         range: DataSchema
         inlined: true
         annotations:
@@ -635,6 +649,7 @@ classes:
             Used to signal if there is no internal state (cf. resource state) is changed when invoking an Action.
             In that case responses can be cached as example.
         slot_uri: td:isSafe
+        domain: ActionAffordance
         range: boolean
       idempotent:
         description: >-
@@ -646,6 +661,7 @@ classes:
             Indicates whether the Action is idempotent (=true) or not.
             Informs whether the Action can be called repeatedly with the same result, if present, based on the same input.
         slot_uri: td:isIdempotent
+        domain: ActionAffordance
         range: boolean
       synchronous:
         description: >-
@@ -659,6 +675,7 @@ classes:
             and no further querying about the status of the action is needed.
             Lack of this keyword means that no claim on the synchronicity of the action can be made.
         slot_uri: td:isSynchronous
+        domain: ActionAffordance
         range: boolean
   EventAffordance:
     description: >-
@@ -695,24 +712,28 @@ classes:
         description: >-
           Defines data that needs to be passed upon subscription, e.g., filters or message format for setting up Webhooks.
         slot_uri: td:hasSubscriptionSchema
+        domain: EventAffordance
         range: DataSchema
         inlined: true
       data:
         description: >-
           Defines the data schema of the Event instance messages pushed by the Thing.
         slot_uri: td:hasNotificationSchema
+        domain: EventAffordance
         range: DataSchema
         inlined: true
       dataResponse:
         description: >-
           Defines the data schema of the Event response messages sent by the consumer in a response to a data message.
         slot_uri: td:hasNotificationResponseSchema
+        domain: EventAffordance
         range: DataSchema
         inlined: true
       cancellation:
         description: >-
           Defines any data that needs to be passed to cancel a subscription, e.g., a specific message to remove a Webhook.
         slot_uri: td:hasCancellationSchema
+        domain: EventAffordance
         range: DataSchema
         inlined: true
   VersionInfo:
@@ -724,10 +745,6 @@ classes:
     extra_slots:
       allowed: true
     annotations:
-      rdfs:isDefinedBy:
-        value: https://www.w3.org/2019/wot/td
-      skos:inScheme:
-        value: https://www.w3.org/2019/wot/td
       spec_content:
         value:
           - type: markdown
@@ -740,25 +757,22 @@ classes:
         description: >-
           Provides a version indicator of this TD instance.
         slot_uri: td:instance
+        domain: VersionInfo
         implements:
           - owl:DatatypeProperty
         range: string
         required: true
         annotations:
-          rdfs:isDefinedBy:
-            value: https://www.w3.org/2019/wot/td
           spec_description: >-
             Provides a version indicator of this TD.
       model:
         description: >-
           Provides a version indicator of the underlying TM.
         slot_uri: td:model
+        domain: VersionInfo
         implements:
           - owl:DatatypeProperty
         range: string
-        annotations:
-          rdfs:isDefinedBy:
-            value: https://www.w3.org/2019/wot/td
   MultiLanguage:
     description: >-
       A Map providing a set of human-readable texts in different languages identified by language tags as defined in BCP47.

@@ -1,8 +1,8 @@
-id: https://www.w3.org/2019/wot/security#
+id: https://www.w3.org/2019/wot/security
 name: wot_security
 title: WoT Security
 description: >-
-  LinkML schema for the Security vocabulary of the W3C Web of Things (WoT) Thing Description 1.1 model.
+  Schema for the WoT Security vocabulary of the W3C Web of Things.
 version: "1.1"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
@@ -10,7 +10,7 @@ contributors:
   - mailto:michael.mccool@intel.com
   - https://vcharpenay.link/#me
 created_on: "2023-12-05"
-last_updated_on: "2026-09-29"
+last_updated_on: "2026-10-16"
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
   - https://www.w3.org/TR/wot-thing-description11/#sec-security-vocabulary-definition
@@ -110,6 +110,7 @@ slots:
   alg:
     description: Encoding, encryption, or digest algorithm (e.g., ES256, ES512-256).
     slot_uri: wotsec:alg
+    domain: BearerSecurityScheme
     annotations:
       spec_description: >-
         Encoding, encryption, or digest algorithm.
@@ -117,10 +118,12 @@ slots:
   flow:
     description: Authorization flow.
     slot_uri: wotsec:flow
+    domain: OAuth2SecurityScheme
     range: OAuth2Flow
   identity:
     description: Identifier providing information which can be used for selection or confirmation.
     slot_uri: wotsec:identity
+    domain: PSKSecurityScheme
     range: string
   in:
     description: Specifies the location of security authentication information.
@@ -143,6 +146,7 @@ slots:
   qop:
     description: Quality of protection.
     slot_uri: wotsec:qop
+    domain: DigestSecurityScheme
     range: QoPType
     comments:
       - This feature is at risk.
@@ -151,6 +155,7 @@ slots:
       Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an 
       authorization server and associated with forms in order to identify what resources a client may access and how.
     slot_uri: wotsec:scopes
+    domain: OAuth2SecurityScheme
     range: string
     annotations:
       spec_description: >-
@@ -168,6 +173,7 @@ slots:
       URI of the proxy server this security configuration provides access to. If not given, the corresponding 
       security configuration is for the endpoint.
     slot_uri: wotsec:proxy
+    domain: SecurityScheme
     range: uri
     comments:
       - This feature is at risk.
@@ -180,12 +186,14 @@ slots:
   refresh:
     description: URI of the refresh server.
     slot_uri: wotsec:refresh
+    domain: OAuth2SecurityScheme
     implements:
       - owl:ObjectProperty
     range: uri
   token:
     description: URI of the token server.
     slot_uri: wotsec:token
+    domain: OAuth2SecurityScheme
     implements:
       - owl:ObjectProperty
     range: uri
@@ -194,6 +202,7 @@ slots:
       Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, will allow access. Only one may be chosen for use.
     alias: oneOf
     slot_uri: wotsec:oneOf
+    domain: ComboSecurityScheme
     implements:
       - owl:ObjectProperty
     annotations:
@@ -208,6 +217,7 @@ slots:
       satisfied for access.
     alias: allOf
     slot_uri: wotsec:allOf
+    domain: ComboSecurityScheme
     implements:
       - owl:ObjectProperty
     range: string
@@ -497,6 +507,7 @@ classes:
         alias: in
         description: Specifies the location of security authentication information.
         slot_uri: wotsec:apikeyIn
+        domain: APIKeySecurityScheme
         required: true
         range: SecurityLocationType
         annotations:
@@ -537,6 +548,7 @@ classes:
       format:
         description: Specifies format of security authentication information.
         slot_uri: wotsec:format
+        domain: BearerSecurityScheme
         range: BearerFormat
         annotations:
           spec_default: true

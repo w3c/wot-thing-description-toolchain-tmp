@@ -1,8 +1,8 @@
 id: https://www.w3.org/2019/wot/tm
 name: thing_model
 title: Thing Model
-description: |-
-  LinkML schema for the Thing Model vocabulary of the W3C Web of Things (WoT) Thing Description 1.1 model.
+description: >-
+  Schema for the Thing Model vocabulary of the W3C Web of Things.
 version: "1.1"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
@@ -10,7 +10,7 @@ contributors:
   - mailto:sebastian.kaebisch@siemens.com
   - https://vcharpenay.link/#me
 created_on: "2026-10-01"
-last_updated_on: "2026-10-05"
+last_updated_on: "2026-10-16"
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
 annotations:
@@ -45,11 +45,6 @@ classes:
       metadata that are shared for an entire group of Things. Compared to a
       Thing Description, a Thing Model does not contain enough information to
       identify or interact with a Thing instance.
-    annotations:
-      rdfs:isDefinedBy:
-        value: https://www.w3.org/2019/wot/tm
-      skos:inScheme:
-        value: https://www.w3.org/2019/wot/tm
     attributes:
       optional:
         description: >-
@@ -63,11 +58,6 @@ classes:
           - owl:DatatypeProperty
         multivalued: true
         range: string
-        annotations:
-          rdfs:isDefinedBy:
-            value: https://www.w3.org/2019/wot/tm
-          skos:inScheme:
-            value: https://www.w3.org/2019/wot/tm
       required:
         description: >-
           Constraint that provides references to declarations in the Thing Model
@@ -78,11 +68,6 @@ classes:
           - owl:DatatypeProperty
         multivalued: true
         range: string
-        annotations:
-          rdfs:isDefinedBy:
-            value: https://www.w3.org/2019/wot/tm
-          skos:inScheme:
-            value: https://www.w3.org/2019/wot/tm
       ref:
         description: >-
           Provides a reference to an existing (external or local) definition that
@@ -92,9 +77,4 @@ classes:
         implements:
           - owl:DatatypeProperty
         range: string
-        annotations:
-          rdfs:isDefinedBy:
-            value: https://www.w3.org/2019/wot/tm
-          skos:inScheme:
-            value: https://www.w3.org/2019/wot/tm
 slots: {}

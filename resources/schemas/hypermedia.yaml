@@ -1,16 +1,15 @@
-id: https://www.w3.org/2019/wot/hypermedia#
+id: https://www.w3.org/2019/wot/hypermedia
 name: hypermedia
 title: Hypermedia Controls
 description: >-
-  LinkML schema for the Hypermedia Controls vocabulary of the W3C Web of Things (WoT) Thing Description 1.1 model.
+  Schema for the Hypermedia Controls vocabulary of the W3C Web of Things.
 version: "1.1"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
 contributors:
   - https://vcharpenay.link/#me
-  - mailto:mahda.noura@siemens.com
 created_on: "2023-12-05"
-last_updated_on: "2026-09-29"
+last_updated_on: "2026-10-16"
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
   - https://www.w3.org/TR/wot-thing-description11/#sec-hypermedia-vocabulary-definition
@@ -113,8 +112,6 @@ enums:
       interaction model.
     enum_uri: td:OperationType
     annotations:
-      rdfs:isDefinedBy:
-        value: https://www.w3.org/2019/wot/td
       rdfs:subClassOf:
         value: http://schema.org/Enumeration
     comments:
@@ -226,6 +223,7 @@ slots:
     description: >-
       Indicates the operation type (e.g., readproperty, writeproperty, observeproperty, etc.)
     slot_uri: hctl:hasOperationType
+    domain: Form
     range: string
     implements:
       - owl:ObjectProperty
@@ -246,6 +244,7 @@ slots:
     description: >-
       Content coding values indicate an encoding transformation that has been or can be applied to a representation. Content codings are primarily used to allow a representation to be compressed or otherwise usefully transformed without losing the identity of its underlying media type and without loss of information. Examples of content coding include "gzip", "deflate", etc.
     slot_uri: hctl:forContentCoding
+    domain: Form
     range: string
   contentType:
     description: >-
@@ -260,17 +259,20 @@ slots:
     description: >-
       This optional term can be used if, e.g., the output communication metadata differ from input metadata (e.g., output contentType differ from the input contentType). The response name contains metadata that is only valid for the primary response messages.
     slot_uri: hctl:returns
+    domain: Form
     range: ExpectedResponse
   additionalResponses:
     description: >-
       This optional term can be used if additional expected responses are possible, e.g., for error reporting. Each additional response needs to be distinguished from others in some way (for example, by specifying a protocol-specific error code), and may also have its own data schema.
     slot_uri: hctl:additionalReturns
+    domain: Form
     multivalued: true
     range: AdditionalExpectedResponse
   subprotocol:
     description: >-
       Indicates the exact protocol that should be used for additional notifications.
     slot_uri: hctl:forSubProtocol
+    domain: Form
     annotations:
       spec_description: >-
         Indicates the exact mechanism by which an interaction will be accomplished for a given protocol when there are multiple options. For example, for HTTP and Events, it indicates which of several available mechanisms should be used for asynchronous notifications such as long polling (`longpoll`), WebSub [[websub]] (websub), Server-Sent Events (`sse`) [[html]] (also known as EventSource). Please note that there is no restriction on the subprotocol selection and other mechanisms can also be announced by this subprotocol term.
@@ -349,10 +351,12 @@ classes:
           spec_description: >-
             Target attribute providing a hint indicating what the media type [[RFC2046]] of the result of dereferencing the link should be.
         slot_uri: hctl:hintsAtMediaType
+        domain: Link
         range: string
       rel:
         description: A link relation type identifies the semantics of a link.
         slot_uri: hctl:hasRelationType
+        domain: Link
         range: string
         comments:
           - Recommended to use IANA Link Relations when possible
@@ -360,12 +364,14 @@ classes:
         description: >-
           Overrides the link context (by default the Thing itself identified by its id) with the given URI or IRI.
         slot_uri: hctl:hasAnchor
+        domain: Link
         range: uri
       sizes:
         description: >-
           Target attribute that specifies one or more sizes for the referenced icon. Only applicable for relation 
           type "icon". The value pattern follows {Height}x{Width} (e.g., "16x16", "16x16 32x32").
         slot_uri: hctl:hasSizes
+        domain: Link
         range: string
         pattern: "^(\\d+x\\d+)(\\s+\\d+x\\d+)*$"
       hreflang:
@@ -376,6 +382,7 @@ classes:
           spec_description: >-
             The hreflang attribute specifies the language of a linked document. The value of this must be a valid language tag [[BCP47]].
         slot_uri: hctl:hasHreflang
+        domain: Link
         range: string
         exactly_one_of:
           - range: string
@@ -619,6 +626,7 @@ classes:
         annotations:
           spec_default: true
         slot_uri: hctl:isSuccess
+        domain: AdditionalExpectedResponse
         range: boolean
       schema:
         description: >-
@@ -629,6 +637,7 @@ classes:
           spec_description: >-
             Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a `DataSchema` object, the name of a previous definition given in a `schemaDefinitions` map must be used.
         slot_uri: hctl:hasAdditionalOutputSchema
+        domain: AdditionalExpectedResponse
         range: string
       contentType:
         description: >-

@@ -1,16 +1,15 @@
-id: https://www.w3.org/2019/wot/json-schema#
+id: https://www.w3.org/2019/wot/json-schema
 name: jsonschema
 title: JSON Schema in RDF
 description: >-
-  LinkML schema for the Data Schema vocabulary of the W3C Web of Things (WoT) Thing Description 1.1 model.
+  Schema for the JSON Schema in RDF vocabulary of the W3C Web of Things.
 version: "1.1"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
 contributors:
   - https://vcharpenay.link/#me
-  - mailto:mahda.noura@siemens.com
 created_on: "2023-12-05"
-last_updated_on: "2026-09-29"
+last_updated_on: "2026-10-16"
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
   - https://www.w3.org/TR/wot-thing-description11/#sec-data-schema-vocabulary-definition
@@ -122,6 +121,7 @@ slots:
     description: >-
       Used to ensure that the data is valid against one of the specified schemas in the array. This can be used to describe multiple input or output schemas.
     slot_uri: jsonschema:oneOf
+    domain: DataSchema
     multivalued: true
     range: DataSchema
     inlined_as_list: true
@@ -129,6 +129,7 @@ slots:
     description: >-
       Used to ensure that the data is valid against all of the specified schemas in the array.
     slot_uri: jsonschema:allOf
+    domain: DataSchema
     multivalued: true
     range: DataSchema
     inlined_as_list: true
@@ -148,12 +149,14 @@ slots:
     description: >-
       Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null).
     slot_uri: jsonschema:type
+    domain: DataSchema
     range: DataSchemaType
   writeOnly:
     description: >-
       Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false).
       Also see Interaction Semantics for further information on the usage patterns and implications.
     slot_uri: jsonschema:writeOnly
+    domain: DataSchema
     annotations:
       spec_description: >-
         Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false).
@@ -164,6 +167,7 @@ slots:
       Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false).
       Also see Interaction Semantics for further information on the usage patterns and implications.
     slot_uri: jsonschema:readOnly
+    domain: DataSchema
     annotations:
       spec_description: >-
         Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false).
@@ -180,12 +184,14 @@ slots:
     description: >-
       Restricted set of values provided as an array.
     slot_uri: jsonschema:enum
+    domain: DataSchema
     range: Any
     multivalued: true
   format:
     description: >-
       Allows validation based on a format pattern such as "date-time", "email", "uri", etc.
     slot_uri: jsonschema:format
+    domain: DataSchema
     annotations:
       spec_description: >-
         Allows validation based on a format pattern such as "date-time", "email", "uri", etc. (Also see below.)
@@ -194,11 +200,13 @@ slots:
     description: >-
       Provides a constant value.
     slot_uri: jsonschema:const
+    domain: DataSchema
     range: Any
   default:
     description: >-
       Supply a default value. The value SHOULD validate against the data schema in which it resides.
     slot_uri: jsonschema:default
+    domain: DataSchema
     annotations:
       spec_description: >-
         Supply a default value. The value SHOULD validate against the data schema in which it resides.
@@ -206,23 +214,27 @@ slots:
   items:
     description: Used to define the characteristics of an array.
     slot_uri: jsonschema:items
+    domain: ArraySchema
     range: DataSchema
   maxItems:
     description: >-
       Defines the maximum number of items that have to be in the array.
     slot_uri: jsonschema:maxItems
+    domain: ArraySchema
     range: NonNegativeInteger
     minimum_value: 0
   minItems:
     description: >-
       Defines the minimum number of items that have to be in the array.
     slot_uri: jsonschema:minItems
+    domain: ArraySchema
     range: NonNegativeInteger
     minimum_value: 0
   required:
     description: >-
       Defines which members of the object type are mandatory, i.e. which members are mandatory in the payload that is to be sent (e.g., input of invokeaction, writeproperty) and what members will be definitely delivered in the payload that is being received (e.g., output of invokeaction, readproperty)
     slot_uri: jsonschema:required
+    domain: ObjectSchema
     annotations:
       spec_description: >-
         Defines which members of the object type are mandatory, i.e. which members are mandatory in the payload that is to be sent (e.g., input of `invokeaction`, `writeproperty`) and what members will be definitely delivered in the payload that is being received (e.g., output of `invokeaction`, `readproperty`)
@@ -341,10 +353,12 @@ classes:
     attributes:
       minItems:
         slot_uri: jsonschema:minItems
+        domain: ArraySchema
         description: Defines the minimum number of items that have to be in the array.
         range: NonNegativeInteger
       maxItems:
         slot_uri: jsonschema:maxItems
+        domain: ArraySchema
         description: Defines the maximum number of items that have to be in the array.
         range: NonNegativeInteger
     slots:
@@ -457,14 +471,17 @@ classes:
     attributes:
       minLength:
         slot_uri: jsonschema:minLength
+        domain: StringSchema
         description: Specifies the minimum length of a string. Only applicable for associated string types.
         range: NonNegativeInteger
       maxLength:
         slot_uri: jsonschema:maxLength
+        domain: StringSchema
         description: Specifies the maximum length of a string. Only applicable for associated string types.
         range: NonNegativeInteger
       pattern:
         slot_uri: jsonschema:pattern
+        domain: StringSchema
         description: >-
           Provides a regular expression to express constraints of the string value.
           The regular expression must follow the ECMA 262 dialect.
@@ -474,6 +491,7 @@ classes:
         range: string
       contentEncoding:
         slot_uri: jsonschema:contentEncoding
+        domain: StringSchema
         description: >-
           Specifies the encoding used to store the contents, as specified in RFC 2045 (Section 6.1) and RFC 4648.
         annotations:
@@ -482,6 +500,7 @@ classes:
         range: contentEncodingList
       contentMediaType:
         slot_uri: jsonschema:contentMediaType
+        domain: StringSchema
         description: Specifies the MIME type of the contents of a string value, as described in RFC 2046.
         annotations:
           spec_description: >-
