@@ -49,7 +49,6 @@ def _run_gen_owl(schema_path: Path) -> str:
                 metaclasses=False,
                 type_objects=False,
                 use_native_uris=False,
-                default_language="en",
                 skip_vacuous_local_range_axioms=True,
                 skip_vacuous_min_zero_cardinality_axioms=True,
                 consolidate_cardinality_axioms=False,

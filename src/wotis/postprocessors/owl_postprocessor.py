@@ -12,10 +12,19 @@ from linkml_runtime.linkml_model.meta import (
 from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SKOS, VANN, XSD
+from rdflib.plugin import register
+from rdflib.serializer import Serializer
 
 SCHEMA = Namespace("http://schema.org/")
 LINKML = Namespace("https://w3id.org/linkml/")
 LINKML_NS = str(LINKML)
+
+register(
+    "wot-turtle",
+    Serializer,
+    "src.wotis.serializers.wot_turtle",
+    "WotTurtleSerializer",
+)
 
 _Enums = dict[str, EnumDefinition]
 _Prefixes = dict[str, Prefix]
@@ -54,11 +63,15 @@ def postprocess_owl(
     _fix_aliased_labels(g)
     _strip_orphan_blank_nodes(g)
     _strip_empty_blank_node_restrictions(g)
+    _add_domain_includes(g, sv_merged)
+    _add_is_defined_by(g, ns, onto_iri)
+    _add_lang_tags(g)
 
     _add_ontology_header(g, sv, ns, onto_iri)
 
+    g.namespace_manager.bind("schema", SCHEMA, override=True, replace=True)
     output_dir.mkdir(parents=True, exist_ok=True)
-    ttl = g.serialize(format="turtle")
+    ttl = g.serialize(format="wot-turtle")
     (output_dir / output_file).write_text(ttl, encoding="utf-8")
 
 
@@ -225,20 +238,72 @@ def _clean_exact_match(g: Graph) -> None:
         g.remove((s, p, o))
 
 
+def _add_domain_includes(g: Graph, sv: SchemaView) -> None:
+    """Add schema:domainIncludes for properties used by multiple classes."""
+    uri_to_classes: dict[str, set[str]] = {}
+    for cls_def in sv.all_classes().values():
+        if not cls_def.class_uri:
+            continue
+        for slot_name in cls_def.slots or []:
+            su = (cls_def.slot_usage or {}).get(str(slot_name))
+            if su and su.slot_uri:
+                expanded = sv.expand_curie(su.slot_uri)
+            else:
+                slot = sv.get_slot(slot_name)
+                if not slot or not slot.slot_uri:
+                    continue
+                expanded = sv.expand_curie(slot.slot_uri)
+            uri_to_classes.setdefault(expanded, set()).add(cls_def.class_uri)
+        for attr_name, attr_def in (cls_def.attributes or {}).items():
+            if attr_def.slot_uri:
+                expanded = sv.expand_curie(attr_def.slot_uri)
+                uri_to_classes.setdefault(expanded, set()).add(cls_def.class_uri)
+    for uri_str, class_uris in uri_to_classes.items():
+        if len(class_uris) < 2:
+            continue
+        prop_iri = URIRef(uri_str)
+        if not any(g.triples((prop_iri, None, None))):
+            continue
+        for cu in class_uris:
+            g.add((prop_iri, SCHEMA.domainIncludes, URIRef(sv.expand_curie(cu))))
+
+
+def _add_is_defined_by(g: Graph, local_ns: str, onto_iri: URIRef) -> None:
+    """Add rdfs:isDefinedBy to every local subject (class/property in module namespace)."""
+    for s in set(g.subjects()):
+        if isinstance(s, URIRef) and str(s).startswith(local_ns):
+            g.add((s, RDFS.isDefinedBy, onto_iri))
+
+
+def _add_lang_tags(g: Graph, lang: str = "en") -> None:
+    """Add @en lang tag to plain-string literals on description/label predicates."""
+    _TAGGED_PREDICATES = (SKOS.definition, RDFS.comment, RDFS.label)
+    for pred in _TAGGED_PREDICATES:
+        for s, _, o in list(g.triples((None, pred, None))):
+            if isinstance(o, Literal) and o.language is None and o.datatype is None:
+                g.remove((s, pred, o))
+                g.add((s, pred, Literal(str(o), lang=lang)))
+
+
 def _add_ontology_header(g: Graph, sv: SchemaView, ns: str, onto_iri: URIRef) -> None:
     schema = _get_schema(sv)
 
     g.add((onto_iri, RDF.type, OWL.Ontology))
+    g.remove((onto_iri, RDFS.label, None))
     if schema.title:
-        g.add((onto_iri, DCTERMS.title, Literal(schema.title, lang="en")))
-    if schema.description:
-        g.add((onto_iri, RDFS.comment, Literal(schema.description, lang="en")))
+        g.add((onto_iri, DCTERMS.title, Literal(f"{schema.title} Ontology", lang="en")))
+        g.add((onto_iri, RDFS.label, Literal(schema.title, lang="en")))
+    g.remove((onto_iri, RDFS.comment, None))
+    if schema.title:
+        owl_comment = f"Ontology for the W3C Web of Things {schema.title} vocabulary."
+        g.add((onto_iri, RDFS.comment, Literal(owl_comment, lang="en")))
     g.add((onto_iri, VANN.preferredNamespacePrefix, Literal(schema.default_prefix)))
     g.add((onto_iri, VANN.preferredNamespaceUri, Literal(ns)))
     if schema.version:
         g.add((onto_iri, OWL.versionInfo, Literal(schema.version)))
     if schema.license:
         g.add((onto_iri, DCTERMS.license, URIRef(schema.license)))
+    g.remove((onto_iri, DCTERMS.creator, None))
     if schema.created_by:
         g.add((onto_iri, DCTERMS.creator, URIRef(schema.created_by)))
     for contributor in schema.contributors or []:
