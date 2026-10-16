@@ -17,6 +17,7 @@ Guidelines for authoring and maintaining the WoT Thing Description Toolchain.
 | [JSON-LD Context Composition](jsonld-context-composition.md) | Context-generation inputs, scoped-vocabulary inference, and RDF expansion contract |
 | [Postprocessor Conventions](postprocessor-conventions.md) | Writing and maintaining Python postprocessors for each artifact type |
 | [Snippet Authoring](snippet-authoring.md) | JSON snippet creation, metadata, path notation, groups, validation |
+| [OWL/RDF Modeling](owl-rdf-modeling.md) | OWL property types, slot-to-IRI mapping, domain declarations, annotation workarounds |
 
 ## Supplementary Documents
 

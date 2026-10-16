@@ -122,6 +122,18 @@ emits it as the property IRI for OWL output.
 **LinkML issue:** By design — `gen-owl` intentionally uses slot name for
 property IRI. WoT's split naming convention is outside the generator's scope.
 
+### 11. No multi-domain support for OWL properties
+
+**Symptom:** Properties used by multiple classes cannot express domain declarations natively. `rdfs:domain` with multiple classes creates OWL intersection semantics (subject must be ALL classes), which is wrong for multi-domain properties.
+
+**Artifact:** OWL (`.ttl`)
+
+**Root cause:** `SlotDefinition.domain` accepts a single class name only. `domain_of` exists on `ClassDefinition` but `gen-owl` ignores it. `AnonymousSlotExpression` has no `domain` field. No way to express `rdfs:domain [ owl:unionOf (...) ]` or `schema:domainIncludes` natively in LinkML.
+
+**Workaround:** Postprocessor emits `schema:domainIncludes` derived from SchemaView class→slot membership. This matches upstream WoT ontology convention (20+ `schema:domainIncludes` occurrences, zero `rdfs:domain`). See [OWL/RDF Modeling Guide §6](guidelines/owl-rdf-modeling.md#6-domain-declarations--design-decision).
+
+**LinkML issue:** none filed
+
 ---
 
 ## JSON Schema Generator

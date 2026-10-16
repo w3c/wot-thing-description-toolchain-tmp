@@ -69,7 +69,7 @@ If `pre-commit` is not installed: `uv tool install pre-commit` or `pip install p
 
 ## The Postprocessor Pattern
 
-See [Postprocessor Conventions](docs/guidelines/postprocessor-conventions.md) for when and how to write postprocessors. See [Known LinkML Gaps](docs/known-linkml-gaps.md) for documented generator limitations.
+See [Postprocessor Conventions](docs/guidelines/postprocessor-conventions.md) for when and how to write postprocessors. See [Known LinkML Gaps](docs/known-linkml-gaps.md) for documented generator limitations. See [OWL Accepted Differences](docs/guidelines/owl-accepted-differences.md) for the authoritative list of known differences between generated and target OWL ontologies — check it before investigating or reporting any OWL gap.
 
 Never edit files under `resources/gens/` directly — they are overwritten on every run.
 
@@ -129,6 +129,8 @@ The pipeline aborts on any snippet validation ERROR. Fix before declaring the ch
 The suite has no accepted failures. A generated-schema rejection of a valid
 sample, a generated-versus-upstream schema mismatch, or an HTML-structure
 regression fails the relevant test directly.
+
+**You are NOT allowed to ignore test failures.** Even if a failure appears pre-existing or unrelated to the current change, investigate it. Every failure must be understood and either fixed or escalated — never dismissed as "not from my change." The completion chain requires ALL tests green.
 
 ### Golden Files
 
