@@ -232,6 +232,24 @@ def _build_form_variants(schema: dict, config: TransformConfig) -> None:
                 forms_prop['items'] = {"$ref": f"#/$defs/{cls_name}"}
 
 
+def _dedup_oneof(schema: dict) -> None:
+    """Deduplicate identical oneOf branches (e.g. string vs langString both map to {"type":"string"})."""
+    def _dedup(obj: dict) -> None:
+        if 'oneOf' not in obj or not isinstance(obj['oneOf'], list):
+            return
+        unique: list[dict] = []
+        for item in obj['oneOf']:
+            if item not in unique:
+                unique.append(item)
+        if len(unique) == 1:
+            obj.pop('oneOf')
+            obj.update(unique[0])
+        elif len(unique) < len(obj['oneOf']):
+            obj['oneOf'] = unique
+
+    _walk_schema(schema, _dedup)
+
+
 def _normalize_types(schema: dict) -> None:
     def _strip_oneof_type(props: dict) -> None:
         for prop in props.values():
@@ -413,6 +431,7 @@ def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     _flatten_subclasses(schema, schema_view, config)
     _build_oneof_dispatch(schema, schema_view, config)
     _build_form_variants(schema, config)
+    _dedup_oneof(schema)
     _normalize_types(schema)
     _simplify_exclusive_minimum(schema)
     _remove_identifier_slots(schema, schema_view)
