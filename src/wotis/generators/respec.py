@@ -13,7 +13,7 @@ from typing import Callable, Dict, List, Optional
 from ..specgen.config import Config
 from ..specgen.bikeshed_processor import process_fragments
 from ..specgen.respec import build_jinja_env, assemble
-from ..specgen.tables import collect_slot_rows
+from ..specgen.tables import collect_slot_rows, load_type_hrefs
 from ..specgen.assertions import html_assertions_to_csv
 
 cfg = Config.from_resources_dir(Path("resources"), placeholder="%s")
@@ -520,6 +520,7 @@ def generate_respec_spec(
     for section_id, section_path in cfg.section_schemas.items():
         if section_id != core_section_id:
             non_core_classes.update(file_to_classes.get(section_path.name, []))
+    type_hrefs = load_type_hrefs(cfg.glossary_path)
     sections_content: List[str] = []
     for section_id, section_path in cfg.section_schemas.items():
         section_classes_to_render = file_to_classes.get(section_path.name, [])
@@ -551,7 +552,7 @@ def generate_respec_spec(
                     )
                     continue
 
-            rows = collect_slot_rows(sv, cls, process_description, schema_prefix)
+            rows = collect_slot_rows(sv, cls, process_description, schema_prefix, type_hrefs=type_hrefs)
             intro_html = ""
             desc_html = ""
             if "spec_intro_content" in ann:

@@ -1,9 +1,23 @@
 from __future__ import annotations
 import re
+from pathlib import Path
 from typing import Any, Dict, List, Callable, Optional
+
+import yaml
 from linkml_runtime.utils.schemaview import SchemaView
 
 from .assertions import make_slot_assertion_id
+
+
+def load_type_hrefs(glossary_path: Path) -> Dict[str, str]:
+    if not glossary_path.exists():
+        return {}
+    data = yaml.safe_load(glossary_path.read_text(encoding="utf-8")) or {}
+    return {
+        term: entry["href"]
+        for term, entry in (data.get("terms") or {}).items()
+        if isinstance(entry, dict) and "href" in entry
+    }
 
 
 def _strip_outer_p(html: str) -> str:
@@ -130,19 +144,19 @@ def get_assignment(slot_name, class_def, slot_def) -> str:
 _XSD_BASE = "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#"
 
 
-def _link(name: str, sv: SchemaView) -> str:
+def _link(name: str, sv: SchemaView, type_hrefs: Dict[str, str] | None = None) -> str:
     if name == "any type":
         return name
-    if name == "rdf:langString":
-        return f"<code>{name}</code>"
     if name in ("Array", "Map"):
         return f"<a>{name}</a>"
     if name in sv.all_classes():
         return f'<a href="#{name.lower()}"><code>{name}</code></a>'
+    if type_hrefs and name in type_hrefs:
+        return f'<a href="{type_hrefs[name]}"><code>{name}</code></a>'
     return f'<a href="{_XSD_BASE}{name}"><code>{name}</code></a>'
 
 
-def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effective_range: Optional[str] = None) -> str:
+def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effective_range: Optional[str] = None, type_hrefs: Dict[str, str] | None = None) -> str:
     raw_rng = effective_range if effective_range else getattr(slot_def, "range", None)
     # Choice Logic (exactly_one_of or any_of)
     usage = (getattr(class_def, "slot_usage", None) or {}).get(slot_name)
@@ -168,11 +182,11 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
             mv = bool(getattr(alt, "multivalued", False))
             if mv:
                 if slot_name == "@context":
-                    p = _link("Array", sv)
+                    p = _link("Array", sv, type_hrefs)
                 else:
-                    p = f"{_link('Array', sv)} of {_link(rng, sv)}" if rng else _link("Array", sv)
+                    p = f"{_link('Array', sv, type_hrefs)} of {_link(rng, sv, type_hrefs)}" if rng else _link("Array", sv, type_hrefs)
             else:
-                p = _link(rng, sv) if rng else ""
+                p = _link(rng, sv, type_hrefs) if rng else ""
             if p and p not in seen:
                 seen.add(p)
                 pretty.append(p)
@@ -187,26 +201,27 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
     if raw_rng in all_enums:
         enum_def = all_enums[raw_rng]
         is_uri_enum = (enum_def.enum_uri in ["linkml:uri", "anyURI"] or raw_rng.lower() == "uri")
-        enum_base = _link("anyURI", sv) if is_uri_enum else _link("string", sv)
+        enum_base = _link("anyURI", sv, type_hrefs) if is_uri_enum else _link("string", sv, type_hrefs)
         if _get_type_values_annotation(slot_name, class_def, slot_def) is not None:
             return _append_type_values(enum_base, slot_name, class_def, slot_def)
         pv_names = list(enum_def.permissible_values.keys())
         if pv_names:
             formatted_pvs = _format_value_list(pv_names)
-            return f"{_link('anyURI', sv)} (one of {formatted_pvs})" if is_uri_enum else f"{_link('string', sv)} (e.g., {formatted_pvs})"
-        return _link("string", sv)
+            return f"{_link('anyURI', sv, type_hrefs)} (one of {formatted_pvs})" if is_uri_enum else f"{_link('string', sv, type_hrefs)} (e.g., {formatted_pvs})"
+        return _link("string", sv, type_hrefs)
     # STANDARD FALLBACK
     rng = _normalize_range_name(raw_rng)
     if not rng:
         return ""
     if getattr(slot_def, "inlined", False) and getattr(slot_def, "multivalued", False):
-        return _append_type_values(f"{_link('Map', sv)} of {_link(rng, sv)}", slot_name, class_def, slot_def)
+        return _append_type_values(f"{_link('Map', sv, type_hrefs)} of {_link(rng, sv, type_hrefs)}", slot_name, class_def, slot_def)
     if getattr(slot_def, "multivalued", False):
-        return _append_type_values(f"{_link('Array', sv)} of {_link(rng, sv)}", slot_name, class_def, slot_def)
-    return _append_type_values(_link(rng, sv), slot_name, class_def, slot_def)
+        return _append_type_values(f"{_link('Array', sv, type_hrefs)} of {_link(rng, sv, type_hrefs)}", slot_name, class_def, slot_def)
+    return _append_type_values(_link(rng, sv, type_hrefs), slot_name, class_def, slot_def)
 
 
 def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Callable[[str], str], schema_prefix: str = "",
+                      type_hrefs: Dict[str, str] | None = None,
                       ) -> List[Dict[str, Any]]:
     """
         Collect all visible slot rows for *class_name* in schema-defined order.
@@ -288,7 +303,8 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
                 slot_def=slot_def,
                 class_def=class_def,
                 sv=sv,
-                effective_range=effective_range_name
+                effective_range=effective_range_name,
+                type_hrefs=type_hrefs,
             ),
             "range_original": effective_range_name,
         })
