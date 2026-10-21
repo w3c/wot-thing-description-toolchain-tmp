@@ -116,20 +116,46 @@ class TestTdModule:
         assert isinstance(gen, dict)
         assert gen.get("@language") == "en"
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: security missing @type — upstream uses xsd:string to prevent IRI coercion")
+    @pytest.mark.xfail(reason="DESIGN_CHOICE: @type: xsd:string is redundant — string is default JSON-LD type")
     def test_security_has_string_type(self, td_upstream, td_generated):
-        """IMPORTANT: `security` should have @type: "xsd:string".
+        """Upstream explicitly sets @type: xsd:string on security.
 
         Upstream: {"@id": "td:hasSecurityConfiguration", "@type": "xsd:string"}
-        Generated: {"@id": "hasSecurityConfiguration"}  (missing @type)
+        Generated: {"@id": "hasSecurityConfiguration"}  (no @type)
 
-        Security values are string references to keys in securityDefinitions,
-        NOT IRIs — @type must be xsd:string to prevent JSON-LD processors
-        from interpreting them as node references.
+        String is the default JSON-LD datatype (§4.2.2). Omitting @type
+        is semantically equivalent — values stay plain strings either way.
         """
         gen = td_generated.get("security", {})
         assert isinstance(gen, dict)
         assert gen.get("@type") == "xsd:string"
+
+    @pytest.mark.xfail(reason="DESIGN_CHOICE: @type: xsd:string is redundant — string is default JSON-LD type")
+    def test_instance_has_string_type(self, td_upstream, td_generated):
+        """Upstream explicitly sets @type: xsd:string on instance.
+
+        Upstream: {"@id": "td:instance", "@type": "xsd:string"}
+        Generated: {"@id": "td:instance"}  (no @type)
+
+        Same as security — omitting redundant xsd:string is correct.
+        """
+        gen = td_generated.get("instance", {})
+        assert isinstance(gen, dict)
+        assert gen.get("@type") == "xsd:string"
+
+    @pytest.mark.xfail(reason="LINKML_LIMITATION: LinkML omits @type: @id for OWL-only object properties without range")
+    def test_hasInstanceConfiguration_has_id_type(self, td_upstream, td_generated):
+        """hasInstanceConfiguration carries @type: @id upstream.
+
+        Upstream: {"@id": "td:hasInstanceConfiguration", "@type": "@id"}
+        Generated: {"@id": "td:hasInstanceConfiguration"}  (missing @type)
+
+        OWL-only object property with no LinkML range — generator cannot
+        infer that values are IRIs.
+        """
+        gen = td_generated.get("hasInstanceConfiguration", {})
+        assert isinstance(gen, dict)
+        assert gen.get("@type") == "@id"
 
     def test_extra_hasInteractionAffordance_is_harmless(self, td_upstream, td_generated):
         """DESIGN_CHOICE: generated has hasInteractionAffordance (not in upstream).
@@ -416,12 +442,14 @@ class TestHctlModule:
         gen = hctl_generated.get("anchor", {})
         assert gen.get("@type") == "@id"
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: schema missing @type: @id")
+    @pytest.mark.xfail(reason="LINKML_LIMITATION: LinkML omits @type: @id for string-ranged slot used as IRI reference")
     def test_schema_has_id_type(self, hctl_upstream, hctl_generated):
-        """IMPORTANT: `schema` (additionalOutputSchema) needs @type: "@id".
+        """schema (additionalOutputSchema) needs @type: @id upstream.
 
         Upstream: {"@id": "hctl:hasAdditionalOutputSchema", "@type": "@id"}
         Generated: {"@id": "hctl:hasAdditionalOutputSchema"}  (missing @type)
+
+        LinkML generator cannot infer @type: @id from range: string.
         """
         assert hctl_upstream["schema"]["@type"] == "@id"
         gen = hctl_generated.get("schema", {})
