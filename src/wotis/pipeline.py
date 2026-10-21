@@ -16,7 +16,7 @@ from linkml.generators.owlgen import OwlSchemaGenerator
 from linkml.generators.shaclgen import ShaclGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
-from . import SCHEMA_PATH, GENS_PATH, GENERATORS
+from . import SCHEMA_PATH, GENS_PATH, GENERATORS, EXTRA_ASSERTS_PATH
 from .config import JSONLD_CONTEXT_MODULES, OWL_MODULES, GEN_OWL_OPTIONS
 from .generators.visualization import generate_visualizations
 from .generators.respec import generate_respec_spec
@@ -61,7 +61,7 @@ def run_pipeline(
             FINAL_SPEC_PATH,
             CORE_SCHEMA_PLACEHOLDER,
             assertions_csv_path=assertions_csv_path or ASSERTION_PATH,
-            extra_asserts_path=extra_asserts_path,
+            extra_asserts_path=extra_asserts_path or EXTRA_ASSERTS_PATH,
         )
 
 
