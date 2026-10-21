@@ -187,6 +187,8 @@ slots:
     domain: DataSchema
     range: Any
     multivalued: true
+    implements:
+      - owl:DatatypeProperty
   format:
     description: >-
       Allows validation based on a format pattern such as "date-time", "email", "uri", etc.
@@ -202,11 +204,15 @@ slots:
     slot_uri: jsonschema:const
     domain: DataSchema
     range: Any
+    implements:
+      - owl:DatatypeProperty
   default:
     description: >-
       Supply a default value. The value SHOULD validate against the data schema in which it resides.
     slot_uri: jsonschema:default
     domain: DataSchema
+    implements:
+      - owl:DatatypeProperty
     annotations:
       spec_description: >-
         Supply a default value. The value SHOULD validate against the data schema in which it resides.

@@ -192,29 +192,15 @@ class TestJsonSchemaModule:
         assert gen.get("@id") == "@type", f"type @id should be @type, got {gen.get('@id')}"
         assert "@context" not in gen, "type should not have SKOS @context"
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: enum should not have @type: @id — values are arbitrary JSON")
     def test_enum_no_id_type(self, js_upstream, js_generated):
-        """IMPORTANT: `enum` should not have @type: "@id".
-
-        Upstream: {"@id": "jsonschema:enum", "@container": "@set"}
-        Generated: {"@type": "@id", "@container": "@set", "@id": "jsonschema:enum"}
-
-        Enum values are arbitrary JSON values (strings, numbers, etc.),
-        not IRIs. Forcing @type: @id makes the processor try to resolve
-        them as node references.
-        """
         gen = js_generated.get("enum", {})
         assert "@type" not in gen or gen["@type"] != "@id"
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: const should not have @type: @id")
     def test_const_no_id_type(self, js_upstream, js_generated):
-        """IMPORTANT: `const` should not have @type: "@id"."""
         gen = js_generated.get("const", {})
         assert "@type" not in gen or gen["@type"] != "@id"
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: default should not have @type: @id")
     def test_default_no_id_type(self, js_upstream, js_generated):
-        """IMPORTANT: `default` should not have @type: "@id"."""
         gen = js_generated.get("default", {})
         assert "@type" not in gen or gen["@type"] != "@id"
 

@@ -129,6 +129,25 @@ def _remove_literal_type_coercion(context: dict[str, Any]) -> None:
                 _remove_literal_type_coercion(val["@context"])
 
 
+def _strip_datatype_property_id_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
+    """Strip ``@type: @id`` from slots declared as ``owl:DatatypeProperty``.
+
+    ``range: Any`` (a LinkML class) causes the context generator to emit
+    ``@type: @id``.  When the slot's ``implements`` declares it as a
+    DatatypeProperty, the coercion is wrong and must be removed.
+    """
+    datatype_slots = {
+        _slot_key(slot)
+        for slot in schema_view.all_slots().values()
+        if "owl:DatatypeProperty" in (slot.implements or [])
+    }
+    for key, val in context.items():
+        if key in datatype_slots and isinstance(val, dict) and val.get("@type") == "@id":
+            del val["@type"]
+        if isinstance(val, dict) and "@context" in val:
+            _strip_datatype_property_id_coercion(val["@context"], schema_view)
+
+
 def _remove_linkml_internals(context: dict[str, Any]) -> None:
     """Strip LinkML-internal prefix and type declarations from a context dict."""
     context.pop("linkml", None)
@@ -250,6 +269,8 @@ def build_module_context(
                 entry.pop("@type", None)
         elif index := _annotation_value(slot, "jsonld_index"):
             entry["@index"] = _curie_term_name(index)
+        if isinstance(entry, dict) and entry.get("@type") == "@id" and "owl:DatatypeProperty" in (slot.implements or []):
+            entry.pop("@type")
         context[key] = entry
     for cls in schema_view.all_classes().values():
         cls_prefix = curie_prefix(str(cls.class_uri) if cls.class_uri else None)
@@ -466,6 +487,7 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
     _apply_class_mappings(schema_view, context, module_contexts)
     _remove_uninduced_slots(context, _uninduced_slot_keys(schema_view))
     _remove_literal_type_coercion(context)
+    _strip_datatype_property_id_coercion(context, schema_view)
     _remove_linkml_internals(context)
     context["@version"] = 1.1
     return json.dumps(document, indent=2)

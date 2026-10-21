@@ -263,8 +263,7 @@
           "@type": "@id"
         },
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -294,16 +293,14 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
-          "@id": "jsonschema:enum",
-          "@type": "@id"
+          "@id": "jsonschema:enum"
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
@@ -505,8 +502,7 @@
       "@type": "@id"
     },
     "const": {
-      "@id": "jsonschema:const",
-      "@type": "@id"
+      "@id": "jsonschema:const"
     },
     "contentCoding": {
       "@id": "hctl:forContentCoding"
@@ -647,8 +643,7 @@
           "@type": "@id"
         },
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -686,16 +681,14 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
-          "@id": "jsonschema:enum",
-          "@type": "@id"
+          "@id": "jsonschema:enum"
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
@@ -1009,8 +1002,7 @@
           "@type": "@id"
         },
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -1044,16 +1036,14 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
-          "@id": "jsonschema:enum",
-          "@type": "@id"
+          "@id": "jsonschema:enum"
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
@@ -1256,8 +1246,7 @@
     },
     "dcterms": "http://purl.org/dc/terms/",
     "default": {
-      "@id": "jsonschema:default",
-      "@type": "@id"
+      "@id": "jsonschema:default"
     },
     "description": {
       "@id": "description"
@@ -1268,8 +1257,7 @@
     },
     "enum": {
       "@container": "@set",
-      "@id": "jsonschema:enum",
-      "@type": "@id"
+      "@id": "jsonschema:enum"
     },
     "events": {
       "@container": "@index",
@@ -1408,8 +1396,7 @@
           "@type": "@id"
         },
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -1431,8 +1418,7 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
@@ -1778,8 +1764,7 @@
           "@type": "@id"
         },
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -1817,16 +1802,14 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
-          "@id": "jsonschema:enum",
-          "@type": "@id"
+          "@id": "jsonschema:enum"
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
@@ -2162,8 +2145,7 @@
           "@type": "@id"
         },
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -2185,8 +2167,7 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
@@ -2554,8 +2535,7 @@
           "@type": "@id"
         },
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -2593,16 +2573,14 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
-          "@id": "jsonschema:enum",
-          "@type": "@id"
+          "@id": "jsonschema:enum"
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
@@ -2929,8 +2907,7 @@
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -2960,16 +2937,14 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
-          "@id": "jsonschema:enum",
-          "@type": "@id"
+          "@id": "jsonschema:enum"
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
@@ -3332,8 +3307,7 @@
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -3363,16 +3337,14 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
-          "@id": "jsonschema:enum",
-          "@type": "@id"
+          "@id": "jsonschema:enum"
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
@@ -3702,8 +3674,7 @@
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -3717,8 +3688,7 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
@@ -4059,8 +4029,7 @@
           "@type": "@id"
         },
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -4098,16 +4067,14 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
-          "@id": "jsonschema:enum",
-          "@type": "@id"
+          "@id": "jsonschema:enum"
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
@@ -4458,8 +4425,7 @@
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
         "const": {
-          "@id": "jsonschema:const",
-          "@type": "@id"
+          "@id": "jsonschema:const"
         },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
@@ -4489,16 +4455,14 @@
         },
         "dcterms": "http://purl.org/dc/terms/",
         "default": {
-          "@id": "jsonschema:default",
-          "@type": "@id"
+          "@id": "jsonschema:default"
         },
         "description": {
           "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
-          "@id": "jsonschema:enum",
-          "@type": "@id"
+          "@id": "jsonschema:enum"
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
