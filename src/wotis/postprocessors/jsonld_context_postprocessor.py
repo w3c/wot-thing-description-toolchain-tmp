@@ -165,6 +165,20 @@ def _fix_vocab_type_coercion(context: dict[str, Any], schema_view: SchemaView) -
             _fix_vocab_type_coercion(val["@context"], schema_view)
 
 
+def _add_enum_value_aliases(context: dict[str, Any], schema_view: SchemaView) -> None:
+    """Add term aliases for enum permissible values that declare a ``meaning``.
+
+    LinkML does not emit JSON-LD context entries for enum values.  When a
+    permissible value carries a ``meaning`` CURIE the upstream W3C context
+    maps the lowercase value text to the class IRI so that e.g.
+    ``"type": "object"`` expands to ``jsonschema:ObjectSchema``.
+    """
+    for enum_def in schema_view.all_enums().values():
+        for pv_name, pv in enum_def.permissible_values.items():
+            if pv.meaning and str(pv_name) not in context:
+                context[str(pv_name)] = str(pv.meaning)
+
+
 def _strip_datatype_property_id_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
     """Strip ``@type: @id`` from slots declared as ``owl:DatatypeProperty``.
 
@@ -532,6 +546,7 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
     _strip_skos_enum_contexts(context)
     _strip_datatype_property_id_coercion(context, schema_view)
     _fix_vocab_type_coercion(context, schema_view)
+    _add_enum_value_aliases(context, schema_view)
     _remove_linkml_internals(context)
     context["@version"] = 1.1
     return json.dumps(document, indent=2)

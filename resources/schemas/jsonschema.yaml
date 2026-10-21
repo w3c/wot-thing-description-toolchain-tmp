@@ -71,18 +71,25 @@ enums:
     permissible_values:
       object:
         description: Represents an object type
+        meaning: jsonschema:ObjectSchema
       array:
         description: Represents an array type
+        meaning: jsonschema:ArraySchema
       string:
         description: Represents a string type
+        meaning: jsonschema:StringSchema
       number:
         description: Represents a number type
+        meaning: jsonschema:NumberSchema
       integer:
         description: Represents an integer type
+        meaning: jsonschema:IntegerSchema
       boolean:
         description: Represents a boolean type
+        meaning: jsonschema:BooleanSchema
       "null":
         description: Represents a null type
+        meaning: jsonschema:NullSchema
 
 slots:
   minimum:

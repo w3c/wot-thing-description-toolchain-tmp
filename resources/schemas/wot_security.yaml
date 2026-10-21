@@ -38,22 +38,31 @@ enums:
     permissible_values:
       nosec:
         description: No authentication or other security mechanism is required.
+        meaning: wotsec:NoSecurityScheme
       combo:
         description: A combination of named security schemes using oneOf or allOf.
+        meaning: wotsec:ComboSecurityScheme
       basic:
         description: HTTP Basic authentication using a username and password.
+        meaning: wotsec:BasicSecurityScheme
       digest:
         description: HTTP Digest Access Authentication.
+        meaning: wotsec:DigestSecurityScheme
       bearer:
         description: Bearer token authentication independent of OAuth 2.0.
+        meaning: wotsec:BearerSecurityScheme
       psk:
         description: Pre-shared key authentication, for example TLS-PSK.
+        meaning: wotsec:PSKSecurityScheme
       oauth2:
         description: OAuth 2.0 authentication.
+        meaning: wotsec:OAuth2SecurityScheme
       apikey:
         description: API key authentication using an opaque access token.
+        meaning: wotsec:APIKeySecurityScheme
       auto:
         description: Security parameters are negotiated by the underlying protocol at runtime.
+        meaning: wotsec:AutoSecurityScheme
   SecurityLocationType:
     description: Specifies the location where security authentication information should be provided
     permissible_values:

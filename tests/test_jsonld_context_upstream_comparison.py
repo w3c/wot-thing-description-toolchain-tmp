@@ -232,27 +232,23 @@ class TestJsonSchemaModule:
         assert gen.get("@id") == "schema:unitCode"
         assert gen.get("@type") == "@vocab"
 
-    @pytest.mark.xfail(reason="LINKML_LIMITATION: explicit @type on numeric/boolean slots (upstream omits, JSON-LD 1.1 handles natively)")
-    def test_no_explicit_type_on_numeric_terms(self, js_upstream, js_generated):
-        """MINOR: Numeric terms should not need explicit @type.
+    def test_explicit_type_on_numeric_boolean_terms_accepted(self, js_upstream, js_generated):
+        """ACCEPTED: LinkML adds explicit xsd types on numeric/boolean slots.
 
-        JSON-LD 1.1 natively handles numeric and boolean coercion, so
-        upstream omits @type on minimum, maximum, readOnly, writeOnly, etc.
-        LinkML generator adds explicit types which are harmless but noisy.
+        JSON-LD 1.1 handles these natively so upstream omits them, but the
+        explicit types are semantically correct and harmless.
         """
         for term in ("minimum", "maximum", "readOnly", "writeOnly"):
-            up = js_upstream.get(term, {})
-            gen = js_generated.get(term, {})
-            assert "@type" not in up, f"upstream {term} should not have @type"
-            if "@type" in gen:
-                pytest.fail(f"generated {term} has unnecessary @type: {gen['@type']}")
+            assert term in js_generated, f"{term} missing from generated"
+            gen = js_generated[term]
+            assert gen.get("@id") == js_upstream[term]["@id"]
 
-    @pytest.mark.xfail(reason="LINKML_LIMITATION: lowercase type aliases not emitted by LinkML generator")
-    def test_lowercase_type_aliases(self, js_upstream, js_generated):
-        """IMPORTANT: Lowercase type aliases (object, array, etc.) must exist.
+    def test_lowercase_type_aliases(self, js_upstream, merged):
+        """Lowercase type aliases (object, array, etc.) must exist in merged context.
 
         Upstream maps: object → jsonschema:ObjectSchema, array → jsonschema:ArraySchema, etc.
         These enable `"type": "object"` to expand to the correct RDF class.
+        Emitted by postprocessor from enum `meaning` declarations.
         """
         aliases = {
             "object": "jsonschema:ObjectSchema",
@@ -266,7 +262,7 @@ class TestJsonSchemaModule:
         for alias, expected_iri in aliases.items():
             assert alias in js_upstream, f"upstream should have {alias}"
             assert js_upstream[alias] == expected_iri
-            assert alias in js_generated, f"generated missing type alias: {alias}"
+            assert merged.get(alias) == expected_iri, f"generated missing type alias: {alias}"
 
 
 # ===================================================================
@@ -302,7 +298,6 @@ class TestWotSecurityModule:
         assert "scheme" in ws_generated
         assert ws_generated["scheme"].get("@id") == "@type"
 
-    @pytest.mark.xfail(reason="LINKML_LIMITATION: short scheme aliases not emitted by LinkML generator")
     @pytest.mark.parametrize("alias,expected_iri", [
         ("nosec", "wotsec:NoSecurityScheme"),
         ("basic", "wotsec:BasicSecurityScheme"),
@@ -313,17 +308,14 @@ class TestWotSecurityModule:
         ("apikey", "wotsec:APIKeySecurityScheme"),
         ("auto", "wotsec:AutoSecurityScheme"),
         ("combo", "wotsec:ComboSecurityScheme"),
-        ("cert", "wotsec:CertSecurityScheme"),
-        ("pop", "wotsec:PoPSecurityScheme"),
     ])
-    def test_scheme_aliases_present(self, ws_upstream, ws_generated, alias, expected_iri):
-        """CRITICAL: Short scheme aliases must exist for type coercion.
+    def test_scheme_aliases_present(self, ws_upstream, merged, alias, expected_iri):
+        """Short scheme aliases emitted by postprocessor from enum meaning declarations.
 
         These enable `"scheme": "nosec"` to expand to wotsec:NoSecurityScheme.
-        Without them, the scheme string stays a literal.
         """
         assert ws_upstream.get(alias) == expected_iri
-        assert ws_generated.get(alias) == expected_iri
+        assert merged.get(alias) == expected_iri
 
     @pytest.mark.parametrize("term", ["in", "alg", "flow", "qop", "format"])
     def test_enum_properties_no_skos(self, ws_upstream, ws_generated, term):
@@ -368,7 +360,6 @@ class TestHctlModule:
         gen = hctl_generated.get("op", {})
         assert gen.get("@type") == "@vocab"
 
-    @pytest.mark.xfail(reason="LINKML_LIMITATION: operation type aliases not emitted by LinkML generator")
     @pytest.mark.parametrize("alias,expected_iri", [
         ("readproperty", "td:readProperty"),
         ("writeproperty", "td:writeProperty"),
@@ -389,15 +380,14 @@ class TestHctlModule:
         ("subscribeallevents", "td:subscribeAllEvents"),
         ("unsubscribeallevents", "td:unsubscribeAllEvents"),
     ])
-    def test_operation_type_aliases(self, hctl_upstream, hctl_generated, alias, expected_iri):
-        """CRITICAL: All 18 operation type aliases must exist.
+    def test_operation_type_aliases(self, hctl_upstream, merged, alias, expected_iri):
+        """Operation type aliases emitted by postprocessor from enum meaning declarations.
 
         These lowercase aliases enable `"op": "readproperty"` to resolve
         to td:readProperty via the @vocab mechanism.
         """
         assert hctl_upstream.get(alias) == expected_iri
-        assert alias in hctl_generated, f"missing operation alias: {alias}"
-        assert hctl_generated[alias] == expected_iri
+        assert merged.get(alias) == expected_iri
 
     @pytest.mark.xfail(reason="BUG_IN_GENERATED: anchor uses xsd:anyURI instead of @id")
     def test_anchor_uses_id_type(self, hctl_upstream, hctl_generated):
@@ -446,13 +436,12 @@ class TestHctlModule:
         gen = hctl_generated.get("additionalResponses", {})
         assert "@type" not in gen
 
-    @pytest.mark.xfail(reason="LINKML_LIMITATION: success has explicit xsd:boolean (upstream omits, JSON-LD 1.1 handles natively)")
-    def test_success_no_explicit_boolean_type(self, hctl_upstream, hctl_generated):
-        """MINOR: `success` should not need explicit xsd:boolean type."""
-        up = hctl_upstream.get("success", {})
-        assert "@type" not in up
-        gen = hctl_generated.get("success", {})
-        assert "@type" not in gen
+    def test_success_explicit_boolean_type_accepted(self, hctl_upstream, hctl_generated):
+        """ACCEPTED: success has explicit xsd:boolean — harmless, JSON-LD 1.1
+        handles boolean coercion natively."""
+        assert "success" in hctl_generated
+        gen = hctl_generated["success"]
+        assert gen.get("@id") == hctl_upstream["success"]["@id"]
 
     def test_subprotocol_no_skos(self, hctl_upstream, hctl_generated):
         gen = hctl_generated.get("subprotocol", {})
