@@ -66,6 +66,14 @@ def run_pipeline(
 
 
 def _gen_jsonschema(sv: SchemaView, output_dir: Path) -> None:
+    # LinkML JSON Schema generator crashes on designates_type when the slot
+    # range is an enum (calls type_ancestors on enum name).  Temporarily
+    # clear the flag — JSON Schema output doesn't use it.
+    patched_slots = []
+    for slot in sv.all_slots().values():
+        if slot.designates_type:
+            patched_slots.append(slot)
+            slot.designates_type = False
     gen = JsonSchemaGenerator(
         sv.schema,
         mergeimports=True,
@@ -75,6 +83,8 @@ def _gen_jsonschema(sv: SchemaView, output_dir: Path) -> None:
         preserve_names=True,
     )
     raw = json.loads(gen.serialize())
+    for slot in patched_slots:
+        slot.designates_type = True
     processed = post_process_jsonschema(raw, sv)
     with (output_dir / "jsonschema.json").open("w", encoding="utf-8") as f:
         json.dump(processed, f, indent=2, ensure_ascii=False)

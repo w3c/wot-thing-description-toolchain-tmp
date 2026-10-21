@@ -38,7 +38,7 @@ def _normalize_range_name(rng: str) -> str:
         return "any type"
     if rng == "langString":
         return "rdf:langString"
-    if rng == "uri":
+    if rng in ("uri", "uriorcurie"):
         return "anyURI"
     if rng == "datetime":
         return "dateTime"

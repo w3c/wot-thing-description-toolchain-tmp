@@ -220,16 +220,17 @@ class TestJsonSchemaModule:
         assert "anyOf" in js_generated
 
     def test_unit_present(self, js_upstream, merged):
-        """unit maps to schema:unitCode with @type: @vocab.
+        """unit maps to qudt:unit with @type: @vocab.
 
-        Upstream puts unit in json-schema module context, but our toolchain
-        assigns it to root context because its slot_uri is schema:unitCode
-        (not jsonschema: prefix).
+        Upstream uses schema:unitCode but qudt:unit is the correct predicate
+        for unit semantics.  Upstream puts unit in json-schema module context,
+        but our toolchain assigns it to root context because its slot_uri is
+        not in the jsonschema: namespace.
         """
         assert js_upstream["unit"] == {"@id": "schema:unitCode", "@type": "@vocab"}
         assert "unit" in merged
         gen = merged["unit"]
-        assert gen.get("@id") == "schema:unitCode"
+        assert gen.get("@id") == "qudt:unit"
         assert gen.get("@type") == "@vocab"
 
     def test_explicit_type_on_numeric_boolean_terms_accepted(self, js_upstream, js_generated):
@@ -272,31 +273,28 @@ class TestJsonSchemaModule:
 class TestWotSecurityModule:
     """Deltas in the wot-security-context module."""
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: URI properties use xsd:anyURI instead of @id — produces literals instead of links")
     @pytest.mark.parametrize("term", ["authorization", "token", "refresh", "proxy"])
-    def test_uri_properties_use_id_type(self, ws_upstream, ws_generated, term):
-        """CRITICAL: URI properties must use @type: "@id", not xsd:anyURI.
+    def test_uri_properties_use_id_type(self, ws_upstream, merged, term):
+        """URI properties must use @type: "@id", not xsd:anyURI.
 
         Using xsd:anyURI produces RDF literals instead of IRI references.
         JSON-LD processors cannot follow literal URIs for dereferencing.
+        Postprocessor promotes owl:ObjectProperty URI slots to @id coercion.
         """
         up = ws_upstream[term]
         assert up["@type"] == "@id"
-        gen = ws_generated.get(term, {})
+        gen = merged.get(term, {})
         assert gen.get("@type") == "@id", f"{term}: got @type={gen.get('@type')}, expected @id"
 
-    @pytest.mark.xfail(reason="LINKML_LIMITATION: scheme → @type mapping not emitted by LinkML generator")
-    def test_scheme_maps_to_at_type(self, ws_upstream, ws_generated):
-        """CRITICAL: `scheme` must map to @type.
+    def test_scheme_maps_to_at_type(self, ws_upstream, merged):
+        """``scheme`` must map to @type.
 
         Upstream: {"@id": "@type"}
-        Generated: MISSING
-
-        This enables `"scheme": "nosec"` to expand to rdf:type.
+        Postprocessor emits this for slots with designates_type: true.
         """
         assert ws_upstream["scheme"] == {"@id": "@type"}
-        assert "scheme" in ws_generated
-        assert ws_generated["scheme"].get("@id") == "@type"
+        assert "scheme" in merged
+        assert merged["scheme"].get("@id") == "@type"
 
     @pytest.mark.parametrize("alias,expected_iri", [
         ("nosec", "wotsec:NoSecurityScheme"),
@@ -389,15 +387,13 @@ class TestHctlModule:
         assert hctl_upstream.get(alias) == expected_iri
         assert merged.get(alias) == expected_iri
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: anchor uses xsd:anyURI instead of @id")
-    def test_anchor_uses_id_type(self, hctl_upstream, hctl_generated):
-        """IMPORTANT: `anchor` must use @type: "@id", not xsd:anyURI.
+    def test_anchor_uses_id_type(self, hctl_upstream, merged):
+        """``anchor`` must use @type: "@id", not xsd:anyURI.
 
-        Same pattern as wotsec URI properties — xsd:anyURI produces
-        literals, @id produces IRI references.
+        Postprocessor promotes owl:ObjectProperty URI slots to @id coercion.
         """
         assert hctl_upstream["anchor"]["@type"] == "@id"
-        gen = hctl_generated.get("anchor", {})
+        gen = merged.get("anchor", {})
         assert gen.get("@type") == "@id"
 
     @pytest.mark.xfail(reason="LINKML_LIMITATION: LinkML omits @type: @id for string-ranged slot used as IRI reference")
@@ -464,7 +460,6 @@ class TestCrossModulePatterns:
                     skos_leaks.append(key)
         assert skos_leaks == [], f"SKOS @context leak in: {skos_leaks}"
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: xsd:anyURI used where @id is needed")
     def test_no_xsd_anyuri_for_link_properties(self, merged):
         """Cross-cutting: Link properties must use @type: @id, not xsd:anyURI.
 

@@ -165,6 +165,24 @@ def _fix_vocab_type_coercion(context: dict[str, Any], schema_view: SchemaView) -
             _fix_vocab_type_coercion(val["@context"], schema_view)
 
 
+def _fix_object_property_id_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
+    """Replace ``xsd:anyURI`` with ``@id`` for URI slots declared as ``owl:ObjectProperty``.
+
+    LinkML emits ``@type: xsd:anyURI`` for ``range: uri`` but object properties
+    reference dereferenceable IRIs that must be IRI nodes, not literal strings.
+    """
+    object_prop_slots = {
+        _slot_key(slot)
+        for slot in schema_view.all_slots().values()
+        if slot.range == "uri" and "owl:ObjectProperty" in (slot.implements or [])
+    }
+    for key, val in context.items():
+        if key in object_prop_slots and isinstance(val, dict) and val.get("@type") == "xsd:anyURI":
+            val["@type"] = "@id"
+        if isinstance(val, dict) and "@context" in val:
+            _fix_object_property_id_coercion(val["@context"], schema_view)
+
+
 def _add_enum_value_aliases(context: dict[str, Any], schema_view: SchemaView) -> None:
     """Add term aliases for enum permissible values that declare a ``meaning``.
 
@@ -177,6 +195,25 @@ def _add_enum_value_aliases(context: dict[str, Any], schema_view: SchemaView) ->
         for pv_name, pv in enum_def.permissible_values.items():
             if pv.meaning and str(pv_name) not in context:
                 context[str(pv_name)] = str(pv.meaning)
+
+
+def _fix_type_designator_mapping(context: dict[str, Any], schema_view: SchemaView) -> None:
+    """Map ``designates_type`` slots to ``@type`` in JSON-LD context.
+
+    When a slot carries ``designates_type: true`` its value determines the
+    RDF type of the enclosing node.  The JSON-LD representation is
+    ``{"@id": "@type"}``.  LinkML's context generator does not emit this.
+    """
+    designator_slots = {
+        _slot_key(slot)
+        for slot in schema_view.all_slots().values()
+        if slot.designates_type
+    }
+    for key, val in context.items():
+        if key in designator_slots:
+            context[key] = {"@id": "@type"}
+        if isinstance(val, dict) and "@context" in val:
+            _fix_type_designator_mapping(val["@context"], schema_view)
 
 
 def _strip_datatype_property_id_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
@@ -546,6 +583,8 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
     _strip_skos_enum_contexts(context)
     _strip_datatype_property_id_coercion(context, schema_view)
     _fix_vocab_type_coercion(context, schema_view)
+    _fix_object_property_id_coercion(context, schema_view)
+    _fix_type_designator_mapping(context, schema_view)
     _add_enum_value_aliases(context, schema_view)
     _remove_linkml_internals(context)
     context["@version"] = 1.1

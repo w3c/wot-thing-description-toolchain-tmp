@@ -115,6 +115,7 @@ slots:
   scheme:
     description: Identification of the security mechanism being configured.
     required: true
+    designates_type: true
     range: SecuritySchemeList
   alg:
     description: Encoding, encryption, or digest algorithm (e.g., ES256, ES512-256).
@@ -179,10 +180,12 @@ slots:
       - This feature is at risk.
   proxy:
     description: >-
-      URI of the proxy server this security configuration provides access to. If not given, the corresponding 
+      URI of the proxy server this security configuration provides access to. If not given, the corresponding
       security configuration is for the endpoint.
     slot_uri: wotsec:proxy
     domain: SecurityScheme
+    implements:
+      - owl:ObjectProperty
     range: uri
     comments:
       - This feature is at risk.

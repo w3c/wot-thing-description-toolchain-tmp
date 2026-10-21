@@ -365,6 +365,8 @@ classes:
           Overrides the link context (by default the Thing itself identified by its id) with the given URI or IRI.
         slot_uri: hctl:hasAnchor
         domain: Link
+        implements:
+          - owl:ObjectProperty
         range: uri
       sizes:
         description: >-

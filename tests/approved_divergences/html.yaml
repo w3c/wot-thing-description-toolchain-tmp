@@ -280,6 +280,22 @@ divergences:
     rationale: Applies introductory comma punctuation without changing the requirement.
     expected_generated:
       text: For the client flow, authorization vocabulary term MUST NOT be included.
+  - id: html-data-schema-unit-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-data-schema-vocabulary-definition
+      table: Vocabulary Terms in DataSchema Level
+      row_id: td-vocab-unit--DataSchema
+      column: 3
+    rationale: >-
+      The spec recommends that unit "points to a semantic definition";
+      actual usage includes CURIEs (om:degreeCelsius) and plain strings
+      resolved via @vocab to IRIs.  anyURI is the correct XSD type.
+      Upstream incorrectly declares string.
+    expected_generated:
+      text: anyURI
   - id: html-assertion-oauth-code-flow-comma
     category: editorial-correction
     review: approved

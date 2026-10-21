@@ -26,6 +26,7 @@ prefixes:
   linkml: https://w3id.org/linkml/
   xsd: http://www.w3.org/2001/XMLSchema#
   owl: http://www.w3.org/2002/07/owl#
+  qudt: http://qudt.org/schema/qudt/
   skos: http://www.w3.org/2004/02/skos/core#
   td: https://www.w3.org/2019/wot/td#
 default_prefix: jsonschema
@@ -183,7 +184,7 @@ slots:
   unit:
     description: >-
       Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition.
-    slot_uri: schema:unitCode
+    slot_uri: qudt:unit
     annotations:
       spec_description: >-
         Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition (also see Section [Semantic Annotations](#semantic-annotations-example-version-units)).
