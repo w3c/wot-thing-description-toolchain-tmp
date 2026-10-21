@@ -123,11 +123,6 @@
       "@type": "@id"
     },
     "alg": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "wotsec:alg"
     },
     "allOf": {
@@ -269,19 +264,9 @@
           "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentEncoding"
         },
         "contentMediaType": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentMediaType"
         },
         "contentType": {
@@ -475,11 +460,6 @@
           "@type": "xsd:anyURI"
         },
         "type": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:type"
         },
         "unit": {
@@ -508,19 +488,9 @@
       "@id": "hctl:forContentCoding"
     },
     "contentEncoding": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "jsonschema:contentEncoding"
     },
     "contentMediaType": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "jsonschema:contentMediaType"
     },
     "contentType": {
@@ -649,19 +619,9 @@
           "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentEncoding"
         },
         "contentMediaType": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentMediaType"
         },
         "contentType": {
@@ -863,11 +823,6 @@
           "@type": "xsd:anyURI"
         },
         "type": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:type"
         },
         "unit": {
@@ -1008,19 +963,9 @@
           "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentEncoding"
         },
         "contentMediaType": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentMediaType"
         },
         "contentType": {
@@ -1218,11 +1163,6 @@
           "@type": "xsd:anyURI"
         },
         "type": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:type"
         },
         "unit": {
@@ -1274,11 +1214,6 @@
       "@type": "xsd:decimal"
     },
     "flow": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "wotsec:flow"
     },
     "foaf": "http://xmlns.com/foaf/0.1/",
@@ -1570,11 +1505,6 @@
         },
         "skos": "http://www.w3.org/2004/02/skos/core#",
         "subprotocol": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "hctl:forSubProtocol"
         },
         "subscription": {
@@ -1644,11 +1574,6 @@
       "@id": "wotsec:identity"
     },
     "in": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "wotsec:in"
     },
     "input": {
@@ -1770,19 +1695,9 @@
           "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentEncoding"
         },
         "contentMediaType": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentMediaType"
         },
         "contentType": {
@@ -1996,11 +1911,6 @@
           "@type": "xsd:anyURI"
         },
         "type": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:type"
         },
         "unit": {
@@ -2319,11 +2229,6 @@
         },
         "skos": "http://www.w3.org/2004/02/skos/core#",
         "subprotocol": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "hctl:forSubProtocol"
         },
         "subscription": {
@@ -2541,19 +2446,9 @@
           "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentEncoding"
         },
         "contentMediaType": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentMediaType"
         },
         "contentType": {
@@ -2763,11 +2658,6 @@
           "@type": "xsd:anyURI"
         },
         "type": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:type"
         },
         "unit": {
@@ -2913,19 +2803,9 @@
           "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentEncoding"
         },
         "contentMediaType": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentMediaType"
         },
         "contentType": {
@@ -3127,11 +3007,6 @@
           "@type": "xsd:anyURI"
         },
         "type": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:type"
         },
         "unit": {
@@ -3162,11 +3037,6 @@
       "@type": "xsd:anyURI"
     },
     "qop": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "wotsec:qop"
     },
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -3313,19 +3183,9 @@
           "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentEncoding"
         },
         "contentMediaType": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentMediaType"
         },
         "contentType": {
@@ -3519,11 +3379,6 @@
           "@type": "xsd:anyURI"
         },
         "type": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:type"
         },
         "unit": {
@@ -3547,11 +3402,6 @@
       "@type": "@id"
     },
     "scheme": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "scheme"
     },
     "scopes": {
@@ -3649,11 +3499,6 @@
           "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
         },
         "alg": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "wotsec:alg"
         },
         "allOf": {
@@ -3702,20 +3547,10 @@
           "@type": "xsd:decimal"
         },
         "flow": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "wotsec:flow"
         },
         "foaf": "http://xmlns.com/foaf/0.1/",
         "format": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "wotsec:format"
         },
         "hasInstanceConfiguration": {
@@ -3738,11 +3573,6 @@
           "@id": "wotsec:identity"
         },
         "in": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "wotsec:in"
         },
         "instance": {
@@ -3822,11 +3652,6 @@
           "@type": "xsd:anyURI"
         },
         "qop": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "wotsec:qop"
         },
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -3909,11 +3734,6 @@
     },
     "skos": "http://www.w3.org/2004/02/skos/core#",
     "subprotocol": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "hctl:forSubProtocol"
     },
     "subscription": {
@@ -4035,19 +3855,9 @@
           "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentEncoding"
         },
         "contentMediaType": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentMediaType"
         },
         "contentType": {
@@ -4253,11 +4063,6 @@
           "@type": "xsd:anyURI"
         },
         "type": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:type"
         },
         "unit": {
@@ -4305,11 +4110,6 @@
       "@type": "xsd:anyURI"
     },
     "type": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "jsonschema:type"
     },
     "unit": {
@@ -4431,19 +4231,9 @@
           "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentEncoding"
         },
         "contentMediaType": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:contentMediaType"
         },
         "contentType": {
@@ -4637,11 +4427,6 @@
           "@type": "xsd:anyURI"
         },
         "type": {
-          "@context": {
-            "description": "skos:prefLabel",
-            "meaning": "@id",
-            "text": "skos:notation"
-          },
           "@id": "jsonschema:type"
         },
         "unit": {

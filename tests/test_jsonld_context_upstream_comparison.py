@@ -204,19 +204,11 @@ class TestJsonSchemaModule:
         gen = js_generated.get("default", {})
         assert "@type" not in gen or gen["@type"] != "@id"
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: SKOS @context leak on contentEncoding")
     def test_contentEncoding_no_skos(self, js_upstream, js_generated):
-        """IMPORTANT: `contentEncoding` should be a plain string, no SKOS.
-
-        Upstream: {"@id": "jsonschema:contentEncoding"}
-        Generated: {"@context": {...SKOS...}, "@id": "jsonschema:contentEncoding"}
-        """
         gen = js_generated.get("contentEncoding", {})
         assert "@context" not in gen
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: SKOS @context leak on contentMediaType")
     def test_contentMediaType_no_skos(self, js_upstream, js_generated):
-        """IMPORTANT: `contentMediaType` should be a plain string, no SKOS."""
         gen = js_generated.get("contentMediaType", {})
         assert "@context" not in gen
 
@@ -336,15 +328,8 @@ class TestWotSecurityModule:
         assert ws_upstream.get(alias) == expected_iri
         assert ws_generated.get(alias) == expected_iri
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: SKOS @context leak on enum properties")
     @pytest.mark.parametrize("term", ["in", "alg", "flow", "qop", "format"])
     def test_enum_properties_no_skos(self, ws_upstream, ws_generated, term):
-        """IMPORTANT: Enum properties should not have SKOS @context.
-
-        LinkML emits SKOS context blocks for enum-valued slots. Upstream
-        treats them as plain strings. The SKOS leak adds noise and can
-        interfere with term resolution.
-        """
         gen = ws_generated.get(term, {})
         assert "@context" not in gen, f"{term} has SKOS @context leak"
 
@@ -472,9 +457,7 @@ class TestHctlModule:
         gen = hctl_generated.get("success", {})
         assert "@type" not in gen
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: SKOS @context leak on subprotocol")
     def test_subprotocol_no_skos(self, hctl_upstream, hctl_generated):
-        """MINOR: `subprotocol` should not have SKOS @context."""
         gen = hctl_generated.get("subprotocol", {})
         assert "@context" not in gen
 
@@ -486,14 +469,7 @@ class TestHctlModule:
 class TestCrossModulePatterns:
     """Tests for patterns that repeat across modules."""
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: SKOS @context leak affects multiple modules")
     def test_no_skos_context_leak_anywhere(self, merged):
-        """Cross-cutting: No term should have a SKOS @context block.
-
-        LinkML emits SKOS context (text/description/meaning) for enum-valued
-        slots. Upstream never uses this pattern. The SKOS blocks pollute
-        the context and can interfere with term resolution.
-        """
         skos_leaks = []
         for key, value in merged.items():
             if isinstance(value, dict) and "@context" in value:

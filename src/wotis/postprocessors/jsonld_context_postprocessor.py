@@ -129,6 +129,23 @@ def _remove_literal_type_coercion(context: dict[str, Any]) -> None:
                 _remove_literal_type_coercion(val["@context"])
 
 
+_SKOS_ENUM_KEYS = frozenset({"text", "description", "meaning"})
+
+
+def _strip_skos_enum_contexts(context: dict[str, Any]) -> None:
+    """Remove SKOS @context blocks that LinkML emits for enum-ranged slots."""
+    for val in context.values():
+        if not isinstance(val, dict):
+            continue
+        inner = val.get("@context")
+        if isinstance(inner, dict) and _SKOS_ENUM_KEYS.issubset(inner):
+            del val["@context"]
+        elif isinstance(inner, dict):
+            _strip_skos_enum_contexts(inner)
+        if "@context" in val and isinstance(val["@context"], dict):
+            _strip_skos_enum_contexts(val["@context"])
+
+
 def _strip_datatype_property_id_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
     """Strip ``@type: @id`` from slots declared as ``owl:DatatypeProperty``.
 
@@ -269,8 +286,12 @@ def build_module_context(
                 entry.pop("@type", None)
         elif index := _annotation_value(slot, "jsonld_index"):
             entry["@index"] = _curie_term_name(index)
-        if isinstance(entry, dict) and entry.get("@type") == "@id" and "owl:DatatypeProperty" in (slot.implements or []):
-            entry.pop("@type")
+        if isinstance(entry, dict):
+            inner = entry.get("@context")
+            if isinstance(inner, dict) and _SKOS_ENUM_KEYS.issubset(inner):
+                del entry["@context"]
+            if entry.get("@type") == "@id" and "owl:DatatypeProperty" in (slot.implements or []):
+                entry.pop("@type")
         context[key] = entry
     for cls in schema_view.all_classes().values():
         cls_prefix = curie_prefix(str(cls.class_uri) if cls.class_uri else None)
@@ -487,6 +508,7 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
     _apply_class_mappings(schema_view, context, module_contexts)
     _remove_uninduced_slots(context, _uninduced_slot_keys(schema_view))
     _remove_literal_type_coercion(context)
+    _strip_skos_enum_contexts(context)
     _strip_datatype_property_id_coercion(context, schema_view)
     _remove_linkml_internals(context)
     context["@version"] = 1.1
