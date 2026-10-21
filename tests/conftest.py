@@ -1,7 +1,10 @@
 """Provide shared pytest options and test reporting."""
 import os
+from pathlib import Path
+
 import pytest
 
+from .baselines import load_baseline
 from .rejections import defined_at
 
 
@@ -16,12 +19,27 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     config.rejections = {}
     config.spec_html_findings = []
+    config.new_failures = []
+
+
+def pytest_collection_modifyitems(config, items):
+    baseline = load_baseline(Path(__file__).parent / "known_failures" / "spec_structure.txt")
+    if not baseline:
+        return
+    for item in items:
+        if item.nodeid in baseline:
+            item.add_marker(pytest.mark.xfail(strict=True, reason="known spec structure gap"))
 
 
 @pytest.fixture
 def rejections(request):
     """{(td version, schema location): {"count": n, "example": message}}"""
     return request.config.rejections
+
+
+@pytest.fixture
+def new_failures(request):
+    return request.config.new_failures
 
 
 @pytest.fixture
@@ -36,6 +54,14 @@ def spec_html_findings(request):
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    new_failures = config.new_failures
+    if new_failures:
+        terminalreporter.write_line("")
+        terminalreporter.write_line(f"NEW failures not in any baseline ({len(new_failures)}):")
+        for entry in new_failures:
+            terminalreporter.write_line(f"  {entry}")
+        terminalreporter.write_line("")
+
     html_findings = config.spec_html_findings
     if not config.rejections and not html_findings:
         return

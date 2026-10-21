@@ -1,0 +1,176 @@
+{
+  "@context" : {
+    "td": "https://www.w3.org/2019/wot/td#",
+    "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+    "wotsec": "https://www.w3.org/2019/wot/security#",
+    "hctl": "https://www.w3.org/2019/wot/hypermedia#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dct": "http://purl.org/dc/terms/",
+    "tm": "https://www.w3.org/2019/wot/tm#",
+    "@vocab": "https://www.w3.org/2019/wot/td#",
+    "license" : {
+      "@id" : "http://purl.org/dc/terms/license"
+    },
+    "id": "@id",
+    "properties" : {
+      "@id" : "td:hasPropertyAffordance",
+      "@type" : "@id",
+      "@container": "@index",
+      "@index": "name"
+    },
+    "actions" : {
+      "@id" : "td:hasActionAffordance",
+      "@type" : "@id",
+      "@container": "@index",
+      "@index": "name"
+    },
+    "events" : {
+      "@id" : "td:hasEventAffordance",
+      "@type" : "@id",
+      "@container": "@index",
+      "@index": "name"
+    },
+    "security" : {
+      "@id" : "td:hasSecurityConfiguration",
+      "@type": "xsd:string"
+    },
+    "schema" : {
+      "@id" : "hctl:hasAdditionalOutputSchema",
+      "@type" : "@id"
+    },
+    "securityDefinitions" : {
+      "@id" : "td:definesSecurityScheme",
+      "@type" : "@id",
+      "@container": "@index",
+      "@index": "hasInstanceConfiguration"
+    },
+    "hasInstanceConfiguration": {
+      "@id": "td:hasInstanceConfiguration",
+      "@type": "@id"
+    },
+    "schemaDefinitions" : {
+      "@id" : "td:schemaDefinitions",
+      "@type" : "@id",
+      "@container": "@index"
+    },
+    "Thing" : {
+      "@id" : "td:Thing"
+    },
+    "EventAffordance" : {
+      "@id" : "td:EventAffordance"
+    },
+    "name" : {
+      "@id" : "td:name"
+    },
+    "profile" : {
+      "@id" : "td:followsProfile"
+    },
+    "created" : {
+      "@id" : "dct:created",
+      "@type": "xsd:dateTime"
+    },
+    "modified" : {
+      "@id" : "dct:modified",
+      "@type": "xsd:dateTime"
+    },
+    "observable" : {
+      "@id" : "td:isObservable"
+    },
+    "VersionInfo" : {
+      "@id" : "td:VersionInfo"
+    },
+    "PropertyAffordance" : {
+      "@id" : "td:PropertyAffordance"
+    },
+    "forms" : {
+      "@id" : "td:hasForm",
+      "@type" : "@id",
+      "@container": "@set"
+    },
+    "version" : {
+      "@id" : "td:versionInfo",
+      "@type" : "@id"
+    },
+    "links" : {
+      "@id" : "td:hasLink",
+      "@type" : "@id",
+      "@container": "@set"
+    },
+    "uriVariables" : {
+      "@id" : "td:hasUriTemplateSchema",
+      "@type": "@id",
+      "@container": "@index",
+      "@index": "name"
+    },
+    "safe" : {
+      "@id" : "td:isSafe"
+    },
+    "idempotent" : {
+      "@id" : "td:isIdempotent"
+    },
+    "synchronous" : {
+      "@id" : "td:isSynchronous"
+    },
+    "instance": {
+      "@id": "td:instance",
+      "@type": "xsd:string"
+    },
+    "model": {
+      "@id": "td:model"
+    },
+    "InteractionAffordance" : {
+      "@id" : "td:InteractionAffordance"
+    },
+    "ActionAffordance" : {
+      "@id" : "td:ActionAffordance"
+    },
+    "input" : {
+      "@id" : "td:hasInputSchema",
+      "@type" : "@id"
+    },
+    "output" : {
+      "@id" : "td:hasOutputSchema",
+      "@type" : "@id"
+    },
+    "subscription" : {
+      "@id" : "td:hasSubscriptionSchema",
+      "@type" : "@id"
+    },
+    "data" : {
+      "@id" : "td:hasNotificationSchema",
+      "@type" : "@id"
+    },
+    "dataResponse" : {
+      "@id" : "td:hasNotificationResponseSchema",
+      "@type" : "@id"
+    },
+    "cancellation" : {
+      "@id" : "td:hasCancellationSchema",
+      "@type" : "@id"
+    },
+    "description" : {
+      "@id" : "td:description",
+      "@language": "en"
+    },
+    "descriptions" : {
+      "@id": "td:descriptionInLanguage",
+      "@container": "@language"
+    },
+    "title": {
+      "@id": "td:title",
+      "@language": "en"
+    },
+    "titles" : {
+      "@id": "td:titleInLanguage",
+      "@container": "@language"
+    },
+    "support": {
+      "@id" : "td:supportContact",
+      "@type": "xsd:anyURI"
+    },
+    "base": {
+      "@id" : "td:baseURI"
+    }
+  }
+}

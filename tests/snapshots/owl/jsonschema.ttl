@@ -1,0 +1,345 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix jsonschema: <https://www.w3.org/2019/wot/json-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://www.w3.org/2019/wot/json-schema>
+    rdf:type owl:Ontology ;
+    dcterms:title "JSON Schema in RDF Ontology"@en ;
+    rdfs:label "JSON Schema in RDF"@en ;
+    rdfs:comment "Ontology for the W3C Web of Things JSON Schema in RDF vocabulary."@en ;
+    vann:preferredNamespacePrefix "jsonschema" ;
+    vann:preferredNamespaceUri "https://www.w3.org/2019/wot/json-schema#" ;
+    owl:versionInfo "1.1" ;
+    dcterms:license <http://purl.org/NET/rdflicense/cc-by4.0> ;
+    dcterms:creator <mailto:mahda.noura@siemens.com> ;
+    dcterms:contributor <https://vcharpenay.link/#me> ;
+    dcterms:publisher
+        [
+            rdf:type schema:Organization ;
+            schema:name "W3C Web of Things Working Group" ;
+            schema:url <https://www.w3.org/WoT/WG/> ;
+        ] ;
+.
+
+jsonschema:ArraySchema
+    rdf:type owl:Class ;
+    rdfs:label "ArraySchema"@en ;
+    rdfs:subClassOf jsonschema:DataSchema ;
+    skos:definition "Metadata describing data of type array. This subclass is indicated by the value array assigned to type in DataSchema instances."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:BooleanSchema
+    rdf:type owl:Class ;
+    rdfs:label "BooleanSchema"@en ;
+    rdfs:subClassOf jsonschema:DataSchema ;
+    skos:definition "Metadata describing data of type boolean. This subclass is indicated by the value boolean assigned to type in DataSchema instances."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:DataSchema
+    rdf:type owl:Class ;
+    rdfs:label "DataSchema"@en ;
+    skos:definition "A data schema describes the data format used. It can be used for validation."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:IntegerSchema
+    rdf:type owl:Class ;
+    rdfs:label "IntegerSchema"@en ;
+    rdfs:subClassOf jsonschema:DataSchema ;
+    skos:definition "Metadata describing data of type integer. This subclass is indicated by the value integer assigned to type in DataSchema instances."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:NullSchema
+    rdf:type owl:Class ;
+    rdfs:label "NullSchema"@en ;
+    rdfs:subClassOf jsonschema:DataSchema ;
+    skos:definition "Metadata describing data of type null. This subclass is indicated by the value null assigned to type in DataSchema instances. This Subclass describes only one acceptable value, namely null. It is important to note that null does not mean the absence of a value. It is analogous to null in JavaScript, None in Python, null in Java and nil in Ruby programming languages. It can be used as part of a oneOf declaration, where it is used to indicate, that the data can also be null."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:NumberSchema
+    rdf:type owl:Class ;
+    rdfs:label "NumberSchema"@en ;
+    rdfs:subClassOf jsonschema:DataSchema ;
+    skos:definition "Metadata describing data of type number. This subclass is indicated by the value number assigned to type in DataSchema instances."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:ObjectSchema
+    rdf:type owl:Class ;
+    rdfs:label "ObjectSchema"@en ;
+    rdfs:subClassOf jsonschema:DataSchema ;
+    skos:definition "Metadata describing data of type object. This subclass is indicated by the value object assigned to type in DataSchema instances."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:StringSchema
+    rdf:type owl:Class ;
+    rdfs:label "StringSchema"@en ;
+    rdfs:subClassOf jsonschema:DataSchema ;
+    skos:definition "Metadata describing data of type string. This subclass is indicated by the value string assigned to type in DataSchema instances."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:allOf
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "allOf"@en ;
+    skos:definition "Used to ensure that the data is valid against all of the specified schemas in the array."@en ;
+    rdfs:domain jsonschema:DataSchema ;
+    rdfs:range jsonschema:DataSchema ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+    skos:note "The upstream JSON Schema ontology defines `jsonschema:allOf`, but the current TD 2.0 Data Schema vocabulary table does not list it; confirm its inclusion with the WoT Working Group." ;
+.
+
+jsonschema:const
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "const"@en ;
+    skos:definition "Provides a constant value."@en ;
+    rdfs:domain jsonschema:DataSchema ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:contentEncoding
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "contentEncoding"@en ;
+    skos:definition "Specifies the encoding used to store the contents, as specified in RFC 2045 (Section 6.1) and RFC 4648."@en ;
+    rdfs:domain jsonschema:StringSchema ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:contentMediaType
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "contentMediaType"@en ;
+    skos:definition "Specifies the MIME type of the contents of a string value, as described in RFC 2046."@en ;
+    rdfs:domain jsonschema:StringSchema ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:default
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "default"@en ;
+    skos:definition "Supply a default value. The value SHOULD validate against the data schema in which it resides."@en ;
+    rdfs:domain jsonschema:DataSchema ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:enum
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "enum"@en ;
+    skos:definition "Restricted set of values provided as an array."@en ;
+    rdfs:domain jsonschema:DataSchema ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:exclusiveMaximum
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "exclusiveMaximum"@en ;
+    skos:definition "Specifies a maximum numeric value, representing an exclusive upper limit. Only applicable for associated number or integer types."@en ;
+    schema:domainIncludes
+        jsonschema:IntegerSchema ,
+        jsonschema:NumberSchema ;
+    rdfs:range xsd:decimal ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:exclusiveMinimum
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "exclusiveMinimum"@en ;
+    skos:definition "Specifies a minimum numeric value, representing an exclusive lower limit. Only applicable for associated number or integer types."@en ;
+    schema:domainIncludes
+        jsonschema:IntegerSchema ,
+        jsonschema:NumberSchema ;
+    rdfs:range xsd:decimal ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:format
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "format"@en ;
+    skos:definition "Allows validation based on a format pattern such as \"date-time\", \"email\", \"uri\", etc."@en ;
+    rdfs:domain jsonschema:DataSchema ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:items
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "items"@en ;
+    skos:definition "Used to define the characteristics of an array."@en ;
+    rdfs:domain jsonschema:ArraySchema ;
+    rdfs:range jsonschema:DataSchema ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:maxItems
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "maxItems"@en ;
+    skos:definition "Defines the maximum number of items that have to be in the array."@en ;
+    rdfs:domain jsonschema:ArraySchema ;
+    rdfs:range xsd:nonNegativeInteger ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:maxLength
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "maxLength"@en ;
+    skos:definition "Specifies the maximum length of a string. Only applicable for associated string types."@en ;
+    rdfs:domain jsonschema:StringSchema ;
+    rdfs:range xsd:nonNegativeInteger ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:maximum
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "maximum"@en ;
+    skos:definition "Specifies a maximum numeric value, representing an inclusive upper limit. Only applicable for associated number or integer types."@en ;
+    schema:domainIncludes
+        jsonschema:IntegerSchema ,
+        jsonschema:NumberSchema ;
+    rdfs:range xsd:decimal ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:minItems
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "minItems"@en ;
+    skos:definition "Defines the minimum number of items that have to be in the array."@en ;
+    rdfs:domain jsonschema:ArraySchema ;
+    rdfs:range xsd:nonNegativeInteger ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:minLength
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "minLength"@en ;
+    skos:definition "Specifies the minimum length of a string. Only applicable for associated string types."@en ;
+    rdfs:domain jsonschema:StringSchema ;
+    rdfs:range xsd:nonNegativeInteger ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:minimum
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "minimum"@en ;
+    skos:definition "Specifies a minimum numeric value, representing an inclusive lower limit. Only applicable for associated number or integer types."@en ;
+    schema:domainIncludes
+        jsonschema:IntegerSchema ,
+        jsonschema:NumberSchema ;
+    rdfs:range xsd:decimal ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:multipleOf
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "multipleOf"@en ;
+    skos:definition "Specifies the multipleOf value number. The value must strictly greater than 0. Only applicable for associated number or integer types."@en ;
+    schema:domainIncludes
+        jsonschema:IntegerSchema ,
+        jsonschema:NumberSchema ;
+    rdfs:range xsd:decimal ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:oneOf
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "oneOf"@en ;
+    skos:definition "Used to ensure that the data is valid against one of the specified schemas in the array. This can be used to describe multiple input or output schemas."@en ;
+    rdfs:domain jsonschema:DataSchema ;
+    rdfs:range jsonschema:DataSchema ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:pattern
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "pattern"@en ;
+    skos:definition "Provides a regular expression to express constraints of the string value. The regular expression must follow the ECMA 262 dialect."@en ;
+    rdfs:domain jsonschema:StringSchema ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:propertyName
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "propertyName"@en ;
+    skos:definition "Used to store the indexing name in the parent object when this schema appears as a property of an object schema."@en ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:readOnly
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "readOnly"@en ;
+    skos:definition "Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false). Also see Interaction Semantics for further information on the usage patterns and implications."@en ;
+    rdfs:domain jsonschema:DataSchema ;
+    rdfs:range xsd:boolean ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:required
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "required"@en ;
+    skos:definition "Defines which members of the object type are mandatory, i.e. which members are mandatory in the payload that is to be sent (e.g., input of invokeaction, writeproperty) and what members will be definitely delivered in the payload that is being received (e.g., output of invokeaction, readproperty)"@en ;
+    rdfs:domain jsonschema:ObjectSchema ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:type
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "type"@en ;
+    skos:definition "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)."@en ;
+    rdfs:domain jsonschema:DataSchema ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.
+
+jsonschema:writeOnly
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "writeOnly"@en ;
+    skos:definition "Boolean value that is a hint to indicate whether a property interaction / value is write only (=true) or not (=false). Also see Interaction Semantics for further information on the usage patterns and implications."@en ;
+    rdfs:domain jsonschema:DataSchema ;
+    rdfs:range xsd:boolean ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
+    skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
+.

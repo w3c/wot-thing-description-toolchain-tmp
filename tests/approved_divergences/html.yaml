@@ -14,7 +14,93 @@ divergences:
       table: Vocabulary Terms in Thing Level
       row_id: td-vocab-title--Thing
       column: 3
-    rationale: ThingShape permits xsd:string or rdf:langString for title.
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-thing-description-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-core-vocabulary-definition
+      table: Vocabulary Terms in Thing Level
+      row_id: td-vocab-description--Thing
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-interaction-affordance-title-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-core-vocabulary-definition
+      table: Vocabulary Terms in InteractionAffordance Level
+      row_id: td-vocab-title--InteractionAffordance
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-interaction-affordance-description-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-core-vocabulary-definition
+      table: Vocabulary Terms in InteractionAffordance Level
+      row_id: td-vocab-description--InteractionAffordance
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-data-schema-title-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-data-schema-vocabulary-definition
+      table: Vocabulary Terms in DataSchema Level
+      row_id: td-vocab-title--DataSchema
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-data-schema-description-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-data-schema-vocabulary-definition
+      table: Vocabulary Terms in DataSchema Level
+      row_id: td-vocab-description--DataSchema
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-security-scheme-description-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-security-vocabulary-definition
+      table: Vocabulary Terms in SecurityScheme Level
+      row_id: td-vocab-description--SecurityScheme
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
     expected_generated:
       text: string or rdf:langString
   - id: html-interaction-affordance-uri-variables-spacing

@@ -1,0 +1,4 @@
+# Known spec structure test failures (pytest nodeids).
+# One entry per line, '#' comments ignored.
+# xfail(strict=True): fixes that make a test pass force removing it here.
+# This list can only shrink.

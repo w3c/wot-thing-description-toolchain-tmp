@@ -1,0 +1,4 @@
+# Known JSON Schema validation failures (valid samples the generated schema rejects).
+# One entry per line: <version>/<path relative to tests/data/>
+# xfail(strict=True): fixes that make a test pass force removing it here.
+# This list can only shrink.

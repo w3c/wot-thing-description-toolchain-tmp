@@ -43,7 +43,7 @@ def test_title_accepts_string_or_langstring_in_shacl() -> None:
         assert (property_shape, SH.datatype, None) not in graph
 
 
-def test_title_remains_string_outside_thing_shape() -> None:
+def test_title_has_no_datatype_constraint_outside_thing_shape() -> None:
     schema_view = SchemaView(SCHEMA_PATH, merge_imports=True)
     raw_shacl = ShaclGenerator(schema_view.schema, mergeimports=False, closed=True, suffix="Shape").serialize()
     graph = Graph().parse(data=post_process_shacl(raw_shacl, schema_view), format="turtle")
@@ -52,5 +52,6 @@ def test_title_remains_string_outside_thing_shape() -> None:
         property_shapes = _title_property_shapes(graph, class_uri)
         assert property_shapes
         for property_shape in property_shapes:
-            assert (property_shape, SH.datatype, XSD.string) in graph
+            assert (property_shape, SH.datatype, None) not in graph
             assert (property_shape, SH["or"], None) not in graph
+            assert (property_shape, SH.nodeKind, SH.Literal) in graph

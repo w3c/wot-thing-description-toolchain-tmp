@@ -1,0 +1,65 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix tm: <https://www.w3.org/2019/wot/tm#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://www.w3.org/2019/wot/tm>
+    rdf:type owl:Ontology ;
+    dcterms:title "Thing Model Ontology"@en ;
+    rdfs:label "Thing Model"@en ;
+    rdfs:comment "Ontology for the W3C Web of Things Thing Model vocabulary."@en ;
+    vann:preferredNamespacePrefix "tm" ;
+    vann:preferredNamespaceUri "https://www.w3.org/2019/wot/tm#" ;
+    owl:versionInfo "1.1" ;
+    dcterms:license <http://purl.org/NET/rdflicense/cc-by4.0> ;
+    dcterms:creator <mailto:mahda.noura@siemens.com> ;
+    dcterms:contributor
+        <https://vcharpenay.link/#me> ,
+        <mailto:sebastian.kaebisch@siemens.com> ;
+    dcterms:publisher
+        [
+            rdf:type schema:Organization ;
+            schema:name "W3C Web of Things Working Group" ;
+            schema:url <https://www.w3.org/WoT/WG/> ;
+        ] ;
+.
+
+tm:ThingModel
+    rdf:type owl:Class ;
+    rdfs:label "ThingModel"@en ;
+    skos:definition "A Thing Model is a description for a class of Things that have the same capabilities. It describes the Properties, Actions, and Events and common metadata that are shared for an entire group of Things. Compared to a Thing Description, a Thing Model does not contain enough information to identify or interact with a Thing instance."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/tm> ;
+    skos:inScheme <https://www.w3.org/2019/wot/tm> ;
+.
+
+tm:optional
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "optional"@en ;
+    skos:definition "Constraint that provides references to declarations in the Thing Model that are optional and do not necessarily need to be implemented when Thing Description instances are derived from this Thing Model. The value of tm:optional MUST provide JSON Pointer references to the required interaction model definitions."@en ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/tm> ;
+    skos:inScheme <https://www.w3.org/2019/wot/tm> ;
+.
+
+tm:ref
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "ref"@en ;
+    skos:definition "Provides a reference to an existing (external or local) definition that is copied into a newly defined definition. The reference value is based on three parts: an (optional) URI-reference, '#' sign, and JSON Pointer value."@en ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/tm> ;
+    skos:inScheme <https://www.w3.org/2019/wot/tm> ;
+.
+
+tm:required
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "required"@en ;
+    skos:definition "Constraint that provides references to declarations in the Thing Model that are mandatory and must be present when Thing Description instances are derived from this Thing Model. The reference value is a JSON Pointer."@en ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/tm> ;
+    skos:inScheme <https://www.w3.org/2019/wot/tm> ;
+.

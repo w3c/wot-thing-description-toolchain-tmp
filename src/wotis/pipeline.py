@@ -1,4 +1,4 @@
-"""WoT resource generation pipeline."""
+"""WoT artifact generation pipeline."""
 from __future__ import annotations
 
 import json
@@ -6,6 +6,7 @@ import logging
 import os
 import tempfile
 import warnings
+from collections.abc import Callable
 from pathlib import Path
 
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
@@ -16,11 +17,14 @@ from linkml.generators.shaclgen import ShaclGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
 from . import SCHEMA_PATH, GENS_PATH, GENERATORS
-from .config import OWL_MODULES, GEN_OWL_OPTIONS
+from .config import JSONLD_CONTEXT_MODULES, OWL_MODULES, GEN_OWL_OPTIONS
 from .generators.visualization import generate_visualizations
 from .generators.respec import generate_respec_spec
 from .postprocessors.jsonschema_postprocessor import post_process_jsonschema
-from .postprocessors.jsonld_context_postprocessor import post_process_jsonld_context
+from .postprocessors.jsonld_context_postprocessor import (
+    build_module_context,
+    post_process_jsonld_context,
+)
 from .postprocessors.owl_postprocessor import postprocess_owl
 from .postprocessors.shacl_postprocessor import post_process_shacl
 from .preprocessors.owl_preprocessor import preprocess_for_gen_owl
@@ -91,8 +95,12 @@ def _gen_owl(sv: SchemaView, output_dir: Path) -> None:
 
 def _gen_jsonldcontext(sv: SchemaView, output_dir: Path) -> None:
     gen = ContextGenerator(sv.schema, mergeimports=True, fix_multivalue_containers=True)
-    context = post_process_jsonld_context(sv, gen.serialize())
-    (output_dir / "context.jsonld").write_text(context)
+    for prefix, filename in JSONLD_CONTEXT_MODULES:
+        module_ctx = build_module_context(sv, gen, prefix)
+        doc = json.dumps({"@context": module_ctx}, indent=2)
+        (output_dir / filename).write_text(doc)
+    merged = post_process_jsonld_context(sv, gen.serialize())
+    (output_dir / "context.jsonld").write_text(merged)
 
 
 def _gen_linkml(sv: SchemaView, output_dir: Path) -> None:
@@ -114,7 +122,7 @@ def _run_gen_owl(schema_path: Path) -> str:
         os.unlink(tmp)
 
 
-_DISPATCH: dict[str, callable] = {
+_DISPATCH: dict[str, Callable[[SchemaView, Path], None]] = {
     "jsonschema": _gen_jsonschema,
     "shacl": _gen_shacl,
     "owl": _gen_owl,

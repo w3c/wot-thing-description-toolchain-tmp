@@ -11,6 +11,8 @@ from linkml_runtime.linkml_model.meta import SlotDefinition
 from linkml_runtime.utils.formatutils import underscore
 from linkml_runtime.utils.schemaview import SchemaView
 
+from . import curie_prefix, resolve_prefix_namespace
+
 JSONLD_RESERVED_SLOT_NAMES = frozenset({"@context", "@type"})
 JSONLD_FIXED_TERM_MAPPINGS = {"id": "@id"}
 
@@ -25,6 +27,21 @@ def _annotation_value(annotatable: Any, key: str) -> str | None:
     return str(annotation.value) if annotation else None
 
 
+def _expand_curie(schema_view: SchemaView, curie: str) -> str:
+    """Expand a CURIE to a full IRI using schema-declared prefixes."""
+    expanded = schema_view.expand_curie(curie)
+    if expanded and expanded != curie:
+        return expanded
+    return curie
+
+
+def _curie_term_name(curie: str) -> str:
+    """Extract the local term name from a CURIE (e.g. 'td:name' → 'name')."""
+    if ":" in curie:
+        return curie.split(":", 1)[1]
+    return curie
+
+
 def _context_slots(schema_view: SchemaView) -> list[SlotDefinition]:
     slots = list(schema_view.all_slots().values())
     for class_name in schema_view.all_classes():
@@ -36,19 +53,13 @@ def _slot_key(slot: SlotDefinition) -> str:
     return underscore(slot.alias or slot.name)
 
 
-def _uri_prefix(uri: str | None) -> str | None:
-    if uri is None or ":" not in uri:
-        return None
-    return uri.partition(":")[0]
-
-
 def _owned_vocabulary_prefix(schema_view: SchemaView, class_name: str) -> str | None:
     class_definition = schema_view.get_class(class_name)
-    prefix = _uri_prefix(str(class_definition.class_uri) if class_definition.class_uri else None)
+    prefix = curie_prefix(str(class_definition.class_uri) if class_definition.class_uri else None)
     if prefix is None:
         return None
     if any(
-        _uri_prefix(str(induced_slot.slot_uri) if induced_slot.slot_uri else None) == prefix
+        curie_prefix(str(induced_slot.slot_uri) if induced_slot.slot_uri else None) == prefix
         for induced_slot in schema_view.class_induced_slots(class_name)
     ):
         return prefix
@@ -76,16 +87,114 @@ def _apply_fixed_jsonld_term_mappings(context: dict[str, Any]) -> None:
     context.update(JSONLD_FIXED_TERM_MAPPINGS)
 
 
-def _remove_keyed_map_identifier_slots(context: dict[str, Any], schema_view: SchemaView) -> None:
-    keyed_map_identifier_keys = {
-        _slot_key(member_slot)
-        for map_slot in _context_slots(schema_view)
-        if _annotation_value(map_slot, "jsonld_index") and map_slot.range in schema_view.all_classes()
-        for member_slot in schema_view.class_induced_slots(map_slot.range)
-        if member_slot.identifier
-    }
-    for key in keyed_map_identifier_keys:
+def _uninduced_slot_keys(schema_view: SchemaView) -> frozenset[str]:
+    """Slot keys that no class induces and that no @index annotation references."""
+    induced: set[str] = set()
+    for cls_name in schema_view.all_classes():
+        for slot in schema_view.class_induced_slots(cls_name):
+            induced.add(slot.name)
+    index_terms: set[str] = set()
+    for slot in _context_slots(schema_view):
+        if idx := _annotation_value(slot, "jsonld_index"):
+            index_terms.add(_curie_term_name(idx))
+    never_induced = set(schema_view.all_slots().keys()) - induced
+    return frozenset(
+        _slot_key(schema_view.get_slot(s))
+        for s in never_induced
+        if _slot_key(schema_view.get_slot(s)) not in index_terms
+    )
+
+
+def _remove_uninduced_slots(context: dict[str, Any], keys_to_remove: frozenset[str]) -> None:
+    """Remove slots from root and all scoped contexts that are never induced by any class."""
+    for key in keys_to_remove:
         context.pop(key, None)
+    for val in context.values():
+        if isinstance(val, dict) and "@context" in val:
+            _remove_uninduced_slots(val["@context"], keys_to_remove)
+
+
+def _remove_literal_type_coercion(context: dict[str, Any]) -> None:
+    """Strip ``@type: rdfs:Literal`` from slot entries.
+
+    ``rdfs:Literal`` is the correct OWL range for slots that accept both
+    ``xsd:string`` and ``rdf:langString``, but it is not a valid JSON-LD
+    type coercion target — JSON-LD ``@type`` expects a concrete datatype IRI.
+    """
+    for val in context.values():
+        if isinstance(val, dict):
+            if val.get("@type") == "rdfs:Literal":
+                del val["@type"]
+            if "@context" in val:
+                _remove_literal_type_coercion(val["@context"])
+
+
+def _remove_linkml_internals(context: dict[str, Any]) -> None:
+    """Strip LinkML-internal prefix and type declarations from a context dict."""
+    context.pop("linkml", None)
+    linkml_terms = [
+        key for key, val in context.items()
+        if isinstance(val, dict) and str(val.get("@id", "")).startswith("linkml:")
+    ]
+    for key in linkml_terms:
+        del context[key]
+    for val in context.values():
+        if isinstance(val, dict) and "@context" in val:
+            _remove_linkml_internals(val["@context"])
+
+
+def _resolve_identifier_slot_uri(
+    schema_view: SchemaView, class_name: str, slot_name: str,
+) -> str | None:
+    """Walk the class hierarchy to find a slot_uri for an identifier slot."""
+    for ancestor in schema_view.class_ancestors(class_name, reflexive=True, mixins=True):
+        cls = schema_view.get_class(ancestor)
+        attrs = getattr(cls, "attributes", None) or {}
+        attr = attrs.get(slot_name)
+        if attr and attr.slot_uri:
+            return str(attr.slot_uri)
+    return None
+
+
+def _fix_keyed_map_identifier_slots(context: dict[str, Any], schema_view: SchemaView) -> None:
+    """Replace identifier slots' ``@id`` mapping with their ontology predicate.
+
+    LinkML emits ``"name": "@id"`` for ``identifier: true`` slots, making the
+    value the node identifier.  Keyed-map index properties are data properties
+    and must map to their declared ``slot_uri`` instead.  When no ``slot_uri``
+    exists anywhere in the class hierarchy the slot is purely structural and
+    is removed from the context.
+    """
+    identifier_fixes: dict[str, str | None] = {}
+    for map_slot in _context_slots(schema_view):
+        if not _annotation_value(map_slot, "jsonld_index"):
+            continue
+        if map_slot.range not in schema_view.all_classes():
+            continue
+        for member_slot in schema_view.class_induced_slots(map_slot.range):
+            if not member_slot.identifier:
+                continue
+            key = _slot_key(member_slot)
+            if key in identifier_fixes:
+                continue
+            uri = (
+                str(member_slot.slot_uri)
+                if member_slot.slot_uri
+                else _resolve_identifier_slot_uri(schema_view, map_slot.range, member_slot.name)
+            )
+            identifier_fixes[key] = uri
+
+    for key, uri in identifier_fixes.items():
+        existing = context.get(key)
+        is_identifier_mapping = existing == "@id" or (
+            isinstance(existing, dict) and existing.get("@id") == "@id"
+        )
+        if not is_identifier_mapping:
+            continue
+        if uri:
+            context[key] = {"@id": uri}
+        else:
+            context.pop(key, None)
 
 
 def _context_scope(schema_view: SchemaView, slot: SlotDefinition) -> str | None:
@@ -103,7 +212,7 @@ def _context_scope(schema_view: SchemaView, slot: SlotDefinition) -> str | None:
         )
         if (prefix := _owned_vocabulary_prefix(schema_view, class_name))
     }
-    prefixes.discard(_uri_prefix(str(slot.slot_uri) if slot.slot_uri else None))
+    prefixes.discard(curie_prefix(str(slot.slot_uri) if slot.slot_uri else None))
     unknown_prefixes = prefixes - set(schema_view.schema.prefixes)
     if unknown_prefixes:
         raise ValueError(f"Unknown class URI prefix for {slot.range}: {sorted(unknown_prefixes)}")
@@ -115,27 +224,166 @@ def _context_scope(schema_view: SchemaView, slot: SlotDefinition) -> str | None:
     return next(iter(prefixes), None)
 
 
+def build_module_context(
+    schema_view: SchemaView,
+    generator: ContextGenerator,
+    prefix: str,
+) -> dict[str, Any]:
+    """Build a standalone JSON-LD context dict for one vocabulary module."""
+    ns = resolve_prefix_namespace(schema_view, prefix)
+    context: dict[str, Any] = {"@vocab": ns}
+    slots = _context_slots(schema_view)
+    seen_keys: set[str] = set()
+    for slot in slots:
+        slot_prefix = curie_prefix(str(slot.slot_uri) if slot.slot_uri else None)
+        if slot_prefix != prefix:
+            continue
+        key = _slot_key(slot)
+        if key in seen_keys:
+            continue
+        seen_keys.add(key)
+        entry = _native_slot_context(generator, slot)
+        if container := _annotation_value(slot, "jsonld_container"):
+            entry["@container"] = container
+            if container == "@language":
+                entry.pop("@index", None)
+                entry.pop("@type", None)
+        elif index := _annotation_value(slot, "jsonld_index"):
+            entry["@index"] = _curie_term_name(index)
+        context[key] = entry
+    for cls in schema_view.all_classes().values():
+        cls_prefix = curie_prefix(str(cls.class_uri) if cls.class_uri else None)
+        if cls_prefix == prefix:
+            context[cls.name] = {"@id": str(cls.class_uri)}
+    _fix_keyed_map_identifier_slots(context, schema_view)
+    return context
+
+
 def _module_contexts(schema_view: SchemaView, generator: ContextGenerator) -> dict[str, dict[str, Any]]:
     scopes = {
         scope
         for slot in _context_slots(schema_view)
         if (scope := _context_scope(schema_view, slot))
     }
-    contexts: dict[str, dict[str, Any]] = {}
-    for scope in scopes:
-        prefix = schema_view.schema.prefixes.get(scope)
-        if prefix is None:
-            raise ValueError(f"Unknown jsonld_context prefix: {scope}")
-        context: dict[str, Any] = {"@vocab": str(prefix.prefix_reference)}
-        for slot in _context_slots(schema_view):
-            if not slot.slot_uri or not str(slot.slot_uri).startswith(f"{scope}:"):
-                continue
-            entry = _native_slot_context(generator, slot)
-            if index := _annotation_value(slot, "jsonld_index"):
-                entry["@index"] = index
-            context[_slot_key(slot)] = entry
-        contexts[scope] = context
-    return contexts
+    return {
+        scope: build_module_context(schema_view, generator, scope)
+        for scope in scopes
+    }
+
+
+def _prefix_declarations(schema_view: SchemaView) -> dict[str, str]:
+    """Collect all prefix → namespace mappings from the schema."""
+    return {
+        name: str(p.prefix_reference)
+        for name, p in schema_view.schema.prefixes.items()
+        if p.prefix_reference
+    }
+
+
+def _is_bare_term(term_id: str) -> bool:
+    """Check if a term ID is a bare name (not a CURIE, IRI, or JSON-LD keyword)."""
+    return (
+        ":" not in term_id
+        and "/" not in term_id
+        and not term_id.startswith("@")
+    )
+
+
+def _expand_bare_ids(entry: dict[str, Any], root_vocab: str) -> dict[str, Any]:
+    """Expand bare @id values using root @vocab so they resolve correctly in scoped contexts."""
+    result = deepcopy(entry)
+    term_id = result.get("@id", "")
+    if isinstance(term_id, str) and _is_bare_term(term_id):
+        result["@id"] = root_vocab + term_id
+    return result
+
+
+def _cross_vocab_terms(
+    root_context: dict[str, Any],
+    scoped_vocab: str,
+) -> dict[str, Any]:
+    """Find root-context terms whose @id doesn't match the scoped @vocab.
+
+    These must be re-declared in scoped contexts so they remain accessible.
+    Bare @id values are expanded using root @vocab to prevent mis-resolution.
+    """
+    root_vocab = root_context.get("@vocab", "")
+    redeclare: dict[str, Any] = {}
+    for key, val in root_context.items():
+        if key.startswith("@"):
+            continue
+        if isinstance(val, str):
+            if not val.startswith(scoped_vocab):
+                redeclare[key] = val
+        elif isinstance(val, dict):
+            term_id = val.get("@id", "")
+            if isinstance(term_id, str) and not term_id.startswith(scoped_vocab):
+                if "@container" not in val and "@context" not in val:
+                    redeclare[key] = _expand_bare_ids(val, root_vocab)
+    return redeclare
+
+
+def _term_resolves_to(val: Any, target_iri: str, scoped_vocab: str) -> bool:
+    """Check if a context term definition resolves to the target IRI."""
+    if isinstance(val, str):
+        if val.startswith("@"):
+            return False
+        if ":" in val or "/" in val:
+            return val == target_iri
+        return scoped_vocab + val == target_iri
+    if isinstance(val, dict):
+        term_id = val.get("@id", "")
+        if isinstance(term_id, str):
+            if term_id.startswith("@"):
+                return False
+            if ":" in term_id or "/" in term_id:
+                return term_id == target_iri
+            return scoped_vocab + term_id == target_iri
+    return False
+
+
+def _ensure_index_term(
+    scoped: dict[str, Any],
+    schema_view: SchemaView,
+    index_iri: str,
+) -> None:
+    """Ensure the scoped context has a term that resolves to the @index IRI."""
+    scoped_vocab = scoped.get("@vocab", "")
+    if index_iri.startswith(scoped_vocab):
+        return
+    for key, val in scoped.items():
+        if key.startswith("@"):
+            continue
+        if _term_resolves_to(val, index_iri, scoped_vocab):
+            return
+    for slot in schema_view.all_slots().values():
+        if slot.slot_uri and _expand_curie(schema_view, str(slot.slot_uri)) == index_iri:
+            term = _slot_key(slot)
+            scoped[term] = {"@id": index_iri}
+            return
+    local = index_iri.rsplit("#", 1)[-1] if "#" in index_iri else index_iri.rsplit("/", 1)[-1]
+    scoped[local] = {"@id": index_iri}
+
+
+def _apply_two_level_index_nesting(
+    key: str,
+    entry: dict[str, Any],
+    scoped: dict[str, Any],
+) -> None:
+    parent_index = entry.get("@index")
+    if not parent_index:
+        return
+    inner = scoped.get(key)
+    if not isinstance(inner, dict):
+        return
+    if "@container" not in inner or "@index" not in inner:
+        return
+    inner_index = inner["@index"]
+    if inner_index == parent_index:
+        return
+    level2 = {key: deepcopy(inner)}
+    inner["@index"] = parent_index
+    inner["@context"] = level2
 
 
 def _apply_root_mapping(
@@ -148,10 +396,33 @@ def _apply_root_mapping(
     entry = context.get(key)
     if not isinstance(entry, dict):
         return
+    if container := _annotation_value(slot, "jsonld_container"):
+        entry["@container"] = container
+        if container == "@language":
+            entry.pop("@index", None)
+            entry.pop("@type", None)
+        return
+    index_iri = None
     if index := _annotation_value(slot, "jsonld_index"):
-        entry["@index"] = index
+        index_iri = _expand_curie(schema_view, index)
+        entry["@index"] = _curie_term_name(index)
+    if "@context" in entry and not index_iri:
+        return
     if scope := _context_scope(schema_view, slot):
-        entry["@context"] = deepcopy(module_contexts[scope])
+        scoped = deepcopy(module_contexts[scope])
+        scoped_vocab = scoped.get("@vocab", "")
+        prefixes = _prefix_declarations(schema_view)
+        for name, ns in prefixes.items():
+            if name not in scoped:
+                scoped[name] = ns
+        cross_terms = _cross_vocab_terms(context, scoped_vocab)
+        for term, val in cross_terms.items():
+            if term not in scoped:
+                scoped[term] = val
+        if index_iri:
+            _ensure_index_term(scoped, schema_view, index_iri)
+        _apply_two_level_index_nesting(key, entry, scoped)
+        entry["@context"] = scoped
 
 
 def _apply_class_mappings(
@@ -183,7 +454,7 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
     context = document["@context"]
     _remove_reserved_jsonld_slots(context)
     _apply_fixed_jsonld_term_mappings(context)
-    _remove_keyed_map_identifier_slots(context, schema_view)
+    _fix_keyed_map_identifier_slots(context, schema_view)
     generator = ContextGenerator(
         schema_view.schema,
         mergeimports=True,
@@ -193,4 +464,8 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
     for slot in schema_view.all_slots().values():
         _apply_root_mapping(context, schema_view, slot, module_contexts)
     _apply_class_mappings(schema_view, context, module_contexts)
+    _remove_uninduced_slots(context, _uninduced_slot_keys(schema_view))
+    _remove_literal_type_coercion(context)
+    _remove_linkml_internals(context)
+    context["@version"] = 1.1
     return json.dumps(document, indent=2)

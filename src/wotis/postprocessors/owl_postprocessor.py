@@ -4,16 +4,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from linkml_runtime.linkml_model.meta import (
-    EnumDefinition,
-    Prefix,
-    SchemaDefinition,
-)
+from linkml_runtime.linkml_model.meta import EnumDefinition, SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SKOS, VANN, XSD
 from rdflib.plugin import register
 from rdflib.serializer import Serializer
+
+from . import resolve_prefix_namespace
 
 SCHEMA = Namespace("http://schema.org/")
 LINKML = Namespace("https://w3id.org/linkml/")
@@ -27,7 +25,6 @@ register(
 )
 
 _Enums = dict[str, EnumDefinition]
-_Prefixes = dict[str, Prefix]
 
 
 def _get_schema(sv: SchemaView) -> SchemaDefinition:
@@ -76,14 +73,9 @@ def postprocess_owl(
 
 
 def _module_namespace(sv: SchemaView) -> str:
-    schema = _get_schema(sv)
-    dp = schema.default_prefix
+    dp = _get_schema(sv).default_prefix
     assert dp is not None
-    prefix = cast(Prefix, cast(_Prefixes, schema.prefixes)[dp])
-    ns = str(prefix.prefix_reference)
-    if not ns.endswith(("#", "/")):
-        ns += "#"
-    return ns
+    return resolve_prefix_namespace(sv, dp)
 
 
 def _ontology_iri(sv: SchemaView) -> URIRef:

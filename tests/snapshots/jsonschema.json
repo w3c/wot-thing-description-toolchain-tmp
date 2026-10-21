@@ -1773,11 +1773,7 @@
     },
     "title": {
       "description": "Title of the TD element (Thing, interaction affordance or data schema).",
-      "oneOf": [
-        {
-          "type": "string"
-        }
-      ]
+      "type": "string"
     },
     "titles": {
       "additionalProperties": {

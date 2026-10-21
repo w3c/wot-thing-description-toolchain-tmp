@@ -33,11 +33,21 @@ def _normalize_json(path: Path) -> str:
     return json.dumps(data, sort_keys=True, indent=2, ensure_ascii=False) + "\n"
 
 
+def _read_text(path: Path) -> str:
+    return "\n".join(line.rstrip() for line in path.read_text(encoding="utf-8").splitlines()) + "\n"
+
+
 # name, generated file, function that turns it into the compared text
 ARTIFACTS = [
     ("jsonschema.json", REPO_ROOT / "resources" / "gens" / "jsonschema" / "jsonschema.json", _normalize_json),
     ("context.jsonld", REPO_ROOT / "resources" / "gens" / "jsonldcontext" / "context.jsonld", _normalize_json),
     ("spec-sections.html", REPO_ROOT / "resources" / "gens" / "index.html", generated_sections_html),
+    ("owl/td.ttl", REPO_ROOT / "resources" / "gens" / "owl" / "td.ttl", _read_text),
+    ("owl/hctl.ttl", REPO_ROOT / "resources" / "gens" / "owl" / "hctl.ttl", _read_text),
+    ("owl/wotsec.ttl", REPO_ROOT / "resources" / "gens" / "owl" / "wotsec.ttl", _read_text),
+    ("owl/jsonschema.ttl", REPO_ROOT / "resources" / "gens" / "owl" / "jsonschema.ttl", _read_text),
+    ("owl/tm.ttl", REPO_ROOT / "resources" / "gens" / "owl" / "tm.ttl", _read_text),
+    ("shapes.shacl.ttl", REPO_ROOT / "resources" / "gens" / "shacl" / "shapes.shacl.ttl", _read_text),
 ]
 
 
@@ -92,7 +102,7 @@ def test_golden_matches_generated(request, name: str, gen_path: Path, normalize)
     golden_path = GOLDENS_DIR / name
 
     if request.config.getoption("--update-goldens"):
-        GOLDENS_DIR.mkdir(parents=True, exist_ok=True)
+        golden_path.parent.mkdir(parents=True, exist_ok=True)
         golden_path.write_text(current, encoding="utf-8")
         pytest.skip(f"Golden updated: {golden_path}")
 
@@ -101,7 +111,8 @@ def test_golden_matches_generated(request, name: str, gen_path: Path, normalize)
     if current == golden:
         return
 
-    summary = _json_change_summary(golden, current) if name.endswith(".json") or name.endswith(".jsonld") else []
+    is_json = name.endswith(".json") or name.endswith(".jsonld")
+    summary = _json_change_summary(golden, current) if is_json else []
     diff = list(difflib.unified_diff(
         golden.splitlines(), current.splitlines(), f"snapshots/{name}", f"generated {name}", lineterm=""
     ))

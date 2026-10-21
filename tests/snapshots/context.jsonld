@@ -1,5 +1,6 @@
 {
   "@context": {
+    "@version": 1.1,
     "@vocab": "https://www.w3.org/2019/wot/td#",
     "APIKeySecurityScheme": {
       "@id": "wotsec:APIKeySecurityScheme"
@@ -9,9 +10,6 @@
     },
     "AdditionalExpectedResponse": {
       "@id": "hctl:AdditionalExpectedResponse"
-    },
-    "Any": {
-      "@id": "linkml:Any"
     },
     "ArraySchema": {
       "@id": "jsonschema:ArraySchema"
@@ -116,7 +114,7 @@
     "actions": {
       "@container": "@index",
       "@id": "hasActionAffordance",
-      "@index": "td:name",
+      "@index": "name",
       "@type": "@id"
     },
     "additionalResponses": {
@@ -155,14 +153,121 @@
     "cancellation": {
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/json-schema#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "IntegerSchema": {
+          "@id": "jsonschema:IntegerSchema"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "allOf": {
           "@container": "@set",
           "@id": "jsonschema:allOf",
           "@type": "@id"
         },
+        "anchor": {
+          "@id": "hctl:hasAnchor",
+          "@type": "xsd:anyURI"
+        },
+        "authorization": {
+          "@id": "wotsec:authorization",
+          "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
+        "cancellation": {
+          "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
+          "@type": "@id"
+        },
         "const": {
           "@id": "jsonschema:const",
           "@type": "@id"
+        },
+        "contentCoding": {
+          "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
           "@context": {
@@ -180,9 +285,20 @@
           },
           "@id": "jsonschema:contentMediaType"
         },
+        "contentType": {
+          "@id": "hctl:forContentType"
+        },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
         "default": {
           "@id": "jsonschema:default",
           "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
@@ -191,18 +307,46 @@
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "exclusiveMinimum": {
           "@id": "jsonschema:exclusiveMinimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
+        "foaf": "http://xmlns.com/foaf/0.1/",
         "format": {
           "@id": "jsonschema:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
+        "href": {
+          "@id": "hctl:hasTarget",
+          "@type": "xsd:anyURI"
+        },
+        "hreflang": {
+          "@id": "hctl:hasHreflang"
+        },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
+        },
+        "identity": {
+          "@id": "wotsec:identity"
+        },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
         },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
         },
         "maxItems": {
           "@id": "jsonschema:maxItems",
@@ -214,7 +358,7 @@
         },
         "maximum": {
           "@id": "jsonschema:maximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "minItems": {
           "@id": "jsonschema:minItems",
@@ -226,36 +370,112 @@
         },
         "minimum": {
           "@id": "jsonschema:minimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
         },
         "multipleOf": {
           "@id": "jsonschema:multipleOf",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "name": {
+          "@id": "td:name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
         },
         "oneOf": {
           "@container": "@set",
           "@id": "jsonschema:oneOf",
           "@type": "@id"
         },
+        "op": {
+          "@id": "hctl:hasOperationType"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
         "pattern": {
           "@id": "jsonschema:pattern"
+        },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
         },
         "properties": {
           "@container": "@index",
           "@id": "jsonschema:properties",
-          "@index": "jsonschema:propertyName",
+          "@index": "propertyName",
           "@type": "@id"
         },
         "propertyName": {
           "@id": "jsonschema:propertyName"
         },
+        "proxy": {
+          "@id": "wotsec:proxy",
+          "@type": "xsd:anyURI"
+        },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "readOnly": {
           "@id": "jsonschema:readOnly",
           "@type": "xsd:boolean"
         },
+        "refresh": {
+          "@id": "wotsec:refresh",
+          "@type": "xsd:anyURI"
+        },
+        "rel": {
+          "@id": "hctl:hasRelationType"
+        },
         "required": {
           "@container": "@set",
           "@id": "jsonschema:required"
+        },
+        "response": {
+          "@id": "hctl:returns",
+          "@type": "@id"
+        },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
+        "schema": "http://schema.org/",
+        "scopes": {
+          "@id": "wotsec:scopes"
+        },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
+        "sizes": {
+          "@id": "hctl:hasSizes"
+        },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "success": {
+          "@id": "hctl:isSuccess",
+          "@type": "xsd:boolean"
+        },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
+        "token": {
+          "@id": "wotsec:token",
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@context": {
@@ -265,10 +485,21 @@
           },
           "@id": "jsonschema:type"
         },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
         "writeOnly": {
           "@id": "jsonschema:writeOnly",
           "@type": "xsd:boolean"
-        }
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "hasCancellationSchema",
       "@type": "@id"
@@ -306,14 +537,121 @@
     "data": {
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/json-schema#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "IntegerSchema": {
+          "@id": "jsonschema:IntegerSchema"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "allOf": {
           "@container": "@set",
           "@id": "jsonschema:allOf",
           "@type": "@id"
         },
+        "anchor": {
+          "@id": "hctl:hasAnchor",
+          "@type": "xsd:anyURI"
+        },
+        "authorization": {
+          "@id": "wotsec:authorization",
+          "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
+        "cancellation": {
+          "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
+          "@type": "@id"
+        },
         "const": {
           "@id": "jsonschema:const",
           "@type": "@id"
+        },
+        "contentCoding": {
+          "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
           "@context": {
@@ -331,9 +669,28 @@
           },
           "@id": "jsonschema:contentMediaType"
         },
+        "contentType": {
+          "@id": "hctl:forContentType"
+        },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "data": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationSchema",
+          "@type": "@id"
+        },
+        "dataResponse": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationResponseSchema",
+          "@type": "@id"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
         "default": {
           "@id": "jsonschema:default",
           "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
@@ -342,18 +699,46 @@
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "exclusiveMinimum": {
           "@id": "jsonschema:exclusiveMinimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
+        "foaf": "http://xmlns.com/foaf/0.1/",
         "format": {
           "@id": "jsonschema:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
+        "href": {
+          "@id": "hctl:hasTarget",
+          "@type": "xsd:anyURI"
+        },
+        "hreflang": {
+          "@id": "hctl:hasHreflang"
+        },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
+        },
+        "identity": {
+          "@id": "wotsec:identity"
+        },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
         },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
         },
         "maxItems": {
           "@id": "jsonschema:maxItems",
@@ -365,7 +750,7 @@
         },
         "maximum": {
           "@id": "jsonschema:maximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "minItems": {
           "@id": "jsonschema:minItems",
@@ -377,36 +762,112 @@
         },
         "minimum": {
           "@id": "jsonschema:minimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
         },
         "multipleOf": {
           "@id": "jsonschema:multipleOf",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "name": {
+          "@id": "td:name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
         },
         "oneOf": {
           "@container": "@set",
           "@id": "jsonschema:oneOf",
           "@type": "@id"
         },
+        "op": {
+          "@id": "hctl:hasOperationType"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
         "pattern": {
           "@id": "jsonschema:pattern"
+        },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
         },
         "properties": {
           "@container": "@index",
           "@id": "jsonschema:properties",
-          "@index": "jsonschema:propertyName",
+          "@index": "propertyName",
           "@type": "@id"
         },
         "propertyName": {
           "@id": "jsonschema:propertyName"
         },
+        "proxy": {
+          "@id": "wotsec:proxy",
+          "@type": "xsd:anyURI"
+        },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "readOnly": {
           "@id": "jsonschema:readOnly",
           "@type": "xsd:boolean"
         },
+        "refresh": {
+          "@id": "wotsec:refresh",
+          "@type": "xsd:anyURI"
+        },
+        "rel": {
+          "@id": "hctl:hasRelationType"
+        },
         "required": {
           "@container": "@set",
           "@id": "jsonschema:required"
+        },
+        "response": {
+          "@id": "hctl:returns",
+          "@type": "@id"
+        },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
+        "schema": "http://schema.org/",
+        "scopes": {
+          "@id": "wotsec:scopes"
+        },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
+        "sizes": {
+          "@id": "hctl:hasSizes"
+        },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "success": {
+          "@id": "hctl:isSuccess",
+          "@type": "xsd:boolean"
+        },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
+        "token": {
+          "@id": "wotsec:token",
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@context": {
@@ -416,10 +877,21 @@
           },
           "@id": "jsonschema:type"
         },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
         "writeOnly": {
           "@id": "jsonschema:writeOnly",
           "@type": "xsd:boolean"
-        }
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "hasNotificationSchema",
       "@type": "@id"
@@ -427,14 +899,121 @@
     "dataResponse": {
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/json-schema#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "IntegerSchema": {
+          "@id": "jsonschema:IntegerSchema"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "allOf": {
           "@container": "@set",
           "@id": "jsonschema:allOf",
           "@type": "@id"
         },
+        "anchor": {
+          "@id": "hctl:hasAnchor",
+          "@type": "xsd:anyURI"
+        },
+        "authorization": {
+          "@id": "wotsec:authorization",
+          "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
+        "cancellation": {
+          "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
+          "@type": "@id"
+        },
         "const": {
           "@id": "jsonschema:const",
           "@type": "@id"
+        },
+        "contentCoding": {
+          "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
           "@context": {
@@ -452,9 +1031,24 @@
           },
           "@id": "jsonschema:contentMediaType"
         },
+        "contentType": {
+          "@id": "hctl:forContentType"
+        },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "dataResponse": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationResponseSchema",
+          "@type": "@id"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
         "default": {
           "@id": "jsonschema:default",
           "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
@@ -463,18 +1057,46 @@
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "exclusiveMinimum": {
           "@id": "jsonschema:exclusiveMinimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
+        "foaf": "http://xmlns.com/foaf/0.1/",
         "format": {
           "@id": "jsonschema:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
+        "href": {
+          "@id": "hctl:hasTarget",
+          "@type": "xsd:anyURI"
+        },
+        "hreflang": {
+          "@id": "hctl:hasHreflang"
+        },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
+        },
+        "identity": {
+          "@id": "wotsec:identity"
+        },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
         },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
         },
         "maxItems": {
           "@id": "jsonschema:maxItems",
@@ -486,7 +1108,7 @@
         },
         "maximum": {
           "@id": "jsonschema:maximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "minItems": {
           "@id": "jsonschema:minItems",
@@ -498,36 +1120,112 @@
         },
         "minimum": {
           "@id": "jsonschema:minimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
         },
         "multipleOf": {
           "@id": "jsonschema:multipleOf",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "name": {
+          "@id": "td:name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
         },
         "oneOf": {
           "@container": "@set",
           "@id": "jsonschema:oneOf",
           "@type": "@id"
         },
+        "op": {
+          "@id": "hctl:hasOperationType"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
         "pattern": {
           "@id": "jsonschema:pattern"
+        },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
         },
         "properties": {
           "@container": "@index",
           "@id": "jsonschema:properties",
-          "@index": "jsonschema:propertyName",
+          "@index": "propertyName",
           "@type": "@id"
         },
         "propertyName": {
           "@id": "jsonschema:propertyName"
         },
+        "proxy": {
+          "@id": "wotsec:proxy",
+          "@type": "xsd:anyURI"
+        },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "readOnly": {
           "@id": "jsonschema:readOnly",
           "@type": "xsd:boolean"
         },
+        "refresh": {
+          "@id": "wotsec:refresh",
+          "@type": "xsd:anyURI"
+        },
+        "rel": {
+          "@id": "hctl:hasRelationType"
+        },
         "required": {
           "@container": "@set",
           "@id": "jsonschema:required"
+        },
+        "response": {
+          "@id": "hctl:returns",
+          "@type": "@id"
+        },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
+        "schema": "http://schema.org/",
+        "scopes": {
+          "@id": "wotsec:scopes"
+        },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
+        "sizes": {
+          "@id": "hctl:hasSizes"
+        },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "success": {
+          "@id": "hctl:isSuccess",
+          "@type": "xsd:boolean"
+        },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
+        "token": {
+          "@id": "wotsec:token",
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@context": {
@@ -537,10 +1235,21 @@
           },
           "@id": "jsonschema:type"
         },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
         "writeOnly": {
           "@id": "jsonschema:writeOnly",
           "@type": "xsd:boolean"
-        }
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "hasNotificationResponseSchema",
       "@type": "@id"
@@ -554,9 +1263,8 @@
       "@id": "description"
     },
     "descriptions": {
-      "@container": "@index",
-      "@id": "descriptionInLanguage",
-      "@type": "@id"
+      "@container": "@language",
+      "@id": "descriptionInLanguage"
     },
     "enum": {
       "@container": "@set",
@@ -566,7 +1274,7 @@
     "events": {
       "@container": "@index",
       "@id": "hasEventAffordance",
-      "@index": "td:name",
+      "@index": "name",
       "@type": "@id"
     },
     "exclusiveMaximum": {
@@ -593,6 +1301,90 @@
       "@container": "@set",
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/hypermedia#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "additionalResponses": {
           "@container": "@set",
           "@id": "hctl:additionalReturns",
@@ -602,12 +1394,65 @@
           "@id": "hctl:hasAnchor",
           "@type": "xsd:anyURI"
         },
+        "authorization": {
+          "@id": "wotsec:authorization",
+          "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
+        "cancellation": {
+          "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
+          "@type": "@id"
+        },
+        "const": {
+          "@id": "jsonschema:const",
+          "@type": "@id"
+        },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
         },
         "contentType": {
           "@id": "hctl:forContentType"
         },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "data": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationSchema",
+          "@type": "@id"
+        },
+        "dataResponse": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationResponseSchema",
+          "@type": "@id"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
+        "default": {
+          "@id": "jsonschema:default",
+          "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
+        },
+        "exclusiveMaximum": {
+          "@id": "jsonschema:exclusiveMaximum",
+          "@type": "xsd:decimal"
+        },
+        "exclusiveMinimum": {
+          "@id": "jsonschema:exclusiveMinimum",
+          "@type": "xsd:decimal"
+        },
+        "foaf": "http://xmlns.com/foaf/0.1/",
+        "format": {
+          "@id": "jsonschema:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
           "@type": "xsd:anyURI"
@@ -615,8 +1460,103 @@
         "hreflang": {
           "@id": "hctl:hasHreflang"
         },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
+        },
+        "identity": {
+          "@id": "wotsec:identity"
+        },
+        "input": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInputSchema",
+          "@type": "@id"
+        },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
+        },
+        "items": {
+          "@id": "jsonschema:items",
+          "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
+        },
+        "maxItems": {
+          "@id": "jsonschema:maxItems",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "maxLength": {
+          "@id": "jsonschema:maxLength",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "maximum": {
+          "@id": "jsonschema:maximum",
+          "@type": "xsd:decimal"
+        },
+        "minItems": {
+          "@id": "jsonschema:minItems",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "minLength": {
+          "@id": "jsonschema:minLength",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "minimum": {
+          "@id": "jsonschema:minimum",
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
+        },
+        "multipleOf": {
+          "@id": "jsonschema:multipleOf",
+          "@type": "xsd:decimal"
+        },
+        "name": {
+          "@id": "td:name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
+        },
         "op": {
           "@id": "hctl:hasOperationType"
+        },
+        "output": {
+          "@id": "https://www.w3.org/2019/wot/td#hasOutputSchema",
+          "@type": "@id"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "pattern": {
+          "@id": "jsonschema:pattern"
+        },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
+        },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
+        },
+        "proxy": {
+          "@id": "wotsec:proxy",
+          "@type": "xsd:anyURI"
+        },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "readOnly": {
+          "@id": "jsonschema:readOnly",
+          "@type": "xsd:boolean"
+        },
+        "refresh": {
+          "@id": "wotsec:refresh",
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -625,32 +1565,81 @@
           "@id": "hctl:returns",
           "@type": "@id"
         },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
         "schema": {
           "@id": "hctl:hasAdditionalOutputSchema"
         },
+        "scopes": {
+          "@id": "wotsec:scopes"
+        },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
           "@id": "hctl:hasSizes"
         },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
         "subprotocol": {
+          "@context": {
+            "description": "skos:prefLabel",
+            "meaning": "@id",
+            "text": "skos:notation"
+          },
           "@id": "hctl:forSubProtocol"
+        },
+        "subscription": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSubscriptionSchema",
+          "@type": "@id"
         },
         "success": {
           "@id": "hctl:isSuccess",
           "@type": "xsd:boolean"
         },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
+        "token": {
+          "@id": "wotsec:token",
+          "@type": "xsd:anyURI"
+        },
         "type": {
           "@id": "hctl:hintsAtMediaType"
-        }
+        },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
+        "writeOnly": {
+          "@id": "jsonschema:writeOnly",
+          "@type": "xsd:boolean"
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "hasForm",
       "@type": "@id"
     },
     "hasInstanceConfiguration": {
       "@id": "hasInstanceConfiguration"
-    },
-    "hasInteractionAffordance": {
-      "@id": "hasInteractionAffordance",
-      "@type": "@id"
     },
     "hctl": "https://www.w3.org/2019/wot/hypermedia#",
     "href": {
@@ -679,14 +1668,121 @@
     "input": {
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/json-schema#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "IntegerSchema": {
+          "@id": "jsonschema:IntegerSchema"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "allOf": {
           "@container": "@set",
           "@id": "jsonschema:allOf",
           "@type": "@id"
         },
+        "anchor": {
+          "@id": "hctl:hasAnchor",
+          "@type": "xsd:anyURI"
+        },
+        "authorization": {
+          "@id": "wotsec:authorization",
+          "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
+        "cancellation": {
+          "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
+          "@type": "@id"
+        },
         "const": {
           "@id": "jsonschema:const",
           "@type": "@id"
+        },
+        "contentCoding": {
+          "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
           "@context": {
@@ -704,9 +1800,28 @@
           },
           "@id": "jsonschema:contentMediaType"
         },
+        "contentType": {
+          "@id": "hctl:forContentType"
+        },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "data": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationSchema",
+          "@type": "@id"
+        },
+        "dataResponse": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationResponseSchema",
+          "@type": "@id"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
         "default": {
           "@id": "jsonschema:default",
           "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
@@ -715,18 +1830,50 @@
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "exclusiveMinimum": {
           "@id": "jsonschema:exclusiveMinimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
+        "foaf": "http://xmlns.com/foaf/0.1/",
         "format": {
           "@id": "jsonschema:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
+        "href": {
+          "@id": "hctl:hasTarget",
+          "@type": "xsd:anyURI"
+        },
+        "hreflang": {
+          "@id": "hctl:hasHreflang"
+        },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
+        },
+        "identity": {
+          "@id": "wotsec:identity"
+        },
+        "input": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInputSchema",
+          "@type": "@id"
+        },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
         },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
         },
         "maxItems": {
           "@id": "jsonschema:maxItems",
@@ -738,7 +1885,7 @@
         },
         "maximum": {
           "@id": "jsonschema:maximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "minItems": {
           "@id": "jsonschema:minItems",
@@ -750,36 +1897,120 @@
         },
         "minimum": {
           "@id": "jsonschema:minimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
         },
         "multipleOf": {
           "@id": "jsonschema:multipleOf",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "name": {
+          "@id": "td:name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
         },
         "oneOf": {
           "@container": "@set",
           "@id": "jsonschema:oneOf",
           "@type": "@id"
         },
+        "op": {
+          "@id": "hctl:hasOperationType"
+        },
+        "output": {
+          "@id": "https://www.w3.org/2019/wot/td#hasOutputSchema",
+          "@type": "@id"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
         "pattern": {
           "@id": "jsonschema:pattern"
+        },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
         },
         "properties": {
           "@container": "@index",
           "@id": "jsonschema:properties",
-          "@index": "jsonschema:propertyName",
+          "@index": "propertyName",
           "@type": "@id"
         },
         "propertyName": {
           "@id": "jsonschema:propertyName"
         },
+        "proxy": {
+          "@id": "wotsec:proxy",
+          "@type": "xsd:anyURI"
+        },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "readOnly": {
           "@id": "jsonschema:readOnly",
           "@type": "xsd:boolean"
         },
+        "refresh": {
+          "@id": "wotsec:refresh",
+          "@type": "xsd:anyURI"
+        },
+        "rel": {
+          "@id": "hctl:hasRelationType"
+        },
         "required": {
           "@container": "@set",
           "@id": "jsonschema:required"
+        },
+        "response": {
+          "@id": "hctl:returns",
+          "@type": "@id"
+        },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
+        "schema": "http://schema.org/",
+        "scopes": {
+          "@id": "wotsec:scopes"
+        },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
+        "sizes": {
+          "@id": "hctl:hasSizes"
+        },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "subscription": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSubscriptionSchema",
+          "@type": "@id"
+        },
+        "success": {
+          "@id": "hctl:isSuccess",
+          "@type": "xsd:boolean"
+        },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
+        "token": {
+          "@id": "wotsec:token",
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@context": {
@@ -789,10 +2020,21 @@
           },
           "@id": "jsonschema:type"
         },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
         "writeOnly": {
           "@id": "jsonschema:writeOnly",
           "@type": "xsd:boolean"
-        }
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "hasInputSchema",
       "@type": "@id"
@@ -809,11 +2051,94 @@
     "language_value": {
       "@id": "language_value"
     },
-    "linkml": "https://w3id.org/linkml/",
     "links": {
       "@container": "@set",
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/hypermedia#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "additionalResponses": {
           "@container": "@set",
           "@id": "hctl:additionalReturns",
@@ -823,12 +2148,65 @@
           "@id": "hctl:hasAnchor",
           "@type": "xsd:anyURI"
         },
+        "authorization": {
+          "@id": "wotsec:authorization",
+          "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
+        "cancellation": {
+          "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
+          "@type": "@id"
+        },
+        "const": {
+          "@id": "jsonschema:const",
+          "@type": "@id"
+        },
         "contentCoding": {
           "@id": "hctl:forContentCoding"
         },
         "contentType": {
           "@id": "hctl:forContentType"
         },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "data": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationSchema",
+          "@type": "@id"
+        },
+        "dataResponse": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationResponseSchema",
+          "@type": "@id"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
+        "default": {
+          "@id": "jsonschema:default",
+          "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
+        },
+        "exclusiveMaximum": {
+          "@id": "jsonschema:exclusiveMaximum",
+          "@type": "xsd:decimal"
+        },
+        "exclusiveMinimum": {
+          "@id": "jsonschema:exclusiveMinimum",
+          "@type": "xsd:decimal"
+        },
+        "foaf": "http://xmlns.com/foaf/0.1/",
+        "format": {
+          "@id": "jsonschema:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
           "@type": "xsd:anyURI"
@@ -836,8 +2214,103 @@
         "hreflang": {
           "@id": "hctl:hasHreflang"
         },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
+        },
+        "identity": {
+          "@id": "wotsec:identity"
+        },
+        "input": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInputSchema",
+          "@type": "@id"
+        },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
+        },
+        "items": {
+          "@id": "jsonschema:items",
+          "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
+        },
+        "maxItems": {
+          "@id": "jsonschema:maxItems",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "maxLength": {
+          "@id": "jsonschema:maxLength",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "maximum": {
+          "@id": "jsonschema:maximum",
+          "@type": "xsd:decimal"
+        },
+        "minItems": {
+          "@id": "jsonschema:minItems",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "minLength": {
+          "@id": "jsonschema:minLength",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "minimum": {
+          "@id": "jsonschema:minimum",
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
+        },
+        "multipleOf": {
+          "@id": "jsonschema:multipleOf",
+          "@type": "xsd:decimal"
+        },
+        "name": {
+          "@id": "td:name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
+        },
         "op": {
           "@id": "hctl:hasOperationType"
+        },
+        "output": {
+          "@id": "https://www.w3.org/2019/wot/td#hasOutputSchema",
+          "@type": "@id"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "pattern": {
+          "@id": "jsonschema:pattern"
+        },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
+        },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
+        },
+        "proxy": {
+          "@id": "wotsec:proxy",
+          "@type": "xsd:anyURI"
+        },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "readOnly": {
+          "@id": "jsonschema:readOnly",
+          "@type": "xsd:boolean"
+        },
+        "refresh": {
+          "@id": "wotsec:refresh",
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -846,22 +2319,75 @@
           "@id": "hctl:returns",
           "@type": "@id"
         },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
         "schema": {
           "@id": "hctl:hasAdditionalOutputSchema"
         },
+        "scopes": {
+          "@id": "wotsec:scopes"
+        },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
           "@id": "hctl:hasSizes"
         },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
         "subprotocol": {
+          "@context": {
+            "description": "skos:prefLabel",
+            "meaning": "@id",
+            "text": "skos:notation"
+          },
           "@id": "hctl:forSubProtocol"
+        },
+        "subscription": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSubscriptionSchema",
+          "@type": "@id"
         },
         "success": {
           "@id": "hctl:isSuccess",
           "@type": "xsd:boolean"
         },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
+        "token": {
+          "@id": "wotsec:token",
+          "@type": "xsd:anyURI"
+        },
         "type": {
           "@id": "hctl:hintsAtMediaType"
-        }
+        },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
+        "writeOnly": {
+          "@id": "jsonschema:writeOnly",
+          "@type": "xsd:boolean"
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "hasLink",
       "@type": "@id"
@@ -901,6 +2427,9 @@
       "@id": "jsonschema:multipleOf",
       "@type": "xsd:decimal"
     },
+    "name": {
+      "@id": "td:name"
+    },
     "observable": {
       "@id": "isObservable",
       "@type": "xsd:boolean"
@@ -915,14 +2444,121 @@
     "output": {
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/json-schema#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "IntegerSchema": {
+          "@id": "jsonschema:IntegerSchema"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "allOf": {
           "@container": "@set",
           "@id": "jsonschema:allOf",
           "@type": "@id"
         },
+        "anchor": {
+          "@id": "hctl:hasAnchor",
+          "@type": "xsd:anyURI"
+        },
+        "authorization": {
+          "@id": "wotsec:authorization",
+          "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
+        "cancellation": {
+          "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
+          "@type": "@id"
+        },
         "const": {
           "@id": "jsonschema:const",
           "@type": "@id"
+        },
+        "contentCoding": {
+          "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
           "@context": {
@@ -940,9 +2576,28 @@
           },
           "@id": "jsonschema:contentMediaType"
         },
+        "contentType": {
+          "@id": "hctl:forContentType"
+        },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "data": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationSchema",
+          "@type": "@id"
+        },
+        "dataResponse": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationResponseSchema",
+          "@type": "@id"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
         "default": {
           "@id": "jsonschema:default",
           "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
@@ -951,18 +2606,46 @@
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "exclusiveMinimum": {
           "@id": "jsonschema:exclusiveMinimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
+        "foaf": "http://xmlns.com/foaf/0.1/",
         "format": {
           "@id": "jsonschema:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
+        "href": {
+          "@id": "hctl:hasTarget",
+          "@type": "xsd:anyURI"
+        },
+        "hreflang": {
+          "@id": "hctl:hasHreflang"
+        },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
+        },
+        "identity": {
+          "@id": "wotsec:identity"
+        },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
         },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
         },
         "maxItems": {
           "@id": "jsonschema:maxItems",
@@ -974,7 +2657,7 @@
         },
         "maximum": {
           "@id": "jsonschema:maximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "minItems": {
           "@id": "jsonschema:minItems",
@@ -986,36 +2669,120 @@
         },
         "minimum": {
           "@id": "jsonschema:minimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
         },
         "multipleOf": {
           "@id": "jsonschema:multipleOf",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "name": {
+          "@id": "td:name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
         },
         "oneOf": {
           "@container": "@set",
           "@id": "jsonschema:oneOf",
           "@type": "@id"
         },
+        "op": {
+          "@id": "hctl:hasOperationType"
+        },
+        "output": {
+          "@id": "https://www.w3.org/2019/wot/td#hasOutputSchema",
+          "@type": "@id"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
         "pattern": {
           "@id": "jsonschema:pattern"
+        },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
         },
         "properties": {
           "@container": "@index",
           "@id": "jsonschema:properties",
-          "@index": "jsonschema:propertyName",
+          "@index": "propertyName",
           "@type": "@id"
         },
         "propertyName": {
           "@id": "jsonschema:propertyName"
         },
+        "proxy": {
+          "@id": "wotsec:proxy",
+          "@type": "xsd:anyURI"
+        },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "readOnly": {
           "@id": "jsonschema:readOnly",
           "@type": "xsd:boolean"
         },
+        "refresh": {
+          "@id": "wotsec:refresh",
+          "@type": "xsd:anyURI"
+        },
+        "rel": {
+          "@id": "hctl:hasRelationType"
+        },
         "required": {
           "@container": "@set",
           "@id": "jsonschema:required"
+        },
+        "response": {
+          "@id": "hctl:returns",
+          "@type": "@id"
+        },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
+        "schema": "http://schema.org/",
+        "scopes": {
+          "@id": "wotsec:scopes"
+        },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
+        "sizes": {
+          "@id": "hctl:hasSizes"
+        },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "subscription": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSubscriptionSchema",
+          "@type": "@id"
+        },
+        "success": {
+          "@id": "hctl:isSuccess",
+          "@type": "xsd:boolean"
+        },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
+        "token": {
+          "@id": "wotsec:token",
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@context": {
@@ -1025,10 +2792,21 @@
           },
           "@id": "jsonschema:type"
         },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
         "writeOnly": {
           "@id": "jsonschema:writeOnly",
           "@type": "xsd:boolean"
-        }
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "hasOutputSchema",
       "@type": "@id"
@@ -1045,14 +2823,117 @@
       "@container": "@index",
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/json-schema#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "IntegerSchema": {
+          "@id": "jsonschema:IntegerSchema"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "allOf": {
           "@container": "@set",
           "@id": "jsonschema:allOf",
           "@type": "@id"
         },
+        "anchor": {
+          "@id": "hctl:hasAnchor",
+          "@type": "xsd:anyURI"
+        },
+        "authorization": {
+          "@id": "wotsec:authorization",
+          "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
         "const": {
           "@id": "jsonschema:const",
           "@type": "@id"
+        },
+        "contentCoding": {
+          "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
           "@context": {
@@ -1070,9 +2951,20 @@
           },
           "@id": "jsonschema:contentMediaType"
         },
+        "contentType": {
+          "@id": "hctl:forContentType"
+        },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
         "default": {
           "@id": "jsonschema:default",
           "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
@@ -1081,18 +2973,46 @@
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "exclusiveMinimum": {
           "@id": "jsonschema:exclusiveMinimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
+        "foaf": "http://xmlns.com/foaf/0.1/",
         "format": {
           "@id": "jsonschema:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
+        "href": {
+          "@id": "hctl:hasTarget",
+          "@type": "xsd:anyURI"
+        },
+        "hreflang": {
+          "@id": "hctl:hasHreflang"
+        },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
+        },
+        "identity": {
+          "@id": "wotsec:identity"
+        },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
         },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
         },
         "maxItems": {
           "@id": "jsonschema:maxItems",
@@ -1104,7 +3024,7 @@
         },
         "maximum": {
           "@id": "jsonschema:maximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "minItems": {
           "@id": "jsonschema:minItems",
@@ -1116,36 +3036,120 @@
         },
         "minimum": {
           "@id": "jsonschema:minimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
         },
         "multipleOf": {
           "@id": "jsonschema:multipleOf",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "name": {
+          "@id": "https://www.w3.org/2019/wot/td#name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
         },
         "oneOf": {
           "@container": "@set",
           "@id": "jsonschema:oneOf",
           "@type": "@id"
         },
+        "op": {
+          "@id": "hctl:hasOperationType"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
         "pattern": {
           "@id": "jsonschema:pattern"
         },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
+        },
         "properties": {
           "@container": "@index",
+          "@context": {
+            "properties": {
+              "@container": "@index",
+              "@id": "jsonschema:properties",
+              "@index": "propertyName",
+              "@type": "@id"
+            }
+          },
           "@id": "jsonschema:properties",
-          "@index": "jsonschema:propertyName",
+          "@index": "name",
           "@type": "@id"
         },
         "propertyName": {
           "@id": "jsonschema:propertyName"
         },
+        "proxy": {
+          "@id": "wotsec:proxy",
+          "@type": "xsd:anyURI"
+        },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "readOnly": {
           "@id": "jsonschema:readOnly",
           "@type": "xsd:boolean"
         },
+        "refresh": {
+          "@id": "wotsec:refresh",
+          "@type": "xsd:anyURI"
+        },
+        "rel": {
+          "@id": "hctl:hasRelationType"
+        },
         "required": {
           "@container": "@set",
           "@id": "jsonschema:required"
+        },
+        "response": {
+          "@id": "hctl:returns",
+          "@type": "@id"
+        },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
+        "schema": "http://schema.org/",
+        "scopes": {
+          "@id": "wotsec:scopes"
+        },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
+        "sizes": {
+          "@id": "hctl:hasSizes"
+        },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "success": {
+          "@id": "hctl:isSuccess",
+          "@type": "xsd:boolean"
+        },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
+        "token": {
+          "@id": "wotsec:token",
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@context": {
@@ -1155,13 +3159,24 @@
           },
           "@id": "jsonschema:type"
         },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
         "writeOnly": {
           "@id": "jsonschema:writeOnly",
           "@type": "xsd:boolean"
-        }
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "hasPropertyAffordance",
-      "@index": "td:name",
+      "@index": "name",
       "@type": "@id"
     },
     "propertyName": {
@@ -1211,14 +3226,117 @@
       "@container": "@index",
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/json-schema#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "IntegerSchema": {
+          "@id": "jsonschema:IntegerSchema"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "allOf": {
           "@container": "@set",
           "@id": "jsonschema:allOf",
           "@type": "@id"
         },
+        "anchor": {
+          "@id": "hctl:hasAnchor",
+          "@type": "xsd:anyURI"
+        },
+        "authorization": {
+          "@id": "wotsec:authorization",
+          "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
         "const": {
           "@id": "jsonschema:const",
           "@type": "@id"
+        },
+        "contentCoding": {
+          "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
           "@context": {
@@ -1236,9 +3354,20 @@
           },
           "@id": "jsonschema:contentMediaType"
         },
+        "contentType": {
+          "@id": "hctl:forContentType"
+        },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
         "default": {
           "@id": "jsonschema:default",
           "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
@@ -1247,18 +3376,46 @@
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "exclusiveMinimum": {
           "@id": "jsonschema:exclusiveMinimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
+        "foaf": "http://xmlns.com/foaf/0.1/",
         "format": {
           "@id": "jsonschema:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
+        "href": {
+          "@id": "hctl:hasTarget",
+          "@type": "xsd:anyURI"
+        },
+        "hreflang": {
+          "@id": "hctl:hasHreflang"
+        },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
+        },
+        "identity": {
+          "@id": "wotsec:identity"
+        },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
         },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
         },
         "maxItems": {
           "@id": "jsonschema:maxItems",
@@ -1270,7 +3427,7 @@
         },
         "maximum": {
           "@id": "jsonschema:maximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "minItems": {
           "@id": "jsonschema:minItems",
@@ -1282,36 +3439,112 @@
         },
         "minimum": {
           "@id": "jsonschema:minimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
         },
         "multipleOf": {
           "@id": "jsonschema:multipleOf",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "name": {
+          "@id": "td:name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
         },
         "oneOf": {
           "@container": "@set",
           "@id": "jsonschema:oneOf",
           "@type": "@id"
         },
+        "op": {
+          "@id": "hctl:hasOperationType"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
         "pattern": {
           "@id": "jsonschema:pattern"
+        },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
         },
         "properties": {
           "@container": "@index",
           "@id": "jsonschema:properties",
-          "@index": "jsonschema:propertyName",
+          "@index": "propertyName",
           "@type": "@id"
         },
         "propertyName": {
           "@id": "jsonschema:propertyName"
         },
+        "proxy": {
+          "@id": "wotsec:proxy",
+          "@type": "xsd:anyURI"
+        },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "readOnly": {
           "@id": "jsonschema:readOnly",
           "@type": "xsd:boolean"
         },
+        "refresh": {
+          "@id": "wotsec:refresh",
+          "@type": "xsd:anyURI"
+        },
+        "rel": {
+          "@id": "hctl:hasRelationType"
+        },
         "required": {
           "@container": "@set",
           "@id": "jsonschema:required"
+        },
+        "response": {
+          "@id": "hctl:returns",
+          "@type": "@id"
+        },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
+        "schema": "http://schema.org/",
+        "scopes": {
+          "@id": "wotsec:scopes"
+        },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
+        "sizes": {
+          "@id": "hctl:hasSizes"
+        },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "success": {
+          "@id": "hctl:isSuccess",
+          "@type": "xsd:boolean"
+        },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
+        "token": {
+          "@id": "wotsec:token",
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@context": {
@@ -1321,13 +3554,24 @@
           },
           "@id": "jsonschema:type"
         },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
         "writeOnly": {
           "@id": "jsonschema:writeOnly",
           "@type": "xsd:boolean"
-        }
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "schemaDefinitions",
-      "@index": "td:hasInstanceConfiguration",
+      "@index": "hasInstanceConfiguration",
       "@type": "@id"
     },
     "scheme": {
@@ -1348,6 +3592,90 @@
       "@container": "@index",
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/security#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "alg": {
           "@context": {
             "description": "skos:prefLabel",
@@ -1360,9 +3688,48 @@
           "@container": "@set",
           "@id": "wotsec:allOf"
         },
+        "anchor": {
+          "@id": "hctl:hasAnchor",
+          "@type": "xsd:anyURI"
+        },
         "authorization": {
           "@id": "wotsec:authorization",
           "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
+        "const": {
+          "@id": "jsonschema:const",
+          "@type": "@id"
+        },
+        "contentCoding": {
+          "@id": "hctl:forContentCoding"
+        },
+        "contentType": {
+          "@id": "hctl:forContentType"
+        },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
+        "default": {
+          "@id": "jsonschema:default",
+          "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
+        },
+        "exclusiveMaximum": {
+          "@id": "jsonschema:exclusiveMaximum",
+          "@type": "xsd:decimal"
+        },
+        "exclusiveMinimum": {
+          "@id": "jsonschema:exclusiveMinimum",
+          "@type": "xsd:decimal"
         },
         "flow": {
           "@context": {
@@ -1372,6 +3739,7 @@
           },
           "@id": "wotsec:flow"
         },
+        "foaf": "http://xmlns.com/foaf/0.1/",
         "format": {
           "@context": {
             "description": "skos:prefLabel",
@@ -1379,6 +3747,22 @@
             "text": "skos:notation"
           },
           "@id": "wotsec:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
+        "href": {
+          "@id": "hctl:hasTarget",
+          "@type": "xsd:anyURI"
+        },
+        "hreflang": {
+          "@id": "hctl:hasHreflang"
+        },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
         },
         "identity": {
           "@id": "wotsec:identity"
@@ -1391,12 +3775,77 @@
           },
           "@id": "wotsec:in"
         },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
+        },
+        "items": {
+          "@id": "jsonschema:items",
+          "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
+        },
+        "maxItems": {
+          "@id": "jsonschema:maxItems",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "maxLength": {
+          "@id": "jsonschema:maxLength",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "maximum": {
+          "@id": "jsonschema:maximum",
+          "@type": "xsd:decimal"
+        },
+        "minItems": {
+          "@id": "jsonschema:minItems",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "minLength": {
+          "@id": "jsonschema:minLength",
+          "@type": "xsd:nonNegativeInteger"
+        },
+        "minimum": {
+          "@id": "jsonschema:minimum",
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
+        },
+        "multipleOf": {
+          "@id": "jsonschema:multipleOf",
+          "@type": "xsd:decimal"
+        },
         "name": {
           "@id": "wotsec:name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
         },
         "oneOf": {
           "@container": "@set",
           "@id": "wotsec:oneOf"
+        },
+        "op": {
+          "@id": "hctl:hasOperationType"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "pattern": {
+          "@id": "jsonschema:pattern"
+        },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
+        },
+        "propertyName": {
+          "@id": "jsonschema:propertyName"
         },
         "proxy": {
           "@id": "wotsec:proxy",
@@ -1410,20 +3859,78 @@
           },
           "@id": "wotsec:qop"
         },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "readOnly": {
+          "@id": "jsonschema:readOnly",
+          "@type": "xsd:boolean"
+        },
         "refresh": {
           "@id": "wotsec:refresh",
           "@type": "xsd:anyURI"
         },
+        "rel": {
+          "@id": "hctl:hasRelationType"
+        },
+        "response": {
+          "@id": "hctl:returns",
+          "@type": "@id"
+        },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
+        "schema": "http://schema.org/",
         "scopes": {
           "@id": "wotsec:scopes"
         },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
+        "sizes": {
+          "@id": "hctl:hasSizes"
+        },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "success": {
+          "@id": "hctl:isSuccess",
+          "@type": "xsd:boolean"
+        },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
           "@type": "xsd:anyURI"
-        }
+        },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
+        "writeOnly": {
+          "@id": "jsonschema:writeOnly",
+          "@type": "xsd:boolean"
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "definesSecurityScheme",
-      "@index": "td:hasInstanceConfiguration",
+      "@index": "hasInstanceConfiguration",
       "@type": "@id"
     },
     "shex": "http://www.w3.org/ns/shex#",
@@ -1442,14 +3949,121 @@
     "subscription": {
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/json-schema#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "IntegerSchema": {
+          "@id": "jsonschema:IntegerSchema"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "allOf": {
           "@container": "@set",
           "@id": "jsonschema:allOf",
           "@type": "@id"
         },
+        "anchor": {
+          "@id": "hctl:hasAnchor",
+          "@type": "xsd:anyURI"
+        },
+        "authorization": {
+          "@id": "wotsec:authorization",
+          "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
+        "cancellation": {
+          "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
+          "@type": "@id"
+        },
         "const": {
           "@id": "jsonschema:const",
           "@type": "@id"
+        },
+        "contentCoding": {
+          "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
           "@context": {
@@ -1467,9 +4081,28 @@
           },
           "@id": "jsonschema:contentMediaType"
         },
+        "contentType": {
+          "@id": "hctl:forContentType"
+        },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "data": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationSchema",
+          "@type": "@id"
+        },
+        "dataResponse": {
+          "@id": "https://www.w3.org/2019/wot/td#hasNotificationResponseSchema",
+          "@type": "@id"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
         "default": {
           "@id": "jsonschema:default",
           "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
@@ -1478,18 +4111,46 @@
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "exclusiveMinimum": {
           "@id": "jsonschema:exclusiveMinimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
+        "foaf": "http://xmlns.com/foaf/0.1/",
         "format": {
           "@id": "jsonschema:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
+        "href": {
+          "@id": "hctl:hasTarget",
+          "@type": "xsd:anyURI"
+        },
+        "hreflang": {
+          "@id": "hctl:hasHreflang"
+        },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
+        },
+        "identity": {
+          "@id": "wotsec:identity"
+        },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
         },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
         },
         "maxItems": {
           "@id": "jsonschema:maxItems",
@@ -1501,7 +4162,7 @@
         },
         "maximum": {
           "@id": "jsonschema:maximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "minItems": {
           "@id": "jsonschema:minItems",
@@ -1513,36 +4174,116 @@
         },
         "minimum": {
           "@id": "jsonschema:minimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
         },
         "multipleOf": {
           "@id": "jsonschema:multipleOf",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "name": {
+          "@id": "td:name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
         },
         "oneOf": {
           "@container": "@set",
           "@id": "jsonschema:oneOf",
           "@type": "@id"
         },
+        "op": {
+          "@id": "hctl:hasOperationType"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
         "pattern": {
           "@id": "jsonschema:pattern"
+        },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
         },
         "properties": {
           "@container": "@index",
           "@id": "jsonschema:properties",
-          "@index": "jsonschema:propertyName",
+          "@index": "propertyName",
           "@type": "@id"
         },
         "propertyName": {
           "@id": "jsonschema:propertyName"
         },
+        "proxy": {
+          "@id": "wotsec:proxy",
+          "@type": "xsd:anyURI"
+        },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "readOnly": {
           "@id": "jsonschema:readOnly",
           "@type": "xsd:boolean"
         },
+        "refresh": {
+          "@id": "wotsec:refresh",
+          "@type": "xsd:anyURI"
+        },
+        "rel": {
+          "@id": "hctl:hasRelationType"
+        },
         "required": {
           "@container": "@set",
           "@id": "jsonschema:required"
+        },
+        "response": {
+          "@id": "hctl:returns",
+          "@type": "@id"
+        },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
+        "schema": "http://schema.org/",
+        "scopes": {
+          "@id": "wotsec:scopes"
+        },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
+        "sizes": {
+          "@id": "hctl:hasSizes"
+        },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "subscription": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSubscriptionSchema",
+          "@type": "@id"
+        },
+        "success": {
+          "@id": "hctl:isSuccess",
+          "@type": "xsd:boolean"
+        },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
+        "token": {
+          "@id": "wotsec:token",
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@context": {
@@ -1552,10 +4293,21 @@
           },
           "@id": "jsonschema:type"
         },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
         "writeOnly": {
           "@id": "jsonschema:writeOnly",
           "@type": "xsd:boolean"
-        }
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "hasSubscriptionSchema",
       "@type": "@id"
@@ -1577,9 +4329,8 @@
       "@id": "title"
     },
     "titles": {
-      "@container": "@index",
-      "@id": "titleInLanguage",
-      "@type": "@id"
+      "@container": "@language",
+      "@id": "titleInLanguage"
     },
     "tm": "https://www.w3.org/2019/wot/tm#",
     "token": {
@@ -1601,14 +4352,117 @@
       "@container": "@index",
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/json-schema#",
+        "APIKeySecurityScheme": {
+          "@id": "wotsec:APIKeySecurityScheme"
+        },
+        "ActionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
+        },
+        "AdditionalExpectedResponse": {
+          "@id": "hctl:AdditionalExpectedResponse"
+        },
+        "ArraySchema": {
+          "@id": "jsonschema:ArraySchema"
+        },
+        "AutoSecurityScheme": {
+          "@id": "wotsec:AutoSecurityScheme"
+        },
+        "BasicSecurityScheme": {
+          "@id": "wotsec:BasicSecurityScheme"
+        },
+        "BearerSecurityScheme": {
+          "@id": "wotsec:BearerSecurityScheme"
+        },
+        "BooleanSchema": {
+          "@id": "jsonschema:BooleanSchema"
+        },
+        "ComboSecurityScheme": {
+          "@id": "wotsec:ComboSecurityScheme"
+        },
+        "DataSchema": {
+          "@id": "jsonschema:DataSchema"
+        },
+        "DigestSecurityScheme": {
+          "@id": "wotsec:DigestSecurityScheme"
+        },
+        "EventAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
+        },
+        "ExpectedResponse": {
+          "@id": "hctl:ExpectedResponse"
+        },
+        "Form": {
+          "@id": "hctl:Form"
+        },
+        "IntegerSchema": {
+          "@id": "jsonschema:IntegerSchema"
+        },
+        "InteractionAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
+        },
+        "Link": {
+          "@id": "hctl:Link"
+        },
+        "MultiLanguage": {
+          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
+        },
+        "NoSecurityScheme": {
+          "@id": "wotsec:NoSecurityScheme"
+        },
+        "NullSchema": {
+          "@id": "jsonschema:NullSchema"
+        },
+        "NumberSchema": {
+          "@id": "jsonschema:NumberSchema"
+        },
+        "OAuth2SecurityScheme": {
+          "@id": "wotsec:OAuth2SecurityScheme"
+        },
+        "ObjectSchema": {
+          "@id": "jsonschema:ObjectSchema"
+        },
+        "PSKSecurityScheme": {
+          "@id": "wotsec:PSKSecurityScheme"
+        },
+        "PropertyAffordance": {
+          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
+        },
+        "SecurityScheme": {
+          "@id": "wotsec:SecurityScheme"
+        },
+        "StringSchema": {
+          "@id": "jsonschema:StringSchema"
+        },
+        "Thing": {
+          "@id": "https://www.w3.org/2019/wot/td#Thing"
+        },
+        "VersionInfo": {
+          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
+        },
         "allOf": {
           "@container": "@set",
           "@id": "jsonschema:allOf",
           "@type": "@id"
         },
+        "anchor": {
+          "@id": "hctl:hasAnchor",
+          "@type": "xsd:anyURI"
+        },
+        "authorization": {
+          "@id": "wotsec:authorization",
+          "@type": "xsd:anyURI"
+        },
+        "base": {
+          "@id": "https://www.w3.org/2019/wot/td#baseURI",
+          "@type": "xsd:anyURI"
+        },
+        "bcp47": "https://tools.ietf.org/html/bcp47",
         "const": {
           "@id": "jsonschema:const",
           "@type": "@id"
+        },
+        "contentCoding": {
+          "@id": "hctl:forContentCoding"
         },
         "contentEncoding": {
           "@context": {
@@ -1626,9 +4480,20 @@
           },
           "@id": "jsonschema:contentMediaType"
         },
+        "contentType": {
+          "@id": "hctl:forContentType"
+        },
+        "created": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "dcterms": "http://purl.org/dc/terms/",
         "default": {
           "@id": "jsonschema:default",
           "@type": "@id"
+        },
+        "description": {
+          "@id": "https://www.w3.org/2019/wot/td#description"
         },
         "enum": {
           "@container": "@set",
@@ -1637,18 +4502,46 @@
         },
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "exclusiveMinimum": {
           "@id": "jsonschema:exclusiveMinimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
+        "foaf": "http://xmlns.com/foaf/0.1/",
         "format": {
           "@id": "jsonschema:format"
+        },
+        "hasInstanceConfiguration": {
+          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
+        },
+        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
+        "href": {
+          "@id": "hctl:hasTarget",
+          "@type": "xsd:anyURI"
+        },
+        "hreflang": {
+          "@id": "hctl:hasHreflang"
+        },
+        "id": "@id",
+        "idempotent": {
+          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
+          "@type": "xsd:boolean"
+        },
+        "identity": {
+          "@id": "wotsec:identity"
+        },
+        "instance": {
+          "@id": "https://www.w3.org/2019/wot/td#instance"
         },
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
+        },
+        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
+        "language_tag": "@id",
+        "language_value": {
+          "@id": "https://www.w3.org/2019/wot/td#language_value"
         },
         "maxItems": {
           "@id": "jsonschema:maxItems",
@@ -1660,7 +4553,7 @@
         },
         "maximum": {
           "@id": "jsonschema:maximum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
         },
         "minItems": {
           "@id": "jsonschema:minItems",
@@ -1672,36 +4565,112 @@
         },
         "minimum": {
           "@id": "jsonschema:minimum",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "model": {
+          "@id": "https://www.w3.org/2019/wot/td#model"
+        },
+        "modified": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
         },
         "multipleOf": {
           "@id": "jsonschema:multipleOf",
-          "@type": "xsd:integer"
+          "@type": "xsd:decimal"
+        },
+        "name": {
+          "@id": "https://www.w3.org/2019/wot/td#name"
+        },
+        "observable": {
+          "@id": "https://www.w3.org/2019/wot/td#isObservable",
+          "@type": "xsd:boolean"
         },
         "oneOf": {
           "@container": "@set",
           "@id": "jsonschema:oneOf",
           "@type": "@id"
         },
+        "op": {
+          "@id": "hctl:hasOperationType"
+        },
+        "owl": "http://www.w3.org/2002/07/owl#",
         "pattern": {
           "@id": "jsonschema:pattern"
+        },
+        "profile": {
+          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
+          "@type": "xsd:anyURI"
         },
         "properties": {
           "@container": "@index",
           "@id": "jsonschema:properties",
-          "@index": "jsonschema:propertyName",
+          "@index": "propertyName",
           "@type": "@id"
         },
         "propertyName": {
           "@id": "jsonschema:propertyName"
         },
+        "proxy": {
+          "@id": "wotsec:proxy",
+          "@type": "xsd:anyURI"
+        },
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "readOnly": {
           "@id": "jsonschema:readOnly",
           "@type": "xsd:boolean"
         },
+        "refresh": {
+          "@id": "wotsec:refresh",
+          "@type": "xsd:anyURI"
+        },
+        "rel": {
+          "@id": "hctl:hasRelationType"
+        },
         "required": {
           "@container": "@set",
           "@id": "jsonschema:required"
+        },
+        "response": {
+          "@id": "hctl:returns",
+          "@type": "@id"
+        },
+        "safe": {
+          "@id": "https://www.w3.org/2019/wot/td#isSafe",
+          "@type": "xsd:boolean"
+        },
+        "schema": "http://schema.org/",
+        "scopes": {
+          "@id": "wotsec:scopes"
+        },
+        "security": {
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+        },
+        "shex": "http://www.w3.org/ns/shex#",
+        "sizes": {
+          "@id": "hctl:hasSizes"
+        },
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "success": {
+          "@id": "hctl:isSuccess",
+          "@type": "xsd:boolean"
+        },
+        "support": {
+          "@id": "https://www.w3.org/2019/wot/td#supportContact",
+          "@type": "xsd:anyURI"
+        },
+        "synchronous": {
+          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
+          "@type": "xsd:boolean"
+        },
+        "td": "https://www.w3.org/2019/wot/td#",
+        "title": {
+          "@id": "https://www.w3.org/2019/wot/td#title"
+        },
+        "tm": "https://www.w3.org/2019/wot/tm#",
+        "token": {
+          "@id": "wotsec:token",
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@context": {
@@ -1711,13 +4680,24 @@
           },
           "@id": "jsonschema:type"
         },
+        "unit": {
+          "@id": "https://www.w3.org/2019/wot/td#unit"
+        },
+        "vann": "http://purl.org/vocab/vann/",
+        "version": {
+          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
+          "@type": "@id"
+        },
+        "wotsec": "https://www.w3.org/2019/wot/security#",
         "writeOnly": {
           "@id": "jsonschema:writeOnly",
           "@type": "xsd:boolean"
-        }
+        },
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "hasUriTemplateSchema",
-      "@index": "td:name",
+      "@index": "name",
       "@type": "@id"
     },
     "vann": "http://purl.org/vocab/vann/",

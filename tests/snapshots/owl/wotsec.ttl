@@ -1,0 +1,285 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix wotsec: <https://www.w3.org/2019/wot/security#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://www.w3.org/2019/wot/security>
+    rdf:type owl:Ontology ;
+    dcterms:title "WoT Security Ontology"@en ;
+    rdfs:label "WoT Security"@en ;
+    rdfs:comment "Ontology for the W3C Web of Things WoT Security vocabulary."@en ;
+    vann:preferredNamespacePrefix "wotsec" ;
+    vann:preferredNamespaceUri "https://www.w3.org/2019/wot/security#" ;
+    owl:versionInfo "1.1" ;
+    dcterms:license <http://purl.org/NET/rdflicense/cc-by4.0> ;
+    dcterms:creator <mailto:mahda.noura@siemens.com> ;
+    dcterms:contributor
+        <https://vcharpenay.link/#me> ,
+        <mailto:michael.mccool@intel.com> ;
+    dcterms:publisher
+        [
+            rdf:type schema:Organization ;
+            schema:name "W3C Web of Things Working Group" ;
+            schema:url <https://www.w3.org/WoT/WG/> ;
+        ] ;
+.
+
+wotsec:APIKeySecurityScheme
+    rdf:type owl:Class ;
+    rdfs:label "APIKeySecurityScheme"@en ;
+    rdfs:subClassOf wotsec:SecurityScheme ;
+    skos:definition "API key authentication security configuration identified by the term apikey. This scheme is to be used when the  access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:AutoSecurityScheme
+    rdf:type owl:Class ;
+    rdfs:label "AutoSecurityScheme"@en ;
+    rdfs:subClassOf wotsec:SecurityScheme ;
+    skos:definition "An automatic authentication security configuration identified by the term auto. This scheme indicates that the security  parameters are going to be negotiated by the underlying protocols at runtime."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:BasicSecurityScheme
+    rdf:type owl:Class ;
+    rdfs:label "BasicSecurityScheme"@en ;
+    rdfs:subClassOf wotsec:SecurityScheme ;
+    skos:definition "Basic Authentication security configuration using an unencrypted username and password."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:BearerSecurityScheme
+    rdf:type owl:Class ;
+    rdfs:label "BearerSecurityScheme"@en ;
+    rdfs:subClassOf wotsec:SecurityScheme ;
+    skos:definition "Bearer Token security configuration for situations where bearer tokens are used independently of OAuth2."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:ComboSecurityScheme
+    rdf:type owl:Class ;
+    rdfs:label "ComboSecurityScheme"@en ;
+    rdfs:subClassOf wotsec:SecurityScheme ;
+    skos:definition "A combination of other security schemes. Exactly one of either oneOf or allOf vocabulary terms MUST be included."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:DigestSecurityScheme
+    rdf:type owl:Class ;
+    rdfs:label "DigestSecurityScheme"@en ;
+    rdfs:subClassOf wotsec:SecurityScheme ;
+    skos:definition "Digest Access Authentication security configuration. This scheme is similar to basic authentication but with  added features to avoid man-in-the-middle attacks."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:NoSecurityScheme
+    rdf:type owl:Class ;
+    rdfs:label "NoSecurityScheme"@en ;
+    rdfs:subClassOf wotsec:SecurityScheme ;
+    skos:definition "A security configuration indicating there is no authentication or other mechanism required to access the resource."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:OAuth2SecurityScheme
+    rdf:type owl:Class ;
+    rdfs:label "OAuth2SecurityScheme"@en ;
+    rdfs:subClassOf wotsec:SecurityScheme ;
+    skos:definition "OAuth 2.0 authentication security configuration for systems conformant with RFC6749 and RFC8252."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:PSKSecurityScheme
+    rdf:type owl:Class ;
+    rdfs:label "PSKSecurityScheme"@en ;
+    rdfs:subClassOf wotsec:SecurityScheme ;
+    skos:definition "Pre-shared key authentication security configuration. This is meant to identify that a standard is used for  pre-shared keys such as TLS-PSK."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:SecurityScheme
+    rdf:type owl:Class ;
+    rdfs:label "SecurityScheme"@en ;
+    skos:definition "Metadata describing the configuration of a security mechanism. The value assigned to the name scheme MUST be defined  within a Vocabulary included in the Thing Description. For all security schemes, any keys, passwords, or other  sensitive information directly providing access MUST NOT be stored in the TD and should instead be shared and  stored out-of-band via other mechanisms."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:alg
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "alg"@en ;
+    skos:definition "Encoding, encryption, or digest algorithm (e.g., ES256, ES512-256)."@en ;
+    rdfs:domain wotsec:BearerSecurityScheme ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:allOf
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "allOf"@en ;
+    skos:definition "Array of two or more strings identifying other named security scheme definitions, all of which must be satisfied for access."@en ;
+    rdfs:domain wotsec:ComboSecurityScheme ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:apikeyIn
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "in"@en ;
+    skos:definition "Specifies the location of security authentication information."@en ;
+    rdfs:domain wotsec:APIKeySecurityScheme ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:authorization
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "authorization"@en ;
+    skos:definition "URI of the authorization server."@en ;
+    schema:domainIncludes
+        wotsec:BearerSecurityScheme ,
+        wotsec:OAuth2SecurityScheme ;
+    rdfs:range xsd:anyURI ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:flow
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "flow"@en ;
+    skos:definition "Authorization flow."@en ;
+    rdfs:domain wotsec:OAuth2SecurityScheme ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:format
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "format"@en ;
+    skos:definition "Specifies format of security authentication information."@en ;
+    rdfs:domain wotsec:BearerSecurityScheme ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:identity
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "identity"@en ;
+    skos:definition "Identifier providing information which can be used for selection or confirmation."@en ;
+    rdfs:domain wotsec:PSKSecurityScheme ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:in
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "in"@en ;
+    skos:definition "Specifies the location of security authentication information."@en ;
+    schema:domainIncludes
+        wotsec:BasicSecurityScheme ,
+        wotsec:BearerSecurityScheme ,
+        wotsec:DigestSecurityScheme ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+    skos:note
+        "Default value should be provided by implementations" ,
+        "The API Key security scheme maps the JSON member `in` to `wotsec:apikeyIn`, while Basic, Digest, and Bearer schemes map it to `wotsec:in`." ;
+.
+
+wotsec:name
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "name"@en ;
+    skos:definition "Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer."@en ;
+    schema:domainIncludes
+        wotsec:APIKeySecurityScheme ,
+        wotsec:BasicSecurityScheme ,
+        wotsec:BearerSecurityScheme ,
+        wotsec:DigestSecurityScheme ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:oneOf
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "oneOf"@en ;
+    skos:definition "Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, will allow access. Only one may be chosen for use."@en ;
+    rdfs:domain wotsec:ComboSecurityScheme ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+    skos:note "In a Combo security scheme, `oneOf` maps to `wotsec:oneOf` rather than the distinct `jsonschema:oneOf` term." ;
+.
+
+wotsec:proxy
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "proxy"@en ;
+    skos:definition "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint."@en ;
+    rdfs:domain wotsec:SecurityScheme ;
+    rdfs:range xsd:anyURI ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+    skos:note "This feature is at risk." ;
+.
+
+wotsec:qop
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "qop"@en ;
+    skos:definition "Quality of protection."@en ;
+    rdfs:domain wotsec:DigestSecurityScheme ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+    skos:note "This feature is at risk." ;
+.
+
+wotsec:refresh
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "refresh"@en ;
+    skos:definition "URI of the refresh server."@en ;
+    rdfs:domain wotsec:OAuth2SecurityScheme ;
+    rdfs:range xsd:anyURI ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
+wotsec:scopes
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "scopes"@en ;
+    skos:definition "Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an  authorization server and associated with forms in order to identify what resources a client may access and how."@en ;
+    rdfs:domain wotsec:OAuth2SecurityScheme ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+    skos:note "This feature is at risk." ;
+.
+
+wotsec:token
+    rdf:type owl:ObjectProperty ;
+    rdfs:label "token"@en ;
+    skos:definition "URI of the token server."@en ;
+    rdfs:domain wotsec:OAuth2SecurityScheme ;
+    rdfs:range xsd:anyURI ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.

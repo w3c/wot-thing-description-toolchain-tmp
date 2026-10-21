@@ -1,13 +1,19 @@
 """Generator configuration — schema-to-artifact module mapping and gen-owl options."""
 
 # Each tuple: (input schema filename, output TTL filename).
-# Order within each group is preserved in the pipeline.
 OWL_MODULES = (
     ("thing_description.yaml", "td.ttl"),
     ("hypermedia.yaml", "hctl.ttl"),
     ("wot_security.yaml", "wotsec.ttl"),
     ("jsonschema.yaml", "jsonschema.ttl"),
     ("thing_model.yaml", "tm.ttl"),
+)
+
+JSONLD_CONTEXT_MODULES = (
+    ("td", "td-context.jsonld"),
+    ("jsonschema", "json-schema-context.jsonld"),
+    ("wotsec", "wot-security-context.jsonld"),
+    ("hctl", "hypermedia-context.jsonld"),
 )
 
 GEN_OWL_OPTIONS = {

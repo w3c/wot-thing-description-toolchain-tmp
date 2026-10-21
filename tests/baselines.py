@@ -1,6 +1,19 @@
-"""Derive TD 2.0 samples from TD 1.1 samples."""
+"""Derive TD 2.0 samples from TD 1.1 samples, and load known-failure baselines."""
+from pathlib import Path
 
 TD_VERSIONS = ("td11", "td20")
+
+
+def load_baseline(path: Path) -> set[str]:
+    """Read a known-failure list: one entry per line, '#' comments ignored."""
+    if not path.exists():
+        return set()
+    entries = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#"):
+            entries.add(line.split()[0])
+    return entries
 
 TD11_CONTEXT_URLS = {
     "https://www.w3.org/2019/wot/td/v1",

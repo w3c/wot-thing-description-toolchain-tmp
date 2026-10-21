@@ -38,15 +38,15 @@ def test_security_name_is_a_scoped_json_key() -> None:
 def test_indexed_maps_preserve_their_rdf_key_predicates() -> None:
     context = _context()
 
-    assert context["properties"]["@index"] == "td:name"
-    assert context["actions"]["@index"] == "td:name"
-    assert context["events"]["@index"] == "td:name"
-    assert context["uriVariables"]["@index"] == "td:name"
-    assert context["securityDefinitions"]["@index"] == "td:hasInstanceConfiguration"
-    assert context["schemaDefinitions"]["@index"] == "td:hasInstanceConfiguration"
+    assert context["properties"]["@index"] == "name"
+    assert context["actions"]["@index"] == "name"
+    assert context["events"]["@index"] == "name"
+    assert context["uriVariables"]["@index"] == "name"
+    assert context["securityDefinitions"]["@index"] == "hasInstanceConfiguration"
+    assert context["schemaDefinitions"]["@index"] == "hasInstanceConfiguration"
 
     data_schema_context = context["properties"]["@context"]
-    assert data_schema_context["properties"]["@index"] == "jsonschema:propertyName"
+    assert data_schema_context["properties"]["@index"] == "name"
 
 
 def test_scoped_contexts_select_the_correct_vocabulary() -> None:
