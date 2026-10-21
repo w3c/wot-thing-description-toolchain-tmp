@@ -212,26 +212,23 @@ class TestJsonSchemaModule:
         gen = js_generated.get("contentMediaType", {})
         assert "@context" not in gen
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: anyOf missing from generated context")
+    @pytest.mark.xfail(reason="INTENTIONAL_DEVIATION: anyOf excluded from TD 2.0 schema")
     def test_anyOf_present(self, js_upstream, js_generated):
-        """IMPORTANT: `anyOf` must be present with @container: @set.
-
-        Upstream: {"@id": "jsonschema:anyOf", "@container": "@set"}
-        Generated: MISSING
-        """
+        """anyOf is in upstream TD 1.1 context but intentionally excluded from
+        our TD 2.0 schema — not part of the vocabulary table."""
         assert js_upstream["anyOf"] == {"@id": "jsonschema:anyOf", "@container": "@set"}
         assert "anyOf" in js_generated
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: unit missing — should map to schema:unitCode with @type: @vocab")
-    def test_unit_present(self, js_upstream, js_generated):
-        """IMPORTANT: `unit` must map to schema:unitCode with @type: @vocab.
+    def test_unit_present(self, js_upstream, merged):
+        """unit maps to schema:unitCode with @type: @vocab.
 
-        Upstream: {"@id": "schema:unitCode", "@type": "@vocab"}
-        Generated: MISSING
+        Upstream puts unit in json-schema module context, but our toolchain
+        assigns it to root context because its slot_uri is schema:unitCode
+        (not jsonschema: prefix).
         """
         assert js_upstream["unit"] == {"@id": "schema:unitCode", "@type": "@vocab"}
-        assert "unit" in js_generated
-        gen = js_generated["unit"]
+        assert "unit" in merged
+        gen = merged["unit"]
         assert gen.get("@id") == "schema:unitCode"
         assert gen.get("@type") == "@vocab"
 

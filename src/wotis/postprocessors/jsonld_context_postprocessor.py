@@ -146,6 +146,25 @@ def _strip_skos_enum_contexts(context: dict[str, Any]) -> None:
             _strip_skos_enum_contexts(val["@context"])
 
 
+def _fix_vocab_type_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
+    """Replace ``xsd:anyURI`` with ``@vocab`` for uriorcurie-ranged slots.
+
+    LinkML emits ``@type: xsd:anyURI`` for ``range: uriorcurie`` but the
+    upstream W3C context uses ``@type: @vocab`` so values resolve as
+    vocabulary terms rather than plain URI strings.
+    """
+    vocab_slots = {
+        _slot_key(slot)
+        for slot in schema_view.all_slots().values()
+        if slot.range == "uriorcurie"
+    }
+    for key, val in context.items():
+        if key in vocab_slots and isinstance(val, dict) and val.get("@type") == "xsd:anyURI":
+            val["@type"] = "@vocab"
+        if isinstance(val, dict) and "@context" in val:
+            _fix_vocab_type_coercion(val["@context"], schema_view)
+
+
 def _strip_datatype_property_id_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
     """Strip ``@type: @id`` from slots declared as ``owl:DatatypeProperty``.
 
@@ -292,6 +311,8 @@ def build_module_context(
                 del entry["@context"]
             if entry.get("@type") == "@id" and "owl:DatatypeProperty" in (slot.implements or []):
                 entry.pop("@type")
+            if entry.get("@type") == "xsd:anyURI" and slot.range == "uriorcurie":
+                entry["@type"] = "@vocab"
         context[key] = entry
     for cls in schema_view.all_classes().values():
         cls_prefix = curie_prefix(str(cls.class_uri) if cls.class_uri else None)
@@ -510,6 +531,7 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
     _remove_literal_type_coercion(context)
     _strip_skos_enum_contexts(context)
     _strip_datatype_property_id_coercion(context, schema_view)
+    _fix_vocab_type_coercion(context, schema_view)
     _remove_linkml_internals(context)
     context["@version"] = 1.1
     return json.dumps(document, indent=2)

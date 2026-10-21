@@ -176,10 +176,11 @@ slots:
   unit:
     description: >-
       Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition.
+    slot_uri: schema:unitCode
     annotations:
       spec_description: >-
         Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition (also see Section [Semantic Annotations](#semantic-annotations-example-version-units)).
-    range: string
+    range: uriorcurie
   enum:
     description: >-
       Restricted set of values provided as an array.
