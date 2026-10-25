@@ -1,0 +1,51 @@
+schema_version: 1
+upstream:
+  repository: w3c/wot-thing-description
+  artifact: resources/upstream/context/td-context-1.1.jsonld
+policy: >-
+  Entries are limited to reviewed term-level differences between the generated
+  JSON-LD context and the upstream W3C TD 1.1 context.
+divergences:
+  - id: context-cert-scheme-alias-absent
+    category: intentional-omission
+    review: approved
+    upstream_locator:
+      kind: context_term
+      term: cert
+    upstream_value: "wotsec:CertSecurityScheme"
+    rationale: >-
+      CertSecurityScheme is not modeled in the TD 1.1 schema. The upstream
+      context includes it but no TD 1.1 vocabulary definition exists for this
+      scheme. The toolchain only emits terms for modeled vocabulary.
+    expected_generated: null
+
+  - id: context-pop-scheme-alias-absent
+    category: intentional-omission
+    review: approved
+    upstream_locator:
+      kind: context_term
+      term: pop
+    upstream_value: "wotsec:PoPSecurityScheme"
+    rationale: >-
+      PoPSecurityScheme is not modeled in the TD 1.1 schema. The upstream
+      context includes it but no TD 1.1 vocabulary definition exists for this
+      scheme. The toolchain only emits terms for modeled vocabulary.
+    expected_generated: null
+
+  - id: context-unit-iri-qudt
+    category: intentional-deviation
+    review: approved
+    upstream_locator:
+      kind: context_term
+      term: unit
+    upstream_value:
+      "@id": "schema:unitCode"
+      "@type": "@vocab"
+    rationale: >-
+      Upstream maps unit to schema:unitCode, a string code from UN/CEFACT.
+      The LinkML schema maps unit to qudt:unit, which points to QUDT unit
+      individual IRIs providing richer unit semantics (dimensional analysis,
+      conversion factors, ontology membership). Deliberate modeling choice.
+    expected_generated:
+      "@id": "qudt:unit"
+      "@type": "@vocab"

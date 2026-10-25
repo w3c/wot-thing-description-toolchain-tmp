@@ -320,18 +320,12 @@ class TestWotSecurityModule:
         gen = ws_generated.get(term, {})
         assert "@context" not in gen, f"{term} has SKOS @context leak"
 
-    @pytest.mark.xfail(reason="LINKML_LIMITATION: cross-module terms not duplicated in per-module context")
     @pytest.mark.parametrize("term,expected_id", [
         ("description", "td:description"),
         ("descriptions", "td:descriptionInLanguage"),
     ])
     def test_cross_module_terms_present(self, ws_upstream, ws_generated, term, expected_id):
-        """IMPORTANT: Cross-module terms must be present in each module.
-
-        Upstream duplicates description/descriptions in the wotsec module
-        because security schemes need them. The generated per-module context
-        omits them since LinkML maps them to the td module only.
-        """
+        """Cross-module terms must be present in each module."""
         assert term in ws_upstream
         assert ws_upstream[term]["@id"] == expected_id
         assert term in ws_generated

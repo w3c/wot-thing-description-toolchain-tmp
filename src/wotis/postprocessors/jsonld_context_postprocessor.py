@@ -354,6 +354,21 @@ def _context_scope(schema_view: SchemaView, slot: SlotDefinition) -> str | None:
     return next(iter(prefixes), None)
 
 
+def _cross_module_slot_keys(schema_view: SchemaView, prefix: str) -> set[str]:
+    """Slot keys used by classes in this module but defined in other modules."""
+    keys: set[str] = set()
+    for cls in schema_view.all_classes().values():
+        cls_prefix = curie_prefix(str(cls.class_uri) if cls.class_uri else None)
+        if cls_prefix != prefix:
+            continue
+        for slot in schema_view.class_induced_slots(cls.name):
+            slot_prefix = curie_prefix(str(slot.slot_uri) if slot.slot_uri else None)
+            key = _slot_key(slot)
+            if slot_prefix and slot_prefix != prefix and not key.startswith("@"):
+                keys.add(key)
+    return keys
+
+
 def build_module_context(
     schema_view: SchemaView,
     generator: ContextGenerator,
@@ -364,15 +379,20 @@ def build_module_context(
     context: dict[str, Any] = {"@vocab": ns}
     slots = _context_slots(schema_view)
     seen_keys: set[str] = set()
+    cross_module = _cross_module_slot_keys(schema_view, prefix)
     for slot in slots:
-        slot_prefix = curie_prefix(str(slot.slot_uri) if slot.slot_uri else None)
-        if slot_prefix != prefix:
-            continue
         key = _slot_key(slot)
+        slot_prefix = curie_prefix(str(slot.slot_uri) if slot.slot_uri else None)
+        if slot_prefix != prefix and key not in cross_module:
+            continue
         if key in seen_keys:
             continue
         seen_keys.add(key)
         entry = _native_slot_context(generator, slot)
+        if key in cross_module and isinstance(entry, dict):
+            bare_id = entry.get("@id", key)
+            if ":" not in bare_id:
+                entry["@id"] = f"{slot_prefix}:{bare_id}"
         if container := _annotation_value(slot, "jsonld_container"):
             entry["@container"] = container
             if container == "@language":
