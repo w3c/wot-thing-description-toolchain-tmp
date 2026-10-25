@@ -165,6 +165,30 @@ def _fix_vocab_type_coercion(context: dict[str, Any], schema_view: SchemaView) -
             _fix_vocab_type_coercion(val["@context"], schema_view)
 
 
+def _fix_enum_vocab_type_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
+    """Set ``@type: @vocab`` for slots whose range is an enum with ``meaning`` declarations.
+
+    When permissible values carry ``meaning`` CURIEs, their aliases are added
+    to the context by ``_add_enum_value_aliases``.  The ``@type: @vocab``
+    coercion activates those aliases so bare string values expand to IRIs.
+    Slots with ``designates_type`` are excluded — they map to ``@type``.
+    """
+    vocab_enum_slots: set[str] = set()
+    for slot in schema_view.all_slots().values():
+        if slot.designates_type:
+            continue
+        enum_def = schema_view.get_enum(slot.range) if slot.range else None
+        if enum_def is None:
+            continue
+        if any(pv.meaning for pv in enum_def.permissible_values.values()):
+            vocab_enum_slots.add(_slot_key(slot))
+    for key, val in context.items():
+        if key in vocab_enum_slots and isinstance(val, dict) and "@type" not in val:
+            val["@type"] = "@vocab"
+        if isinstance(val, dict) and "@context" in val:
+            _fix_enum_vocab_type_coercion(val["@context"], schema_view)
+
+
 def _fix_object_property_id_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
     """Replace ``xsd:anyURI`` with ``@id`` for URI slots declared as ``owl:ObjectProperty``.
 
@@ -364,6 +388,10 @@ def build_module_context(
                 entry.pop("@type")
             if entry.get("@type") == "xsd:anyURI" and slot.range == "uriorcurie":
                 entry["@type"] = "@vocab"
+            if "@type" not in entry and not slot.designates_type:
+                enum_def = schema_view.get_enum(slot.range) if slot.range else None
+                if enum_def and any(pv.meaning for pv in enum_def.permissible_values.values()):
+                    entry["@type"] = "@vocab"
         context[key] = entry
     for cls in schema_view.all_classes().values():
         cls_prefix = curie_prefix(str(cls.class_uri) if cls.class_uri else None)
@@ -583,6 +611,7 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
     _strip_skos_enum_contexts(context)
     _strip_datatype_property_id_coercion(context, schema_view)
     _fix_vocab_type_coercion(context, schema_view)
+    _fix_enum_vocab_type_coercion(context, schema_view)
     _fix_object_property_id_coercion(context, schema_view)
     _fix_type_designator_mapping(context, schema_view)
     _add_enum_value_aliases(context, schema_view)

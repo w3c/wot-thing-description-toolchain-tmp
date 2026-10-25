@@ -344,7 +344,6 @@ class TestWotSecurityModule:
 class TestHctlModule:
     """Deltas in the hypermedia-context module."""
 
-    @pytest.mark.xfail(reason="BUG_IN_GENERATED: op missing @type: @vocab — breaks operation type resolution")
     def test_op_has_vocab_type(self, hctl_upstream, hctl_generated):
         """CRITICAL: `op` must have @type: "@vocab".
 
