@@ -25,17 +25,27 @@ class OneOfDispatchConfig:
 
 
 @dataclass
-class FormVariantsConfig:
+class EnumSubsetPartitionConfig:
     class_name: str
-    op_slot: str
-    variants: dict[str, list[str]] = field(default_factory=dict)
+    slot_name: str
+    enum_name: str
+    subsets: dict[str, list[str]] = field(default_factory=dict)
+
+
+@dataclass
+class FormSubsetNarrowConfig:
+    class_name: str
+    slot_name: str
+    subset_name: str
+    partition_class: str
 
 
 @dataclass
 class TransformConfig:
     flatten_subclass_parents: list[str] = field(default_factory=list)
     oneof_dispatches: list[OneOfDispatchConfig] = field(default_factory=list)
-    form_variants: list[FormVariantsConfig] = field(default_factory=list)
+    enum_subset_partitions: list[EnumSubsetPartitionConfig] = field(default_factory=list)
+    form_subset_narrows: list[FormSubsetNarrowConfig] = field(default_factory=list)
     excluded_classes: list[str] = field(default_factory=list)
 
 
@@ -98,19 +108,61 @@ def _read_annotations(sv: SchemaView) -> TransformConfig:
                 include_unknown=oneof.get('include_unknown', False),
             ))
 
-        fv = _get_annotation_value(cls_def, 'jsonschema_form_variants')
-        if fv:
-            config.form_variants.append(FormVariantsConfig(
+        esp = _get_annotation_value(cls_def, 'jsonschema_enum_subset_partition')
+        if esp:
+            enum_name = esp['enum']
+            slot_name = esp['slot']
+            enum_def = sv.get_enum(enum_name)
+            subsets: dict[str, list[str]] = {}
+            if enum_def and enum_def.permissible_values:
+                for pv_name, pv in enum_def.permissible_values.items():
+                    for subset in (pv.in_subset or []):
+                        subsets.setdefault(subset, []).append(pv_name)
+            config.enum_subset_partitions.append(EnumSubsetPartitionConfig(
                 class_name=cls_name,
-                op_slot=fv['op_slot'],
-                variants=fv['variants'],
+                slot_name=slot_name,
+                enum_name=enum_name,
+                subsets=subsets,
             ))
 
         if _get_annotation_value(cls_def, 'jsonschema_exclude'):
             config.excluded_classes.append(cls_name)
 
+    for cls_name, cls_def in sv.all_classes().items():
+        if not cls_def.slot_usage:
+            continue
+        for slot_name, slot_usage in cls_def.slot_usage.items():
+            subset_val = _get_annotation_value(slot_usage, 'jsonschema_form_subset')
+            if subset_val:
+                partition_class = None
+                for esp in config.enum_subset_partitions:
+                    if subset_val in esp.subsets:
+                        partition_class = esp.class_name
+                        break
+                if partition_class:
+                    config.form_subset_narrows.append(FormSubsetNarrowConfig(
+                        class_name=cls_name,
+                        slot_name=slot_name,
+                        subset_name=subset_val,
+                        partition_class=partition_class,
+                    ))
+
     return config
 
+
+
+def _fix_extra_slots(schema: dict, sv: SchemaView) -> None:
+    """Honour extra_slots: linkml gen-jsonschema ignores it, emitting additionalProperties: false."""
+    defs = schema.get('$defs', {})
+    for cls_name, cls_def in sv.all_classes().items():
+        if cls_name not in defs:
+            continue
+        defn = defs[cls_name]
+        if not isinstance(defn, dict):
+            continue
+        es = cls_def.extra_slots
+        if es and getattr(es, 'allowed', False):
+            defn['additionalProperties'] = True
 
 
 def _flatten_subclasses(schema: dict, sv: SchemaView, config: TransformConfig) -> None:
@@ -176,11 +228,11 @@ def _build_oneof_dispatch(schema: dict, sv: SchemaView, config: TransformConfig)
         defs[cls_name] = {"oneOf": one_of_list}
 
 
-def _build_form_variants(schema: dict, config: TransformConfig) -> None:
+def _build_enum_subset_partitions(schema: dict, config: TransformConfig) -> None:
     defs = schema.get('$defs', {})
 
-    for fv in config.form_variants:
-        cls_name = fv.class_name
+    for esp in config.enum_subset_partitions:
+        cls_name = esp.class_name
         if cls_name not in defs:
             continue
 
@@ -188,7 +240,7 @@ def _build_form_variants(schema: dict, config: TransformConfig) -> None:
         original_props = original.get('properties', {})
         original_required = original.get('required', [])
 
-        base_props = {k: v for k, v in original_props.items() if k != fv.op_slot}
+        base_props = {k: v for k, v in original_props.items() if k != esp.slot_name}
         base_def = {
             "type": "object",
             "properties": base_props,
@@ -199,8 +251,8 @@ def _build_form_variants(schema: dict, config: TransformConfig) -> None:
         defs[base_name] = base_def
 
         variant_refs = []
-        for variant_name, ops in fv.variants.items():
-            variant_def_name = f"{cls_name}_element_{variant_name}"
+        for subset_name, ops in esp.subsets.items():
+            variant_def_name = f"{cls_name}_element_{subset_name}"
             op_schema = {
                 "oneOf": [{"const": op} for op in ops] +
                          [{"type": "array", "items": {"enum": ops}}]
@@ -210,26 +262,42 @@ def _build_form_variants(schema: dict, config: TransformConfig) -> None:
                     {"$ref": f"#/$defs/{base_name}"},
                     {
                         "type": "object",
-                        "properties": {fv.op_slot: op_schema},
-                        "required": [fv.op_slot],
+                        "properties": {esp.slot_name: op_schema},
                     }
                 ]
             }
             defs[variant_def_name] = variant_def
             variant_refs.append({"$ref": f"#/$defs/{variant_def_name}"})
 
-        # The base branch takes only forms without op, otherwise a form with op also matches a variant and oneOf fails (KNOWN_LINKML_GAPS.md #10).
-        defs[cls_name] = {
-            "oneOf": variant_refs + [
-                {"$ref": f"#/$defs/{base_name}", "not": {"required": [fv.op_slot]}}
-            ]
-        }
+        defs[cls_name] = {"oneOf": variant_refs}
 
-        thing_props = schema.get('properties', {})
-        if 'forms' in thing_props:
-            forms_prop = thing_props['forms']
-            if isinstance(forms_prop, dict) and 'items' in forms_prop:
-                forms_prop['items'] = {"$ref": f"#/$defs/{cls_name}"}
+    partition_meta = {
+        esp.class_name: esp.slot_name for esp in config.enum_subset_partitions
+    }
+
+    for narrow in config.form_subset_narrows:
+        base_name = f"{narrow.partition_class}_element_base"
+        variant_def_name = f"{narrow.partition_class}_element_{narrow.subset_name}"
+        if variant_def_name not in defs or base_name not in defs:
+            continue
+        slot_name = partition_meta.get(narrow.partition_class, "op")
+        narrowed_items = {"$ref": f"#/$defs/{variant_def_name}"}
+
+        target_slot = narrow.slot_name
+
+        def _narrow_slot(props: dict, items: dict = narrowed_items, slot: str = target_slot) -> None:
+            slot_prop = props.get(slot)
+            if isinstance(slot_prop, dict) and 'items' in slot_prop:
+                slot_prop['items'] = items
+
+        if narrow.class_name in defs:
+            cls_def = defs[narrow.class_name]
+            if isinstance(cls_def, dict) and 'properties' in cls_def:
+                _narrow_slot(cls_def['properties'])
+                if set(cls_def.get('properties', {}).keys()) == set(schema.get('properties', {}).keys()):
+                    _narrow_slot(schema['properties'])
+        else:
+            _narrow_slot(schema.get('properties', {}))
 
 
 def _dedup_oneof(schema: dict) -> None:
@@ -291,7 +359,7 @@ def _remove_excluded_defs(schema: dict, sv: SchemaView, config: TransformConfig)
         if enum_name in defs:
             to_remove.add(enum_name)
 
-    to_remove.update(['Any', 'Thing', 'InteractionAffordance'])
+    to_remove.update(['Any', 'Thing', 'InteractionAffordance', 'Form'])
 
     for name in to_remove:
         if name in defs:
@@ -426,11 +494,13 @@ def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     logger.info("JSON Schema postprocessor: reading annotations")
     logger.debug(f"  flatten_subclass_parents: {config.flatten_subclass_parents}")
     logger.debug(f"  oneof_dispatches: {[d.class_name for d in config.oneof_dispatches]}")
-    logger.debug(f"  form_variants: {[f.class_name for f in config.form_variants]}")
+    logger.debug(f"  enum_subset_partitions: {[e.class_name for e in config.enum_subset_partitions]}")
+    logger.debug(f"  form_subset_narrows: {[n.class_name for n in config.form_subset_narrows]}")
 
+    _fix_extra_slots(schema, schema_view)
     _flatten_subclasses(schema, schema_view, config)
     _build_oneof_dispatch(schema, schema_view, config)
-    _build_form_variants(schema, config)
+    _build_enum_subset_partitions(schema, config)
     _dedup_oneof(schema)
     _normalize_types(schema)
     _simplify_exclusive_minimum(schema)

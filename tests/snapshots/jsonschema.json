@@ -46,7 +46,7 @@
           "type": "string"
         },
         "proxy": {
-          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.",
+          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint.",
           "format": "uri",
           "type": "string"
         },
@@ -96,7 +96,7 @@
         "forms": {
           "description": "Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. The array cannot be empty.",
           "items": {
-            "$ref": "#/$defs/Form"
+            "$ref": "#/$defs/Form_element_action_ops"
           },
           "minItems": 1,
           "type": "array"
@@ -193,7 +193,7 @@
           "type": "object"
         },
         "proxy": {
-          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.",
+          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint.",
           "format": "uri",
           "type": "string"
         },
@@ -256,7 +256,7 @@
           "type": "string"
         },
         "proxy": {
-          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.",
+          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint.",
           "format": "uri",
           "type": "string"
         },
@@ -342,7 +342,7 @@
           "type": "string"
         },
         "proxy": {
-          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.",
+          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint.",
           "format": "uri",
           "type": "string"
         },
@@ -405,7 +405,7 @@
           "type": "array"
         },
         "proxy": {
-          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.",
+          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint.",
           "format": "uri",
           "type": "string"
         },
@@ -659,7 +659,7 @@
           "type": "string"
         },
         "proxy": {
-          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.",
+          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint.",
           "format": "uri",
           "type": "string"
         },
@@ -728,7 +728,7 @@
         "forms": {
           "description": "Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. The array cannot be empty.",
           "items": {
-            "$ref": "#/$defs/Form"
+            "$ref": "#/$defs/Form_element_event_ops"
           },
           "minItems": 1,
           "type": "array"
@@ -771,31 +771,7 @@
       },
       "type": "object"
     },
-    "Form": {
-      "oneOf": [
-        {
-          "$ref": "#/$defs/Form_element_action"
-        },
-        {
-          "$ref": "#/$defs/Form_element_event"
-        },
-        {
-          "$ref": "#/$defs/Form_element_property"
-        },
-        {
-          "$ref": "#/$defs/Form_element_root"
-        },
-        {
-          "$ref": "#/$defs/Form_element_base",
-          "not": {
-            "required": [
-              "op"
-            ]
-          }
-        }
-      ]
-    },
-    "Form_element_action": {
+    "Form_element_action_ops": {
       "allOf": [
         {
           "$ref": "#/$defs/Form_element_base"
@@ -826,9 +802,6 @@
               ]
             }
           },
-          "required": [
-            "op"
-          ],
           "type": "object"
         }
       ]
@@ -916,7 +889,7 @@
       ],
       "type": "object"
     },
-    "Form_element_event": {
+    "Form_element_event_ops": {
       "allOf": [
         {
           "$ref": "#/$defs/Form_element_base"
@@ -943,14 +916,11 @@
               ]
             }
           },
-          "required": [
-            "op"
-          ],
           "type": "object"
         }
       ]
     },
-    "Form_element_property": {
+    "Form_element_property_ops": {
       "allOf": [
         {
           "$ref": "#/$defs/Form_element_base"
@@ -985,14 +955,11 @@
               ]
             }
           },
-          "required": [
-            "op"
-          ],
           "type": "object"
         }
       ]
     },
-    "Form_element_root": {
+    "Form_element_root_ops": {
       "allOf": [
         {
           "$ref": "#/$defs/Form_element_base"
@@ -1047,9 +1014,6 @@
               ]
             }
           },
-          "required": [
-            "op"
-          ],
           "type": "object"
         }
       ]
@@ -1161,7 +1125,7 @@
           "type": "object"
         },
         "proxy": {
-          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.",
+          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint.",
           "format": "uri",
           "type": "string"
         },
@@ -1221,7 +1185,7 @@
           "type": "string"
         },
         "proxy": {
-          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.",
+          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint.",
           "format": "uri",
           "type": "string"
         },
@@ -1308,7 +1272,7 @@
           "type": "string"
         },
         "proxy": {
-          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.",
+          "description": "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint.",
           "format": "uri",
           "type": "string"
         },
@@ -1408,7 +1372,7 @@
         "forms": {
           "description": "Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. The array cannot be empty.",
           "items": {
-            "$ref": "#/$defs/Form"
+            "$ref": "#/$defs/Form_element_property_ops"
           },
           "minItems": 1,
           "type": "array"
@@ -1691,7 +1655,7 @@
     "forms": {
       "description": "Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. The array cannot be empty.",
       "items": {
-        "$ref": "#/$defs/Form"
+        "$ref": "#/$defs/Form_element_root_ops"
       },
       "type": "array"
     },

@@ -511,6 +511,10 @@ classes:
         range: EventAffordance
         multivalued: true
         inlined: true
+      forms:
+        annotations:
+          jsonschema_form_subset:
+            value: root_ops
   InteractionAffordance:
     description: >-
       Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact with the Thing.
@@ -599,6 +603,11 @@ classes:
           - type: note
             text: |
               The observation mechanism depends on the underlying protocol or sub-protocol. Having said that, it is not guaranteed that the current Property value will be provided once the subscription is initiated. Hence, it may be necessary to read the current Property value before/after the subscription to get a first value.
+    slot_usage:
+      forms:
+        annotations:
+          jsonschema_form_subset:
+            value: property_ops
     extra_slots:
       allowed: true
     attributes:
@@ -629,6 +638,11 @@ classes:
               - id: td-op-for-action
                 text: |
                   When a Form instance is within an `ActionAffordance` instance, the value assigned to `op` *MUST* either be `invokeaction`, `queryaction`, `cancelaction`, or an Array containing a combination of these terms.
+    slot_usage:
+      forms:
+        annotations:
+          jsonschema_form_subset:
+            value: action_ops
     extra_slots:
       allowed: true
     attributes:
@@ -720,6 +734,11 @@ classes:
                   Events MAY be triggered through conditions that are not exposed as Properties.
               - text: |
                   Furthermore, EventAffordances allow for more complex subscribing and unsubscribing mechanisms via the definition of subscription, dataResponse, and cancellation DataSchema definitions. Not all protocols might support these more advanced mechanisms, however, which is why in some scenarios, events may be very similar to observable PropertyAffordances. In these cases, the choice between a Property and a Event for modelling the Affordance should be made based on the semantics of the underlying resource; for example, if the state of the affordance is also supposed to be read or written by a Consumer, then a Property is most likely the appropriate choice.
+    slot_usage:
+      forms:
+        annotations:
+          jsonschema_form_subset:
+            value: event_ops
     extra_slots:
       allowed: true
     attributes:
