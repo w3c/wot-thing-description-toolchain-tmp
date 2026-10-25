@@ -1,0 +1,17 @@
+{
+  "@context": "https://www.w3.org/2022/wot/td/v1.1",
+  "id": "urn:example:thing:event-wrong-op",
+  "@type": "Thing",
+  "title": "Event with wrong op",
+  "securityDefinitions": { "nosec_sc": { "scheme": "nosec" } },
+  "security": "nosec_sc",
+  "events": {
+    "overheat": {
+      "data": { "type": "string" },
+      "forms": [{
+        "href": "https://example.com/overheat",
+        "op": "invokeaction"
+      }]
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "@context": "https://www.w3.org/2022/wot/td/v1.1",
+  "id": "urn:example:thing:root-wrong-op",
+  "@type": "Thing",
+  "title": "Root form with wrong op",
+  "securityDefinitions": { "nosec_sc": { "scheme": "nosec" } },
+  "security": "nosec_sc",
+  "forms": [{
+    "href": "https://example.com/properties",
+    "op": "readproperty"
+  }]
+}

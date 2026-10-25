@@ -1,0 +1,17 @@
+{
+  "@context": "https://www.w3.org/2022/wot/td/v1.1",
+  "id": "urn:example:thing:property-wrong-op",
+  "@type": "Thing",
+  "title": "Property with wrong op",
+  "securityDefinitions": { "nosec_sc": { "scheme": "nosec" } },
+  "security": "nosec_sc",
+  "properties": {
+    "temperature": {
+      "type": "number",
+      "forms": [{
+        "href": "https://example.com/temp",
+        "op": "invokeaction"
+      }]
+    }
+  }
+}

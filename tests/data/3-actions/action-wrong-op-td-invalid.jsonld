@@ -1,0 +1,16 @@
+{
+  "@context": "https://www.w3.org/2022/wot/td/v1.1",
+  "id": "urn:example:thing:action-wrong-op",
+  "@type": "Thing",
+  "title": "Action with wrong op",
+  "securityDefinitions": { "nosec_sc": { "scheme": "nosec" } },
+  "security": "nosec_sc",
+  "actions": {
+    "toggle": {
+      "forms": [{
+        "href": "https://example.com/toggle",
+        "op": "readproperty"
+      }]
+    }
+  }
+}
