@@ -240,23 +240,33 @@ def _add_enum_value_aliases(context: dict[str, Any], schema_view: SchemaView) ->
                 context[str(pv_name)] = str(pv.meaning)
 
 
-def _fix_type_designator_mapping(context: dict[str, Any], schema_view: SchemaView) -> None:
+def _fix_type_designator_mapping(
+    context: dict[str, Any], schema_view: SchemaView, *, root: bool = True
+) -> None:
     """Map ``designates_type`` slots to ``@type`` in JSON-LD context.
 
     When a slot carries ``designates_type: true`` its value determines the
     RDF type of the enclosing node.  The JSON-LD representation is
     ``{"@id": "@type"}``.  LinkML's context generator does not emit this.
+
+    At root level, designator slots are *removed* — they must only appear
+    inside scoped contexts where the owning class lives, otherwise they
+    hijack ``@type`` globally.
     """
     designator_slots = {
         _slot_key(slot)
         for slot in schema_view.all_slots().values()
         if slot.designates_type
     }
-    for key, val in context.items():
+    for key in list(context.keys()):
+        val = context[key]
         if key in designator_slots:
-            context[key] = {"@id": "@type"}
+            if root:
+                del context[key]
+            else:
+                context[key] = {"@id": "@type"}
         if isinstance(val, dict) and "@context" in val:
-            _fix_type_designator_mapping(val["@context"], schema_view)
+            _fix_type_designator_mapping(val["@context"], schema_view, root=False)
 
 
 def _strip_datatype_property_id_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
@@ -428,10 +438,24 @@ def build_module_context(
     all_classes = schema_view.all_classes()
     seen_keys: set[str] = set()
     cross_module = _cross_module_slot_keys(schema_view, prefix)
+    designator_slots = {
+        _slot_key(slot)
+        for slot in schema_view.all_slots().values()
+        if slot.designates_type
+        and any(
+            curie_prefix(str(c.class_uri) if c.class_uri else None) == prefix
+            for c in schema_view.all_classes().values()
+            if slot.name in [s.name for s in schema_view.class_induced_slots(c.name)]
+        )
+    }
     for slot in slots:
         key = _slot_key(slot)
         slot_prefix = curie_prefix(str(slot.slot_uri) if slot.slot_uri else None)
-        if slot_prefix != prefix and key not in cross_module:
+        if slot_prefix != prefix and key not in cross_module and key not in designator_slots:
+            continue
+        if key in designator_slots:
+            context[key] = {"@id": "@type"}
+            seen_keys.add(key)
             continue
         if key in seen_keys:
             continue
