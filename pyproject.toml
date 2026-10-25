@@ -10,7 +10,7 @@ readme = "README.md"
 include = ["README.md", "resources/schemas/*"]
 requires-python = ">=3.14"
 dependencies = [
-    "linkml @ git+https://github.com/linkml/linkml.git@v1.12.0#subdirectory=packages/linkml",
+    "linkml>=1.12.0",
     "mkdocs-mermaid2-plugin==1.2.3",
     "mkdocs-material>=9.7.6",
     "schemasheets>=0.1.10",
