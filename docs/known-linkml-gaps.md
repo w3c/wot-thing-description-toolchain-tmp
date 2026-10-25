@@ -6,6 +6,34 @@ Each entry: **what the gap is**, **which artifact(s) affected**, **current worka
 
 ---
 
+## Accepted Differences from Upstream W3C Contexts
+
+These are intentional deviations from upstream W3C TD/hctl/jsonschema/wotsec
+contexts. They are correct LinkML default behavior, not bugs. **Do not "fix"
+these — they should not be filed as issues.**
+
+### A1. Explicit XSD primitive type coercion
+
+**Upstream:** Omits `@type` for slots with XSD primitive ranges (`xsd:boolean`,
+`xsd:string`, `xsd:integer`, `xsd:double`, `xsd:decimal`, `xsd:dateTime`,
+`xsd:nonNegativeInteger`, `xsd:unsignedShort`, etc.) because JSON-LD processors
+infer datatype from native JSON types (boolean, string, number).
+
+**Generated:** LinkML emits explicit `@type: xsd:boolean`, `@type: xsd:integer`,
+etc. for all typed slots.
+
+**Why accepted:** This is LinkML's default JSON-LD context serialization. The
+explicit coercion is redundant but semantically correct — it does not change
+JSON-LD expansion or compaction behavior. Stripping all XSD primitives would
+mean fighting the generator's native output for no functional benefit.
+
+**Affected terms:** `success` (`xsd:boolean`), `idempotent` (`xsd:boolean`),
+`observable` (`xsd:boolean`), `safe` (`xsd:boolean`), `synchronous`
+(`xsd:boolean`), `readOnly` (`xsd:boolean`), `writeOnly` (`xsd:boolean`),
+and all `xsd:integer`/`xsd:string`/`xsd:double`-ranged terms.
+
+---
+
 ## JSON-LD Context Generator
 
 ### 1. No `@container: "@language"` support in JSON-LD context generator

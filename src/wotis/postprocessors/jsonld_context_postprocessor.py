@@ -487,6 +487,12 @@ def build_module_context(
         cls_prefix = curie_prefix(str(cls.class_uri) if cls.class_uri else None)
         if cls_prefix == prefix:
             context[cls.name] = {"@id": str(cls.class_uri)}
+    for enum_def in schema_view.all_enums().values():
+        for pv_name, pv in enum_def.permissible_values.items():
+            if pv.meaning and curie_prefix(str(pv.meaning)) == prefix:
+                key = str(pv_name)
+                if key not in context:
+                    context[key] = str(pv.meaning)
     _fix_keyed_map_identifier_slots(context, schema_view)
     return context
 
