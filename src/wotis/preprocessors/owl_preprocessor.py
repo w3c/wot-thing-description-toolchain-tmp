@@ -266,9 +266,12 @@ def _strip_discriminator_slots(s: SchemaDefinition, view: SchemaView) -> None:
 
 
 def _strip_non_ontological_enums(s: SchemaDefinition) -> None:
-    """Remove enums without enum_uri — JSON Schema validation only, no OWL counterpart."""
+    """Remove enums without enum_uri or with linkml: enum_uri (type discriminators)."""
     enums = cast(_Enums, s.enums)
-    to_remove = [name for name, edef in enums.items() if not edef.enum_uri]
+    to_remove = [
+        name for name, edef in enums.items()
+        if not edef.enum_uri or str(edef.enum_uri).startswith("linkml:")
+    ]
     for name in to_remove:
         del enums[name]
 

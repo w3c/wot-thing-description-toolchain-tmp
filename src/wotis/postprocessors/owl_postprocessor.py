@@ -167,7 +167,7 @@ def _convert_enum_subclasses_to_individuals(g: Graph, sv: SchemaView) -> None:
     """Convert PV subclasses to rdf:type individuals (upstream pattern)."""
     schema = _get_schema(sv)
     for edef in cast(_Enums, schema.enums).values():
-        if not edef.enum_uri:
+        if not edef.enum_uri or str(edef.enum_uri).startswith("linkml:"):
             continue
         enum_iri = URIRef(sv.expand_curie(edef.enum_uri))
         for s, _, _ in list(g.triples((None, RDFS.subClassOf, enum_iri))):
