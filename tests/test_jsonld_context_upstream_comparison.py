@@ -389,7 +389,6 @@ class TestHctlModule:
         gen = merged.get("anchor", {})
         assert gen.get("@type") == "@id"
 
-    @pytest.mark.xfail(reason="LINKML_LIMITATION: LinkML omits @type: @id for string-ranged slot used as IRI reference")
     def test_schema_has_id_type(self, hctl_upstream, hctl_generated):
         """schema (additionalOutputSchema) needs @type: @id upstream.
 
@@ -402,7 +401,6 @@ class TestHctlModule:
         gen = hctl_generated.get("schema", {})
         assert gen.get("@type") == "@id"
 
-    @pytest.mark.xfail(reason="LINKML_LIMITATION: response has extra @type: @id (upstream omits)")
     def test_response_no_extra_id_type(self, hctl_upstream, hctl_generated):
         """MINOR: `response` should not have @type: "@id".
 
@@ -417,7 +415,6 @@ class TestHctlModule:
         gen = hctl_generated.get("response", {})
         assert "@type" not in gen
 
-    @pytest.mark.xfail(reason="LINKML_LIMITATION: additionalResponses has extra @type: @id")
     def test_additionalResponses_no_extra_id_type(self, hctl_upstream, hctl_generated):
         """MINOR: `additionalResponses` should not have @type: "@id"."""
         up = hctl_upstream["additionalResponses"]

@@ -75,6 +75,28 @@ The TD Data Schema member `type` is deliberately outside this contract. It
 must remain distinct from semantic JSON-LD `@type`; its RDF representation is
 tracked in [Upstream Compatibility Findings](../upstream-compatibility-findings.md).
 
+## Implicit `xsd:string` Type Coercion
+
+The W3C upstream context annotates some string-valued terms with explicit
+`"@type": "xsd:string"`. The generated context omits this annotation because
+JSON-LD defines `xsd:string` as the default datatype for plain string values.
+
+Verified behavior:
+
+- **Expanded JSON-LD** differs structurally: without the annotation, expansion
+  produces `{"@value": "basic_sc"}`; with it,
+  `{"@type": "xsd:string", "@value": "basic_sc"}`. These are semantically
+  equivalent per the JSON-LD specification.
+- **RDF output** is identical: both produce the same N-Quads with a plain
+  string literal (`"basic_sc"`). No datatype IRI appears in either case.
+- **Roundtrip** is lossless: expand then compact recovers the original
+  document regardless of the annotation.
+
+The upstream annotation is a defensive belt-and-suspenders measure that makes
+the string coercion explicit in expanded form. Omitting it does not change
+RDF semantics or TD instance processing. This is not a bug in the generated
+context.
+
 ## Snippet Expectations
 
 Specification snippets are authored as TD/TM JSONC and validate against the
@@ -102,6 +124,60 @@ Rendered snippet comparison tests check specification content. JSON-LD context
 tests check RDF expansion separately, using compact representative TD inputs.
 This keeps presentation differences from masking semantic regressions.
 
+## OWL-Only Slot Exclusion
+
+Some slots exist in the LinkML schema solely for OWL ontology emission (e.g.
+`hasInteractionAffordance`). They are never instantiated in TD JSON instances
+and must not appear in the JSON-LD context.
+
+The postprocessor identifies these slots structurally: a slot is excluded when
+it is never induced by any class (via `SchemaView.class_induced_slots`) AND its
+key is not referenced as a `@index` term by any slot's `jsonld_index`
+annotation. This inference-based approach requires no extra annotations or
+hardcoded lists.
+
+For example, `hasInstanceConfiguration` is never class-induced but is retained
+because it serves as the `@index` term for `securityDefinitions` and
+`schemaDefinitions`. `hasInteractionAffordance` is neither class-induced nor
+an `@index` term, so it is excluded.
+
+## Enum Vocabulary Type Coercion
+
+When a slot's range is an enum whose permissible values carry `meaning`
+declarations (mapping string names to vocabulary IRIs), the postprocessor
+sets `@type: @vocab` on that slot's context entry. This activates the enum
+value aliases added by `_add_enum_value_aliases`, so bare string values
+like `"readproperty"` expand to their vocabulary IRIs (e.g.
+`td:readProperty`) during JSON-LD processing.
+
+**Derivation rule:**
+
+1. Resolve the slot's `range` to an enum definition.
+2. Check whether any permissible value in that enum has a `meaning` CURIE.
+3. If yes, and the slot is not `designates_type`, set `@type: @vocab`.
+
+Slots with `designates_type` are excluded because they map to JSON-LD
+`@type`, which already receives IRI expansion through a different mechanism.
+
+**Two halves of one mechanism:**
+
+- `_add_enum_value_aliases` adds each permissible value's text as a context
+  alias pointing to its `meaning` IRI. This makes the vocabulary terms
+  available to the JSON-LD processor.
+- `@type: @vocab` tells the processor to resolve bare string values through
+  these aliases. Without it, enum values remain plain string literals and
+  never expand to IRIs.
+
+**Current slots affected:** `op` (range `OperationType`, 18 values with
+meanings mapping operation names to `td:` and `hctl:` IRIs).
+
+**Slots excluded:** `scheme` (range `SecuritySchemeList`,
+`designates_type=True` — maps to `@type`), `type` (range
+`DataSchemaType` — maps to `@type` via upstream convention).
+
+This rule is structural: it derives from `range`, `meaning`, and
+`designates_type` — no custom annotations are required.
+
 ## Annotation Reduction Status
 
 - `jsonld_scoped_context` was removed: vocabulary ownership is derived from the
@@ -127,3 +203,257 @@ This keeps presentation differences from masking semantic regressions.
 
 Revisit a retained annotation only after a native LinkML metaslot or a new
 schema relationship can express the same meaning without reducing clarity.
+
+## Upstream JSON-LD Issues Identified
+
+### `@language: en` on `title`/`description` breaks multilanguage roundtrips
+
+**Upstream context entries (td-context-1.1.jsonld):**
+
+```json
+"title":       { "@id": "td:title",       "@language": "en" },
+"description": { "@id": "td:description", "@language": "en" }
+```
+
+The term-level `@language: en` forces every value of `title` and `description`
+to produce an English-tagged RDF literal (`"value"@en`), regardless of the
+document-level `@language` set by the TD instance. This is correct for the
+common case — the W3C spec defines `title` and `description` as the default
+English text, while `titles` and `descriptions` carry language maps — but it
+causes a roundtrip failure when a TD instance sets a non-English document
+language and places non-English text in `title`.
+
+**Affected test instance:** `tests/data/11-multilanguage/string-direction-td-valid.jsonld`
+
+```json
+{
+  "@context": [
+    "https://www.w3.org/2022/wot/td/v1.1",
+    { "@language": "ar-EG", "@direction": "rtl" }
+  ],
+  "title": "شيء يخصني يقيس درجة الحرارة",
+  "description": "TD for a sensor that measures the temperature",
+  ...
+}
+```
+
+The instance sets `@language: ar-EG` at the document level and places Arabic
+text in `title`. Since the upstream context defines `title` with
+`@language: en`, the term-level setting wins during expansion.
+
+**Expanded form (relevant fields):**
+
+```json
+"https://www.w3.org/2019/wot/td#title": [{
+  "@value": "شيء يخصني يقيس درجة الحرارة",
+  "@language": "en",
+  "@direction": "rtl"
+}],
+"https://www.w3.org/2019/wot/td#description": [{
+  "@value": "TD for a sensor that measures the temperature",
+  "@language": "en",
+  "@direction": "rtl"
+}]
+```
+
+Arabic text is tagged as `@language: en`. This is semantically incorrect.
+
+**Compacted form divergence:**
+
+After expand→compact, the compactor cannot use the short-form key `title`
+because its term-level `@language: en` does not match the document-level
+`@language: ar-EG`. The processor falls back to the prefixed form:
+
+| Field         | Original key    | After roundtrip   |
+|---------------|-----------------|-------------------|
+| `title`       | `title`         | `td:title`        |
+| `description` | `description`   | `td:description`  |
+
+The original `title` and `description` keys disappear from the compacted
+output. Downstream consumers expecting the short-form keys will break.
+
+**Root cause:** JSON-LD term-level `@language` overrides document-level
+`@language` unconditionally (JSON-LD 1.1 §9.8). The upstream context assumes
+`title` and `description` always carry English text, but the TD spec allows
+instances to override the document language and use non-English text in these
+fields.
+
+**Impact:** This is an upstream spec issue. The test instance
+`string-direction-td-valid.jsonld` is provided as a valid TD by the W3C test
+suite, so the standard allows non-English text in `title`.
+
+**Resolution:** The generated context omits `@language` from `title` and
+`description` term definitions entirely. This is an intentional deviation from
+upstream. Without term-level `@language`, these fields inherit the
+document-level `@language` (if set), which correctly tags the value in the
+language the TD instance declares. For TDs with no document-level `@language`,
+the value becomes a plain string literal — which is the conservative default
+since the language is genuinely unknown.
+
+The `titles` and `descriptions` fields continue to use `@container: @language`
+(language maps with BCP47 keys), which is the correct mechanism for explicit
+multilanguage tagging. No `in_language` annotation is needed on those fields.
+
+**RDF datatype implications:** The RDF literal type of `title` and
+`description` values is determined by the TD instance, not the schema. When
+a TD sets document-level `@language` (e.g. `"@language": "ar-EG"` in
+`@context`), the value becomes an `rdf:langString` literal tagged with that
+language. When no `@language` is in scope, the value is a plain `xsd:string`
+literal. This is correct behavior — the instance author controls whether their
+title is language-tagged. The LinkML schema declares `range: string`, which
+maps to `xsd:string` for JSON Schema validation purposes. JSON Schema validates
+the JSON surface form (always a plain string), while JSON-LD processing
+determines the RDF datatype at expansion time based on the active `@language`.
+These are independent concerns at different layers.
+
+This deviation is tracked in `tests/test_jsonld_context_upstream_comparison.py`
+under `INTENTIONAL_DEVIATION` xfail markers on `test_title_has_language_tag`
+and `test_description_has_language_tag`.
+
+**TODO:** Clarify in the specification text that the TD instance controls
+whether `title` and `description` values are language-tagged — not the
+context or schema. When a TD sets `@language` in its `@context`, values
+become `rdf:langString` literals; otherwise they are plain `xsd:string`.
+This should be explicit so implementers understand the interaction between
+document-level `@language` and these default-language fields.
+
+### `rdfs:range xsd:string` contradicts `rdf:langString` literals from `@language`
+
+The upstream ontology declares `td:title` and `td:description` with range
+`xsd:string`, but the upstream JSON-LD context forces language-tagged
+literals via `@language: en`. In RDF 1.1, `xsd:string` and `rdf:langString`
+are **disjoint datatypes** — a literal is one or the other, never both.
+Every TD instance processed with the upstream context produces triples that
+violate the ontology's own range declarations.
+
+**The contradiction across upstream files:**
+
+| File | Predicate | Range value |
+|------|-----------|-------------|
+| `td.ttl` (hand-authored) | `schema:rangeIncludes` | `schema:Text` |
+| `target/td.ttl` | `schema:rangeIncludes` | `xsd:string` |
+| `gen-owl-td.ttl` | `rdfs:range` | `xsd:string` |
+| `td-context-1.1.jsonld` | `@language: en` | produces `rdf:langString` |
+
+The ontology says "values must be `xsd:string`". The context produces
+`rdf:langString`. These types cannot overlap.
+
+**Upstream SHACL shapes are also inconsistent.** In `td-validation.ttl`:
+
+- `ThingShape` declares `td:title` inline with
+  `sh:or ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] )` —
+  accepts both.
+- The reusable blank node `_:title` (used by other shapes) declares only
+  `sh:datatype rdf:langString` — rejects plain strings.
+- The reusable `_:description` declares only `sh:datatype rdf:langString`.
+
+The same property has different datatype constraints depending on which
+shape validates it.
+
+**RDF 1.1 type rules
+([RDF Concepts §3.3](https://www.w3.org/TR/rdf11-concepts/#section-Graph-Literal)):**
+
+A literal in RDF 1.1 has exactly one datatype IRI. A language tag is
+present *if and only if* the datatype IRI is `rdf:langString`. Without a
+language tag, the datatype is `xsd:string`. The value spaces are
+structurally different: `xsd:string` values are plain Unicode strings;
+`rdf:langString` values are (string, language-tag) pairs with no overlap
+([RDF Semantics](https://www.w3.org/TR/rdf11-mt/)).
+
+Under RDFS entailment (rule rdfs3), if `p rdfs:range C` and `x p y`, then
+`y rdf:type C`. A language-tagged literal cannot satisfy `rdfs:range
+xsd:string`.
+
+**Inheritance from Dublin Core:**
+
+`td:title rdfs:subPropertyOf dcterms:title`. Dublin Core declares
+`dcterms:title rdfs:range rdfs:Literal`
+([DCMI Terms](https://www.dublincore.org/specifications/dublin-core/dcmi-terms/)).
+`rdfs:Literal` is the superclass of all literal datatypes — it covers both
+`xsd:string` and `rdf:langString`
+([RDF Schema §2.3](https://www.w3.org/TR/rdf-schema/#ch_literal)). The
+upstream TD ontology narrows this to `xsd:string`, which is more
+restrictive than the parent property and excludes language-tagged values
+that the context itself produces.
+
+`td:description rdfs:subPropertyOf dcterms:description`. Dublin Core
+declares no range constraint on `dcterms:description`, making the upstream
+`xsd:string` restriction an independent addition that conflicts with the
+context.
+
+**How other W3C ontologies handle string-or-langString properties:**
+
+| Ontology | Property | Range declaration | Accepts both? | Reference |
+|----------|----------|-------------------|---------------|-----------|
+| Dublin Core | `dcterms:title` | `rdfs:Literal` | Yes | [DCMI Terms](https://www.dublincore.org/specifications/dublin-core/dcmi-terms/) |
+| SKOS | `skos:prefLabel` | "RDF plain literals" | Yes | [SKOS §S12](https://www.w3.org/TR/skos-reference/#labels) |
+| FOAF | `foaf:name` | `rdfs:Literal` | Yes | [FOAF Spec](http://xmlns.com/foaf/spec/) |
+| Schema.org | `schema:name` | `schema:Text` | Sidesteps issue | [schema.org](https://schema.org/) |
+| WoT TD | `td:title` | `xsd:string` | **No** | Upstream bug |
+
+**Fix alternatives and their layer compatibility:**
+
+| Approach | OWL ontology | SHACL shapes | JSON-LD context | RDFS reasoning |
+|----------|-------------|--------------|-----------------|----------------|
+| `rdfs:range rdfs:Literal` | Valid, broad (accepts integers too) | Use `sh:nodeKind sh:Literal` | No change needed | Works |
+| `rdfs:range rdf:PlainLiteral` | Precise, OWL 2 native ([OWL 2 §5.7](https://www.w3.org/TR/owl2-syntax/#Literals)) | Not expressible directly | Processors don't know OWL | Requires OWL 2 reasoner |
+| `sh:or xsd:string rdf:langString` | Not an OWL range construct | Precise, matches ThingShape inline | No change needed | N/A (SHACL layer) |
+| No `rdfs:range` | Permissive | Constrain in SHACL only | No change needed | No violation possible |
+
+No single declaration works optimally at every layer. The practical
+solution requires coordinated declarations:
+
+1. **OWL ontology:** `rdfs:range rdfs:Literal`. Matches Dublin Core parent
+   (`dcterms:title`), works with RDFS and OWL 2 reasoners, accepts both
+   `xsd:string` and `rdf:langString`. Broader than ideal (admits integers)
+   but consistent with established W3C precedent. `rdf:PlainLiteral` is
+   more precise but only understood by OWL 2 reasoners — RDFS reasoners
+   would still flag `rdf:langString` values against it.
+2. **SHACL shapes:** `sh:or ( [ sh:datatype xsd:string ] [ sh:datatype
+   rdf:langString ] )`. Precise validation that accepts exactly the two
+   concrete literal types JSON-LD processors produce. This is what the
+   upstream `ThingShape` already does for `td:title` inline — it should be
+   applied consistently to all reusable shapes.
+3. **JSON-LD context:** No `@type` coercion on `title`/`description`. The
+   instance controls the RDF datatype via document-level `@language` (see
+   previous section).
+4. **JSON Schema:** `"type": "string"` (unchanged). JSON Schema validates
+   the JSON surface form, not the RDF layer. A JSON string is a JSON
+   string regardless of whether JSON-LD later tags it with a language.
+
+This is an upstream issue requiring coordinated fixes across the ontology,
+SHACL shapes, and context. Our generated artifacts follow the approach
+above: the OWL postprocessor emits `rdfs:range xsd:string` (matching
+current upstream) and should be updated when upstream resolves this; the
+SHACL shapes use `sh:nodeKind sh:Literal` without `sh:datatype` (accepts
+both types); the JSON-LD context omits `@language` (see previous section).
+
+**TODO:** File upstream issue proposing: (1) change `rdfs:range xsd:string`
+to `rdfs:range rdfs:Literal` on `td:title` and `td:description` in the
+ontology, (2) unify SHACL shapes to use
+`sh:or ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] )`
+consistently, (3) reconsider `@language: en` in the context (see previous
+section).
+
+## Accepted IRI Differences
+
+Some generated context entries intentionally use different IRIs than the
+upstream W3C contexts. These are deliberate modeling choices, not bugs.
+
+### `unit` — `qudt:unit` vs `schema:unitCode`
+
+| Source | IRI |
+|--------|-----|
+| Generated context | `qudt:unit` (`http://qudt.org/schema/qudt/unit`) |
+| Upstream `json-schema-context-1.1.jsonld` | `schema:unitCode` |
+
+The upstream context maps `unit` to `schema:unitCode`, which is a string
+code (e.g. `"CEL"`) from the UN/CEFACT recommendation. The LinkML schema
+maps `unit` to `qudt:unit`, which points to a QUDT unit individual IRI
+(e.g. `unit:DEG_C`). QUDT provides richer unit semantics — dimensional
+analysis, conversion factors, and unit ontology membership — which aligns
+with the machine-readable design goals of the Thing Description.
+
+This difference is tracked in
+`tests/test_jsonld_context_upstream_comparison.py` under
+`ACCEPTED_IRI_DIFFERENCE` xfail markers.

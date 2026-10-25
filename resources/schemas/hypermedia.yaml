@@ -307,6 +307,7 @@ slots:
     slot_uri: hctl:returns
     domain: Form
     range: ExpectedResponse
+    inlined: true
   additionalResponses:
     description: >-
       This optional term can be used if additional expected responses are possible, e.g., for error reporting. Each additional response needs to be distinguished from others in some way (for example, by specifying a protocol-specific error code), and may also have its own data schema.
@@ -314,6 +315,7 @@ slots:
     domain: Form
     multivalued: true
     range: AdditionalExpectedResponse
+    inlined_as_list: true
   subprotocol:
     description: >-
       Indicates the exact protocol that should be used for additional notifications.
@@ -665,6 +667,8 @@ classes:
         slot_uri: hctl:hasAdditionalOutputSchema
         domain: AdditionalExpectedResponse
         range: string
+        implements:
+          - owl:ObjectProperty
       contentType:
         description: >-
           Assign a content type based on a media type (e.g., text/plain) and potential parameters

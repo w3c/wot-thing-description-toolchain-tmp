@@ -8,16 +8,20 @@ Each entry: **what the gap is**, **which artifact(s) affected**, **current worka
 
 ## JSON-LD Context Generator
 
-### 1. Language maps are not derived from `langString` alternatives
-**Symptom:** The context generator does not derive `@container: "@language"`
-for WoT multilingual values from a `langString` alternative or the
-`MultiLanguage` value model.
+### 1. No `@container: "@language"` support in JSON-LD context generator
+**Symptom:** The context generator only emits `@container: "@index"` (inlined
+dicts) or `@container: "@set"` (lists) via `fix_multivalue_containers`. It has
+no mechanism to emit `@container: "@language"` for language maps.
 **Artifact:** `context.jsonld`
-**Status:** Open. The current context retains LinkML's generated indexed-map
-representation; it must not be changed until the TD language-map mapping is
-specified and tested with expansion and compaction.
-**LinkML issue:** unknown — report as "derive JSON-LD language containers from
-language-keyed LinkML maps".
+**Checked:** v1.12.0 — `jsonldcontextgen.py` lines 423–427 only handle
+`@index` and `@set`. The `in_language` metaslot (PR #3449, merged June 2026)
+is for OWL/SHACL literal language tags, not JSON-LD container declarations.
+**Workaround:** Schema annotation `jsonld_container: "@language"` on `titles`
+and `descriptions` slots. The postprocessor reads this annotation and emits
+`@container: "@language"` instead of the default `@container: "@index"`.
+Tested with jsonld.js expand→compact roundtrip (64/64 instances pass).
+**LinkML issue:** none filed — report as "support `@container: '@language'`
+in JSON-LD context generator for language-keyed maps".
 
 ### 2. Multivalue containers are now natively supported
 **Status:** Resolved in LinkML 1.11.0.post278.dev0+26ebff6d.
@@ -30,18 +34,21 @@ tests for list and map serialization.
 **LinkML reference:** [JSON-LD context generator options](https://linkml.io/linkml/cli/generate.html)
 
 ### 3. JSON-LD index predicates are not generated for keyed maps
-**Symptom:** LinkML now emits `@container: "@index"` for an inlined keyed
-map, but it cannot emit the RDF predicate carried by the JSON map key, for
-example `@index: "td:hasInstanceConfiguration"` or
-`@index: "jsonschema:propertyName"`.
+**Symptom:** LinkML emits `@container: "@index"` for inlined keyed maps but
+cannot emit the `@index` predicate that tells the JSON-LD processor which RDF
+property carries the map key.
 **Artifact:** `context.jsonld`
 **WoT requirement:** TD JSON-LD expansion and compaction must preserve names
 from `securityDefinitions`, `schemaDefinitions`, affordance maps, and nested
 Data Schema `properties` maps as RDF statements.
 **Current limitation:** The LinkML `instantiates` metaslot does not inform the
-current JSON-LD context generator's `@index` value.
-**Workaround:** A small WoT context-composition adapter reads an explicit
-schema-declared index predicate until LinkML can generate it natively.
+JSON-LD context generator's `@index` value.
+**Workaround:** Postprocessor reads `jsonld_index_key` annotation from the
+schema and emits `@index` with bare term names (e.g. `"name"`,
+`"hasInstanceConfiguration"`), matching upstream W3C context convention. The
+`@index` value is a JSON-LD term name resolved via the active context's
+`@vocab` — not a prefixed CURIE. Verified with jsonld.js expand→compact
+roundtrip (64/64 instances pass).
 **LinkML issue:** unknown — report as "support an `@index` predicate for
 inlined keyed maps, sourced from LinkML schema metadata".
 
@@ -67,6 +74,120 @@ context merger.
 definitions for aliases and slot URIs, not only range coercion overrides".
 See [JSON-LD Context Composition](guidelines/jsonld-context-composition.md)
 for the complete inference algorithm and generated-context contract.
+
+### 3b. `uriorcurie` range emits `xsd:anyURI` instead of `@vocab`
+**Symptom:** Slots with `range: uriorcurie` get `@type: xsd:anyURI` in the
+generated JSON-LD context. The upstream W3C context uses `@type: @vocab` so
+that bare terms resolve against the active `@vocab` base.
+**Artifact:** `context.jsonld`
+**Example:** `unit` slot — upstream: `{"@id": "schema:unitCode", "@type": "@vocab"}`,
+LinkML emits: `{"@id": "schema:unitCode", "@type": "xsd:anyURI"}`.
+**Workaround:** Postprocessor `_fix_vocab_type_coercion()` replaces
+`xsd:anyURI` → `@vocab` for all `uriorcurie`-ranged slots.
+**LinkML issue:** none filed — report as "support `@type: @vocab` in JSON-LD
+context for `uriorcurie` or `uri` ranged slots".
+
+### 3d. URI `owl:ObjectProperty` slots emit `xsd:anyURI` instead of `@id`
+**Symptom:** Slots with `range: uri` always get `@type: xsd:anyURI` in the
+generated JSON-LD context, even when the slot represents a dereferenceable RDF
+resource (an `owl:ObjectProperty`).  The upstream W3C context uses `@type: @id`
+for these slots so that values produce IRI nodes, not literal strings.
+**Artifact:** `context.jsonld`
+**Example:** `authorization` slot — upstream: `{"@id": "wotsec:authorization", "@type": "@id"}`,
+LinkML emits: `{"@id": "wotsec:authorization", "@type": "xsd:anyURI"}`.
+**Workaround:** Postprocessor `_fix_object_property_id_coercion()` replaces
+`xsd:anyURI` → `@id` for all slots that declare `implements: [owl:ObjectProperty]`
+and have `range: uri`.  The `implements` metaslot is native LinkML — no custom
+annotations needed.
+**LinkML issue:** none filed — report as "support `@type: @id` in JSON-LD
+context for `uri`-ranged slots annotated as `owl:ObjectProperty`".
+See [JSON-LD Type Coercion Rules](guidelines/jsonld-type-coercion-rules.md)
+for the full decision tree.
+
+### 3e. `designates_type` slots not mapped to `@type` in JSON-LD context
+**Symptom:** Slots with `designates_type: true` are not emitted as
+`{"@id": "@type"}` in the generated JSON-LD context.  The upstream W3C context
+maps `scheme` to `{"@id": "@type"}` so that the slot value determines the RDF
+type of the enclosing node.
+**Artifact:** `context.jsonld`
+**Example:** `scheme` slot — upstream: `{"@id": "@type"}`,
+LinkML emits: no entry (slot absent from generated context).
+**Additional bug:** Setting `designates_type: true` on a slot whose range is
+an enum causes the JSON Schema generator to crash (`ValueError: No such type`)
+because `JsonSchemaGenerator.type_ancestors()` treats the range as a type name,
+not an enum name.
+**Workaround:** Postprocessor `_fix_type_designator_mapping()` injects
+`{"@id": "@type"}` for all `designates_type` slots.  Pipeline guard in
+`_gen_jsonschema()` temporarily clears `designates_type` before JSON Schema
+generation and restores it after.
+**LinkML issue:** none filed — report as "emit `{\"@id\": \"@type\"}` in
+JSON-LD context for slots with `designates_type: true`" and separately "JSON
+Schema generator crashes on `designates_type` when slot range is an enum".
+See [JSON-LD Type Coercion Rules](guidelines/jsonld-type-coercion-rules.md)
+for the full decision tree.
+
+### 3f. Class-ranged slots always get `@type: @id` in JSON-LD context
+**Symptom:** Slots whose range is a class always get `@type: @id` in the
+generated JSON-LD context, even when the slot values are always inline objects
+(never IRI references). `@type: @id` tells the JSON-LD processor to treat the
+value as an IRI string, which is wrong for embedded objects.
+**Artifact:** `context.jsonld`
+**Example:** `response` slot (range: `ExpectedResponse`) — upstream:
+`{"@id": "hctl:returns"}` (no `@type`), LinkML emits:
+`{"@id": "hctl:returns", "@type": "@id"}`. Same for `additionalResponses`
+(range: `AdditionalExpectedResponse`).
+**Root cause:** `ContextGenerator.visit_slot()` adds `@type: @id` for every
+class-ranged slot regardless of whether the value is an IRI reference or an
+inline object. LinkML's `inlined` metaslot has no effect on context generation.
+**Workaround:** Postprocessor strips `@type: @id` from slots where
+`schema_view.is_inlined(slot)` returns `True` and the range class has no
+`identifier` slot (i.e. values are always inline, never referenceable by IRI).
+Uses `schema_view.is_inlined()` rather than checking `slot.inlined` directly,
+because `inlined_as_list: true` sets `is_inlined()` to `True` but leaves
+`slot.inlined` as `None`.
+**LinkML issue:** none filed — report as "JSON-LD context generator should not
+emit `@type: @id` for class-ranged slots when the range class has no identifier
+slot (inlined-only values)".
+
+### 3g. String-ranged `owl:ObjectProperty` slots need `@type: @id` coercion
+**Symptom:** Slots with `range: string` and `implements: [owl:ObjectProperty]`
+get no `@type` coercion in the generated JSON-LD context. The upstream W3C
+context uses `@type: @id` for these slots so that plain string values (e.g.
+schema definition names) are resolved to IRIs by the JSON-LD processor.
+**Artifact:** `context.jsonld`
+**Example:** `schema` slot (hctl:hasAdditionalOutputSchema) — upstream:
+`{"@id": "hctl:hasAdditionalOutputSchema", "@type": "@id"}`, LinkML emits:
+`{"@id": "hctl:hasAdditionalOutputSchema"}` (no `@type`).
+**Distinction from gap 3d:** Gap 3d covers `range: uri` slots where LinkML
+emits `xsd:anyURI` (wrong type, needs replacement). This gap covers
+`range: string` slots where LinkML emits no type at all (missing, needs addition).
+**Caveat:** Not all string-ranged ObjectProperties need `@type: @id`. When the
+domain class has a `designates_type` slot, its scoped context provides `@vocab`
+resolution, making `@type: @id` unnecessary. Example: `wotsec:allOf` and
+`wotsec:oneOf` on `ComboSecurityScheme` (which has `designates_type: scheme`) —
+values resolve via `@vocab: wotsec:` in the security scoped context.
+**Workaround:** Postprocessor `_fix_object_property_id_coercion()` adds
+`@type: @id` for string-ranged ObjectProperty slots whose domain class has no
+`designates_type` slot. Same logic in `build_module_context` for per-module
+contexts.
+**LinkML issue:** none filed — report as "support `@type: @id` in JSON-LD
+context for string-ranged slots annotated as `owl:ObjectProperty`".
+
+### 3c. Enum value `meaning` not emitted as JSON-LD context term aliases
+**Symptom:** Enum permissible values with a `meaning` CURIE are not emitted as
+JSON-LD context term definitions. The upstream W3C context maps lowercase enum
+values to class IRIs so that e.g. `"type": "object"` expands to
+`jsonschema:ObjectSchema` and `"scheme": "nosec"` expands to
+`wotsec:NoSecurityScheme`.
+**Artifact:** `context.jsonld`
+**Example:** `DataSchemaType.object` has `meaning: jsonschema:ObjectSchema` but
+the generated context contains no `"object": "jsonschema:ObjectSchema"` entry.
+Similarly for all 9 `SecuritySchemeList` values.
+**Workaround:** Postprocessor `_add_enum_value_aliases()` iterates all enums
+and adds `"value": "meaning:CURIE"` entries for permissible values that declare
+a `meaning`.
+**LinkML issue:** none filed — report as "emit JSON-LD context term aliases for
+enum permissible values that declare a `meaning` CURIE".
 
 ### 4. Context coercion for default ranges requires review
 **Symptom:** Slots whose range equals the schema `default_range` may not get a

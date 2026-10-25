@@ -190,18 +190,37 @@ def _fix_enum_vocab_type_coercion(context: dict[str, Any], schema_view: SchemaVi
 
 
 def _fix_object_property_id_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
-    """Replace ``xsd:anyURI`` with ``@id`` for URI slots declared as ``owl:ObjectProperty``.
+    """Fix ``@type`` coercion for ``owl:ObjectProperty`` slots.
 
-    LinkML emits ``@type: xsd:anyURI`` for ``range: uri`` but object properties
-    reference dereferenceable IRIs that must be IRI nodes, not literal strings.
+    Two cases:
+
+    1. ``range: uri`` / ``range: uriorcurie`` — LinkML emits ``xsd:anyURI``,
+       replace with ``@id``.
+    2. ``range: string`` where values are name-based cross-references resolved
+       to IRIs by the JSON-LD processor — LinkML emits no ``@type``, add ``@id``.
+       Skipped when the enclosing context has ``@vocab`` set, because values
+       resolve via vocabulary mapping instead (e.g. ``wotsec:allOf`` inside
+       the ``security`` scoped context) (gap 3g).
     """
-    object_prop_slots = {
-        _slot_key(slot)
-        for slot in schema_view.all_slots().values()
-        if slot.range == "uri" and "owl:ObjectProperty" in (slot.implements or [])
-    }
+    replace_anyuri: set[str] = set()
+    add_id: set[str] = set()
+    all_classes = schema_view.all_classes()
+    for slot in schema_view.all_slots().values():
+        if "owl:ObjectProperty" not in (slot.implements or []):
+            continue
+        if slot.range in ("uri", "uriorcurie"):
+            replace_anyuri.add(_slot_key(slot))
+        elif slot.range == "string" and slot.domain and slot.domain in all_classes:
+            domain_has_vocab = any(
+                s.designates_type
+                for s in schema_view.class_induced_slots(slot.domain)
+            )
+            if not domain_has_vocab:
+                add_id.add(_slot_key(slot))
     for key, val in context.items():
-        if key in object_prop_slots and isinstance(val, dict) and val.get("@type") == "xsd:anyURI":
+        if isinstance(val, dict) and key in replace_anyuri and val.get("@type") == "xsd:anyURI":
+            val["@type"] = "@id"
+        if isinstance(val, dict) and key in add_id and "@type" not in val:
             val["@type"] = "@id"
         if isinstance(val, dict) and "@context" in val:
             _fix_object_property_id_coercion(val["@context"], schema_view)
@@ -257,6 +276,34 @@ def _strip_datatype_property_id_coercion(context: dict[str, Any], schema_view: S
             del val["@type"]
         if isinstance(val, dict) and "@context" in val:
             _strip_datatype_property_id_coercion(val["@context"], schema_view)
+
+
+def _strip_inlined_class_id_coercion(context: dict[str, Any], schema_view: SchemaView) -> None:
+    """Strip ``@type: @id`` from inlined slots whose range class has no identifier.
+
+    LinkML emits ``@type: @id`` for every class-ranged slot (gap 3f).  When the
+    range class has no identifier slot and ``inlined: true`` is set, values are
+    always embedded objects that cannot be referenced by IRI — ``@type: @id`` is
+    wrong.  Classes with identifiers keep ``@type: @id`` because their instances
+    can be either inlined or referenced.
+    """
+    all_classes = schema_view.all_classes()
+    inlined_slots: set[str] = set()
+    for slot in schema_view.all_slots().values():
+        if slot.range not in all_classes:
+            continue
+        if not schema_view.is_inlined(slot):
+            continue
+        if "owl:ObjectProperty" in (slot.implements or []):
+            continue
+        if any(s.identifier for s in schema_view.class_induced_slots(slot.range)):
+            continue
+        inlined_slots.add(_slot_key(slot))
+    for key, val in context.items():
+        if key in inlined_slots and isinstance(val, dict) and val.get("@type") == "@id":
+            del val["@type"]
+        if isinstance(val, dict) and "@context" in val:
+            _strip_inlined_class_id_coercion(val["@context"], schema_view)
 
 
 def _remove_linkml_internals(context: dict[str, Any]) -> None:
@@ -378,6 +425,7 @@ def build_module_context(
     ns = resolve_prefix_namespace(schema_view, prefix)
     context: dict[str, Any] = {"@vocab": ns}
     slots = _context_slots(schema_view)
+    all_classes = schema_view.all_classes()
     seen_keys: set[str] = set()
     cross_module = _cross_module_slot_keys(schema_view, prefix)
     for slot in slots:
@@ -408,6 +456,28 @@ def build_module_context(
                 entry.pop("@type")
             if entry.get("@type") == "xsd:anyURI" and slot.range == "uriorcurie":
                 entry["@type"] = "@vocab"
+            if entry.get("@type") == "xsd:anyURI" and "owl:ObjectProperty" in (slot.implements or []):
+                entry["@type"] = "@id"
+            if (
+                "@type" not in entry
+                and slot.range == "string"
+                and "owl:ObjectProperty" in (slot.implements or [])
+                and slot.domain
+                and slot.domain in all_classes
+                and not any(
+                    s.designates_type
+                    for s in schema_view.class_induced_slots(slot.domain)
+                )
+            ):
+                entry["@type"] = "@id"
+            if (
+                entry.get("@type") == "@id"
+                and schema_view.is_inlined(slot)
+                and slot.range in all_classes
+                and "owl:ObjectProperty" not in (slot.implements or [])
+                and not any(s.identifier for s in schema_view.class_induced_slots(slot.range))
+            ):
+                del entry["@type"]
             if "@type" not in entry and not slot.designates_type:
                 enum_def = schema_view.get_enum(slot.range) if slot.range else None
                 if enum_def and any(pv.meaning for pv in enum_def.permissible_values.values()):
@@ -630,6 +700,7 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
     _remove_literal_type_coercion(context)
     _strip_skos_enum_contexts(context)
     _strip_datatype_property_id_coercion(context, schema_view)
+    _strip_inlined_class_id_coercion(context, schema_view)
     _fix_vocab_type_coercion(context, schema_view)
     _fix_enum_vocab_type_coercion(context, schema_view)
     _fix_object_property_id_coercion(context, schema_view)
