@@ -1765,5 +1765,6 @@
     "securityDefinitions"
   ],
   "title": "Thing Description",
-  "type": "object"
+  "type": "object",
+  "version": "1.1"
 }

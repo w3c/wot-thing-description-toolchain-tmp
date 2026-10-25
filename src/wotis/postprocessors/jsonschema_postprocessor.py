@@ -472,14 +472,17 @@ def _resolve_refs(schema: dict, sv: SchemaView) -> None:
     _walk_schema(schema, _resolve)
 
 
-def _clean_metadata(schema: dict) -> None:
+def _clean_metadata(schema: dict, sv: SchemaView) -> None:
     for defn in schema.get('$defs', {}).values():
         if isinstance(defn, dict):
             defn.pop('description', None)
             defn.pop('title', None)
 
     schema.pop('metamodel_version', None)
-    schema.pop('version', None)
+    if sv.schema.version:
+        schema['version'] = sv.schema.version
+    else:
+        schema.pop('version', None)
 
     if 'required' in schema:
         req = schema['required']
@@ -507,7 +510,7 @@ def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     _remove_identifier_slots(schema, schema_view)
     _remove_excluded_defs(schema, schema_view, config)
     _resolve_refs(schema, schema_view)
-    _clean_metadata(schema)
+    _clean_metadata(schema, schema_view)
 
     if schema_view.schema.title:
         schema["title"] = schema_view.schema.title
