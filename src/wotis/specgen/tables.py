@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Callable, Optional
 import yaml
 from linkml_runtime.utils.schemaview import SchemaView
 
+from ..schema_utils import annotation_dict_value as _annotation_value
 from .assertions import make_slot_assertion_id
 
 
@@ -47,13 +48,6 @@ def _normalize_range_name(rng: str) -> str:
     if rng == "decimal":
         return "double"
     return rng
-
-
-def _annotation_value(annotations: dict, key: str):
-    ann = annotations.get(key)
-    if ann is None:
-        return None
-    return getattr(ann, "value", ann)
 
 
 def _is_truthy_annotation(value) -> bool:

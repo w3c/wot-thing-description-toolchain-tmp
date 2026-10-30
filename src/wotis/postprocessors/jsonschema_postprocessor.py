@@ -14,6 +14,8 @@ from typing import Any
 
 from linkml_runtime.utils.schemaview import SchemaView
 
+from ..schema_utils import annotation_tag_value as _get_annotation_value
+
 logger = logging.getLogger(__name__)
 
 
@@ -59,38 +61,6 @@ def _walk_schema(obj: Any, fn: Callable[[dict], dict | None]) -> Any:
     elif isinstance(obj, list):
         return [_walk_schema(item, fn) for item in obj]
     return obj
-
-
-def _jsonobj_to_dict(obj: Any) -> Any:
-    try:
-        from jsonasobj2._jsonobj import JsonObj
-        if isinstance(obj, JsonObj):
-            result = {}
-            for key in (k for k in dir(obj) if not k.startswith('_')):
-                try:
-                    val = getattr(obj, key)
-                    if callable(val):
-                        continue
-                    result[key] = _jsonobj_to_dict(val)
-                except AttributeError:
-                    continue
-            return result
-    except ImportError:
-        pass
-    if isinstance(obj, dict):
-        return {k: _jsonobj_to_dict(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [_jsonobj_to_dict(v) for v in obj]
-    return obj
-
-
-def _get_annotation_value(annotatable, key: str) -> Any | None:
-    if not hasattr(annotatable, 'annotations') or not annotatable.annotations:
-        return None
-    for ann in annotatable.annotations.values():
-        if ann.tag == key:
-            return _jsonobj_to_dict(ann.value)
-    return None
 
 
 def _read_annotations(sv: SchemaView) -> TransformConfig:

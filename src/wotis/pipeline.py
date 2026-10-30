@@ -100,7 +100,7 @@ def _gen_owl(sv: SchemaView, output_dir: Path) -> None:
     (output_dir / "ontology.owl.ttl").unlink(missing_ok=True)
     for schema_file, output_file in OWL_MODULES:
         ttl = _run_gen_owl(SCHEMA_PATH / schema_file)
-        postprocess_owl(ttl, schema_file, output_file, SCHEMA_PATH, output_dir)
+        postprocess_owl(ttl, schema_file, output_file, SCHEMA_PATH, output_dir, sv_merged=sv)
 
 
 def _gen_jsonldcontext(sv: SchemaView, output_dir: Path) -> None:

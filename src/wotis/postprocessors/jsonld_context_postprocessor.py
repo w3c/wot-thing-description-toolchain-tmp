@@ -12,19 +12,10 @@ from linkml_runtime.utils.formatutils import underscore
 from linkml_runtime.utils.schemaview import SchemaView
 
 from . import curie_prefix, resolve_prefix_namespace
+from ..schema_utils import annotation_str_value as _annotation_value
 
 JSONLD_RESERVED_SLOT_NAMES = frozenset({"@context", "@type"})
 JSONLD_FIXED_TERM_MAPPINGS = {"id": "@id"}
-
-
-def _annotation_value(annotatable: Any, key: str) -> str | None:
-    annotations = getattr(annotatable, "annotations", None) or {}
-    annotation = (
-        annotations.get(key)
-        if isinstance(annotations, dict)
-        else getattr(annotations, key, None)
-    )
-    return str(annotation.value) if annotation else None
 
 
 def _expand_curie(schema_view: SchemaView, curie: str) -> str:
@@ -386,6 +377,8 @@ def _fix_keyed_map_identifier_slots(context: dict[str, Any], schema_view: Schema
 
 def _context_scope(schema_view: SchemaView, slot: SlotDefinition) -> str | None:
     if explicit_scope := _annotation_value(slot, "jsonld_context"):
+        if explicit_scope == "none":
+            return None
         if explicit_scope not in schema_view.schema.prefixes:
             raise ValueError(f"Unknown jsonld_context prefix: {explicit_scope}")
         return explicit_scope

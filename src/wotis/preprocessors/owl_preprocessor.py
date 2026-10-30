@@ -16,6 +16,8 @@ from linkml_runtime.linkml_model.meta import (
 from linkml_runtime.utils.formatutils import camelcase
 from linkml_runtime.utils.schemaview import SchemaView
 
+from ..schema_utils import get_schema as _get_schema
+
 # Fields gen-owl converts to blank-node owl:Restriction axioms not present in the WoT TD ontology.
 _LIST_CONSTRAINT_FIELDS = ("exactly_one_of", "any_of", "all_of", "none_of")
 _SCALAR_CONSTRAINT_FIELDS = (
@@ -30,12 +32,6 @@ _Slots = dict[str, SlotDefinition]
 _Classes = dict[str, ClassDefinition]
 _Enums = dict[str, EnumDefinition]
 _Prefixes = dict[str, Prefix]
-
-
-def _get_schema(view: SchemaView) -> SchemaDefinition:
-    schema = view.schema
-    assert schema is not None
-    return schema
 
 
 def _remove_slots(s: SchemaDefinition, names: set[str]) -> None:

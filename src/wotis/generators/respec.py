@@ -10,6 +10,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
+from ..schema_utils import annotation_dict_value as _annotation_value
 from ..specgen.config import Config
 from ..specgen.bikeshed_processor import process_fragments
 from ..specgen.respec import build_jinja_env, assemble
@@ -17,13 +18,6 @@ from ..specgen.tables import collect_slot_rows, load_type_hrefs
 from ..specgen.assertions import html_assertions_to_csv
 
 cfg = Config.from_resources_dir(Path("resources"), placeholder="%s")
-
-
-def _annotation_value(annotations: dict, key: str):
-    ann = annotations.get(key)
-    if ann is None:
-        return None
-    return getattr(ann, "value", ann)
 
 
 def _record_value(record: dict, key: str):

@@ -12,6 +12,7 @@ from rdflib.plugin import register
 from rdflib.serializer import Serializer
 
 from . import resolve_prefix_namespace
+from ..schema_utils import get_schema as _get_schema
 
 SCHEMA = Namespace("http://schema.org/")
 LINKML = Namespace("https://w3id.org/linkml/")
@@ -27,25 +28,22 @@ register(
 _Enums = dict[str, EnumDefinition]
 
 
-def _get_schema(sv: SchemaView) -> SchemaDefinition:
-    schema = sv.schema
-    assert schema is not None
-    return schema
-
-
 def postprocess_owl(
     module_ttl: str,
     schema_file: str,
     output_file: str,
     schema_dir: Path,
     output_dir: Path,
+    *,
+    sv_merged: SchemaView | None = None,
 ) -> None:
     """Clean gen-owl output and write per-module OWL vocabulary file."""
     g = Graph()
     g.parse(data=module_ttl, format="turtle")
 
     sv = SchemaView(str(schema_dir / schema_file), merge_imports=False)
-    sv_merged = SchemaView(str(schema_dir / schema_file), merge_imports=True)
+    if sv_merged is None:
+        sv_merged = SchemaView(str(schema_dir / schema_file), merge_imports=True)
     ns = _module_namespace(sv)
     onto_iri = _ontology_iri(sv)
 
