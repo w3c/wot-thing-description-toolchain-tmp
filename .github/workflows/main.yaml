@@ -55,7 +55,15 @@ jobs:
             resources/gens/shacl/shapes.shacl.ttl \
             resources/gens/owl/ontology.owl.ttl \
             resources/gens/linkml/linkml.yaml \
-            resources/gens/index.html; do
+            resources/gens/index.html \
+            resources/gens/visualization/td.svg \
+            resources/gens/visualization/jsonschema.svg \
+            resources/gens/visualization/wotsec.svg \
+            resources/gens/visualization/hctl.svg \
+            resources/gens/static/visualization/binding-mechanism.drawio.svg \
+            resources/gens/static/visualization/binding-templates.svg \
+            resources/gens/static/visualization/thing_model_td.png \
+            resources/gens/static/visualization/tm_overwriting.png; do
             test -s "$f" || { echo "missing or empty: $f"; exit 1; }
           done
           uv run python -c "import json; assert isinstance(json.load(open('resources/gens/jsonschema/jsonschema.json')), dict)"
@@ -76,6 +84,12 @@ jobs:
           name: python-package
           path: dist/
           if-no-files-found: error
+
+      - name: Upload GitHub Pages artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: resources/gens/
 
   test-gates:
     name: Test gates
@@ -133,3 +147,22 @@ jobs:
 
       - name: Golden diff
         run: uv run pytest tests/test_golden_diff.py -v
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: [test-gates, golden-diff]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
