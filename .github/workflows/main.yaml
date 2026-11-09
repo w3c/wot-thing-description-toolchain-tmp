@@ -56,10 +56,10 @@ jobs:
             resources/gens/owl/ontology.owl.ttl \
             resources/gens/linkml/linkml.yaml \
             resources/gens/index.html \
-            resources/gens/visualization/td.svg \
-            resources/gens/visualization/jsonschema.svg \
-            resources/gens/visualization/wotsec.svg \
-            resources/gens/visualization/hctl.svg \
+            resources/gens/static/visualization/td.svg \
+            resources/gens/static/visualization/jsonschema.svg \
+            resources/gens/static/visualization/wotsec.svg \
+            resources/gens/static/visualization/hctl.svg \
             resources/gens/static/visualization/binding-mechanism.drawio.svg \
             resources/gens/static/visualization/binding-templates.svg \
             resources/gens/static/visualization/thing_model_td.png \

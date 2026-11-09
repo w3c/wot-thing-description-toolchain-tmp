@@ -90,7 +90,7 @@ def run_pipeline(
         logging.info(f"Proceeding with WoT resource generation for {generator}")
         _run_linkml_generator(schema_view, generator, output_dir)
 
-    generate_visualizations(SCHEMA_PATH, GENS_PATH / "visualization")
+    generate_visualizations(SCHEMA_PATH, GENS_PATH / "static" / "visualization")
 
     if generate_docs:
         shutil.copytree(STATIC_VISUALIZATION_PATH, GENS_PATH / "static" / "visualization", dirs_exist_ok=True)
