@@ -171,7 +171,7 @@ When reviewing HTML changes, do not evaluate the entire document — scope the c
 
 ### CI Pipeline (GitHub Actions)
 
-`main.yaml` runs five jobs in sequence: `static-analysis` → `build` → [`test-gates` ∥ `golden-diff`] → `deploy-pages`.
+`main.yaml` runs the following jobs in sequence: `static-analysis` → `build` → [`test-gates` ∥ `golden-diff`] → `deploy-pages`.
 
 | Job | What it checks |
 |---|---|
