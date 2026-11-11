@@ -23,7 +23,7 @@ The toolchain models WoT resources in LinkML and generates the related artifacts
 
 ## Usage
 
-Requirements:
+### Requirements
 
 - Python 3.14, as declared in `pyproject.toml`;
 - [uv](https://docs.astral.sh/uv/); and
@@ -34,13 +34,27 @@ git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
 uv sync
 uv run pre-commit install
-uv run wotis generate-wot-resources -d
-uv run pytest tests/ -v
 ```
 
-`wotis` is the Python command-line interface installed from this checkout by `uv sync`. `generate-wot-resources` generates the resource artifacts; `-d` additionally generates the ReSpec TD specification and its assertion CSV inventory. Run `uv run wotis --help` to view the available command and options.
+### Generating Artifacts
+
+`wotis` is the Python command-line interface one can use.
+
+To generate the WoT resources run
+
+```bash
+uv run wotis generate-wot-resources -d
+```
+
+Options:
+ - `generate-wot-resources` generates the resource artifacts
+ - `-d` additionally generates the ReSpec TD specification and its assertion CSV inventory
+
+Run `uv run wotis --help` to view all the available command and options.
 
 Generated files are written under `resources/gens/`. Do not edit them directly.
+
+Note: The [Testing](#testing) section covers the checks and controls that can be performed.
 
 ## How It Works
 
