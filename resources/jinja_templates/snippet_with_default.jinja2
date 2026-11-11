@@ -1,4 +1,4 @@
-<aside class="example with-default"{{ ' id="%s"' % id if id }}>
+<aside class="example with-default"{% if id %} id="{{ id }}"{% endif %}>
   <div class="marker">
     <span class="example-title">{{ title }}</span>
   </div>

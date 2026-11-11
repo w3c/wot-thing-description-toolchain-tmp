@@ -171,14 +171,17 @@ When reviewing HTML changes, do not evaluate the entire document — scope the c
 
 ### CI Pipeline (GitHub Actions)
 
-`main.yaml` runs four jobs in sequence: `static-analysis` → `build` → [`test-gates` ∥ `golden-diff`].
+`main.yaml` runs the following jobs in sequence: `static-analysis` → `build` → [`test-gates` ∥ `golden-diff`] → `deploy-pages`.
 
 | Job | What it checks |
 |---|---|
 | `static-analysis` | Ruff lint; LinkML schema lint (non-blocking) |
-| `build` | Full artifact generation; all output files non-empty; package builds |
+| `build` | Full artifact generation; all output files non-empty; package builds; uploads `resources/gens/` as the Pages artifact on `main` |
 | `test-gates` | TD instance gate; W3C cross-check; HTML structure tests; assertion inventory vs upstream |
 | `golden-diff` | Generated JSON Schema + context + the four generated spec sections vs committed snapshots |
+| `deploy-pages` | Pushes to `main` only: publishes the tested `resources/gens/` to GitHub Pages once `test-gates` and `golden-diff` pass |
+
+The hand-drawn spec figures live in `resources/static/visualization/` (copied from `w3c/wot-thing-description`) and are copied into `resources/gens/visualization/` during `-d` generation.
 
 ## Language Style
 

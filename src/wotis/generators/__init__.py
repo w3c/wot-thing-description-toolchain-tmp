@@ -1,5 +1,6 @@
 import json
 import logging
+import shutil
 
 from pathlib import Path
 from typing import Optional
@@ -13,7 +14,8 @@ from linkml_runtime.utils.schemaview import SchemaView
 
 from .. import (SCHEMA_PATH, GENS_PATH, GENERATORS,
                 RESPEC_TEMPLATE_PATH, FINAL_SPEC_PATH,
-                CORE_SCHEMA_PLACEHOLDER, ASSERTION_PATH)
+                CORE_SCHEMA_PLACEHOLDER, ASSERTION_PATH,
+                STATIC_VISUALIZATION_PATH)
 from ..postprocessors.jsonschema_postprocessor import post_process_jsonschema
 from ..postprocessors.shacl_postprocessor import post_process_shacl
 from .visualization import generate_visualizations
@@ -88,9 +90,10 @@ def run_pipeline(
         logging.info(f"Proceeding with WoT resource generation for {generator}")
         _run_linkml_generator(schema_view, generator, output_dir)
 
-    generate_visualizations(SCHEMA_PATH, GENS_PATH / "visualization")
+    generate_visualizations(SCHEMA_PATH, GENS_PATH / "static" / "visualization")
 
     if generate_docs:
+        shutil.copytree(STATIC_VISUALIZATION_PATH, GENS_PATH / "static" / "visualization", dirs_exist_ok=True)
         logging.info("Starting ReSpec specification generation...")
         generate_respec_spec(
             input_path,

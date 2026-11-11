@@ -1,5 +1,6 @@
 import click
 import logging
+import sys
 import yaml
 
 from pathlib import Path
@@ -78,8 +79,10 @@ def generate_wot_resources(input_schema: str, generate_docs: bool, assertions_cs
         )
     except yaml.YAMLError as e:
         logging.error(f"LinkML schema validation failed: {e}")
+        sys.exit(1)
     except Exception as e:
         logging.error(f"An unexpected error occurred during resource generation: {e}", exc_info=True)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
