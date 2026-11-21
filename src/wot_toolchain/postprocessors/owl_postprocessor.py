@@ -43,7 +43,19 @@ def postprocess_owl(
     """Clean gen-owl output and write per-module OWL vocabulary file."""
     g = Graph()
     g.parse(data=module_ttl, format="turtle")
+    postprocess_owl_graph(g, schema_file, output_file, schema_dir, output_dir, sv_merged=sv_merged)
 
+
+def postprocess_owl_graph(
+    g: Graph,
+    schema_file: str,
+    output_file: str,
+    schema_dir: Path,
+    output_dir: Path,
+    *,
+    sv_merged: SchemaView | None = None,
+) -> None:
+    """Clean the gen-owl graph in place and write the per-module OWL vocabulary file."""
     sv = SchemaView(str(schema_dir / schema_file), merge_imports=False)
     if sv_merged is None:
         sv_merged = SchemaView(str(schema_dir / schema_file), merge_imports=True)

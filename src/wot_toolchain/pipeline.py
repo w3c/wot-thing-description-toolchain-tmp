@@ -15,6 +15,7 @@ from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml.generators.owlgen import OwlSchemaGenerator
 from linkml_runtime.utils.schemaview import SchemaView
+from rdflib import Graph
 
 from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
 from .artifacts.jsonschema.options import JsonSchemaOptions
@@ -29,7 +30,7 @@ from .postprocessors.jsonld_context_postprocessor import (
     post_process_jsonld_context,
 )
 from .postprocessors.jsonschema_postprocessor import post_process_jsonschema
-from .postprocessors.owl_postprocessor import postprocess_owl
+from .postprocessors.owl_postprocessor import postprocess_owl_graph
 from .postprocessors.shacl_postprocessor import post_process_shacl
 from .preprocessors.owl_preprocessor import preprocess_for_gen_owl
 from .schema_utils import load_schema_view
@@ -135,8 +136,10 @@ def _gen_owl(project: Project, sv: SchemaView, output_dir: Path) -> None:
     for module in project.modules:
         if module.ontology is None:
             continue
-        ttl = _run_gen_owl(module.schema)
-        postprocess_owl(ttl, module.schema.name, module.ontology, module.schema.parent, output_dir, sv_merged=sv)
+        graph = _run_gen_owl(module.schema)
+        postprocess_owl_graph(
+            graph, module.schema.name, module.ontology, module.schema.parent, output_dir, sv_merged=sv
+        )
 
 
 def _gen_jsonldcontext(project: Project, sv: SchemaView, output_dir: Path) -> None:
@@ -173,14 +176,16 @@ def _gen_visualization(project: Project, sv: SchemaView, output_dir: Path) -> No
     generate_visualizations(project.modules, output_dir, range_labels)
 
 
-def _run_gen_owl(schema_path: Path) -> str:
+def _run_gen_owl(schema_path: Path) -> Graph:
     # YAML, not the preprocessed SchemaDefinition: upstream fails on that object with
     # AttributeError: 'JsonObj' object has no attribute 'values' (linkml-runtime schemaview.py:598,
     # imports_closure; see commit bb61d75f). Re-parsing the YAML gives upstream its own objects.
     yaml_str = preprocess_for_gen_owl(str(schema_path))
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", DeprecationWarning)
-        return OwlSchemaGenerator(yaml_str, **GEN_OWL_OPTIONS).serialize()
+        # as_graph(), not serialize() and re-parse: serialize() only adds canonical text that the post passes
+        # discard; the final serializer orders the output (guarded by tests/test_owl_determinism.py).
+        return OwlSchemaGenerator(yaml_str, **GEN_OWL_OPTIONS).as_graph()
 
 
 _DISPATCH: dict[str, Callable[[Project, SchemaView, Path], None]] = {
