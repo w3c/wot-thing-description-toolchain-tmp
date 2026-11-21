@@ -12,6 +12,8 @@ from linkml_runtime.linkml_model.meta import SlotDefinition
 from linkml_runtime.utils.formatutils import underscore
 from linkml_runtime.utils.schemaview import SchemaView
 
+from ..artifacts.jsonld_context.generator import WotContextGenerator
+from ..artifacts.jsonld_context.options import JsonLdContextOptions
 from ..errors import SchemaError
 from ..schema_utils import annotation_str_value as _annotation_value
 from ..schema_utils import default_prefix, get_schema
@@ -60,16 +62,9 @@ def _owned_vocabulary_prefix(schema_view: SchemaView, class_name: str) -> str | 
     return None
 
 
-def _native_slot_context(generator: ContextGenerator, slot: SlotDefinition) -> dict[str, Any]:
-    generator.context_body.clear()
-    generator.visit_schema()
-    if slot.range is None:
-        entry: dict[str, Any] = {}
-        generator._build_element_id(entry, slot.slot_uri)
-        return entry
-    generator.visit_slot(slot.alias or slot.name, slot)
-    native_key = underscore(slot.alias or slot.name)
-    return deepcopy(generator.context_body[native_key])
+def _native_slot_context(generator: ContextGenerator, slot: SlotDefinition) -> Any:
+    # Called unbound because build_module_context also accepts plain upstream generators.
+    return WotContextGenerator.slot_term_definition(generator, slot)
 
 
 def _remove_reserved_jsonld_slots(context: dict[str, Any]) -> None:
@@ -797,11 +792,7 @@ def post_process_jsonld_context(
     _remove_reserved_jsonld_slots(context)
     _apply_fixed_jsonld_term_mappings(context)
     _fix_keyed_map_identifier_slots(context, schema_view)
-    generator = ContextGenerator(
-        schema_view.schema,
-        mergeimports=True,
-        fix_multivalue_containers=True,
-    )
+    generator = WotContextGenerator.from_options(schema_view.schema, JsonLdContextOptions())
     module_contexts = _module_contexts(schema_view, generator)
     for slot in schema_view.all_slots().values():
         _apply_root_mapping(context, schema_view, slot, module_contexts)

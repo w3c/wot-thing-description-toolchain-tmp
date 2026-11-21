@@ -11,11 +11,12 @@ from collections.abc import Callable
 from pathlib import Path
 from types import MappingProxyType
 
-from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import Graph
 
+from .artifacts.jsonld_context.generator import WotContextGenerator
+from .artifacts.jsonld_context.options import JsonLdContextOptions
 from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
 from .artifacts.jsonschema.options import JsonSchemaOptions
 from .artifacts.owl.generator import WotOwlGenerator
@@ -159,8 +160,8 @@ def _gen_jsonldcontext(project: Project, sv: SchemaView, output_dir: Path) -> No
     (output_dir / "context.jsonld").write_text(merged)
 
 
-def _context_generator(sv: SchemaView) -> ContextGenerator:
-    return ContextGenerator(sv.schema, mergeimports=True, fix_multivalue_containers=True)
+def _context_generator(sv: SchemaView) -> WotContextGenerator:
+    return WotContextGenerator.from_options(sv.schema, JsonLdContextOptions())
 
 
 def _gen_linkml(project: Project, sv: SchemaView, output_dir: Path) -> None:
