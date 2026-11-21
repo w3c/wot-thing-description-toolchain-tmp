@@ -9,6 +9,7 @@ Usage:
 Input:  resources/upstream/html/index.template.html
 Output: resources/index.template.html
 """
+
 from __future__ import annotations
 
 import re
@@ -165,8 +166,7 @@ def prepare_template(upstream_html: str) -> tuple[str, list[str]]:
 
     if len(matches) != len(SNIPPET_CALLS):
         warnings.append(
-            f"Expected {len(SNIPPET_CALLS)} examples, found {len(matches)} — "
-            f"upstream template may have changed"
+            f"Expected {len(SNIPPET_CALLS)} examples, found {len(matches)} — upstream template may have changed"
         )
         if len(matches) < len(SNIPPET_CALLS):
             return upstream_html, warnings
@@ -175,7 +175,7 @@ def prepare_template(upstream_html: str) -> tuple[str, list[str]]:
 
     for i, match in enumerate(matches):
         if i >= len(SNIPPET_CALLS):
-            line = upstream_html[:match.start()].count("\n") + 1
+            line = upstream_html[: match.start()].count("\n") + 1
             warnings.append(f"Extra example at line {line} — left inline")
             continue
 
@@ -198,9 +198,7 @@ def prepare_template(upstream_html: str) -> tuple[str, list[str]]:
     prev_end = 0
     for start, end, replacement in replacements:
         result.append(upstream_html[prev_end:start])
-        # Strip leading whitespace from the line since indent is in replacement
-        chunk = upstream_html[prev_end:start]
-        # Actually, just take everything up to the line start
+        # The replacement carries its own indent, so drop the whitespace-only line prefix.
         line_start = upstream_html.rfind("\n", prev_end, start)
         if line_start != -1 and upstream_html[line_start + 1 : start].strip() == "":
             result[-1] = upstream_html[prev_end : line_start + 1]
@@ -217,6 +215,7 @@ def prepare_template(upstream_html: str) -> tuple[str, list[str]]:
 
 
 def main() -> int:
+    """Write the prepared template; return the process exit code."""
     if not UPSTREAM_TEMPLATE.exists():
         print(f"ERROR: upstream template not found: {UPSTREAM_TEMPLATE}", file=sys.stderr)
         return 1
