@@ -6,7 +6,6 @@ import copy
 import dataclasses
 import json
 import os
-import tempfile
 import warnings
 from collections.abc import Callable
 from pathlib import Path
@@ -175,17 +174,13 @@ def _gen_visualization(project: Project, sv: SchemaView, output_dir: Path) -> No
 
 
 def _run_gen_owl(schema_path: Path) -> str:
+    # YAML, not the preprocessed SchemaDefinition: upstream fails on that object with
+    # AttributeError: 'JsonObj' object has no attribute 'values' (linkml-runtime schemaview.py:598,
+    # imports_closure; see commit bb61d75f). Re-parsing the YAML gives upstream its own objects.
     yaml_str = preprocess_for_gen_owl(str(schema_path))
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
-        f.write(yaml_str)
-        tmp = f.name
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            gen = OwlSchemaGenerator(tmp, **GEN_OWL_OPTIONS)
-            return gen.serialize()
-    finally:
-        Path(tmp).unlink()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        return OwlSchemaGenerator(yaml_str, **GEN_OWL_OPTIONS).serialize()
 
 
 _DISPATCH: dict[str, Callable[[Project, SchemaView, Path], None]] = {
