@@ -24,6 +24,33 @@ def get_schema(sv: SchemaView) -> SchemaDefinition:
     return schema
 
 
+def default_prefix(sv: SchemaView) -> str:
+    """Return the default prefix of the schema, guaranteed to be declared in its ``prefixes``.
+
+    LinkML substitutes the schema id for an omitted ``default_prefix``, so an
+    unset value surfaces here as an undeclared one.
+
+    Args:
+        sv: SchemaView of the schema.
+
+    Returns:
+        The ``default_prefix`` of the schema.
+
+    Raises:
+        SchemaError: The SchemaView has no schema loaded, or ``default_prefix``
+            is unset or not declared in the ``prefixes`` of the schema.
+    """
+    schema = get_schema(sv)
+    prefix = schema.default_prefix
+    if prefix is None or prefix not in schema.prefixes:
+        location = f"{schema.source_file}: " if schema.source_file else ""
+        raise SchemaError(
+            f"{location}default_prefix {prefix!r} is not declared in the prefixes of schema {schema.name!r}. "
+            "Set 'default_prefix' to a prefix listed under 'prefixes'."
+        )
+    return str(prefix)
+
+
 def resolve_prefix_namespace(sv: SchemaView, prefix: str) -> str:
     """Return the full namespace URI for a schema-declared prefix.
 

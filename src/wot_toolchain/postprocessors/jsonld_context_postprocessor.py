@@ -13,7 +13,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 
 from ..errors import SchemaError
 from ..schema_utils import annotation_str_value as _annotation_value
-from ..schema_utils import get_schema
+from ..schema_utils import default_prefix
 from . import curie_prefix, resolve_prefix_namespace
 
 JSONLD_RESERVED_SLOT_NAMES = frozenset({"@context", "@type"})
@@ -326,9 +326,10 @@ def _remove_non_root_terms(context: dict[str, Any], schema_view: SchemaView) -> 
         schema_view: SchemaView of the main schema.
 
     Raises:
-        SchemaError: The SchemaView has no schema loaded.
+        SchemaError: The SchemaView has no schema loaded, or its ``default_prefix``
+            is unset or not declared in its ``prefixes``.
     """
-    root_prefix = get_schema(schema_view).default_prefix
+    root_prefix = default_prefix(schema_view)
     root_slots: set[str] = set()
     non_root_slots: set[str] = set()
     for slot in schema_view.all_slots().values():

@@ -18,8 +18,8 @@ from linkml_runtime.utils.formatutils import camelcase
 from linkml_runtime.utils.schemaview import SchemaView
 
 from ..errors import SchemaError
+from ..schema_utils import default_prefix, load_schema_view
 from ..schema_utils import get_schema as _get_schema
-from ..schema_utils import load_schema_view
 
 # Fields gen-owl converts to blank-node owl:Restriction axioms not present in the WoT TD ontology.
 _LIST_CONSTRAINT_FIELDS = ("exactly_one_of", "any_of", "all_of", "none_of")
@@ -105,15 +105,8 @@ def _namespace(view: SchemaView) -> str:
     Raises:
         SchemaError: If the schema has no ``default_prefix`` or it is not declared in ``prefixes``.
     """
-    schema = _get_schema(view)
-    source = schema.source_file or schema.name
-    dp = schema.default_prefix
-    if dp is None:
-        raise SchemaError(f"{source}: schema has no default_prefix; declare one under 'default_prefix'.")
-    prefixes = cast(_Prefixes, schema.prefixes)
-    if dp not in prefixes:
-        raise SchemaError(f"{source}: default_prefix {dp!r} is not declared in prefixes; declare it under 'prefixes'.")
-    return str(cast(Prefix, prefixes[dp]).prefix_reference)
+    prefixes = cast(_Prefixes, _get_schema(view).prefixes)
+    return str(cast(Prefix, prefixes[default_prefix(view)]).prefix_reference)
 
 
 def _expand_curie(view: SchemaView, curie: str, element: str) -> str:

@@ -11,7 +11,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 from wot_toolchain.errors import SchemaError
 from wot_toolchain.postprocessors.jsonld_context_postprocessor import post_process_jsonld_context
 from wot_toolchain.postprocessors.jsonschema_postprocessor import post_process_jsonschema
-from wot_toolchain.schema_utils import get_schema, resolve_prefix_namespace
+from wot_toolchain.schema_utils import default_prefix, get_schema, resolve_prefix_namespace
 
 SCHEMA_HEADER = """
 id: https://example.org/probe
@@ -190,3 +190,40 @@ classes:
     root = json.loads(_jsonld_context(sv))["@context"]
     assert "label" in root
     assert "Probe" in root
+
+
+def _schema_view_with_default_prefix_line(default_prefix_line: str) -> SchemaView:
+    return SchemaView(
+        f"""
+id: https://example.org/probe
+name: probe
+prefixes:
+  linkml: https://w3id.org/linkml/
+  ex: https://example.org/ex#
+{default_prefix_line}
+imports: [linkml:types]
+classes:
+  Probe:
+    class_uri: ex:Probe
+"""
+    )
+
+
+def test_default_prefix_returns_declared_default_prefix() -> None:
+    assert default_prefix(_schema_view("classes:\n  A: {}\n")) == "ex"
+
+
+def test_default_prefix_undeclared_raises_schema_error_naming_value_and_schema() -> None:
+    sv = _schema_view_with_default_prefix_line("default_prefix: zz")
+
+    with pytest.raises(SchemaError, match=r"default_prefix 'zz' is not declared.*'probe'"):
+        default_prefix(sv)
+
+
+def test_root_context_with_omitted_default_prefix_raises_schema_error() -> None:
+    # LinkML substitutes the schema id for an omitted default_prefix, which is never a declared prefix.
+    sv = _schema_view_with_default_prefix_line("")
+    substituted = get_schema(sv).default_prefix
+
+    with pytest.raises(SchemaError, match=rf"default_prefix '{substituted}' is not declared.*'probe'"):
+        _jsonld_context(sv)
