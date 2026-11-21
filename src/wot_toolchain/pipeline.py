@@ -20,7 +20,7 @@ from linkml.generators.shaclgen import ShaclGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
 from .config import GEN_OWL_OPTIONS, JSON_SCHEMA_FILES, Project, SpecConfig
-from .errors import ManifestError
+from .errors import GenerationError, ManifestError
 from .generators.respec import generate_respec_spec
 from .generators.visualization import generate_visualizations, require_dot
 from .postprocessors.jsonld_context_postprocessor import (
@@ -110,17 +110,21 @@ def _gen_jsonschema(project: Project, sv: SchemaView, output_dir: Path) -> None:
         if slot.designates_type:
             patched_slots.append(slot)
             slot.designates_type = False
-    gen = JsonSchemaGenerator(
-        sv.schema,
-        mergeimports=True,
-        top_class=project.top_class,
-        not_closed=True,
-        include_null=False,
-        preserve_names=True,
-    )
-    raw = json.loads(gen.serialize())
-    for slot in patched_slots:
-        slot.designates_type = True
+    try:
+        gen = JsonSchemaGenerator(
+            sv.schema,
+            mergeimports=True,
+            top_class=project.top_class,
+            not_closed=True,
+            include_null=False,
+            preserve_names=True,
+        )
+        raw = json.loads(gen.serialize())
+    except ValueError as exc:
+        raise GenerationError(f"Could not generate the JSON Schema from {project.main_schema}: {exc}") from exc
+    finally:
+        for slot in patched_slots:
+            slot.designates_type = True
     processed = post_process_jsonschema(raw, sv)
     with (output_dir / JSON_SCHEMA_FILES["jsonschema"]).open("w", encoding="utf-8") as f:
         json.dump(processed, f, indent=2, ensure_ascii=False)
