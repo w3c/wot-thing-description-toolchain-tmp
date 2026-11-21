@@ -13,6 +13,8 @@ LinkML is a general-purpose schema language — it generates JSON Schema, OWL, S
 
 2. **JSON Schema structural patterns.** The W3C TD specification defines JSON Schema patterns (discriminated unions, flat type hierarchies, operation-specific form variants) that the LinkML JSON Schema generator cannot express. The `jsonschema_*` annotation family instructs the postprocessor to transform the raw generator output into the required shapes.
 
+3. **JSON-LD context mappings.** The TD JSON-LD context requires language maps, `@index` predicates for keyed maps, and explicit scoped vocabularies that the LinkML context generator does not emit. The `jsonld_*` annotation family instructs the context postprocessor to add them.
+
 Custom annotations are **workarounds, not features.** Each one exists because native LinkML cannot express a specific WoT requirement. When an upstream fix lands, the corresponding annotation should be retired.
 
 For the catalog of known LinkML limitations, see [Known LinkML Gaps](../known-linkml-gaps.md).
@@ -25,7 +27,7 @@ Before reaching for an annotation:
 
 1. **Can native LinkML express this?** Prefer `exactly_one_of`, `rules`, `minimum_value`, `multivalued`, etc. See [Native LinkML Features for JSON Schema](#native-linkml-features-for-json-schema) below.
 2. **Is the gap already documented?** Check [Known LinkML Gaps](../known-linkml-gaps.md) — a workaround may already exist.
-3. **Is this a spec rendering concern or a schema concern?** Use `spec_*` for HTML output. Use `jsonschema_*` for JSON Schema output. Never mix them.
+3. **Which artifact does the concern affect?** Use `spec_*` for HTML output, `jsonschema_*` for JSON Schema output, and `jsonld_*` for the JSON-LD context. Never mix them.
 
 ---
 
@@ -78,10 +80,12 @@ vocabulary terms.
 ### `jsonld_context`
 
 **What it does:** controls the scoped vocabulary for a slot's nested context.
-Two modes:
+Declared on a slot. Two modes:
 
 1. **Explicit prefix** — selects a scoped vocabulary when it cannot be
-   inferred from the range (e.g., a slot whose range is `Any`).
+   inferred from the range (e.g., a slot whose range is `Any`). The prefix
+   must be declared under the schema's `prefixes`; otherwise generation fails.
+   No current schema uses this mode; the example below is illustrative.
 2. **`none`** — suppresses scoped context generation entirely, even when the
    range class would normally trigger one.
 
@@ -114,15 +118,55 @@ through a vocabulary-specific lens.
 **What it does:** declares the RDF predicate represented by keys in an
 inlined dictionary-valued slot. LinkML generates `@container: "@index"`
 natively but does not currently generate this predicate.
+([Known LinkML Gaps, gap #3](../known-linkml-gaps.md#3-json-ld-index-predicates-are-not-generated-for-keyed-maps))
+
+Declared on a slot (top-level slot or `slot_usage`). The value is a CURIE.
 
 ```yaml
-schemaDefinitions:
+securityDefinitions:
+  slot_uri: td:definesSecurityScheme
   annotations:
     jsonld_index: td:hasInstanceConfiguration
 ```
 
-Use an explicit CURIE. The value becomes the JSON-LD term definition's
-`@index` field.
+Effect on the JSON-LD context:
+
+- The term definition's `@index` field receives the local name of the CURIE
+  (`td:name` becomes `"name"`).
+- When the slot also receives a scoped context, the postprocessor ensures that
+  the scoped context contains a term resolving to the expanded CURIE.
+- The identifier slot of the range class (the map key) is remapped from `@id`
+  to its `slot_uri`, or removed from the context when it has none.
+- `jsonld_index` has no effect on a slot that also declares `jsonld_container`.
+
+Currently used on: `properties`, `actions`, `events`, `securityDefinitions`,
+`schemaDefinitions`, `uriVariables` (TD module) and the `properties` slot usage
+of `ObjectSchema` in the JSON Schema module.
+
+### `jsonld_container`
+
+**What it does:** overrides the `@container` value of a slot's JSON-LD term
+definition. LinkML emits only `@index` or `@set` containers and cannot express
+language maps.
+([Known LinkML Gaps, gap #1](../known-linkml-gaps.md#1-no-container-language-support-in-json-ld-context-generator))
+
+Declared on a slot. The value is a JSON-LD container keyword string.
+
+```yaml
+titles:
+  slot_uri: td:titleInLanguage
+  annotations:
+    jsonld_container: "@language"
+  inlined: true
+  multivalued: true
+  range: MultiLanguage
+```
+
+The postprocessor writes the value to the term's `@container` and generates
+neither an `@index` predicate nor a scoped context for the slot. For the value
+`"@language"` it also removes `@index` and `@type` from the term definition.
+
+Currently used on: `titles`, `descriptions`.
 
 The fixed TD JSON-LD members `@context`, `@type`, and `id` are handled by the
 context composer rather than custom schema annotations. `id` maps to `@id` and
@@ -141,7 +185,7 @@ These annotations control how classes and slots appear in the generated HTML spe
 
 ### `spec_description`
 
-**What it does:** overrides a slot's `description` text in the HTML vocabulary table with specification-specific markup. Supports ReSpec bibliography references (`[[RFC3986]]`), backtick code formatting, and `<a>` links that plain-text `description` cannot carry.
+**What it does:** overrides a slot's `description` text in the HTML vocabulary table with specification-specific markup. On a class, it overrides the class description rendered above the vocabulary table, unless the class declares `spec_intro_content`. For a slot, an annotation in the class's `slot_usage` takes precedence over one in the class's `attributes`, which takes precedence over one on the slot definition. Supports ReSpec bibliography references (`[[RFC3986]]`), backtick code formatting, and `<a>` links that plain-text `description` cannot carry.
 
 **What you need to do:**
 
@@ -166,11 +210,11 @@ id:
 
 ### `spec_default`
 
-**What it does:** marks a slot as having a normative default value in the W3C spec. The vocabulary table renders a "Default value" assertion for this slot.
+**What it does:** marks a slot as having a normative default value in the W3C spec. The vocabulary table renders `with default` in the slot's assignment column instead of `mandatory` or `optional`, linked to the default-values section when the spec manifest defines its anchor.
 
 **What you need to do:**
 
-- Set `spec_default` to the default value (typically `true`, `false`, or a string).
+- Set `spec_default: true` on the slot definition, the class's `slot_usage`, or the class's `attributes`. Any boolean `true`, the strings `true`, `yes`, `1`, or `with default`, or any other non-string, non-boolean value counts as set. The value is not rendered.
 - This is a **spec-level** default for the vocabulary table, not a schema-level default. Do not confuse with LinkML `ifabsent` or `equals_expression` (those are runtime defaults for schema validation).
 
 ```yaml
@@ -183,17 +227,18 @@ observable:
 
 ### `spec_exclude`
 
-**What it does:** hides a slot from the HTML vocabulary table entirely. The slot still exists in all generated schemas (JSON Schema, OWL, SHACL).
+**What it does:** hides a slot from the HTML vocabulary table entirely, or, on a class, skips rendering the class section. The slot or class still exists in all generated schemas (JSON Schema, OWL, SHACL).
 
 **What you need to do:**
 
-- Add `spec_exclude: true` on structural slots that are JSON serialization keys, not W3C vocabulary terms.
+- Add `spec_exclude: true` on structural slots that are JSON serialization keys, not W3C vocabulary terms. The annotation is read from the slot definition or the class's `attributes`, not from `slot_usage`.
 - Typical candidates: `identifier: true` slots like `name` and `language_tag` that serve as map keys.
 
 ```yaml
-name:
+language_tag:
   identifier: true
   range: string
+  required: true
   annotations:
     spec_exclude: true
 ```
@@ -382,7 +427,7 @@ Thing:
 
 ### `spec_intro_content`
 
-**What it does:** same structure as `spec_content`, but rendered **before** the vocabulary table as introductory prose.
+**What it does:** same structure as `spec_content`, but rendered **before** the vocabulary table as introductory prose. It replaces the class description: when present, neither `description` nor `spec_description` of the class is rendered.
 
 **What you need to do:**
 
@@ -395,11 +440,13 @@ Currently used on: `SecurityScheme`, `ComboSecurityScheme`, `BearerSecuritySchem
 
 ### `spec_subsections`
 
-**What it does:** creates sub-headings with their own content blocks after a class's main `spec_content`. Each subsection gets its own HTML `<section>` with a heading.
+**What it does:** creates sub-headings with their own content blocks after a class's main `spec_content`. Each subsection gets its own HTML `<section>` with an `<h4>` heading.
 
 **What you need to do:**
 
 - Add a `value` list where each item defines `id` (becomes the HTML anchor), `title` (the heading text), optional `class` (`informative` or `normative`), and `content` (same block types as `spec_content`).
+
+The example below is illustrative.
 
 ```yaml
 Form:
@@ -417,7 +464,7 @@ Form:
                     If not specified, the default content type...
 ```
 
-Currently used on: `Form` (one subsection for response-related terms).
+Currently not used in any schema.
 
 ---
 
@@ -430,7 +477,8 @@ Currently used on: `Form` (one subsection for response-related terms).
 - Set on a slot (typically via `slot_usage`), not on a class.
 - Choose `mode`:
   - `one_of` — exhaustive list. The values **must** be complete.
-  - `examples` — illustrative subset. Use when the full list is too long or open-ended.
+  - `examples` — illustrative subset. Use when the full list is too long or open-ended. This is the default when `mode` is omitted.
+- The table renders the range followed by `(one of ...)` or `(e.g., ...)`. An annotation in `slot_usage` takes precedence over one in `attributes`, which takes precedence over one on the slot definition.
 
 ```yaml
 # Exhaustive — all allowed values listed
@@ -507,15 +555,16 @@ Currently used on: `DataSchema`.
 
 ### `jsonschema_oneof_dispatch`
 
-**What it does:** generates a discriminated `oneOf` union from a class's subclasses. Each subclass becomes a `$ref` variant with a `const` constraint on the discriminator slot. With `include_unknown: true`, a fallback variant without the discriminator constraint is added.
+**What it does:** replaces a class's definition with a `oneOf` of `$ref`s to its direct subclasses (`is_a`) that have a definition in `$defs`, sorted by reference. With `include_unknown: true`, a final object variant is appended that requires the discriminator slot and constrains it to a prefixed value (pattern `.+:.*`), so that unknown schemes do not overlap the known ones.
 
-**Why it exists:** the W3C TD spec uses the `scheme` field value (`"basic"`, `"oauth2"`, etc.) to select which `SecurityScheme` subclass applies. LinkML has no native discriminated-union dispatch. ([Known LinkML Gaps, gap #9](../known-linkml-gaps.md#9-no-oneOf-dispatch-on-a-discriminator-slot))
+**Why it exists:** the W3C TD specification uses the `scheme` field value (`"basic"`, `"oauth2"`, etc.) to select which `SecurityScheme` subclass applies, and admits additional schemes with a prefixed `scheme` value. LinkML has no native discriminated-union dispatch. ([Known LinkML Gaps, gap #7](../known-linkml-gaps.md#7-no-oneof-dispatch-on-a-discriminator-slot))
 
 **What you need to do:**
 
 - Add `jsonschema_oneof_dispatch` on the **parent** class with:
-  - `discriminator` — the slot name used as the dispatch key.
-  - `include_unknown` — whether to add a fallback variant for unknown values.
+  - `discriminator` — the slot name used as the dispatch key (required).
+  - `include_unknown` — whether to add the fallback variant for prefixed values (default `false`).
+- The annotation adds no `const` constraint to the subclass variants.
 
 ```yaml
 SecurityScheme:
@@ -526,7 +575,7 @@ SecurityScheme:
         include_unknown: true
 ```
 
-**Result in generated JSON Schema:**
+**Result in generated JSON Schema (abridged):**
 
 ```json
 "SecurityScheme": {
@@ -534,7 +583,12 @@ SecurityScheme:
     { "$ref": "#/$defs/APIKeySecurityScheme" },
     { "$ref": "#/$defs/BasicSecurityScheme" },
     { "$ref": "#/$defs/OAuth2SecurityScheme" },
-    { "$ref": "#/$defs/UnknownSecurityScheme" }
+    {
+      "type": "object",
+      "description": "Additional SecurityScheme not covered by known subclasses",
+      "properties": { "scheme": { "type": "string", "pattern": ".+:.*" } },
+      "required": ["scheme"]
+    }
   ]
 }
 ```
@@ -543,46 +597,71 @@ Currently used on: `SecurityScheme`.
 
 ---
 
-### `jsonschema_form_variants`
+### `jsonschema_enum_subset_partition`
 
-**What it does:** splits a single class into operation-specific variant definitions. Each variant is constrained to a subset of values for the `op` slot. Creates separate `$defs` per variant (e.g., `PropertyForm`, `ActionForm`, `EventForm`) and a top-level `oneOf` referencing them.
+**What it does:** splits a class definition into one variant per LinkML subset of an enum. The partition reads the `in_subset` membership of each permissible value of the enum; each subset becomes a variant whose enum-typed slot accepts only that subset's values. The postprocessor generates:
 
-**Why it exists:** the W3C TD spec defines different allowed `op` values depending on where a `Form` appears (inside a property, action, event, or at root level). LinkML generates a single `Form` definition. ([Known LinkML Gaps, gap #10](../known-linkml-gaps.md#10-no-form-variants-per-affordance-type))
+- `<Class>_element_base` — the original properties without the partitioned slot, with the original `required` list and `additionalProperties`.
+- `<Class>_element_<subset>` — an `allOf` of the base and a constraint on the partitioned slot: one of the subset's values, or an array of them.
+- `<Class>` — a `oneOf` of `$ref`s to all subset variants.
+
+**Why it exists:** the W3C TD specification restricts the allowed `op` values of a `Form` by where it appears (Thing level, property, action, event). LinkML generates a single `Form` definition. ([Known LinkML Gaps, gap #8](../known-linkml-gaps.md#8-no-form-variants-per-affordance-type))
 
 **What you need to do:**
 
-- Add `jsonschema_form_variants` on the class with:
-  - `op_slot` — the slot name whose values determine variants.
-  - `variants` — a dict mapping variant names to their allowed `op` values.
+- Add `jsonschema_enum_subset_partition` on the class with:
+  - `slot` — the name of the enum-typed slot to partition.
+  - `enum` — the name of the enum whose permissible values carry `in_subset`.
+- Declare the subsets under the schema's `subsets` and assign each permissible value with `in_subset`. Values without `in_subset` belong to no variant.
 
 ```yaml
 Form:
+  class_uri: hctl:Form
   annotations:
-    jsonschema_form_variants:
+    jsonschema_enum_subset_partition:
       value:
-        op_slot: op
-        variants:
-          property:
-            - readproperty
-            - writeproperty
-            - observeproperty
-            - unobserveproperty
-          action:
-            - invokeaction
-            - queryaction
-            - cancelaction
-          event:
-            - subscribeevent
-            - unsubscribeevent
+        slot: op
+        enum: OperationType
 ```
 
-Currently used on: `Form`.
+```yaml
+OperationType:
+  permissible_values:
+    readproperty:
+      meaning: td:readProperty
+      in_subset:
+        - property_ops
+```
+
+Currently used on: `Form` (subsets `property_ops`, `action_ops`, `event_ops`, `root_ops`).
+
+---
+
+### `jsonschema_form_subset`
+
+**What it does:** narrows the array `items` of a slot to one subset variant produced by `jsonschema_enum_subset_partition`. The `items` of the slot in the class definition are replaced with a `$ref` to `<PartitionClass>_element_<subset>`. When the class is the schema's `tree_root`, the slot is also narrowed in the top-level `properties`. The slot is left unchanged when it is not an array property, when no partition defines the subset, or when the variant definitions do not exist.
+
+**What you need to do:**
+
+- Add `jsonschema_form_subset` in the class's `slot_usage` for the slot (top-level slot annotations are not read).
+- Set the value to the name of a subset used by a `jsonschema_enum_subset_partition` enum.
+
+```yaml
+PropertyAffordance:
+  slot_usage:
+    forms:
+      annotations:
+        jsonschema_form_subset:
+          value: property_ops
+```
+
+Currently used on: the `forms` slot usage of `Thing` (`root_ops`), `PropertyAffordance` (`property_ops`), `ActionAffordance` (`action_ops`), and `EventAffordance` (`event_ops`).
 
 ---
 
 ### `jsonschema_exclude`
 
-**What it does:** removes a class entirely from the generated JSON Schema `$defs`. The class still exists in LinkML and appears in OWL, SHACL, and HTML output.
+**What it does:** removes a class's definition from the generated JSON Schema `$defs`. The class still exists in LinkML and appears in OWL, SHACL, and HTML output.
 
 **What you need to do:**
 
@@ -595,36 +674,7 @@ SomeInternalClass:
     jsonschema_exclude: true
 ```
 
-Currently not actively used in schemas — available for future needs.
-
----
-
-### `jsonschema_config`
-
-**What it does:** injects raw JSON Schema properties into a slot's generated definition. This is a last-resort escape hatch for when native LinkML features (`inlined: true`, `identifier: true`, `extra_slots`) and other annotations cannot produce the correct output shape.
-
-**Why it exists:** some dict-valued slots (e.g., `actions`, `events`) require a specific `additionalProperties: { $ref: ... }` map pattern that the generator does not emit correctly despite correct `inlined` + `identifier` settings. ([Known LinkML Gaps](../known-linkml-gaps.md))
-
-**What you need to do:**
-
-- Add `jsonschema_config` on the **slot** (typically in `slot_usage`), not on the class.
-- Must cite the corresponding entry in [Known LinkML Gaps](../known-linkml-gaps.md). If no entry exists, add one first.
-- Include the `tag: jsonschema_config` field (required for the postprocessor to identify the annotation).
-
-```yaml
-Thing:
-  slot_usage:
-    actions:
-      annotations:
-        jsonschema_config:
-          tag: jsonschema_config
-          value:
-            type: object
-            additionalProperties:
-              $ref: "#/$defs/ActionAffordance"
-```
-
-Currently not actively used in schemas — documented in `AGENTS.md` as a pattern for when native features fail on dict-valued slots.
+Currently not used in any schema; the example above is illustrative.
 
 ---
 
@@ -632,15 +682,18 @@ Currently not actively used in schemas — documented in `AGENTS.md` as a patter
 
 | Annotation | Level | Domain | Purpose |
 |-----------|-------|--------|---------|
-| `spec_description` | slot | HTML | Spec text with markup (`[[RFC]]`, backticks) |
-| `spec_default` | slot | HTML | Normative default value for vocab table |
-| `spec_exclude` | slot | HTML | Hide structural slot from vocab table |
+| `jsonld_context` | slot | JSON-LD | Explicit scoped vocabulary prefix, or `none` |
+| `jsonld_index` | slot | JSON-LD | `@index` predicate for a keyed map |
+| `jsonld_container` | slot | JSON-LD | `@container` override (e.g. `@language`) |
+| `spec_description` | class, slot | HTML | Spec text with markup (`[[RFC]]`, backticks) |
+| `spec_default` | slot | HTML | `with default` assignment in vocab table |
+| `spec_exclude` | class, slot | HTML | Hide class section or structural slot |
 | `spec_content` | class | HTML | Rich content blocks after vocab table |
 | `spec_intro_content` | class | HTML | Rich content blocks before vocab table |
 | `spec_subsections` | class | HTML | Sub-headings after class content |
 | `spec_type_values` | slot | HTML | Custom "Type" column in vocab table |
 | `jsonschema_flatten_subclasses` | class | JSON Schema | Merge subclass slots into parent |
 | `jsonschema_oneof_dispatch` | class | JSON Schema | Discriminated union from subclasses |
-| `jsonschema_form_variants` | class | JSON Schema | Operation-specific Form variants |
+| `jsonschema_enum_subset_partition` | class | JSON Schema | One variant per enum subset |
+| `jsonschema_form_subset` | slot usage | JSON Schema | Narrow array items to one subset variant |
 | `jsonschema_exclude` | class | JSON Schema | Remove class from `$defs` |
-| `jsonschema_config` | slot | JSON Schema | Raw JSON Schema escape hatch (last resort) |
