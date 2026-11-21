@@ -53,6 +53,54 @@ This is intentionally a structural inference rule. It recognizes
 does not scope `linkml:Any`, because that generic class owns no vocabulary
 slots. No `jsonld_scoped_context` annotation is needed.
 
+## Bare `@id` Expansion
+
+LinkML's `ContextGenerator` emits bare names (e.g., `"@id": "schemaDefinitions"`)
+for slots and classes whose `slot_uri` or `class_uri` prefix matches the root
+`@vocab`. These bare names resolve correctly at root level through `@vocab`
+expansion, but break when re-declared inside scoped contexts where `@vocab`
+points to a different namespace.
+
+The upstream W3C context uses full IRIs for all td-prefixed terms
+(e.g., `"@id": "https://www.w3.org/2019/wot/td#schemaDefinitions"`). The
+postprocessor's `_fix_root_bare_ids` step expands every bare `@id` in the root
+context using the root `@vocab` value, matching upstream behavior.
+
+A term ID is considered bare when it contains no colon, no slash, and does not
+start with `@`. The expansion concatenates root `@vocab` + bare name to produce
+the full IRI. This runs after `_apply_class_mappings` so all class and slot
+entries are present.
+
+## Scoped Context Suppression
+
+The scoped vocabulary algorithm (below) auto-infers a nested `@context` from
+the range class's vocabulary ownership. This works correctly for most slots but
+must be suppressed for definition containers like `schemaDefinitions`.
+
+The upstream W3C merge.js explicitly assigns scoped contexts to these slots:
+
+| Slot | Scoped vocabulary |
+|------|-------------------|
+| `properties`, `input`, `output`, `data`, `dataResponse`, `subscription`, `cancellation` | JSON Schema (`jsonschema`) |
+| `security`, `securityDefinitions` | WoT Security (`wotsec`) |
+| `forms`, `links` | Hypermedia Controls (`hctl`) |
+
+`schemaDefinitions` is deliberately excluded despite having the same range
+(`DataSchema`) as `properties`. Schema definitions are named, reusable data
+schema containers — their content is opaque JSON that should not be
+reinterpreted through a vocabulary-specific scoped context.
+
+When a scoped context is injected into `schemaDefinitions`, terms like `href`
+inside schema definitions expand to `hctl:hasTarget` — the JSON-LD processor
+applies the vocabulary mapping even though the TD author intended `href` as a
+plain JSON property name within a reusable schema.
+
+To suppress auto-inference, annotate the slot with `jsonld_context: none` in
+the LinkML schema. The `_context_scope` function returns `None` for this value,
+and no `@context` is emitted. See
+[Custom Annotations — `jsonld_context`](wot-custom-annotations.md#jsonld_context)
+for the annotation reference.
+
 ## Generated Context Contract
 
 The generated context must provide the following behavior:
@@ -63,8 +111,10 @@ The generated context must provide the following behavior:
   `td:hasInstanceConfiguration`.
 - Nested Object Schema `properties` preserves keys with
   `jsonschema:propertyName`.
-- Objects reached through `properties`, `schemaDefinitions`, `uriVariables`,
-  Action/Event schema slots use the Data Schema vocabulary.
+- Objects reached through `properties`, `uriVariables`, Action/Event schema
+  slots use the Data Schema vocabulary.
+- `schemaDefinitions` has no scoped context — it is a definition container
+  whose content stays opaque to JSON-LD vocabulary mapping.
 - Objects reached through `securityDefinitions` use the WoT Security
   vocabulary.
 - Objects reached through `forms` and `links` use the HCTL vocabulary.

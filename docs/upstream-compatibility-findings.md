@@ -39,7 +39,7 @@ Consequently, an API key scheme such as the following expands with
 - [Security ontology: `wotsec:apikeyIn`](https://github.com/w3c/wot-thing-description/blob/main/ontology/wotsec.ttl)
 - [Security context: `"in"` maps to `wotsec:in`](https://github.com/w3c/wot-thing-description/blob/main/context/wot-security-context.jsonld)
 - [Context merger: security context scopes](https://github.com/w3c/wot-thing-description/blob/main/context/merge.js)
-- [Published TD 2.0 context](https://www.w3.org/ns/wot-next/td)
+- [Published td-next context](https://www.w3.org/ns/wot-next/td)
 
 ### Effect on this toolchain
 

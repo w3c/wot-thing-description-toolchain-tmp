@@ -77,21 +77,37 @@ vocabulary terms.
 
 ### `jsonld_context`
 
-**What it does:** explicitly selects a scoped vocabulary only when it cannot
-be inferred from the range, such as a slot whose range is `Any`.
+**What it does:** controls the scoped vocabulary for a slot's nested context.
+Two modes:
+
+1. **Explicit prefix** — selects a scoped vocabulary when it cannot be
+   inferred from the range (e.g., a slot whose range is `Any`).
+2. **`none`** — suppresses scoped context generation entirely, even when the
+   range class would normally trigger one.
 
 ```yaml
+# Mode 1: explicit prefix override
 external_configuration:
   annotations:
     jsonld_context: example
+
+# Mode 2: suppress scoped context
+schemaDefinitions:
+  annotations:
+    jsonld_context: none
 ```
 
-The context composer resolves `example` through the schema prefixes and builds
-the nested context from slots mapped to that namespace. It does not contain a
-hardcoded list of TD paths or vocabulary terms.
+The context composer resolves a prefix value through the schema prefixes and
+builds the nested context from slots mapped to that namespace. The `none`
+value short-circuits inference and emits no `@context` for the slot.
 
-No current TD slot requires this override. Add it only after confirming that
-the value is an object whose terms need a scoped vocabulary.
+**When to use `none`:** when a slot's range class belongs to a vocabulary
+(triggering auto-inference) but the slot semantically should not receive a
+scoped context. The canonical case is `schemaDefinitions`: its range is
+`DataSchema` (jsonschema prefix), but upstream W3C merge.js deliberately
+excludes it from scoped context assignment because schema definitions are
+opaque definition containers — their content should not be reinterpreted
+through a vocabulary-specific lens.
 
 ### `jsonld_index`
 
@@ -119,7 +135,7 @@ public artifacts.
 
 ## Spec Rendering Annotations (`spec_*`)
 
-These annotations control how classes and slots appear in the generated HTML specification (`index.html`). They have **no effect** on JSON Schema, JSON-LD, SHACL, or OWL output. They are consumed by the ReSpec generator (`src/wotis/generators/respec.py`) and the vocabulary table builder (`src/wotis/specgen/tables.py`).
+These annotations control how classes and slots appear in the generated HTML specification (`index.html`). They have **no effect** on JSON Schema, JSON-LD, SHACL, or OWL output. They are consumed by the ReSpec generator (`src/wot_toolchain/generators/respec.py`) and the vocabulary table builder (`src/wot_toolchain/specgen/tables.py`).
 
 ---
 
@@ -447,7 +463,7 @@ BearerSecurityScheme:
 
 ## JSON Schema Annotations (`jsonschema_*`)
 
-These annotations control how the JSON Schema postprocessor (`src/wotis/postprocessors/jsonschema_postprocessor.py`) transforms raw LinkML generator output. They have **no effect** on HTML, OWL, or SHACL output.
+These annotations control how the JSON Schema postprocessor (`src/wot_toolchain/postprocessors/jsonschema_postprocessor.py`) transforms raw LinkML generator output. They have **no effect** on HTML, OWL, or SHACL output.
 
 The postprocessor reads these annotations via `_read_annotations()` and applies transforms in a fixed pipeline order. Adding an annotation to a class automatically activates the corresponding transform — no Python code changes needed.
 

@@ -1,112 +1,123 @@
-# Contributing to thing-description-schema
+# Contributing to wot-toolchain
 
-:+1: First of all: Thank you for taking the time to contribute!
+This repository is maintained by the
+[W3C Web of Things (WoT) Working Group](https://www.w3.org/groups/wg/wot/).
+It generates the JSON Schema, JSON-LD context, SHACL shapes, OWL ontologies,
+specification HTML, assertion CSV files and diagrams of the WoT Thing
+Description vocabulary from LinkML schemas.
 
-The following is a set of guidelines for contributing to
-thing-description-schema. These guidelines are not strict rules.
-Use your best judgment, and feel free to propose changes to this document
-in a pull request.
+## W3C contribution context
 
-## Table Of Contents
+Contributions are made in the context of the W3C Web of Things Working Group
+and are subject to the W3C Patent Policy and the IPR commitments that apply to
+the group. See the [Working Group page](https://www.w3.org/groups/wg/wot/) for
+participation and IPR information. Code in this repository is distributed under
+the repository license.
 
-* [Guidelines for Contributions and Requests](#contributions)
-  * [Reporting issues and making requests](#reporting-issues)
-  * [Questions and Discussion](#questions-and-discussion)
-  * [Adding new elements yourself](#adding-elements)
-* [Best Practices](#best-practices)
-  * [How to write a great issue](#great-issues)
-  * [How to create a great pull/merge request](#great-pulls)
+## Development setup
 
+Requirements:
 
-<a id="contributions"></a>
+- Python 3.14 or later
+- [uv](https://docs.astral.sh/uv/)
+- [Graphviz](https://graphviz.org/) (the `dot` program) for the diagram
+  generator. When the manifest enables the `visualization` generator,
+  generation stops with an error before writing any output if `dot` is not on
+  `PATH`; `--only` can exclude that generator.
+- [Node.js](https://nodejs.org/) with the `jsonld` package installed in
+  `node_modules/`, only for the JSON-LD round-trip tests.
 
-## Guidelines for Contributions and Requests
+`bikeshed`, used to build the specification HTML, is a Python dependency and
+is installed by uv.
 
-<a id="reporting-issues"></a>
+Install the locked environment:
 
-### Reporting problems and suggesting changes to with the data model
+```bash
+uv sync --locked
+```
 
-Please use our [Issue Tracker][issues] for any of the following:
+Optionally install the pre-commit hooks (`ruff`, `ruff-format`, and
+`linkml-lint` on the schema files):
 
-- Reporting problems
-- Requesting new schema elements
+```bash
+pre-commit install
+```
 
-<a id="questions-and-discussions"></a>
+## Running the generator
 
-### Questions and Discussions
+```bash
+uv run wot-toolchain generate-wot-resources -d
+```
 
-Please use our [Discussions forum][discussions] to ask general questions or contribute to discussions.
+The command reads the project manifest `wot-toolchain.yaml` and writes the
+artifacts to `resources/gens/`. Options:
 
-<a id="adding-elements"></a>
+| Option | Meaning |
+|---|---|
+| `-c`, `--config FILE` | Project manifest (default: `wot-toolchain.yaml`) |
+| `-i`, `--input_schema FILE` | LinkML schema to use instead of the manifest's `main_schema` |
+| `-d`, `--generate_docs` | Also generate the specification HTML and assertion CSV files |
+| `--output-dir DIRECTORY` | Write the artifacts to this directory instead of the manifest's `output_dir` |
+| `--only GENERATOR` | Run only this generator of the manifest's `generators`; repeat for several |
 
-### Adding new elements yourself
+Global options `-v`/`--verbose` and `-q`/`--quiet` go before the command name.
+Run `uv run wot-toolchain --help` for details. The command exits with a
+non-zero status if generation fails.
 
-Please submit a [Pull Request][pulls] to submit a new term for consideration.
+Do not edit files under `resources/gens/`; they are overwritten on every run.
 
-<a id="best-practices"></a>
+## Tests and lint
 
-## Best Practices
+Integration tests read the generated artifacts, so run the generator first:
 
-<a id="great-issues"></a>
+```bash
+uv run wot-toolchain generate-wot-resources -d
+uv run pytest
+uv run ruff check .
+```
 
-### GitHub Best Practice
+See [tests/README.md](tests/README.md) for what each test module covers.
+Failures are investigated, not skipped. Expected failures are listed in
+`tests/known_failures/` and marked as strict expected failures, so an entry
+must be removed once its test passes.
 
-- Creating and curating issues
-    - Read ["About Issues"][[about-issues]]
-    - Issues should be focused and actionable
-    - Complex issues should be broken down into simpler issues where possible
-- Pull Requests
-    - Read ["About Pull Requests"][about-pulls]
-    - Read [GitHub Pull Requests: 10 Tips to Know](https://blog.mergify.com/github-pull-requests-10-tips-to-know/)
-    - Pull Requests (PRs) should be atomic and aim to close a single issue
-    - Long running PRs should be avoided where possible
-    - PRs should reference issues following standard conventions (e.g. “fixes #123”)
-    - Schema developers should always be working on a single issue at any one time
-    - Never work on the main branch, always work on an issue/feature branch
-    - Core developers can work on branches off origin rather than forks
-    - Always create a PR on a branch to maximize transparency of what you are doing
-    - PRs should be reviewed and merged in a timely fashion by the thing-description-schema technical leads
-    - PRs that do not pass GitHub actions should never be merged
-    - In the case of git conflicts, the contributor should try and resolve the conflict
-    - If a PR fails a GitHub action check, the contributor should try and resolve the issue in a timely fashion
+### Snapshots
 
-### Understanding LinkML
+`tests/snapshots/` holds committed copies of the generated output. They are
+updated only deliberately, after a schema or generator change whose effect on
+the artifacts you have reviewed:
 
-Core developers should read the material on the [LinkML site](https://linkml.io/linkml), in particular:
+```bash
+uv run pytest tests/test_golden_diff.py --update-goldens
+```
 
-- [Overview](https://linkml.io/linkml/intro/overview.html)
-- [Tutorial](https://linkml.io/linkml/intro/tutorial.html)
-- [Schemas](https://linkml.io/linkml/schemas/index.html)
-- [FAQ](https://linkml.io/linkml/faq/index.html)
+Commit the updated snapshots together with the change that caused them and
+explain the diff in the pull request so reviewers can check it. Do not edit
+snapshot files by hand, and do not update them to silence an unexplained
+failure.
 
-### Modeling Best Practice
+## Modeling changes
 
-- Follow Naming conventions
-    - Standard LinkML naming conventions should be followed (UpperCamelCase for classes and enums, snake_case for slots)
-    - Know how to use the LinkML linter to check style and conventions
-    - The names for classes should be nouns or noun-phrases: Person, GenomeAnnotation, Address, Sample
-    - Spell out abbreviations and short forms, except where this goes against convention (e.g. do not spell out DNA)
-    - Elements that are imported from outside (e.g. schema.org) need not follow the same naming conventions
-    - Multivalued slots should be named as plurals
-- Document model elements
-    - All model elements should have documentation (descriptions) and other textual annotations (e.g. comments, notes)
-    - Textual annotations on classes, slots and enumerations should be written with minimal jargon, clear grammar and no misspellings
-- Include examples and counter-examples (intentionally invalid examples)
-    - Rationale: these serve as documentation and unit tests
-    - These will be used by the automated test suite
-    - All elements of the nmdc-schema must be illustrated with valid and invalid data examples in src/data. New schema elements will not be merged into the main branch until examples are provided
-    - Invalid example data files should be invalid for one single reason, which should be reflected in the filename. It should be possible to render the invalid example files valid by addressing that single fault.
-- Use enums for categorical values
-    - Rationale: Open-ended string ranges encourage multiple values to represent the same entity, like “water”, “H2O” and “HOH”
-    - Any slot whose values could be constrained to a finite set should use an Enum
-    - Non-categorical values, e.g. descriptive fields like `name` or `description` fall outside of this.
-- Reuse
-    - Existing scheme elements should be reused where appropriate, rather than making duplicative elements
-    - More specific classes can be created by refinining classes using inheritance (`is_a`)
+- The LinkML schemas in `resources/schemas/` are the single source of truth.
+  Fix modeling problems (types, cardinalities, enumerations, descriptions)
+  there, not in the postprocessors under `src/wot_toolchain/postprocessors/`.
+  Postprocessors only adjust generator output that LinkML cannot express; see
+  [Postprocessor Conventions](docs/guidelines/postprocessor-conventions.md).
+- Schema changes must align with the
+  [WoT Thing Description specification](https://www.w3.org/TR/wot-thing-description11/).
+  A change that departs from the specification needs a reference to the
+  corresponding Working Group issue or decision.
+- Read the guidelines in [docs/guidelines/](docs/guidelines/index.md) before
+  editing a schema, in particular the
+  [LinkML Naming Conventions](docs/guidelines/linkml-naming-conventions.md) and
+  [WoT Custom Annotations](docs/guidelines/wot-custom-annotations.md).
 
-[about-branches]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches
-[about-issues]: https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues
-[about-pulls]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests
-[issues]: https://github.com/mahda/thing-description-schema/issues/
-[pulls]: https://github.com/mahda/thing-description-schema/pulls/
+## Pull requests
 
+- Keep each pull request focused on one issue and reference it
+  (for example `fixes #123`).
+- Make sure the generator and lint pass locally and that the change
+  introduces no new test failures before requesting review.
+- Describe any change to generated artifacts or snapshots in the pull request.
+- Use the [issue tracker](https://github.com/w3c/wot-thing-description-toolchain-tmp/issues)
+  to report problems or propose changes.

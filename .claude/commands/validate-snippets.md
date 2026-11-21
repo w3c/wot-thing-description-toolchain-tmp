@@ -1,7 +1,7 @@
 Run generation and show only snippet validation errors and warnings.
 
 ```bash
-uv run wotis generate-wot-resources -d 2>&1 | grep -iE "snippet|Snippet"
+uv run wot-toolchain generate-wot-resources -d 2>&1 | grep -iE "snippet|Snippet"
 ```
 
 If errors: check the failing `.json` file in `resources/snippets/`. Common causes:

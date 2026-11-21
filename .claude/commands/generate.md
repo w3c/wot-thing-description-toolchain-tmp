@@ -1,7 +1,7 @@
-Run the full WoTIS pipeline (resources + spec HTML) and surface only warnings and errors.
+Run the full wot-toolchain pipeline (resources + spec HTML) and surface only warnings and errors.
 
 ```bash
-uv run wotis generate-wot-resources -d 2>&1 | grep -E "ERROR|WARNING|error|warning" | grep -v "^$"
+uv run wot-toolchain generate-wot-resources -d 2>&1 | grep -E "ERROR|WARNING|error|warning" | grep -v "^$"
 ```
 
 If no output: pipeline clean. If errors appear: fix before running tests.

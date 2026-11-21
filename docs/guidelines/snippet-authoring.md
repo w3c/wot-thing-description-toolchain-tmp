@@ -42,6 +42,8 @@ Each snippet is registered in `_snippets.yaml`. The following fields are availab
 | `title` | no | — | Example title displayed in the spec |
 | `layout` | no | `aside` | `aside` (wrapped in `<aside class="example">`) or `pre` (`<pre class="example json">`) |
 | `validate` | no | `true` | Whether to validate against TD/TM JSON Schema |
+| `schema` | no | top-level `default_schema` | Snippet kind to validate against: a key of `spec.snippet_validation_schemas` in `wot-toolchain.yaml` (`tm` for Thing Model snippets) |
+| `default_schema` | when a validated snippet has no `schema` | — | **Top-level key** of `_snippets.yaml`, not a snippet field: the snippet kind for every snippet without its own `schema` (`td`) |
 | `hide_paths` | no | — | Dot-notation paths to hide (replaced with `// ...`) |
 | `show_paths` | no | — | Dot-notation paths to show (everything else becomes `// ...`) |
 
@@ -274,7 +276,7 @@ hide_paths:
 
 ## 9. Pitfalls
 
-- **Forgetting to register in `_snippets.yaml`** — the JSON file exists but produces no output. No error is raised.
+- **Forgetting to register in `_snippets.yaml`** — a `%snippet('name')%` placeholder for an unregistered snippet fails generation with `GenerationError: Snippet 'name' not found in _snippets.yaml`. A JSON file that is neither registered nor referenced is silently ignored and never validated.
 - **Mismatched snippet name** — the key in `_snippets.yaml` must match the filename without `.json`. `simple-td.json` → key is `simple-td`.
 - **Non-existent `hide_paths` entry** — a path that does not match anything in the JSON is silently ignored. Verify after generation.
-- **Stale group references** — if a group references a snippet key that does not exist, generation fails with a KeyError.
+- **Stale group references** — if a group references a snippet key that does not exist, generation fails with a `GenerationError` naming the missing key.

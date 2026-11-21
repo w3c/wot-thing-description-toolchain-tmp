@@ -7,8 +7,8 @@ uv sync
 
 **Step 2 — regenerate all artifacts:**
 ```bash
-uv run wotis generate-wot-resources -d 2>&1 | tee /tmp/wotis-generate.log
-grep -E "ERROR" /tmp/wotis-generate.log
+uv run wot-toolchain generate-wot-resources -d 2>&1 | tee /tmp/wot-toolchain-generate.log
+grep -E "ERROR" /tmp/wot-toolchain-generate.log
 ```
 Must exit with no ERROR lines. If any ERROR: stop and fix before continuing.
 
@@ -20,7 +20,7 @@ Any other WARNING line: investigate.
 
 **Step 4 — validate snippets:**
 ```bash
-uv run wotis generate-wot-resources -d 2>&1 | grep -iE "snippet"
+uv run wot-toolchain generate-wot-resources -d 2>&1 | grep -iE "snippet"
 ```
 Every snippet must pass. `validate: false` only acceptable for non-TD/TM snippets.
 

@@ -10,7 +10,7 @@
 [![W3C WoT TD](https://img.shields.io/badge/W3C-WoT%20Thing%20Description-005A9C?logo=w3c&logoColor=white)](https://www.w3.org/WoT/)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![LinkML](https://img.shields.io/badge/schema--driven-LinkML-2D6A4F?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFKADAAQAAAABAAAAFAAAAACy3fD9AAAD7UlEQVQ4EX1UYWwURRSeNzu3t3ctJwrt9VQiILGRSAzaaIJ/1CjVPyaKPWNMRf9pQqjJebXSFrbXohwHxDSEhEaDEotaAqap8QcxqVEjRn8QNQ0m0kCVQu9soRze3e7tzjxnNt3L2lbfj31v3/veN2/mzRsg/yHx/tw6XddbK9Vqr8V5FAhCWGNFg7GMAHrmSlfHH8ulwmLn3blc440ydiKFBCH0O0r5WXSwQCIS6UITImwBAltQiCmDuQemd+2aC3L8izAxkG2xOTGpBsM73PJnpmmKINi3HzVNNsHqXxKCP68J2l0w07/4sRphfG/uPscV+8OUpK72vnXeB/yfbtx38H7Xdt+NRoyOy50dvyssVZ/bTTPqctGnAetWZA2Zg5sfPHo0qmLLyYbBwYbm9440F7pSPzOg/ZZlDUhfWGE9wqpW106A/PjX7tQ55ay41W0XZ+YPI5HeRXLnoUORuXnr+PVS5WEVKuxOnyVAzxeLlaT6p7KSEBH4GDNix5TDE0TLCRuvrurP9vgupdUCUCVbXYSHLGp878d0oB9wAU+1jYxodDpfuocAXs+nXy/4AJmGxHWJQ2hmdSb7mk+W6M/1cTBue2Dl/NtjLZ+rvntypSf1pzSsbyan72ICRDNFuLgQW1CCEtfhOmMf2QiHGwdy+dVcbHRdnnpi1Y1N2+LjR6ZuRmXB5Fc/T57NFLrOBkaBrBBIi37A1xKgxQwjM18uz1oCT0u/cCDS/krTcLysG63y52Mfq7QQWASKKykSYckqa+XXQADEcaqha73pLk2IEzpAX8XsOHENI4ZMrsF8AxgYCLTM5EjJ7YLXMT8op8zLEFRecXmeJmL7HqlVyzmXKiQNAU4NLw2ZsZaF2BjFMJ0QiHfEc7m6IEA2Rm5aUxzEBBDS8BahmhxA9YPW9uOntzZ6OeaELvvADas4SfPpdIlSmMAKeTZASIkcViRQCfg8M8rjP9kWeUfT8WnBy+OfjD75zPub0onCmpbUJdO0vItdr5MhTvAFWaW3otwoYwT2Xn1zx5IXJZk8Wdne9m23a2svyias4VgZDWHxh5FbB9arFT3CS52dM/KEhhwLB5uz2RX1Gh1O4LoBGV96+l6dhLzc9vWngpNTug4kEqFNtgv31giVMbsnPcYQvpi1yYfq7CbMZHUhd1m11jxmhI36A7ZNviyXxFAsFD2jgN6hBzMaM/sfkdt/Q87npKaxUQPCv623CzcV5kIsFhNVbWOVO89pKAr5ns59wVxlLyFUTjXfl+f+bpWP6ePyzWvgCxdPk90jFPJA6Ve31LHxCzt32goflGUJgwA18OdmZrwrtbmpqXQymeTB+GL7H5S4pwvLuAY7AAAAAElFTkSuQmCC&logoColor=white)](https://linkml.io/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-0B7A75)](https://opensource.org/licenses/MIT)
+[![License: W3C](https://img.shields.io/badge/license-W3C%20Software%20and%20Document-0B7A75)](LICENSE.md)
 
 </div>
 
@@ -32,13 +32,25 @@ Requirements:
 ```bash
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
-uv sync
-uv run pre-commit install
-uv run wotis generate-wot-resources -d
+uv sync --locked
+uv run wot-toolchain generate-wot-resources -d
 uv run pytest tests/ -v
 ```
 
-`wotis` is the Python command-line interface installed from this checkout by `uv sync`. `generate-wot-resources` generates the resource artifacts; `-d` additionally generates the ReSpec TD specification and its assertion CSV inventory. Run `uv run wotis --help` to view the available command and options.
+`wot-toolchain` is the Python command-line interface installed from this checkout by `uv sync`. `generate-wot-resources` generates the resource artifacts; `-d` additionally generates the ReSpec TD specification and its assertion CSV inventory. `--only GENERATOR` runs a subset of the manifest's generators and `--output-dir DIR` redirects the resource artifacts. Run `uv run wot-toolchain generate-wot-resources --help` for all options.
+
+What is generated, from which schemas and into which files is described by the project manifest [`wot-toolchain.yaml`](wot-toolchain.yaml); select another manifest with `-c`.
+
+### Use from another repository
+
+The toolchain contains no schemas of its own. A repository that owns LinkML schemas and a manifest installs a tagged release and runs it against that manifest:
+
+```bash
+uv tool install git+https://github.com/w3c/wot-thing-description-toolchain-tmp@<tag>
+wot-toolchain generate-wot-resources -d -c path/to/wot-toolchain.yaml
+```
+
+The toolchain is not published on PyPI. Bikeshed, used by `-d`, is installed with the toolchain. The visualization generator needs Graphviz `dot` on `PATH`.
 
 Generated files are written under `resources/gens/`. Do not edit them directly.
 
@@ -47,18 +59,17 @@ Generated files are written under `resources/gens/`. Do not edit them directly.
 The source models are maintained manually by the WoT Working Group:
 
 - **WoT LinkML schema modules** — the root module [`td-linkml`](resources/schemas/thing_description.yaml) imports [`hctl-linkml`](resources/schemas/hypermedia.yaml), [`wotsec-linkml`](resources/schemas/wot_security.yaml), and [`jsonschema-linkml`](resources/schemas/jsonschema.yaml)
-- **Static ReSpec template and Jinja templates** — `resources/index.template.html` and `resources/jinja_templates/`
+- **Static ReSpec template and Jinja templates** — `resources/index.template.html` and `src/wot_toolchain/templates/`
 - **TD/TM JSON snippets** — example snippets with `_snippets.yaml` metadata
 
 From these source models, the generation pipeline has two paths:
 
 1. **LinkML resource generation + postprocessors** takes the schema modules and produces the following WoT resource artifacts under `resources/gens/`:
    - **JSON Schema** (`jsonschema/jsonschema.json`) — validation of TD and TM JSON representations
-   - **JSON-LD context** (`jsonldcontext/context.jsonld`) — TD JSON-LD terms, types, and containers
-   - **SHACL shapes** (`shacl/shapes.shacl.ttl`) — validation of RDF representations of TD and TM instances
-   - **OWL ontologies** (`owl/td.ttl`, `owl/hctl.ttl`, `owl/wotsec.ttl`, `owl/jsonschema.ttl`) — WoT vocabulary terms and relationships
-   - **TypeScript definitions** (`typescript/`) — type definitions for [node-wot](https://github.com/eclipse-thingweb/node-wot)
-   - **Visualizations** (`visualization/`) — class-hierarchy diagrams
+   - **JSON-LD context** (`jsonldcontext/context.jsonld` and one context per schema module) — TD JSON-LD terms, types, and containers
+   - **SHACL shapes** (`shacl/shapes.shacl.ttl`, experimental) — validation of RDF representations of TD and TM instances
+   - **OWL ontologies** (`owl/td.ttl`, `owl/tm.ttl`, `owl/hctl.ttl`, `owl/wotsec.ttl`, `owl/jsonschema.ttl`, experimental) — WoT vocabulary terms and relationships
+   - **Visualizations** (`visualization/*.svg`, experimental) — class-hierarchy diagrams
 
 2. **Snippet rendering + ReSpec specification generation**, enabled by `-d`, takes the schema modules, `resources/index.template.html`, Jinja templates, and the TD/TM JSON snippets. It produces:
    - **Generated ReSpec `index.html`** — vocabulary tables, assertions, and rendered TD/TM example snippets
@@ -66,7 +77,7 @@ From these source models, the generation pipeline has two paths:
 
 ![WoT Toolchain generation flow](images/wot-toolchain.svg)
 
-Postprocessors are custom Python functions in [`src/wotis/postprocessors/`](src/wotis/postprocessors/). They modify a raw LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`Known LinkML Gaps`](docs/known-linkml-gaps.md) records each known limitation and workaround.
+Postprocessors are custom Python functions in [`src/wot_toolchain/postprocessors/`](src/wot_toolchain/postprocessors/). They modify a raw LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`Known LinkML Gaps`](docs/known-linkml-gaps.md) records each known limitation and workaround.
 
 ## Testing
 
@@ -78,15 +89,16 @@ uv run pytest tests/ -v
 
 The checks include:
 
-- `tests/test_td_instance_gate.py`: validates valid and invalid TD/TM 2.0 test instances against the generated JSON Schema.
+- `tests/test_td_instance_gate.py`: validates the valid and invalid TD test instances in `tests/data/`, as TD 1.1 and as td-next, against the generated JSON Schema.
 - `tests/test_td_crosscheck.py`: compares generated-schema validation verdicts with the upstream W3C TD schemas manually specified in `resources/upstream/schemas/`.
-- `tests/test_golden_diff.py`: compares generated JSON Schema, JSON-LD context, and generated specification sections with machine-updatable snapshots in `tests/snapshots/`.
+- `tests/test_golden_diff.py`: compares generated JSON Schema, JSON-LD context, OWL modules, SHACL shapes, and generated specification sections with machine-updatable snapshots in `tests/snapshots/`.
 - `tests/test_golden_form_structure.py` and `tests/test_spec_content_rendering.py`: check generated ReSpec structure and rendering behavior.
 - `tests/test_snippet_schema.py` and `tests/test_snippet_crossrefs.py`: validate snippet metadata, source files, and ReSpec cross-references.
+- `tests/test_jsonld_roundtrip.py`: round-trips the valid TD test instances through `jsonld.js`; requires Node.js with the `jsonld` package in `node_modules/`.
 
 `resources/upstream/html/index.html` and `resources/upstream/assertions.csv` are upstream reference files used for TD specification and assertion-inventory comparison. `tests/snapshots/` contains this toolchain's generated-output snapshots; update them only with `uv run pytest tests/test_golden_diff.py --update-goldens` after reviewing an intended change.
 
-The test suite has no accepted validation differences. A generated-schema rejection of a valid sample or a mismatch with the W3C reference schema fails the relevant test directly.
+Known failures are listed one per line in `tests/known_failures/` and marked as strict expected failures: a listed case that starts passing fails the suite until its entry is removed. Any other rejection of a valid sample or mismatch with the W3C reference schema fails the relevant test directly.
 
 See [tests/README.md](tests/README.md) for the complete test inventory and the upstream reference files used by each check.
 
@@ -96,10 +108,10 @@ Useful commands:
 
 ```bash
 # Generate resource artifacts only
-uv run wotis generate-wot-resources
+uv run wot-toolchain generate-wot-resources
 
 # Generate resource artifacts and the ReSpec TD specification
-uv run wotis generate-wot-resources -d
+uv run wot-toolchain generate-wot-resources -d
 
 # Run the complete test suite
 uv run pytest tests/ -v
@@ -112,7 +124,7 @@ Before changing a schema or generator, read the [modeling guidelines](docs/guide
 
 ## Current Status
 
-Current work focuses on JSON Schema parity, generated TD specification vocabulary tables, snippet validation, and assertion inventory comparison with the upstream TD repository. SHACL and OWL artifacts are generated; deeper automated consistency checks for those artifacts are not currently part of the test gates.
+Current work focuses on JSON Schema parity, generated TD specification vocabulary tables, snippet validation, and assertion inventory comparison with the upstream TD repository. The JSON Schema, the JSON-LD context, and the specification HTML with its assertion inventory are the release targets. The OWL, SHACL, and visualization outputs are experimental: they are generated and covered by snapshot and structural tests, but deeper automated consistency checks for them are not currently part of the CI test gates.
 
 ## Contributing
 
@@ -120,4 +132,5 @@ Contributions, issue reports, and review are welcome. Keep each change focused, 
 
 ## License
 
-Licensed under the MIT License.
+Licensed under the [W3C Software and Document License](http://www.w3.org/Consortium/Legal/copyright-software), the same license as
+[w3c/wot-thing-description](https://github.com/w3c/wot-thing-description). See [LICENSE.md](LICENSE.md).

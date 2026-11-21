@@ -1,4 +1,4 @@
-Review a PR against all WOTIS project rules. Usage: `/review-pr <PR_NUMBER>`
+Review a PR against all wot-toolchain project rules. Usage: `/review-pr <PR_NUMBER>`
 
 Fetch the PR and review it across all dimensions: schema annotations, postprocessor correctness, snippet validity, CI pipeline coverage, golden drift, and cross-artifact consistency.
 
@@ -60,7 +60,7 @@ Check:
 
 **Step 5 — snippet review (if snippets changed).**
 ```bash
-uv run wotis generate-wot-resources -d 2>&1 | grep -iE "snippet|ERROR|WARNING"
+uv run wot-toolchain generate-wot-resources -d 2>&1 | grep -iE "snippet|ERROR|WARNING"
 ```
 - Every snippet must have a unique `id` in `_snippets.yaml`.
 - `validate: false` only for non-TD/TM snippets.

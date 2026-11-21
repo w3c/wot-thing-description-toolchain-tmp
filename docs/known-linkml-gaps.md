@@ -266,7 +266,7 @@ TD. The custom generator reads `slot_uri` and uses it as the OWL property IRI,
 which is the correct behavior for this vocabulary.
 
 **Artifact affected:** `*.ttl` (OWL ontology files for all modules)
-**Workaround:** Custom `src/wotis/generators/owl.py` — reads `slot_uri`,
+**Workaround:** Custom `src/wot_toolchain/generators/owl.py` — reads `slot_uri`,
 emits it as the property IRI for OWL output.
 **LinkML issue:** By design — `gen-owl` intentionally uses slot name for
 property IRI. WoT's split naming convention is outside the generator's scope.
@@ -288,7 +288,7 @@ property IRI. WoT's split naming convention is outside the generator's scope.
 ## JSON Schema Generator
 
 ### 6. JSON Schema generator cannot express all W3C TD structural patterns
-The JSON Schema postprocessor (`src/wotis/postprocessors/jsonschema_postprocessor.py`) contains active transforms that compensate for generator gaps — including subclass flattening, oneOf dispatch, form variants, type normalization, identifier slot removal, ref resolution, and metadata cleanup. Gaps #9, #10, and #11 below document specific transforms; additional undocumented transforms (`_normalize_types`, `_simplify_exclusive_minimum`, `_remove_identifier_slots`, `_remove_excluded_defs`, `_resolve_refs`, `_clean_metadata`) handle structural adjustments the generator cannot produce natively.
+The JSON Schema postprocessor (`src/wot_toolchain/postprocessors/jsonschema_postprocessor.py`) contains active transforms that compensate for generator gaps — including subclass flattening, oneOf dispatch, form variants, type normalization, identifier slot removal, ref resolution, and metadata cleanup. Gaps #9, #10, and #11 below document specific transforms; additional undocumented transforms (`_normalize_types`, `_simplify_exclusive_minimum`, `_remove_identifier_slots`, `_remove_excluded_defs`, `_resolve_refs`, `_clean_metadata`) handle structural adjustments the generator cannot produce natively.
 
 ### 7. No oneOf dispatch on a discriminator slot
 **Symptom:** W3C `securityScheme` is a oneOf over the known schemes plus `additionalSecurityScheme` with a prefixed `scheme`; the generator does not use `designates_type` for this.

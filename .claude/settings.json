@@ -6,7 +6,7 @@
       "Bash(uv run pytest *)",
       "Bash(uv run ruff *)",
       "Bash(uv run linkml-lint *)",
-      "Bash(uv run wotis *)",
+      "Bash(uv run wot-toolchain *)",
       "Bash(git diff *)",
       "Bash(git log *)",
       "Bash(git status)",

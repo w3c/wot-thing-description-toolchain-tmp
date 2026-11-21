@@ -117,6 +117,7 @@ These are semantically equivalent. Remaining differences from the hand-authored 
 | E8 | `supportContact`: `rdfs:domain td:Thing` + `rdfs:range xsd:anyURI` | No domain/range in target | INVESTIGATE | See task #14 — need to determine if schema or gen-owl adds these |
 | E9 | `name`: `rdfs:range xsd:string` + wrong domain predicate | No range; target uses `schema:domainIncludes` not `rdfs:domain` | INVESTIGATE | See task #14 — spurious range + wrong domain predicate form |
 | E10 | Entire `td:versionInfo` property block | Not present as OWL property in target | ACCEPTED | gen-owl emits OWL property from schema slot |
+| E11 | `wotsec:proxy`, `wotsec:authorization`: `owl:ObjectProperty` with `rdfs:range xsd:anyURI` | Target has `owl:DatatypeProperty` | DEFERRED | Follows the schema as written (`wot_security.yaml`: `implements: owl:ObjectProperty`, `range: uri`). Kept as is; modeling to be re-checked by the editor later |
 
 ### Missing Triples in Generated
 

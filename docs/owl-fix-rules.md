@@ -33,7 +33,7 @@ These are intentional or acceptable — remove from diff lists:
 | T1 | ✅ DONE | `td:hasInstanceConfiguration` ObjectProperty present and correct                                         | — |
 | T2 | ✅ DONE | `td:OperationType` class + 18 named individuals generated correctly                                      | — |
 | T3 | ✅ DONE | `jsonschema:properties` now in `jsonschema.ttl` (not td.ttl)                                             | — |
-| T4 | ✅ DONE | `td:schemaDefinitions` generated — intentional (TD 2.0 addition, no upstream ontology declaration)       | — |
+| T4 | ✅ DONE | `td:schemaDefinitions` generated — intentional (td-next addition, no upstream ontology declaration)       | — |
 | T5 | ✅ DONE | `td:MultiLanguage` absent from td.ttl; `td:VersionInfo` retained (intentional)                           | — |
 | T6 | ✅ DONE | `dcterms:created` and `dcterms:modified` not re-declared in td.ttl — correct. These are external Dublin Core properties reused via JSON-LD context (`dct:created`, `dct:modified`). Upstream ontology intentionally omits them (standard RDF practice: don't re-declare external vocab). Slots remain in schema for JSON Schema and JSON-LD context generation. | — |
 | T7 | ✅ DONE | `td:titleInLanguage` has `rdfs:subPropertyOf dcterms:title`. Missing `rdfs:range xsd:string` acceptable — upstream uses soft `schema:rangeIncludes schema:Text` (accepted difference #6). | — |

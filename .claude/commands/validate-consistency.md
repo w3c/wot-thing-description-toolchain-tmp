@@ -2,7 +2,7 @@ Validate cross-artifact consistency after a schema change. Generates fresh artif
 
 **Step 1 — generate:**
 ```bash
-uv run wotis generate-wot-resources -d 2>&1 | grep -E "ERROR|WARNING"
+uv run wot-toolchain generate-wot-resources -d 2>&1 | grep -E "ERROR|WARNING"
 ```
 
 **Step 2 — JSON Schema structure:**
