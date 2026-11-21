@@ -39,6 +39,8 @@ uv run pytest tests/ -v
 
 `wot-toolchain` is the Python command-line interface installed from this checkout by `uv sync`. `generate-wot-resources` generates the resource artifacts; `-d` additionally generates the ReSpec TD specification and its assertion CSV inventory. `--only GENERATOR` runs a subset of the manifest's generators and `--output-dir DIR` redirects the resource artifacts. Run `uv run wot-toolchain generate-wot-resources --help` for all options.
 
+`wot-toolchain diff-report GENERATED REFERENCE` prints a Markdown report of the JSON paths added, removed or changed in a generated JSON Schema or JSON-LD context relative to a reference file; it exits 0 whether or not they differ, so its output can be appended to `$GITHUB_STEP_SUMMARY`.
+
 What is generated, from which schemas and into which files is described by the project manifest [`wot-toolchain.yaml`](wot-toolchain.yaml); select another manifest with `-c`.
 
 ### Use from another repository

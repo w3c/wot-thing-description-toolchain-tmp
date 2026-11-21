@@ -11,6 +11,8 @@ from pathlib import Path
 
 import pytest
 
+from wot_toolchain.diff_report import json_change_summary as _json_change_summary
+
 from .spec_html_compare import generated_sections_html
 
 TESTS_DIR = Path(__file__).resolve().parent
@@ -51,50 +53,6 @@ ARTIFACTS = [
     ("owl/tm.ttl", REPO_ROOT / "resources" / "gens" / "owl" / "tm.ttl", _read_text),
     ("shapes.shacl.ttl", REPO_ROOT / "resources" / "gens" / "shacl" / "shapes.shacl.ttl", _read_text),
 ]
-
-
-def _walk(old, new, path: list, changes: list) -> None:
-    if isinstance(old, dict) and isinstance(new, dict):
-        for key in sorted(set(old) | set(new)):
-            if key not in old:
-                changes.append(("added", path + [key]))
-            elif key not in new:
-                changes.append(("removed", path + [key]))
-            else:
-                _walk(old[key], new[key], path + [key], changes)
-    elif isinstance(old, list) and isinstance(new, list) and len(old) == len(new):
-        for index, (old_item, new_item) in enumerate(zip(old, new, strict=True)):
-            _walk(old_item, new_item, path + [index], changes)
-    elif old != new:
-        changes.append(("changed", path))
-
-
-def _pattern(path: list) -> str:
-    # names become *: entries of $defs and properties, terms of the root @context, list indexes
-    parts = []
-    # the shifted copy is one longer, its last element has no part to pair with
-    for parent, part in zip([None] + path, path, strict=False):
-        if isinstance(part, int):
-            parts.append("[*]")
-        elif parent in ("$defs", "properties") or (parent == "@context" and len(parts) == 1):
-            parts.append(".*")
-        else:
-            parts.append(f".{part}")
-    return "$" + "".join(parts)
-
-
-def _json_change_summary(golden: str, current: str) -> list[str]:
-    """Changes grouped by JSON path pattern, with a count and one example each."""
-    changes = []
-    _walk(json.loads(golden), json.loads(current), [], changes)
-    groups = {}
-    for kind, path in changes:
-        group = groups.setdefault((kind, _pattern(path)), [0, path])
-        group[0] += 1
-    lines = [f"{len(changes)} changes, {len(groups)} patterns"]
-    for (kind, pattern), (count, example) in sorted(groups.items(), key=lambda item: -item[1][0]):
-        lines.append(f"{count:5}  {kind:8} {pattern}   e.g. $.{'.'.join(map(str, example))}")
-    return lines
 
 
 @pytest.mark.parametrize("name, gen_path, normalize", ARTIFACTS, ids=[n for n, _, _ in ARTIFACTS])

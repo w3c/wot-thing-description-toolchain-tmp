@@ -5,11 +5,14 @@ from __future__ import annotations
 import dataclasses
 import logging
 import sys
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 import click
 
 from .config import Project, load_project
+from .diff_report import markdown_report
 from .errors import WotToolchainError
 from .pipeline import run_pipeline
 
@@ -98,7 +101,7 @@ def generate_wot_resources(
     Raises:
         click.UsageError: ``only`` names a generator the manifest does not list.
     """
-    try:
+    with _exit_on_toolchain_error():
         project = load_project(config.resolve())
         if input_schema is not None:
             project = dataclasses.replace(project, main_schema=input_schema.resolve())
@@ -107,6 +110,29 @@ def generate_wot_resources(
         if only:
             project = _select_generators(project, only)
         run_pipeline(project, generate_docs=generate_docs)
+
+
+@main.command()
+@click.argument("generated", type=click.Path(dir_okay=False, path_type=Path))
+@click.argument("reference", type=click.Path(dir_okay=False, path_type=Path))
+def diff_report(generated: Path, reference: Path) -> None:
+    """Print a Markdown report of the JSON paths in which GENERATED differs from REFERENCE.
+
+    Differences do not fail the command; append the output to $GITHUB_STEP_SUMMARY to publish it.
+
+    \u000c
+    Args:
+        generated: JSON file produced by this toolchain.
+        reference: JSON file to compare against, for example from another toolchain.
+    """
+    with _exit_on_toolchain_error():
+        click.echo(markdown_report(generated, reference))
+
+
+@contextmanager
+def _exit_on_toolchain_error() -> Iterator[None]:
+    try:
+        yield
     except WotToolchainError as error:
         logging.error("%s", error)
         sys.exit(1)

@@ -33,7 +33,7 @@ resources/schemas/          ← SOURCE OF TRUTH (edit here, not in gens/)
   README.md                 ← points to docs/guidelines/ (read before touching schemas)
 
 src/wot_toolchain/
-  cli.py                    ← entry point: wot-toolchain generate-wot-resources [-d]
+  cli.py                    ← entry point: wot-toolchain generate-wot-resources [-d] | diff-report GENERATED REFERENCE
   config.py                 ← project manifest loading
   pipeline.py               ← runs the LinkML generators and postprocessors
   generators/               ← spec (respec.py) and class-diagram (visualization.py) generators
