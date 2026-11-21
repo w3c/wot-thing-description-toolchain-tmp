@@ -203,3 +203,45 @@ def test_missing_transitive_local_import_names_the_importing_sub_schema(tmp_path
     message = str(excinfo.value)
     assert str(tmp_path / "middle.yaml") in message
     assert str(tmp_path / "gone.yaml") in message
+
+
+def test_missing_root_schema_raises_schema_error_naming_path(tmp_path: Path) -> None:
+    schema = tmp_path / "absent.yaml"
+
+    with pytest.raises(SchemaError, match=r"LinkML schema file not found") as excinfo:
+        preprocess_for_gen_owl(str(schema))
+
+    assert str(schema) in str(excinfo.value)
+
+
+def _write_sub_schema(tmp_path: Path, name: str, imports: str, enum: str) -> None:
+    (tmp_path / f"{name}.yaml").write_text(
+        textwrap.dedent(
+            f"""\
+            id: https://example.org/{name}
+            name: {name}
+            default_prefix: ex
+            prefixes:
+              ex: https://example.org/root#
+            imports:
+              - {imports}
+            enums:
+              {enum}:
+                enum_uri: ex:{enum}
+                permissible_values:
+                  dark: {{}}
+            """
+        ),
+        encoding="utf-8",
+    )
+
+
+def test_cyclic_local_imports_are_walked_once(tmp_path: Path) -> None:
+    _write_sub_schema(tmp_path, "a", "b", "Shade")
+    _write_sub_schema(tmp_path, "b", "a", "Tone")
+    schema = _write_root_schema(tmp_path, "default_prefix: ex", "  - a")
+
+    output = preprocess_for_gen_owl(str(schema))
+
+    assert "Shade:" in output
+    assert "Tone:" in output

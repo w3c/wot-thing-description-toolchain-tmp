@@ -19,6 +19,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 
 from ..errors import SchemaError
 from ..schema_utils import get_schema as _get_schema
+from ..schema_utils import load_schema_view
 
 # Fields gen-owl converts to blank-node owl:Restriction axioms not present in the WoT TD ontology.
 _LIST_CONSTRAINT_FIELDS = ("exactly_one_of", "any_of", "all_of", "none_of")
@@ -60,8 +61,8 @@ def preprocess_for_gen_owl(schema_path: str) -> str:
 
     Raises:
         SchemaError: If a CURIE of the schema cannot be expanded because its prefix declarations
-            (for example ``default_curi_maps``) cannot be resolved, a local import does not exist,
-            or the ``default_prefix`` is not declared.
+            (for example ``default_curi_maps``) cannot be resolved, the schema file or a local import
+            does not exist, or the ``default_prefix`` is not declared.
     """
     # Before merging: LinkML's merge would fail on a missing import with an untyped FileNotFoundError.
     enum_namespaces = _collect_enum_namespaces(schema_path)
@@ -132,11 +133,13 @@ def _collect_enum_namespaces(schema_path: str) -> dict[str, str]:
     """Map each enum of the local imports of ``schema_path`` to the namespace of its originating sub-schema.
 
     Raises:
-        SchemaError: If a local (non-CURIE) import does not resolve to an existing file.
+        SchemaError: If ``schema_path`` or a local (non-CURIE) import does not resolve to an existing file.
     """
-    root_schema = _get_schema(SchemaView(schema_path, merge_imports=False))
+    root_schema = _get_schema(load_schema_view(Path(schema_path), merge_imports=False))
 
     enum_to_ns: dict[str, str] = {}
+    # Import cycles are legal in LinkML; walk each file once so they do not recurse forever.
+    visited: set[Path] = {Path(schema_path).resolve()}
 
     def _walk(importer: str, imports: list[str], base_dir: Path) -> None:
         for import_name in imports:
@@ -146,6 +149,9 @@ def _collect_enum_namespaces(schema_path: str) -> dict[str, str]:
             import_path = base_dir / f"{import_name}.yaml"
             if not import_path.is_file():
                 raise SchemaError(f"{importer}: imports {import_name!r} but {import_path} does not exist.")
+            if import_path.resolve() in visited:
+                continue
+            visited.add(import_path.resolve())
             sub_schema = _get_schema(SchemaView(str(import_path), merge_imports=False))
             dp = sub_schema.default_prefix
             prefixes = cast(_Prefixes, sub_schema.prefixes)
