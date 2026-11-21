@@ -137,20 +137,6 @@ def _read_annotations(sv: SchemaView) -> TransformConfig:
     return config
 
 
-def _fix_extra_slots(schema: dict, sv: SchemaView) -> None:
-    """Honour extra_slots: linkml gen-jsonschema ignores it, emitting additionalProperties: false."""
-    defs = schema.get("$defs", {})
-    for cls_name, cls_def in sv.all_classes().items():
-        if cls_name not in defs:
-            continue
-        defn = defs[cls_name]
-        if not isinstance(defn, dict):
-            continue
-        es = cls_def.extra_slots
-        if es and getattr(es, "allowed", False):
-            defn["additionalProperties"] = True
-
-
 def _flatten_subclasses(schema: dict, sv: SchemaView, config: TransformConfig) -> None:
     defs = schema.get("$defs", {})
 
@@ -593,7 +579,6 @@ def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     logger.debug(f"  enum_subset_partitions: {[e.class_name for e in config.enum_subset_partitions]}")
     logger.debug(f"  form_subset_narrows: {[n.class_name for n in config.form_subset_narrows]}")
 
-    _fix_extra_slots(schema, schema_view)
     _flatten_subclasses(schema, schema_view, config)
     _build_oneof_dispatch(schema, schema_view, config)
     _build_enum_subset_partitions(schema, config)
