@@ -6,8 +6,8 @@ description: >-
 version: "1.1"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
-created_on: "2025-06-01"
-last_updated_on: "2026-11-21"
+created_on: "2025-06-01T00:00:00Z"
+last_updated_on: "2026-11-21T00:00:00Z"
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
 annotations:
