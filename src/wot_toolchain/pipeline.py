@@ -16,9 +16,10 @@ from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml.generators.owlgen import OwlSchemaGenerator
-from linkml.generators.shaclgen import ShaclGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
+from .artifacts.shacl.generator import WotShaclGenerator
+from .artifacts.shacl.options import ShaclOptions
 from .config import GEN_OWL_OPTIONS, JSON_SCHEMA_FILES, Project, SpecConfig
 from .errors import GenerationError, ManifestError
 from .generators.respec import generate_respec_spec
@@ -131,7 +132,7 @@ def _gen_jsonschema(project: Project, sv: SchemaView, output_dir: Path) -> None:
 
 
 def _gen_shacl(project: Project, sv: SchemaView, output_dir: Path) -> None:
-    gen = ShaclGenerator(sv.schema, mergeimports=False, closed=True, suffix="Shape")
+    gen = WotShaclGenerator.from_options(sv.schema, ShaclOptions())
     processed = post_process_shacl(gen.serialize(), sv)
     (output_dir / "shapes.shacl.ttl").write_text(processed, encoding="utf-8")
 
