@@ -141,9 +141,25 @@ def _is_positive_number(value: Any) -> bool:
 _XSD_BASE = "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#"
 
 
-def _link(name: str, sv: SchemaView, type_hrefs: dict[str, str] | None = None) -> str:
-    if name == "any type":
+_LINKML_ANY_URI = "https://w3id.org/linkml/Any"
+
+
+def _denotes_any(rng: str | None, sv: SchemaView) -> bool:
+    if not rng:
+        return False
+    class_def = sv.all_classes().get(rng)
+    uri = class_def.class_uri if class_def and class_def.class_uri else rng
+    return sv.expand_curie(uri) == _LINKML_ANY_URI
+
+
+def _link_range(rng: str | None, name: str, sv: SchemaView, type_hrefs: dict[str, str] | None) -> str:
+    # linkml:Any stands for any value, not a vocabulary term or datatype, so there is nothing to link to.
+    if _denotes_any(rng, sv):
         return name
+    return _link(name, sv, type_hrefs)
+
+
+def _link(name: str, sv: SchemaView, type_hrefs: dict[str, str] | None = None) -> str:
     if name in ("Array", "Map"):
         return f"<a>{name}</a>"
     if name in sv.all_classes():
@@ -197,12 +213,12 @@ def slot_type_text(
                     p = _link("Array", sv, type_hrefs)
                 else:
                     p = (
-                        f"{_link('Array', sv, type_hrefs)} of {_link(rng, sv, type_hrefs)}"
+                        f"{_link('Array', sv, type_hrefs)} of {_link_range(alt_rng_raw, rng, sv, type_hrefs)}"
                         if rng
                         else _link("Array", sv, type_hrefs)
                     )
             else:
-                p = _link(rng, sv, type_hrefs) if rng else ""
+                p = _link_range(alt_rng_raw, rng, sv, type_hrefs) if rng else ""
             if p and p not in seen:
                 seen.add(p)
                 pretty.append(p)
@@ -235,13 +251,19 @@ def slot_type_text(
         return ""
     if getattr(slot_def, "inlined", False) and getattr(slot_def, "multivalued", False):
         return _append_type_values(
-            f"{_link('Map', sv, type_hrefs)} of {_link(rng, sv, type_hrefs)}", slot_name, class_def, slot_def
+            f"{_link('Map', sv, type_hrefs)} of {_link_range(raw_rng, rng, sv, type_hrefs)}",
+            slot_name,
+            class_def,
+            slot_def,
         )
     if getattr(slot_def, "multivalued", False):
         return _append_type_values(
-            f"{_link('Array', sv, type_hrefs)} of {_link(rng, sv, type_hrefs)}", slot_name, class_def, slot_def
+            f"{_link('Array', sv, type_hrefs)} of {_link_range(raw_rng, rng, sv, type_hrefs)}",
+            slot_name,
+            class_def,
+            slot_def,
         )
-    return _append_type_values(_link(rng, sv, type_hrefs), slot_name, class_def, slot_def)
+    return _append_type_values(_link_range(raw_rng, rng, sv, type_hrefs), slot_name, class_def, slot_def)
 
 
 def collect_slot_rows(

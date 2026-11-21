@@ -158,6 +158,33 @@ def test_slot_rows_display_ranges_under_their_configured_labels(tmp_path: Path) 
     ]
 
 
+def test_slot_rows_show_labelled_any_range_as_plain_text(tmp_path: Path) -> None:
+    schema = _write_schema(
+        tmp_path,
+        "slots:\n"
+        "  value:\n"
+        "    range: Any\n"
+        "  values:\n"
+        "    range: Any\n"
+        "    multivalued: true\n"
+        "  choice:\n"
+        "    exactly_one_of:\n"
+        "      - range: Any\n"
+        "      - range: string\n"
+        "classes:\n"
+        "  Any:\n"
+        "    class_uri: linkml:Any\n"
+        "  Sensor:\n"
+        "    slots: [value, values, choice]\n",
+    )
+    rows = collect_slot_rows(SchemaView(str(schema)), "Sensor", lambda text: text, range_labels={"Any": "anything"})
+    assert [row["range_text"] for row in rows] == [
+        "anything",
+        "<a>Array</a> of anything",
+        'anything or <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>',
+    ]
+
+
 _DEFAULTED_SLOT_SCHEMA = (
     "slots:\n  safe:\n    annotations:\n      spec_default: true\nclasses:\n  Sensor:\n    slots: [safe]\n"
 )
