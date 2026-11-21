@@ -13,11 +13,12 @@ from pathlib import Path
 from types import MappingProxyType
 
 from linkml.generators.jsonldcontextgen import ContextGenerator
-from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml.generators.owlgen import OwlSchemaGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
+from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
+from .artifacts.jsonschema.options import JsonSchemaOptions
 from .artifacts.shacl.generator import WotShaclGenerator
 from .artifacts.shacl.options import ShaclOptions
 from .config import GEN_OWL_OPTIONS, JSON_SCHEMA_FILES, Project, SpecConfig
@@ -112,14 +113,7 @@ def _gen_jsonschema(project: Project, sv: SchemaView, output_dir: Path) -> None:
             patched_slots.append(slot)
             slot.designates_type = False
     try:
-        gen = JsonSchemaGenerator(
-            sv.schema,
-            mergeimports=True,
-            top_class=project.top_class,
-            not_closed=True,
-            include_null=False,
-            preserve_names=True,
-        )
+        gen = WotJsonSchemaGenerator.from_options(sv.schema, JsonSchemaOptions(top_class=project.top_class))
         raw = json.loads(gen.serialize())
     except ValueError as exc:
         raise GenerationError(f"Could not generate the JSON Schema from {project.main_schema}: {exc}") from exc
