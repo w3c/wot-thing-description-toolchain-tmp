@@ -1,6 +1,6 @@
 """Annotation-driven post-processor for raw LinkML JSON Schema output.
 
-Transforms the output of gen-jsonschema into the W3C WoT Thing Description JSON Schema.
+Transforms the output of gen-jsonschema into the published JSON Schema, as requested by the schema's annotations.
 """
 
 from __future__ import annotations
@@ -257,6 +257,31 @@ def _build_enum_subset_partitions(schema: dict, config: TransformConfig) -> None
 
         defs[cls_name] = {"oneOf": variant_refs}
 
+
+def _narrow_slot_items(props: dict, slot_name: str, items: dict) -> None:
+    """Replace the array ``items`` of ``slot_name`` in ``props``, if that slot is an array property.
+
+    Args:
+        props: The ``properties`` of a class definition or of the top-level schema.
+        slot_name: The name of the slot to narrow.
+        items: The new ``items`` schema.
+    """
+    slot_prop = props.get(slot_name)
+    if isinstance(slot_prop, dict) and "items" in slot_prop:
+        slot_prop["items"] = items
+
+
+def _narrow_form_subsets(schema: dict, sv: SchemaView, config: TransformConfig) -> None:
+    """Narrow the array items of each ``jsonschema_form_subset`` slot to its subset variant.
+
+    The tree root class is also narrowed in the top-level ``properties``, which hold the tree root's content.
+
+    Args:
+        schema: The JSON Schema being post-processed, after its enum-subset partitions are built.
+        sv: The schema view of the LinkML schema.
+        config: The transforms read from the ``jsonschema_*`` annotations.
+    """
+    defs = schema.get("$defs", {})
     for narrow in config.form_subset_narrows:
         base_name = f"{narrow.partition_class}_element_base"
         variant_def_name = f"{narrow.partition_class}_element_{narrow.subset_name}"
@@ -264,21 +289,11 @@ def _build_enum_subset_partitions(schema: dict, config: TransformConfig) -> None
             continue
         narrowed_items = {"$ref": f"#/$defs/{variant_def_name}"}
 
-        target_slot = narrow.slot_name
-
-        def _narrow_slot(props: dict, items: dict = narrowed_items, slot: str = target_slot) -> None:
-            slot_prop = props.get(slot)
-            if isinstance(slot_prop, dict) and "items" in slot_prop:
-                slot_prop["items"] = items
-
-        if narrow.class_name in defs:
-            cls_def = defs[narrow.class_name]
-            if isinstance(cls_def, dict) and "properties" in cls_def:
-                _narrow_slot(cls_def["properties"])
-                if set(cls_def.get("properties", {}).keys()) == set(schema.get("properties", {}).keys()):
-                    _narrow_slot(schema["properties"])
-        else:
-            _narrow_slot(schema.get("properties", {}))
+        cls_def = defs.get(narrow.class_name)
+        if isinstance(cls_def, dict) and "properties" in cls_def:
+            _narrow_slot_items(cls_def["properties"], narrow.slot_name, narrowed_items)
+        if sv.get_class(narrow.class_name).tree_root:
+            _narrow_slot_items(schema.get("properties", {}), narrow.slot_name, narrowed_items)
 
 
 def _dedup_oneof(schema: dict) -> None:
@@ -582,6 +597,7 @@ def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     _flatten_subclasses(schema, schema_view, config)
     _build_oneof_dispatch(schema, schema_view, config)
     _build_enum_subset_partitions(schema, config)
+    _narrow_form_subsets(schema, schema_view, config)
     _dedup_oneof(schema)
     _normalize_types(schema)
     _simplify_exclusive_minimum(schema)
