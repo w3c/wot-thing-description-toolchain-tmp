@@ -5,7 +5,7 @@ from __future__ import annotations
 from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import BNode, Graph, URIRef
 from rdflib.collection import Collection
-from rdflib.namespace import RDFS, SH
+from rdflib.namespace import SH
 from rdflib.term import Node
 
 from ..artifacts.passes import run_passes
@@ -40,17 +40,6 @@ def _langstring_unions(schema_view: SchemaView) -> dict[tuple[URIRef, URIRef], l
     return unions
 
 
-def _remove_literal_datatype(graph: Graph) -> None:
-    """Remove ``sh:datatype rdfs:Literal`` — not a concrete SHACL datatype.
-
-    Slots typed ``rdfs:Literal`` in the schema already carry ``sh:nodeKind
-    sh:Literal`` which is the correct SHACL constraint for accepting any
-    literal type.
-    """
-    for s in list(graph.subjects(SH.datatype, RDFS.Literal)):
-        graph.remove((s, SH.datatype, RDFS.Literal))
-
-
 # W3C WoT requires rdf:langString alternatives for selected scalar slots; LinkML
 # SHACL generation drops heterogeneous exactly_one_of branches (discussion #2199).
 # TODO: remove when https://github.com/orgs/linkml/discussions/2199 is resolved.
@@ -65,7 +54,6 @@ def post_process_shacl(raw_shacl: str, schema_view: SchemaView) -> str:
     graph.parse(data=raw_shacl, format="turtle")
 
     run_passes(SHACL_PASSES, graph, schema_view)
-    _remove_literal_datatype(graph)
 
     for (class_uri, path), datatypes in _langstring_unions(schema_view).items():
         for node_shape in graph.subjects(SH.targetClass, class_uri):

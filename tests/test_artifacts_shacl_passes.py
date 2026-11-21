@@ -96,3 +96,27 @@ def test_post_process_shacl_drops_keyword_shapes_and_literal_datatypes(schema_vi
 
     assert (None, SH.path, TITLE) in actual
     assert isomorphic(actual, expected)
+
+
+LITERAL_DATATYPE_PASS = "remove_literal_datatype"
+
+
+def test_literal_datatype_pass_is_upstream_gap_and_runs_after_keyword_pass() -> None:
+    names = [p.name for p in SHACL_PASSES]
+    assert {p.name: p for p in SHACL_PASSES}[LITERAL_DATATYPE_PASS].kind is PassKind.UPSTREAM_GAP
+    # Order kept from post_process_shacl before the move; the two passes touch disjoint triples.
+    assert names.index(KEYWORD_PASS) < names.index(LITERAL_DATATYPE_PASS)
+
+
+def test_literal_datatype_removed_and_concrete_datatype_kept(schema_view: SchemaView) -> None:
+    graph = Graph()
+    literal_shape, title_shape = BNode(), BNode()
+    graph.add((literal_shape, SH.datatype, RDFS.Literal))
+    graph.add((literal_shape, SH.nodeKind, SH.Literal))
+    graph.add((title_shape, SH.datatype, XSD.string))
+
+    {p.name: p for p in SHACL_PASSES}[LITERAL_DATATYPE_PASS].apply(graph, schema_view)
+
+    assert (None, SH.datatype, RDFS.Literal) not in graph
+    assert (literal_shape, SH.nodeKind, SH.Literal) in graph
+    assert (title_shape, SH.datatype, XSD.string) in graph

@@ -2,7 +2,7 @@
 
 from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import Graph, URIRef
-from rdflib.namespace import SH
+from rdflib.namespace import RDFS, SH
 
 from wot_toolchain.artifacts.passes import Pass, PassKind
 
@@ -23,11 +23,24 @@ def _remove_jsonld_keyword_properties(graph: Graph, schema_view: SchemaView) -> 
             graph.remove((property_shape, None, None))
 
 
+def _remove_literal_datatype(graph: Graph, schema_view: SchemaView) -> None:
+    """Remove ``sh:datatype rdfs:Literal``; the slot already carries ``sh:nodeKind sh:Literal``."""
+    for s in list(graph.subjects(SH.datatype, RDFS.Literal)):
+        graph.remove((s, SH.datatype, RDFS.Literal))
+
+
 SHACL_PASSES: tuple[Pass, ...] = (
     Pass(
         name="remove_jsonld_keyword_properties",
         kind=PassKind.WOT_SHAPING,
         reason="@context/@type are JSON-LD keywords, not RDF properties, so they get no property shapes.",
         apply=_remove_jsonld_keyword_properties,
+    ),
+    Pass(
+        name="remove_literal_datatype",
+        kind=PassKind.UPSTREAM_GAP,
+        reason="Upstream emits sh:datatype rdfs:Literal, which is not a concrete datatype; sh:nodeKind sh:Literal "
+        "already constrains the slot.",
+        apply=_remove_literal_datatype,
     ),
 )
