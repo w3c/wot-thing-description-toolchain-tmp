@@ -313,3 +313,19 @@ def test_drop_candidate_referenced_only_by_dropped_defs_is_dropped() -> None:
 
 def test_def_of_unmarked_class_named_form_is_kept() -> None:
     assert _remaining_defs("classes:\n  Form: {}\n", {"Form": {"type": "object"}}) == {"Form"}
+
+
+def _holder_property(body: str, target: str) -> dict:
+    holder = {"type": "object", "properties": {"v": {"$ref": f"#/$defs/{target}"}}}
+    defs = {target: {"type": "object"}, "Holder": holder}
+    return post_process_jsonschema({"$defs": defs}, _schema_view(body))["$defs"]["Holder"]["properties"]["v"]
+
+
+def test_ref_to_linkml_any_class_not_named_any_is_unconstrained() -> None:
+    body = "classes:\n  Wildcard:\n    class_uri: linkml:Any\n  Holder: {}\n"
+    assert "$ref" not in _holder_property(body, "Wildcard")
+
+
+def test_ref_to_unmarked_class_named_any_is_kept() -> None:
+    body = "classes:\n  Any: {}\n  Holder: {}\n"
+    assert _holder_property(body, "Any") == {"$ref": "#/$defs/Any"}

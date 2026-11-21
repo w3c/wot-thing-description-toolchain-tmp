@@ -482,6 +482,8 @@ def _resolve_refs(schema: dict, sv: SchemaView) -> None:
         if pvs:
             enum_values[enum_name] = pvs
 
+    any_class_names = {name for name, cls_def in sv.all_classes().items() if _is_linkml_any(sv, cls_def)}
+
     def _is_string_map(cls_name: str | None) -> bool:
         if cls_name is None or cls_name not in sv.all_classes():
             return False
@@ -534,7 +536,7 @@ def _resolve_refs(schema: dict, sv: SchemaView) -> None:
                 result["description"] = obj["description"]
             return result
 
-        if ref_name == "Any":
+        if ref_name in any_class_names:
             del obj["$ref"]
         elif ref_name not in valid_def_names:
             base = ref_name.replace("__identifier_optional", "")
