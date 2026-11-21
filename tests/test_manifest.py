@@ -478,6 +478,61 @@ def test_malformed_generated_validation_schema_is_rejected(
     load_expecting_error(project_dir, manifest, "spec.snippet_validation_schemas.instance", fragment)
 
 
+# --- labels of LinkML ranges in the vocabulary tables ----------------------------------------------------------------
+
+
+def test_range_labels_are_loaded_read_only(project_dir: Path, manifest: dict[str, Any]) -> None:
+    manifest["spec"]["range_labels"] = {"uri": "anyURI", "Any": "any type"}
+
+    spec = load_project(write_manifest(project_dir, manifest)).spec
+
+    assert spec is not None
+    assert dict(spec.range_labels) == {"uri": "anyURI", "Any": "any type"}
+    with pytest.raises(TypeError):
+        spec.range_labels["decimal"] = "double"  # type: ignore[index]
+
+
+def test_range_labels_default_to_empty(project_dir: Path, manifest: dict[str, Any]) -> None:
+    spec = load_project(write_manifest(project_dir, manifest)).spec
+
+    assert spec is not None
+    assert dict(spec.range_labels) == {}
+
+
+def test_repository_manifest_labels_ranges_as_the_published_specification() -> None:
+    spec = load_project(REPO_ROOT / MANIFEST_NAME).spec
+
+    assert spec is not None
+    assert dict(spec.range_labels) == {
+        "Any": "any type",
+        "linkml:Any": "any type",
+        "langString": "rdf:langString",
+        "uri": "anyURI",
+        "uriorcurie": "anyURI",
+        "datetime": "dateTime",
+        "NonNegativeInteger": "unsignedInt",
+        "decimal": "double",
+    }
+
+
+@pytest.mark.parametrize(
+    ("range_labels", "key_path", "fragment"),
+    [
+        (["uri", "anyURI"], "spec.range_labels", "must be a mapping"),
+        ({7: "anyURI"}, "spec.range_labels", "must be a non-empty string"),
+        ({"uri": 7}, "spec.range_labels.uri", "must be a non-empty string"),
+        ({"uri": ""}, "spec.range_labels.uri", "must be a non-empty string"),
+        ({"uri": ["anyURI"]}, "spec.range_labels.uri", "must be a non-empty string"),
+    ],
+)
+def test_invalid_range_labels_are_rejected(
+    project_dir: Path, manifest: dict[str, Any], range_labels: Any, key_path: str, fragment: str
+) -> None:
+    manifest["spec"]["range_labels"] = range_labels
+
+    load_expecting_error(project_dir, manifest, key_path, fragment)
+
+
 # --- JSON-LD root context terms --------------------------------------------------------------------------------------
 
 

@@ -137,3 +137,22 @@ def test_slot_rows_carry_assertion_ids_with_configured_vocab_id_prefix(tmp_path:
     schema = _write_schema(tmp_path, "slots:\n  unit: {}\nclasses:\n  Sensor:\n    slots: [unit]\n")
     [row] = collect_slot_rows(SchemaView(str(schema)), "Sensor", lambda text: text, "sen")
     assert row["assertion_id"] == "sen-vocab-unit--Sensor"
+
+
+def test_slot_rows_display_ranges_under_their_configured_labels(tmp_path: Path) -> None:
+    schema = _write_schema(
+        tmp_path,
+        "slots:\n"
+        "  href:\n"
+        "    range: uri\n"
+        "  created:\n"
+        "    range: datetime\n"
+        "classes:\n"
+        "  Sensor:\n"
+        "    slots: [href, created]\n",
+    )
+    rows = collect_slot_rows(SchemaView(str(schema)), "Sensor", lambda text: text, range_labels={"uri": "anyURI"})
+    assert [row["range_text"] for row in rows] == [
+        '<a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"><code>anyURI</code></a>',
+        '<a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#datetime"><code>datetime</code></a>',
+    ]

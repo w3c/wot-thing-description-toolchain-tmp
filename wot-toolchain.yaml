@@ -55,6 +55,16 @@ spec:
   # Every vocabulary table row gets the assertion ID td-vocab-<term>--<Class>, also in the sections of the
   # jsonschema, wotsec and hctl modules: the published TD specification and its test suite use these IDs.
   vocab_id_prefix: td
+  # The type column of the vocabulary tables names these LinkML ranges as the published TD specification does.
+  range_labels:
+    Any: any type
+    linkml:Any: any type
+    langString: rdf:langString
+    uri: anyURI
+    uriorcurie: anyURI
+    datetime: dateTime
+    NonNegativeInteger: unsignedInt
+    decimal: double
   first_class: Thing
   sections:
     - id: sec-core-vocabulary-definition

@@ -91,6 +91,8 @@ class SpecConfig:
         generated_snippet_validation_schemas: Snippet kinds validated against the JSON Schema generated in the
             same run, mapped to the generator that writes it, read-only. Written ``kind: {generated: GENERATOR}``
             under ``snippet_validation_schemas`` in the manifest.
+        range_labels: Text shown in the vocabulary tables' type column for a LinkML range, keyed by range name,
+            read-only; ranges without an entry are shown under their own name.
     """
 
     template: Path
@@ -107,6 +109,7 @@ class SpecConfig:
     generated_snippet_validation_schemas: Mapping[str, str] = field(
         default_factory=lambda: MappingProxyType({}), hash=False
     )
+    range_labels: Mapping[str, str] = field(default_factory=lambda: MappingProxyType({}), hash=False)
 
 
 @dataclass(frozen=True)
@@ -151,7 +154,7 @@ _JSONLD_KEYS = _Keys((), ("extra_root_terms",))
 _MODULE_KEYS = _Keys(("schema", "prefix"), ("ontology", "context", "diagram"))
 _SPEC_KEYS = _Keys(
     ("template", "output", "placeholder", "vocab_id_prefix", "sections", "snippets", "glossary"),
-    ("first_class", "extra_asserts", "assertions_csv", "snippet_validation_schemas"),
+    ("first_class", "extra_asserts", "assertions_csv", "snippet_validation_schemas", "range_labels"),
 )
 _SECTION_KEYS = _Keys(("id", "schema"))
 _GENERATED_SCHEMA_KEYS = _Keys(("generated",))
@@ -275,6 +278,7 @@ def _parse_spec(root: _Node, modules: tuple[Module, ...]) -> SpecConfig | None:
         assertions_csv=spec.optional_output_path("assertions_csv"),
         snippet_validation_schemas=static_schemas,
         generated_snippet_validation_schemas=generated_schemas,
+        range_labels=_parse_range_labels(spec),
     )
 
 
@@ -302,6 +306,18 @@ def _parse_validation_schemas(spec: _Node) -> tuple[Mapping[str, Path], Mapping[
             else:
                 static[kind] = spec.resolve_input(entry, entry_path, "file")
     return MappingProxyType(static), MappingProxyType(generated)
+
+
+def _parse_range_labels(spec: _Node) -> Mapping[str, str]:
+    key = "range_labels"
+    if key not in spec.values:
+        return MappingProxyType({})
+    key_path = spec.child(key)
+    labels: dict[str, str] = {}
+    for range_name, label in spec.as_mapping(spec.values[key], key_path).items():
+        range_name = spec.as_string(range_name, key_path)
+        labels[range_name] = spec.as_string(label, f"{key_path}.{range_name}")
+    return MappingProxyType(labels)
 
 
 def _parse_generated_schema(spec: _Node, entry: object, entry_path: str) -> str:
