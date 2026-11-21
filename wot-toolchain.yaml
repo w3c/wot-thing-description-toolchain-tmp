@@ -52,6 +52,9 @@ spec:
   template: resources/index.template.html
   output: resources/gens/index.html
   placeholder: "%s"
+  # Every vocabulary table row gets the assertion ID td-vocab-<term>--<Class>, also in the sections of the
+  # jsonschema, wotsec and hctl modules: the published TD specification and its test suite use these IDs.
+  vocab_id_prefix: td
   first_class: Thing
   sections:
     - id: sec-core-vocabulary-definition

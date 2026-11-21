@@ -15,17 +15,19 @@ stable `id` attribute on those <tr> elements.
 
 Stable ID convention (table rows)
 ──────────────────────────────────
-  td-vocab-<slot-name>--<ClassName>
+  <vocab_id_prefix>-vocab-<slot-name>--<ClassName>
+
+``vocab_id_prefix`` is the manifest key ``spec.vocab_id_prefix``; it is the same for every section.
 
 Special LinkML escape names are normalized to the historical TD anchors:
   @context  →  at-context
   @type     →  at-type
   @name     →  name
 
-Examples:
-  Thing.@context                 →  td-vocab-at-context--Thing
-  Thing.@type                    →  td-vocab-at-type--Thing
-  DataSchema.type                →  td-vocab-type--DataSchema
+Examples with vocab_id_prefix "sen":
+  Sensor.@context                →  sen-vocab-at-context--Sensor
+  Sensor.@type                   →  sen-vocab-at-type--Sensor
+  Sensor.unit                    →  sen-vocab-unit--Sensor
 
 The IDs are guaranteed stable as long as the schema class/slot names
 do not change – the same contract the SPARQL pipeline gave via ontology IRIs.
@@ -78,15 +80,23 @@ def _normalize_slot_name(slot_name: str) -> str:
     return slot_name
 
 
-def make_slot_assertion_id(prefix: str, class_name: str, slot_name: str) -> str:
+def make_slot_assertion_id(vocab_id_prefix: str, class_name: str, slot_name: str) -> str:
     """Return the stable assertion ID for a vocabulary-term table row.
 
-    Format:  td-vocab-<slot-normalized>--<ClassName>
+    Format:  <vocab_id_prefix>-vocab-<slot-normalized>--<ClassName>
 
     This is the single source of truth called by both tables.py (emitting <tr>)
     and extract_all_table_assertions() (building the CSV).
+
+    Args:
+        vocab_id_prefix: The manifest's ``spec.vocab_id_prefix``.
+        class_name: Name of the class whose table holds the row.
+        slot_name: Serialized name of the slot, i.e. its alias or else its name.
+
+    Returns:
+        The ID for the row's ``<tr id="...">`` attribute.
     """
-    return f"td-vocab-{_normalize_slot_name(slot_name)}--{class_name}"
+    return f"{vocab_id_prefix}-vocab-{_normalize_slot_name(slot_name)}--{class_name}"
 
 
 def make_class_assertion_id(prefix: str, class_name: str) -> str:
@@ -129,6 +139,7 @@ def _inline_assertion_type(annotations: dict[str, Any]) -> str:
 def extract_all_table_assertions(
     section_schemas: dict[str, Path],
     prefix_map: dict[str, str],
+    vocab_id_prefix: str,
 ) -> list[Assertion]:
     """Walk every section schema and return one Assertion per (class, slot) pair.
 
@@ -141,6 +152,8 @@ def extract_all_table_assertions(
         Ordered dict of section_id → schema Path (from Config.section_schemas).
     prefix_map:
         Maps schema file stem → short ID prefix (e.g. "thing_description" → "td").
+    vocab_id_prefix:
+        The manifest's ``spec.vocab_id_prefix``, shared by the IDs of all sections.
 
     Raises:
         SchemaError: A section schema is not a file or is not valid YAML.
@@ -164,7 +177,7 @@ def extract_all_table_assertions(
                 if slot_name in seen_slots:
                     continue
                 seen_slots.add(slot_name)
-                aid = make_slot_assertion_id(prefix, class_name, slot_name)
+                aid = make_slot_assertion_id(vocab_id_prefix, class_name, slot_name)
                 if aid in seen:
                     continue
                 seen.add(aid)

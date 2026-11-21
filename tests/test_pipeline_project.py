@@ -133,6 +133,7 @@ def _mini_project_with_spec(tmp_path: Path, sensor: dict[str, object]) -> Path:
         "template": "spec/template.html",
         "output": "spec-out/index.html",
         "placeholder": "%s",
+        "vocab_id_prefix": "sen",
         "sections": [{"id": "sec-sensor", "schema": "schemas/sensor.yaml"}],
         "snippets": "spec/snippets",
         "glossary": "spec/glossary.yaml",

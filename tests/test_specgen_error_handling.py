@@ -10,7 +10,11 @@ from linkml_runtime.linkml_model.meta import ClassDefinition, SlotDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
 from wot_toolchain.errors import GenerationError, SchemaError
-from wot_toolchain.specgen.assertions import extract_all_table_assertions, extract_inline_assertions
+from wot_toolchain.specgen.assertions import (
+    extract_all_table_assertions,
+    extract_inline_assertions,
+    make_slot_assertion_id,
+)
 from wot_toolchain.specgen.bikeshed_processor import process_fragments
 from wot_toolchain.specgen.respec import assemble
 from wot_toolchain.specgen.tables import collect_slot_rows, get_assignment
@@ -57,7 +61,7 @@ def test_table_assertions_raise_schema_error_for_invalid_schema(tmp_path: Path) 
     schema = tmp_path / "broken.yaml"
     schema.write_text("classes: [unclosed\n", encoding="utf-8")
     with pytest.raises(SchemaError, match="broken.yaml"):
-        extract_all_table_assertions({"sec": schema}, {})
+        extract_all_table_assertions({"sec": schema}, {}, "sen")
 
 
 def test_inline_assertions_raise_schema_error_for_invalid_schema(tmp_path: Path) -> None:
@@ -69,8 +73,8 @@ def test_inline_assertions_raise_schema_error_for_invalid_schema(tmp_path: Path)
 
 def test_table_assertion_for_slot_undefined_in_module_has_empty_text(tmp_path: Path) -> None:
     schema = _write_schema(tmp_path, "classes:\n  C:\n    slots: [defined_by_importer]\n")
-    [assertion] = extract_all_table_assertions({"sec": schema}, {})
-    assert assertion.id == "td-vocab-defined_by_importer--C"
+    [assertion] = extract_all_table_assertions({"sec": schema}, {}, "sen")
+    assert assertion.id == "sen-vocab-defined_by_importer--C"
     assert assertion.text == ""
 
 
@@ -88,7 +92,7 @@ def test_table_assertions_propagate_slot_induction_failures(tmp_path: Path) -> N
         "        minimum_value: 1\n",
     )
     with pytest.raises(TypeError):
-        extract_all_table_assertions({"sec": schema}, {})
+        extract_all_table_assertions({"sec": schema}, {}, "sen")
 
 
 def test_assemble_missing_template_raises_generation_error(tmp_path: Path) -> None:
@@ -123,3 +127,13 @@ def test_slot_rows_display_unaliased_at_name_slot_under_its_own_name(tmp_path: P
     schema = _write_schema(tmp_path, 'slots:\n  "@name": {}\nclasses:\n  Sensor:\n    slots: ["@name"]\n')
     [row] = collect_slot_rows(SchemaView(str(schema)), "Sensor", lambda text: text)
     assert row["slot_name"] == "@name"
+
+
+def test_slot_assertion_id_uses_configured_vocab_id_prefix() -> None:
+    assert make_slot_assertion_id("sen", "Sensor", "@type") == "sen-vocab-at-type--Sensor"
+
+
+def test_slot_rows_carry_assertion_ids_with_configured_vocab_id_prefix(tmp_path: Path) -> None:
+    schema = _write_schema(tmp_path, "slots:\n  unit: {}\nclasses:\n  Sensor:\n    slots: [unit]\n")
+    [row] = collect_slot_rows(SchemaView(str(schema)), "Sensor", lambda text: text, "sen")
+    assert row["assertion_id"] == "sen-vocab-unit--Sensor"

@@ -452,7 +452,7 @@ def generate_respec_spec(spec: SpecConfig, main_schema: Path) -> None:
     section_tpl = build_jinja_env().get_template("class_section.jinja2")
     type_hrefs = load_type_hrefs(spec.glossary)
     fragments = [
-        _render_section(sv, section_tpl, classes, section.prefix, type_hrefs)
+        _render_section(sv, section_tpl, classes, spec.vocab_id_prefix, type_hrefs)
         for section, classes in zip(spec.sections, _classes_per_section(spec.sections, spec.first_class), strict=True)
     ]
     fragments = process_fragments([section.id for section in spec.sections], fragments, spec.glossary)
@@ -502,10 +502,10 @@ def _render_section(
     sv: SchemaView,
     section_tpl: Template,
     classes: list[str],
-    schema_prefix: str,
+    vocab_id_prefix: str,
     type_hrefs: dict[str, str],
 ) -> str:
-    rendered = (_render_class(sv, section_tpl, cls, schema_prefix, type_hrefs) for cls in classes)
+    rendered = (_render_class(sv, section_tpl, cls, vocab_id_prefix, type_hrefs) for cls in classes)
     return "\n\n".join(html for html in rendered if html is not None)
 
 
@@ -513,7 +513,7 @@ def _render_class(
     sv: SchemaView,
     section_tpl: Template,
     cls: str,
-    schema_prefix: str,
+    vocab_id_prefix: str,
     type_hrefs: dict[str, str],
 ) -> str | None:
     cdef = sv.get_class(cls)
@@ -532,7 +532,7 @@ def _render_class(
             )
             return None
 
-    rows = collect_slot_rows(sv, cls, _process_description, schema_prefix, type_hrefs=type_hrefs)
+    rows = collect_slot_rows(sv, cls, _process_description, vocab_id_prefix, type_hrefs=type_hrefs)
     intro_html = ""
     desc_html = ""
     if "spec_intro_content" in ann:

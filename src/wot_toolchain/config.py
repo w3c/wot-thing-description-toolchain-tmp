@@ -63,12 +63,10 @@ class SpecSection:
     Attributes:
         id: HTML id of the section in the specification template.
         schema: Absolute path of the module schema rendered into the section.
-        prefix: Prefix of the module that owns ``schema``.
     """
 
     id: str
     schema: Path
-    prefix: str
 
 
 @dataclass(frozen=True)
@@ -79,6 +77,8 @@ class SpecConfig:
         template: Absolute path of the HTML specification template.
         output: Absolute path of the rendered specification.
         placeholder: Placeholder in the template that marks where generated content goes.
+        vocab_id_prefix: Leading part of every vocabulary-table assertion ID, ``<vocab_id_prefix>-vocab-...``,
+            shared by all sections regardless of the module that defines the class.
         first_class: Class whose table is rendered first, or ``None`` to keep schema order.
         sections: Sections to fill, in template order.
         snippets: Directory holding the example snippets.
@@ -94,6 +94,7 @@ class SpecConfig:
     template: Path
     output: Path
     placeholder: str
+    vocab_id_prefix: str
     first_class: str | None
     sections: tuple[SpecSection, ...]
     snippets: Path
@@ -147,7 +148,7 @@ _JSONSCHEMA_KEYS = _Keys((), ("top_class",))
 _JSONLD_KEYS = _Keys((), ("extra_root_terms",))
 _MODULE_KEYS = _Keys(("schema", "prefix"), ("ontology", "context", "diagram"))
 _SPEC_KEYS = _Keys(
-    ("template", "output", "placeholder", "sections", "snippets", "glossary"),
+    ("template", "output", "placeholder", "vocab_id_prefix", "sections", "snippets", "glossary"),
     ("first_class", "extra_asserts", "assertions_csv", "snippet_validation_schemas"),
 )
 _SECTION_KEYS = _Keys(("id", "schema"))
@@ -257,14 +258,15 @@ def _parse_spec(root: _Node, modules: tuple[Module, ...]) -> SpecConfig | None:
     spec = root.optional_mapping("spec", _SPEC_KEYS)
     if spec is None:
         return None
-    prefixes = {module.schema: module.prefix for module in modules}
+    module_schemas = {module.schema for module in modules}
     static_schemas, generated_schemas = _parse_validation_schemas(spec)
     return SpecConfig(
         template=spec.input_path("template", "file"),
         output=spec.output_path("output"),
         placeholder=spec.string("placeholder"),
+        vocab_id_prefix=spec.string("vocab_id_prefix"),
         first_class=spec.optional_string("first_class"),
-        sections=tuple(_parse_section(node, prefixes) for node in spec.mappings("sections", _SECTION_KEYS)),
+        sections=tuple(_parse_section(node, module_schemas) for node in spec.mappings("sections", _SECTION_KEYS)),
         snippets=spec.input_path("snippets", "directory"),
         glossary=spec.input_path("glossary", "file"),
         extra_asserts=spec.optional_input_path("extra_asserts", "file"),
@@ -274,15 +276,15 @@ def _parse_spec(root: _Node, modules: tuple[Module, ...]) -> SpecConfig | None:
     )
 
 
-def _parse_section(node: _Node, prefixes: Mapping[Path, str]) -> SpecSection:
+def _parse_section(node: _Node, module_schemas: set[Path]) -> SpecSection:
     schema = node.input_path("schema", "file")
-    if schema not in prefixes:
+    if schema not in module_schemas:
         raise node.error(
             node.child("schema"),
             f"{schema} is not the schema of any module",
             "Use the schema path of one of the entries under 'modules'.",
         )
-    return SpecSection(id=node.string("id"), schema=schema, prefix=prefixes[schema])
+    return SpecSection(id=node.string("id"), schema=schema)
 
 
 def _parse_validation_schemas(spec: _Node) -> tuple[Mapping[str, Path], Mapping[str, str]]:

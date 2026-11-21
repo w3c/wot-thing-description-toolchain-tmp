@@ -34,6 +34,7 @@ BASE_MANIFEST: dict[str, Any] = {
         "template": "spec/template.html",
         "output": "out/index.html",
         "placeholder": "%s",
+        "vocab_id_prefix": "core",
         "first_class": "Root",
         "sections": [
             {"id": "sec-extra", "schema": "schemas/extra.yaml"},
@@ -113,10 +114,11 @@ def test_valid_manifest_resolves_paths_against_manifest_directory(project_dir: P
             template=project_dir / "spec/template.html",
             output=project_dir / "out/index.html",
             placeholder="%s",
+            vocab_id_prefix="core",
             first_class="Root",
             sections=(
-                SpecSection("sec-extra", project_dir / "schemas/extra.yaml", "extra"),
-                SpecSection("sec-core", project_dir / "schemas/core.yaml", "core"),
+                SpecSection("sec-extra", project_dir / "schemas/extra.yaml"),
+                SpecSection("sec-core", project_dir / "schemas/core.yaml"),
             ),
             snippets=project_dir / "spec/snippets",
             glossary=project_dir / "spec/glossary.yaml",
@@ -205,7 +207,7 @@ def test_repository_manifest_loads() -> None:
         "tm.ttl",
     ]
     assert project.spec is not None
-    assert [section.prefix for section in project.spec.sections] == ["td", "jsonschema", "wotsec", "hctl"]
+    assert project.spec.vocab_id_prefix == "td"
 
 
 # --- unreadable manifests --------------------------------------------------------------------------------------------
@@ -277,6 +279,7 @@ def test_unknown_key_is_rejected(
         (("spec",), "snippets", "spec.snippets"),
         (("spec",), "glossary", "spec.glossary"),
         (("spec",), "placeholder", "spec.placeholder"),
+        (("spec",), "vocab_id_prefix", "spec.vocab_id_prefix"),
         (("spec", "sections", 1), "id", "spec.sections[1].id"),
         (("spec", "sections", 1), "schema", "spec.sections[1].schema"),
     ],
@@ -308,6 +311,8 @@ def test_missing_required_key_is_rejected(
         ("modules[0].ontology", True),
         ("spec.sections", "sec-core"),
         ("spec.placeholder", 7),
+        ("spec.vocab_id_prefix", 7),
+        ("spec.vocab_id_prefix", ""),
         ("spec.snippet_validation_schemas", ["spec/instance-schema.json"]),
         ("spec.snippet_validation_schemas.instance", 3),
         ("generators[0]", {"name": "owl"}),
