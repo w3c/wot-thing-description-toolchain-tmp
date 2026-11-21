@@ -71,7 +71,7 @@ from `securityDefinitions`, `schemaDefinitions`, affordance maps, and nested
 Data Schema `properties` maps as RDF statements.
 **Current limitation:** The LinkML `instantiates` metaslot does not inform the
 JSON-LD context generator's `@index` value.
-**Workaround:** Postprocessor reads `jsonld_index_key` annotation from the
+**Workaround:** Postprocessor reads `jsonld_index` annotation from the
 schema and emits `@index` with bare term names (e.g. `"name"`,
 `"hasInstanceConfiguration"`), matching upstream W3C context convention. The
 `@index` value is a JSON-LD term name resolved via the active context's
@@ -266,8 +266,9 @@ TD. The custom generator reads `slot_uri` and uses it as the OWL property IRI,
 which is the correct behavior for this vocabulary.
 
 **Artifact affected:** `*.ttl` (OWL ontology files for all modules)
-**Workaround:** Custom `src/wot_toolchain/generators/owl.py` — reads `slot_uri`,
-emits it as the property IRI for OWL output.
+**Workaround:** Custom `owl.py` generator — reads `slot_uri`,
+emits it as the property IRI for OWL output. (That file no longer exists at HEAD;
+it was removed in commit 3a46834d.)
 **LinkML issue:** By design — `gen-owl` intentionally uses slot name for
 property IRI. WoT's split naming convention is outside the generator's scope.
 
@@ -288,7 +289,7 @@ property IRI. WoT's split naming convention is outside the generator's scope.
 ## JSON Schema Generator
 
 ### 6. JSON Schema generator cannot express all W3C TD structural patterns
-The JSON Schema postprocessor (`src/wot_toolchain/postprocessors/jsonschema_postprocessor.py`) contains active transforms that compensate for generator gaps — including subclass flattening, oneOf dispatch, form variants, type normalization, identifier slot removal, ref resolution, and metadata cleanup. Gaps #9, #10, and #11 below document specific transforms; additional undocumented transforms (`_normalize_types`, `_simplify_exclusive_minimum`, `_remove_identifier_slots`, `_remove_excluded_defs`, `_resolve_refs`, `_clean_metadata`) handle structural adjustments the generator cannot produce natively.
+The JSON Schema postprocessor (`src/wot_toolchain/postprocessors/jsonschema_postprocessor.py`) contains active transforms that compensate for generator gaps — including subclass flattening, oneOf dispatch, form subset partitioning/narrowing, type normalization, identifier slot removal, ref resolution, and metadata cleanup. Gaps #7, #8, and #9 below document specific transforms; additional undocumented transforms (`_normalize_types`, `_simplify_exclusive_minimum`, `_remove_identifier_slots`, `_remove_excluded_defs`, `_resolve_refs`, `_clean_metadata`) handle structural adjustments the generator cannot produce natively.
 
 ### 7. No oneOf dispatch on a discriminator slot
 **Symptom:** W3C `securityScheme` is a oneOf over the known schemes plus `additionalSecurityScheme` with a prefixed `scheme`; the generator does not use `designates_type` for this.
@@ -299,20 +300,20 @@ The JSON Schema postprocessor (`src/wot_toolchain/postprocessors/jsonschema_post
 ### 8. No form variants per affordance type
 **Symptom:** W3C has one form definition per location (root, property, action, event) with its own `op` values; the generator emits a single Form.
 **Artifact:** `jsonschema.json`
-**Workaround:** `jsonschema_postprocessor.py` → `_build_form_variants()`, driven by the `jsonschema_form_variants` annotation; the base branch takes the forms without `op`
+**Workaround:** `jsonschema_postprocessor.py` → `_build_enum_subset_partitions()`, driven by the `jsonschema_enum_subset_partition` annotation on `Form` (subsets come from `OperationType` `in_subset`), and `_narrow_form_subsets()`, driven by the `jsonschema_form_subset` slot_usage annotation
 **LinkML issue:** none found (2026-09-09)
 
 ### 9. Inlined dict slots always allow the object form
 **Symptom:** For `titles`/`descriptions` the generator emits `anyOf` of the object form and the SimpleDict string form; W3C allows only the string form.
 **Artifact:** `jsonschema.json`
-**Workaround:** `jsonschema_postprocessor.py` → `_fix_additional_props_anyof()`, keeps only the string form for a key + one string value class
+**Workaround:** `jsonschema_postprocessor.py` → `_fix_additional_props_anyof()` (nested in `_resolve_refs()`), keeps only the string form for a key + one string value class
 **LinkML issue:** none found (2026-09-09)
 
 ---
 
 ## SHACL Generator
 
-### 8. Known SHACL authoring issues
+### 13. Known SHACL authoring issues
 Known SHACL issues from `issues.txt`:
 
 - `dcterms:created` and `dcterms:modified` appear in SHACL shapes but not in the ontology (missing from hand-authored OWL). Not a LinkML generator gap — an ontology authoring gap.
