@@ -7,7 +7,6 @@ import dataclasses
 import json
 import os
 import warnings
-from collections.abc import Callable
 from pathlib import Path
 from types import MappingProxyType
 
@@ -21,6 +20,7 @@ from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
 from .artifacts.jsonschema.options import JsonSchemaOptions
 from .artifacts.owl.generator import WotOwlGenerator
 from .artifacts.owl.options import OwlOptions
+from .artifacts.registry import Artifact, ArtifactRegistry
 from .artifacts.shacl.generator import WotShaclGenerator
 from .artifacts.shacl.options import ShaclOptions
 from .config import JSON_SCHEMA_FILES, Project, SpecConfig
@@ -69,7 +69,7 @@ def run_pipeline(project: Project, *, generate_docs: bool = False) -> None:
     for name in project.generators:
         output_dir = _generator_dir(project, name)
         output_dir.mkdir(parents=True, exist_ok=True)
-        _DISPATCH[name](project, schema_view, output_dir)
+        ARTIFACT_REGISTRY.generator(name)(project, schema_view, output_dir)
 
     if spec is not None:
         generate_respec_spec(spec, project.main_schema)
@@ -190,11 +190,15 @@ def _run_gen_owl(schema_path: Path) -> Graph:
         return WotOwlGenerator.from_options(yaml_str, OwlOptions()).as_graph()
 
 
-_DISPATCH: dict[str, Callable[[Project, SchemaView, Path], None]] = {
-    "jsonschema": _gen_jsonschema,
-    "shacl": _gen_shacl,
-    "owl": _gen_owl,
-    "jsonldcontext": _gen_jsonldcontext,
-    "linkml": _gen_linkml,
-    "visualization": _gen_visualization,
-}
+ARTIFACT_REGISTRY = ArtifactRegistry(
+    MappingProxyType(
+        {
+            Artifact.JSONSCHEMA: _gen_jsonschema,
+            Artifact.SHACL: _gen_shacl,
+            Artifact.OWL: _gen_owl,
+            Artifact.JSONLDCONTEXT: _gen_jsonldcontext,
+            Artifact.LINKML: _gen_linkml,
+            Artifact.VISUALIZATION: _gen_visualization,
+        }
+    )
+)

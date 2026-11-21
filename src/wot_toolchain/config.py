@@ -19,6 +19,7 @@ from typing import Any, Literal
 
 import yaml
 
+from .artifacts.registry import artifact_names
 from .errors import ManifestError
 
 GEN_OWL_OPTIONS = {
@@ -30,8 +31,6 @@ GEN_OWL_OPTIONS = {
     "consolidate_cardinality_axioms": False,
     "skip_abstract_class_as_unionof_subclasses": True,
 }
-
-KNOWN_GENERATORS = ("jsonschema", "shacl", "jsonldcontext", "owl", "linkml", "visualization")
 
 JSON_SCHEMA_FILES: Mapping[str, str] = MappingProxyType({"jsonschema": "jsonschema.json"})
 """File name of the JSON Schema that a generator writes into its output subdirectory, per generator."""
@@ -221,8 +220,8 @@ def _parse_generators(root: _Node) -> tuple[str, ...]:
     generators: list[str] = []
     for key_path, value in root.list_items("generators"):
         name = root.as_string(value, key_path)
-        if name not in KNOWN_GENERATORS:
-            raise root.error(key_path, f"unknown generator {name!r}", f"Use one of: {', '.join(KNOWN_GENERATORS)}.")
+        if name not in artifact_names():
+            raise root.error(key_path, f"unknown generator {name!r}", f"Use one of: {', '.join(artifact_names())}.")
         if name in generators:
             raise root.error(key_path, f"duplicate generator {name!r}", "List each generator once.")
         generators.append(name)
