@@ -1,0 +1,67 @@
+# Project manifest for wot-toolchain: the LinkML schemas of the WoT Thing Description vocabulary,
+# the generators to run, and how the specification is assembled.
+# All paths are relative to the directory of this file.
+
+main_schema: resources/schemas/thing_description.yaml
+output_dir: resources/gens
+
+generators:
+  - jsonschema
+  - shacl
+  - jsonldcontext
+  - owl
+  - linkml
+  - visualization
+
+jsonschema:
+  top_class: Thing
+
+# ontology, context and diagram are output file names, written to <output_dir>/owl, jsonldcontext and visualization.
+modules:
+  - schema: resources/schemas/thing_description.yaml
+    prefix: td
+    ontology: td.ttl
+    context: td-context.jsonld
+    diagram: td.svg
+  - schema: resources/schemas/hypermedia.yaml
+    prefix: hctl
+    ontology: hctl.ttl
+    context: hypermedia-context.jsonld
+    diagram: hctl.svg
+  - schema: resources/schemas/wot_security.yaml
+    prefix: wotsec
+    ontology: wotsec.ttl
+    context: wot-security-context.jsonld
+    diagram: wotsec.svg
+  - schema: resources/schemas/jsonschema.yaml
+    prefix: jsonschema
+    ontology: jsonschema.ttl
+    context: json-schema-context.jsonld
+    diagram: jsonschema.svg
+  - schema: resources/schemas/thing_model.yaml
+    prefix: tm
+    ontology: tm.ttl
+
+spec:
+  template: resources/index.template.html
+  output: resources/gens/index.html
+  placeholder: "%s"
+  first_class: Thing
+  sections:
+    - id: sec-core-vocabulary-definition
+      schema: resources/schemas/thing_description.yaml
+    - id: sec-data-schema-vocabulary-definition
+      schema: resources/schemas/jsonschema.yaml
+    - id: sec-security-vocabulary-definition
+      schema: resources/schemas/wot_security.yaml
+    - id: sec-hypermedia-vocabulary-definition
+      schema: resources/schemas/hypermedia.yaml
+  snippets: resources/snippets
+  glossary: resources/xref/glossary.yaml
+  # Copied from w3c/wot-thing-description testing/inputs/. Holds the assertions that the spec text
+  # does not state as a separate sentence but the test suite still needs, same as in the upstream toolchain.
+  extra_asserts: resources/upstream/extra-asserts.html
+  assertions_csv: resources/gens/assertions/assertions.csv
+  snippet_validation_schemas:
+    td: resources/upstream/schemas/td-next-json-schema-validation.json
+    tm: resources/upstream/schemas/tm-json-schema-validation.json

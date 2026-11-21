@@ -1,45 +1,46 @@
 [project]
-name = "wotis"
+name = "wot-toolchain"
 version = "0.1.0"
-description = "The CLI tool for Web of Things Integrated Schemas (WOTIS)"
+description = "Toolchain generating W3C Web of Things specification resources from LinkML schemas"
 authors = [
     { name = "Mahda Noura", email = "mahda.noura@siemens.com" }
 ]
-license = "MIT"
+license-files = ["LICENSE.md"]
 readme = "README.md"
-include = ["README.md", "resources/schemas/*"]
 requires-python = ">=3.14"
 dependencies = [
-    "linkml>=1.12.0",
-    "mkdocs-mermaid2-plugin==1.2.3",
-    "mkdocs-material>=9.7.6",
-    "schemasheets>=0.1.10",
-    "jsonschema>=4.21.1",
-    "lxml>=6.1.0",
-    "cssselect>=1.4.0",
     "bikeshed>=7.0.11",
     "click>=8.1.7",
+    "cssselect>=1.4.0",
+    "jinja2>=3.1",
+    "jsonasobj2>=1.0.4",
     "jsonfold>=0.2.0",
+    "jsonschema>=4.21.1",
+    "linkml>=1.12.0,<1.13",
+    "linkml-runtime>=1.12.0,<1.13",
+    "lxml>=6.1.0",
+    "pyyaml>=6.0",
+    "rdflib>=7.0",
 ]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.build]
-only-include = ["src/wotis"]
-
-[tool.hatch.metadata]
-root = "src"
-allow-direct-references = true
+[tool.hatch.build.targets.wheel]
+packages = ["src/wot_toolchain"]
 
 [project.scripts]
-wotis = "src.wotis.cli:main"
+wot-toolchain = "wot_toolchain.cli:main"
 
 [dependency-groups]
 dev = [
+    "build>=1.2",
+    "mypy>=2.4.1",
+    "pyld>=3.3.0",
     "pytest>=8.0",
     "ruff>=0.6",
+    "types-pyyaml>=6.0.12.20261113",
 ]
 
 [tool.pytest.ini_options]
@@ -49,11 +50,45 @@ addopts = "-ra"
 
 [tool.ruff]
 line-length = 120
+target-version = "py314"
+# Vendored BMAD agent tooling, not part of the wot_toolchain package.
+extend-exclude = ["_bmad", ".agents"]
 
 [tool.ruff.lint]
-select = ["E9", "F63", "F7", "F82"]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4", "PTH", "RET", "D"]
 
-[tool.uv]
-dev-dependencies = [
-    "pyld>=3.3.0",
-]
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+# Docstring rules target the public package API in src/wot_toolchain; test names are self-describing.
+"tests/**" = ["D"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["wot_toolchain"]
+
+[tool.mypy]
+python_version = "3.14"
+files = ["src/wot_toolchain"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_return_any = false
+
+[[tool.mypy.overrides]]
+module = ["wot_toolchain.cli", "wot_toolchain.config", "wot_toolchain.errors"]
+disallow_any_generics = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+check_untyped_defs = true
+warn_return_any = true
+no_implicit_reexport = true
+strict_equality = true
+extra_checks = true
+
+# These libraries ship neither inline types nor stubs.
+[[tool.mypy.overrides]]
+module = ["linkml.*", "linkml_runtime.*", "jsonasobj2.*", "jsonfold.*", "lxml.*", "jsonschema.*"]
+ignore_missing_imports = true
