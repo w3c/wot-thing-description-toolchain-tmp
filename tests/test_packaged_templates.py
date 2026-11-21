@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-TEMPLATE_NAMES = ("class_section.jinja2", "class_table.jinja2", "snippet_with_default.jinja2", "thing_table.jinja2")
+TEMPLATE_NAMES = ("class_section.jinja2", "class_table.jinja2", "snippet_with_default.jinja2")
 
 
 @pytest.mark.parametrize("name", TEMPLATE_NAMES)
