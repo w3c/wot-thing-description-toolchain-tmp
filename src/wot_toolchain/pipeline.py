@@ -175,7 +175,8 @@ def _gen_linkml(project: Project, sv: SchemaView, output_dir: Path) -> None:
 
 
 def _gen_visualization(project: Project, sv: SchemaView, output_dir: Path) -> None:
-    generate_visualizations(project.modules, output_dir)
+    range_labels = project.spec.range_labels if project.spec is not None else MappingProxyType({})
+    generate_visualizations(project.modules, output_dir, range_labels)
 
 
 def _run_gen_owl(schema_path: Path) -> str:

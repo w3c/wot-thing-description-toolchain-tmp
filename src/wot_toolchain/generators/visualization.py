@@ -6,7 +6,7 @@ import logging
 import shutil
 import subprocess
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 
 from linkml_runtime.linkml_model.meta import ClassDefinition, SlotDefinition
@@ -30,18 +30,10 @@ HIDE_DETAILS_FOR: set[str] = {"MultiLanguage"}
 HIDE_CLASSES: set[str] = {"Any", "linkml:Any"}
 
 
-def _normalize_range(rng: str | None) -> str:
+def _normalize_range(rng: str | None, range_labels: Mapping[str, str]) -> str:
     if not rng:
         return ""
-    mapping = {
-        "Any": "any type",
-        "linkml:Any": "any type",
-        "uri": "anyURI",
-        "datetime": "dateTime",
-        "NonNegativeInteger": "unsignedInt",
-        "decimal": "double",
-    }
-    return mapping.get(rng, rng)
+    return range_labels.get(rng, rng)
 
 
 def _slot_assignment(slot_name: str, class_def: ClassDefinition, slot_def: SlotDefinition) -> str:
@@ -56,6 +48,7 @@ def _slot_type_text(
     slot_def: SlotDefinition,
     class_def: ClassDefinition,
     sv: SchemaView,
+    range_labels: Mapping[str, str],
     effective_range: str | None = None,
 ) -> str:
     raw_rng = effective_range if effective_range else getattr(slot_def, "range", None)
@@ -68,7 +61,7 @@ def _slot_type_text(
         pretty, seen = [], set()
         for alt in choices:
             alt_rng_raw = getattr(alt, "range", None) or raw_rng
-            rng = _normalize_range(alt_rng_raw)
+            rng = _normalize_range(alt_rng_raw, range_labels)
             mv = bool(getattr(alt, "multivalued", False))
             p = f"(Array of) {rng}" if mv and rng else (rng if rng else "")
             if p and p not in seen:
@@ -84,7 +77,7 @@ def _slot_type_text(
         )
         return "anyURI" if is_uri_enum else "string"
 
-    rng = _normalize_range(raw_rng)
+    rng = _normalize_range(raw_rng, range_labels)
     if not rng:
         return ""
     if getattr(slot_def, "multivalued", False):
@@ -215,7 +208,7 @@ def _detect_kept_external_bases(sv: SchemaView, all_classes: dict[str, object], 
     return referenced_externals or external_classes
 
 
-def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: set[str]) -> str:
+def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: set[str], range_labels: Mapping[str, str]) -> str:
     all_classes = sv.all_classes()
     kept_external_bases = _detect_kept_external_bases(sv, all_classes, local_classes=local_classes)
     children_index = _build_children_index(all_classes)
@@ -252,7 +245,7 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: set[str]) -> s
                 ):
                     continue
 
-                type_text = _slot_type_text(sname, slot, class_def, sv, getattr(slot, "range", None))
+                type_text = _slot_type_text(sname, slot, class_def, sv, range_labels, getattr(slot, "range", None))
                 type_display = _format_type_html(type_text)
                 assignment = _slot_assignment(sname, class_def, slot)
                 mandatory_marker = " <I>(mandatory)</I>" if assignment == "mandatory" else ""
@@ -318,12 +311,14 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: set[str]) -> s
     return "\n".join(lines)
 
 
-def generate_visualizations(modules: Iterable[Module], output_dir: Path) -> None:
+def generate_visualizations(modules: Iterable[Module], output_dir: Path, range_labels: Mapping[str, str]) -> None:
     """Render the class diagram of every module that declares one.
 
     Args:
         modules: Vocabulary modules; each one whose ``diagram`` is set gets an SVG of that name.
         output_dir: Directory that receives the diagrams.
+        range_labels: Text shown for a slot range, keyed by range name; ranges without an entry are shown under
+            their own name.
 
     Raises:
         ExternalToolError: Graphviz ``dot`` is missing or fails to render a diagram.
@@ -347,6 +342,6 @@ def generate_visualizations(modules: Iterable[Module], output_dir: Path) -> None
                 diagram,
                 ", ".join(unresolved),
             )
-        dot_source = _build_dot_from_schema_view(sv_merged, local_classes=local_classes)
+        dot_source = _build_dot_from_schema_view(sv_merged, local_classes=local_classes, range_labels=range_labels)
         _dot_to_svg(dot_source, output_dir / diagram)
         logger.info("Generated %s from %s", diagram, schema_path)

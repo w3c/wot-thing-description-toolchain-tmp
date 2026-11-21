@@ -49,7 +49,7 @@ def _fake_dot(bin_dir: Path, monkeypatch: pytest.MonkeyPatch) -> None:
 def test_diagram_file_name_comes_from_the_module(tmp_path: Path) -> None:
     out = tmp_path / "out"
 
-    generate_visualizations([_module(tmp_path, "widgets.svg")], out)
+    generate_visualizations([_module(tmp_path, "widgets.svg")], out, {})
 
     assert (out / "widgets.svg").is_file()
     assert not (out / "td.svg").exists()
@@ -59,7 +59,7 @@ def test_diagram_file_name_comes_from_the_module(tmp_path: Path) -> None:
 def test_module_without_diagram_gets_none(tmp_path: Path) -> None:
     out = tmp_path / "out"
 
-    generate_visualizations([_module(tmp_path, None)], out)
+    generate_visualizations([_module(tmp_path, None)], out, {})
 
     assert not list(out.glob("*.svg"))
 
@@ -67,27 +67,27 @@ def test_module_without_diagram_gets_none(tmp_path: Path) -> None:
 def test_missing_dot_raises(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("PATH", str(tmp_path))
     with pytest.raises(ExternalToolError, match="dot"):
-        generate_visualizations([_module(tmp_path, "widgets.svg")], tmp_path / "out")
+        generate_visualizations([_module(tmp_path, "widgets.svg")], tmp_path / "out", {})
 
 
 def test_failing_dot_raises_with_stderr(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     _fake_dot(tmp_path / "bin", monkeypatch)
     with pytest.raises(ExternalToolError, match="syntax error in line 1"):
-        generate_visualizations([_module(tmp_path, "widgets.svg")], tmp_path / "out")
+        generate_visualizations([_module(tmp_path, "widgets.svg")], tmp_path / "out", {})
 
 
 @requires_dot
 def test_unloadable_schema_raises_naming_the_file(tmp_path: Path) -> None:
     module = _module(tmp_path, "widgets.svg", text="classes: [unclosed\n")
     with pytest.raises(SchemaError, match="demo.yaml"):
-        generate_visualizations([module], tmp_path / "out")
+        generate_visualizations([module], tmp_path / "out", {})
 
 
 @requires_dot
 def test_only_the_diagram_is_written(tmp_path: Path) -> None:
     out = tmp_path / "out"
 
-    generate_visualizations([_module(tmp_path, "widgets.svg")], out)
+    generate_visualizations([_module(tmp_path, "widgets.svg")], out, {})
 
     assert [path.name for path in out.iterdir()] == ["widgets.svg"]
 
@@ -100,7 +100,7 @@ def test_slot_defined_outside_the_module_is_reported(tmp_path: Path, caplog: pyt
     module = _module(tmp_path, "widgets.svg", text=_SCHEMA_WITH_UNDEFINED_SLOT)
 
     with caplog.at_level(logging.WARNING, logger="wot_toolchain.generators.visualization"):
-        generate_visualizations([module], tmp_path / "out")
+        generate_visualizations([module], tmp_path / "out", {})
 
     assert "Widget.elsewhere" in caplog.text
     assert "demo.yaml" in caplog.text
