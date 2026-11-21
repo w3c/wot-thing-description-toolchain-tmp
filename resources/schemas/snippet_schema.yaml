@@ -3,7 +3,7 @@ name: snippet_schema
 title: Snippet Metadata
 description: >-
   Schema for the snippet metadata used to render examples in the Thing Description specification.
-version: "1.1"
+version: "td-next"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
 created_on: "2025-06-01T00:00:00Z"

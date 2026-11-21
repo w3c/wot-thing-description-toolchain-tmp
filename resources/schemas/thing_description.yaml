@@ -3,7 +3,7 @@ name: thing_description
 title: Thing Description
 description: >-
   Schema for the Thing Description vocabulary of the W3C Web of Things.
-version: "1.1"
+version: "td-next"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
 contributors:
@@ -79,7 +79,7 @@ enums:
       "https://www.w3.org/2022/wot/td/v1.1":
         description: WoT Thing Description 1.1 JSON-LD context URI.
       "https://www.w3.org/ns/wot-next/td":
-        description: WoT Thing Description 2.0 JSON-LD context URI.
+        description: WoT Thing Description td-next JSON-LD context URI.
 
 slots:
   atContext:

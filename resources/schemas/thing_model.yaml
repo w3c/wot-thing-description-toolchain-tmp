@@ -3,7 +3,7 @@ name: thing_model
 title: Thing Model
 description: >-
   Schema for the Thing Model vocabulary of the W3C Web of Things.
-version: "1.1"
+version: "td-next"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
 contributors:
