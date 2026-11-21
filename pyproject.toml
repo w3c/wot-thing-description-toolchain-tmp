@@ -77,7 +77,7 @@ warn_redundant_casts = true
 warn_return_any = false
 
 [[tool.mypy.overrides]]
-module = ["wot_toolchain.cli", "wot_toolchain.config", "wot_toolchain.errors", "wot_toolchain.model.*"]
+module = ["wot_toolchain.cli", "wot_toolchain.config", "wot_toolchain.errors", "wot_toolchain.model.*", "wot_toolchain.artifacts.*"]
 disallow_any_generics = true
 disallow_subclassing_any = true
 disallow_untyped_calls = true
