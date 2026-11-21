@@ -27,6 +27,7 @@ from .config import JSON_SCHEMA_FILES, Project, SpecConfig
 from .errors import GenerationError, ManifestError
 from .generators.respec import generate_respec_spec
 from .generators.visualization import generate_visualizations, require_dot
+from .model.resolved import ResolvedProject
 from .postprocessors.jsonld_context_postprocessor import (
     build_module_context,
     post_process_jsonld_context,
@@ -35,7 +36,6 @@ from .postprocessors.jsonschema_postprocessor import post_process_jsonschema
 from .postprocessors.owl_postprocessor import postprocess_owl_graph
 from .postprocessors.shacl_postprocessor import post_process_shacl
 from .preprocessors.owl_preprocessor import preprocess_for_gen_owl
-from .schema_utils import load_schema_view
 from .specgen.bikeshed_processor import require_bikeshed
 
 
@@ -64,7 +64,8 @@ def run_pipeline(project: Project, *, generate_docs: bool = False) -> None:
     if spec is not None:
         spec = _with_generated_validation_schemas(project, spec)
     _require_external_tools(project, generate_docs=generate_docs)
-    schema_view = load_schema_view(project.main_schema, merge_imports=True)
+    resolved = ResolvedProject(project.main_schema)
+    schema_view = resolved.merged
 
     for name in project.generators:
         output_dir = _generator_dir(project, name)
@@ -72,7 +73,7 @@ def run_pipeline(project: Project, *, generate_docs: bool = False) -> None:
         ARTIFACT_REGISTRY.generator(name)(project, schema_view, output_dir)
 
     if spec is not None:
-        generate_respec_spec(spec, project.main_schema)
+        generate_respec_spec(spec, project.main_schema, resolved)
 
 
 def _generator_dir(project: Project, generator: str) -> Path:

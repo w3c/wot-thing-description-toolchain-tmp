@@ -15,6 +15,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 
 from ..config import SpecConfig, SpecSection
 from ..errors import GenerationError
+from ..model.resolved import ResolvedProject
 from ..schema_utils import annotation_dict_value as _annotation_value
 from ..schema_utils import load_schema_view
 from ..specgen.assertions import html_assertions_to_csv
@@ -431,7 +432,7 @@ def render_explicit_assertion_annotation(
     return "\n".join(rendered)
 
 
-def generate_respec_spec(spec: SpecConfig, main_schema: Path) -> None:
+def generate_respec_spec(spec: SpecConfig, main_schema: Path, resolved: ResolvedProject | None = None) -> None:
     """Render the specification described by the manifest's ``spec`` section.
 
     Renders one table per class of every section's module, resolves glossary links with Bikeshed,
@@ -441,6 +442,7 @@ def generate_respec_spec(spec: SpecConfig, main_schema: Path) -> None:
     Args:
         spec: The specification settings of the project manifest.
         main_schema: Schema that imports all modules; class definitions are read from it.
+        resolved: Views already loaded in this run; section schemas are loaded here when omitted.
 
     Raises:
         GenerationError: ``spec.first_class`` is not rendered by any section,
@@ -448,7 +450,10 @@ def generate_respec_spec(spec: SpecConfig, main_schema: Path) -> None:
         SchemaError: A schema cannot be loaded.
         ExternalToolError: Bikeshed is missing or fails.
     """
+    # Own merged load: the pipeline's merged view has been mutated by the artifact generators (from_schema rewritten).
     sv = load_schema_view(main_schema, merge_imports=True)
+    if resolved is None:
+        resolved = ResolvedProject(main_schema)
     section_tpl = build_jinja_env().get_template("class_section.jinja2")
     type_hrefs = load_type_hrefs(spec.glossary)
     fragments = [
@@ -461,7 +466,9 @@ def generate_respec_spec(spec: SpecConfig, main_schema: Path) -> None:
             spec.range_labels,
             spec.default_values_anchor,
         )
-        for section, classes in zip(spec.sections, _classes_per_section(spec.sections, spec.first_class), strict=True)
+        for section, classes in zip(
+            spec.sections, _classes_per_section(spec.sections, spec.first_class, resolved), strict=True
+        )
     ]
     section_ids = [section.id for section in spec.sections]
     fragments = process_fragments(section_ids, fragments, spec.glossary)
@@ -487,9 +494,11 @@ def _process_description(raw_text: str) -> str:
     return re.sub(r"`([^`]+)`", r"<code>\1</code>", str(raw_text or ""))
 
 
-def _classes_per_section(sections: Sequence[SpecSection], first_class: str | None) -> list[list[str]]:
+def _classes_per_section(
+    sections: Sequence[SpecSection], first_class: str | None, resolved: ResolvedProject
+) -> list[list[str]]:
     """Return the names of the classes each section renders, in rendering order."""
-    classes = [list(load_schema_view(section.schema, merge_imports=False).all_classes()) for section in sections]
+    classes = [list(resolved.module(section.schema).all_classes()) for section in sections]
     if classes:
         # The first section's schema imports the other modules; their classes belong to their own sections.
         rendered_later = {name for later in classes[1:] for name in later}
