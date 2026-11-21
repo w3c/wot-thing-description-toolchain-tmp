@@ -1,14 +1,13 @@
 from pathlib import Path
 
+from linkml.generators.shaclgen import ShaclGenerator
+from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import Graph, URIRef
 from rdflib.collection import Collection
 from rdflib.namespace import RDF as RDF_NAMESPACE
 from rdflib.namespace import SH, XSD
 
-from src.wotis.postprocessors.shacl_postprocessor import post_process_shacl
-from linkml.generators.shaclgen import ShaclGenerator
-from linkml_runtime.utils.schemaview import SchemaView
-
+from wot_toolchain.postprocessors.shacl_postprocessor import post_process_shacl
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_PATH = REPO_ROOT / "resources" / "schemas" / "thing_description.yaml"

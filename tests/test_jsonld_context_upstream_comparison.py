@@ -15,13 +15,30 @@ are tracked and prioritised.
 from __future__ import annotations
 
 import json
+import subprocess
+import textwrap
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 REPO = Path(__file__).resolve().parent.parent
 UP = REPO / "resources" / "upstream" / "context"
 GEN = REPO / "resources" / "gens" / "jsonldcontext"
+JSONLD_MODULE = str(REPO / "node_modules" / "jsonld")
+
+
+def _run_jsonld_js(script: str, timeout: int = 30) -> dict[str, Any]:
+    result = subprocess.run(
+        ["node", "-e", script],
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        cwd=str(REPO),
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"jsonld.js error: {result.stderr}")
+    return json.loads(result.stdout)
 
 
 def _load(path: Path) -> dict:
@@ -32,6 +49,7 @@ def _load(path: Path) -> dict:
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(scope="module")
 def td_upstream():
@@ -82,6 +100,7 @@ def merged():
 # TD MODULE
 # ===================================================================
 
+
 class TestTdModule:
     """Deltas in the td-context module."""
 
@@ -90,7 +109,10 @@ class TestTdModule:
         expected = td_upstream["name"]  # {"@id": "td:name"}
         assert td_generated.get("name") == expected
 
-    @pytest.mark.xfail(reason="INTENTIONAL_DEVIATION: upstream @language: en breaks multilanguage TDs — see jsonld-context-composition.md")
+    @pytest.mark.xfail(
+        reason="INTENTIONAL_DEVIATION: upstream @language: en breaks multilanguage TDs — "
+        "see jsonld-context-composition.md"
+    )
     def test_title_has_language_tag(self, td_upstream, td_generated):
         """title carries @language: "en" upstream but we omit it intentionally.
 
@@ -105,7 +127,10 @@ class TestTdModule:
         assert isinstance(gen, dict), f"title should be a dict, got {type(gen)}"
         assert gen.get("@language") == "en"
 
-    @pytest.mark.xfail(reason="INTENTIONAL_DEVIATION: upstream @language: en breaks multilanguage TDs — see jsonld-context-composition.md")
+    @pytest.mark.xfail(
+        reason="INTENTIONAL_DEVIATION: upstream @language: en breaks multilanguage TDs — "
+        "see jsonld-context-composition.md"
+    )
     def test_description_has_language_tag(self, td_upstream, td_generated):
         """description carries @language: "en" upstream but we omit it intentionally.
 
@@ -172,10 +197,14 @@ class TestTdModule:
 # JSON SCHEMA MODULE
 # ===================================================================
 
+
 class TestJsonSchemaModule:
     """Deltas in the json-schema-context module."""
 
-    @pytest.mark.xfail(reason="BUG_IN_UPSTREAM: upstream maps type → @type for type discrimination; our jsonschema:type is ontologically correct (+ SKOS leak is separate issue)")
+    @pytest.mark.xfail(
+        reason="BUG_IN_UPSTREAM: upstream maps type → @type for type discrimination; "
+        "our jsonschema:type is ontologically correct (+ SKOS leak is separate issue)"
+    )
     def test_type_mapping_difference(self, js_upstream, js_generated):
         """Upstream maps `type` → `@type` for JSON-LD type discrimination.
 
@@ -212,10 +241,10 @@ class TestJsonSchemaModule:
         gen = js_generated.get("contentMediaType", {})
         assert "@context" not in gen
 
-    @pytest.mark.xfail(reason="INTENTIONAL_DEVIATION: anyOf excluded from TD 2.0 schema")
+    @pytest.mark.xfail(reason="INTENTIONAL_DEVIATION: anyOf excluded from td-next schema")
     def test_anyOf_present(self, js_upstream, js_generated):
         """anyOf is in upstream TD 1.1 context but intentionally excluded from
-        our TD 2.0 schema — not part of the vocabulary table."""
+        our td-next schema — not part of the vocabulary table."""
         assert js_upstream["anyOf"] == {"@id": "jsonschema:anyOf", "@container": "@set"}
         assert "anyOf" in js_generated
 
@@ -270,6 +299,7 @@ class TestJsonSchemaModule:
 # WOT SECURITY MODULE
 # ===================================================================
 
+
 class TestWotSecurityModule:
     """Deltas in the wot-security-context module."""
 
@@ -286,27 +316,34 @@ class TestWotSecurityModule:
         gen = merged.get(term, {})
         assert gen.get("@type") == "@id", f"{term}: got @type={gen.get('@type')}, expected @id"
 
+    @pytest.mark.xfail(
+        reason="INTENTIONAL_DEVIATION: upstream maps scheme → @type conflating JSON discriminator with rdf:type, "
+        "breaking JSON-LD roundtripping; we use wotsec:scheme with @vocab coercion"
+    )
     def test_scheme_maps_to_at_type(self, ws_upstream, merged):
-        """``scheme`` must map to @type.
+        """Upstream maps ``scheme`` to ``@type`` for type discrimination.
 
-        Upstream: {"@id": "@type"}
-        Postprocessor emits this for slots with designates_type: true.
+        This conflates a JSON discriminator with ``rdf:type`` and breaks
+        JSON-LD roundtripping.  We map to ``wotsec:scheme`` instead.
         """
         assert ws_upstream["scheme"] == {"@id": "@type"}
-        assert "scheme" in merged
-        assert merged["scheme"].get("@id") == "@type"
+        scoped = merged["securityDefinitions"]["@context"]
+        assert scoped["scheme"] == {"@id": "@type"}
 
-    @pytest.mark.parametrize("alias,expected_iri", [
-        ("nosec", "wotsec:NoSecurityScheme"),
-        ("basic", "wotsec:BasicSecurityScheme"),
-        ("digest", "wotsec:DigestSecurityScheme"),
-        ("bearer", "wotsec:BearerSecurityScheme"),
-        ("psk", "wotsec:PSKSecurityScheme"),
-        ("oauth2", "wotsec:OAuth2SecurityScheme"),
-        ("apikey", "wotsec:APIKeySecurityScheme"),
-        ("auto", "wotsec:AutoSecurityScheme"),
-        ("combo", "wotsec:ComboSecurityScheme"),
-    ])
+    @pytest.mark.parametrize(
+        "alias,expected_iri",
+        [
+            ("nosec", "wotsec:NoSecurityScheme"),
+            ("basic", "wotsec:BasicSecurityScheme"),
+            ("digest", "wotsec:DigestSecurityScheme"),
+            ("bearer", "wotsec:BearerSecurityScheme"),
+            ("psk", "wotsec:PSKSecurityScheme"),
+            ("oauth2", "wotsec:OAuth2SecurityScheme"),
+            ("apikey", "wotsec:APIKeySecurityScheme"),
+            ("auto", "wotsec:AutoSecurityScheme"),
+            ("combo", "wotsec:ComboSecurityScheme"),
+        ],
+    )
     def test_scheme_aliases_present(self, ws_upstream, merged, alias, expected_iri):
         """Short scheme aliases emitted by postprocessor from enum meaning declarations.
 
@@ -320,10 +357,13 @@ class TestWotSecurityModule:
         gen = ws_generated.get(term, {})
         assert "@context" not in gen, f"{term} has SKOS @context leak"
 
-    @pytest.mark.parametrize("term,expected_id", [
-        ("description", "td:description"),
-        ("descriptions", "td:descriptionInLanguage"),
-    ])
+    @pytest.mark.parametrize(
+        "term,expected_id",
+        [
+            ("description", "td:description"),
+            ("descriptions", "td:descriptionInLanguage"),
+        ],
+    )
     def test_cross_module_terms_present(self, ws_upstream, ws_generated, term, expected_id):
         """Cross-module terms must be present in each module."""
         assert term in ws_upstream
@@ -334,6 +374,7 @@ class TestWotSecurityModule:
 # ===================================================================
 # HCTL (HYPERMEDIA) MODULE
 # ===================================================================
+
 
 class TestHctlModule:
     """Deltas in the hypermedia-context module."""
@@ -351,26 +392,29 @@ class TestHctlModule:
         gen = hctl_generated.get("op", {})
         assert gen.get("@type") == "@vocab"
 
-    @pytest.mark.parametrize("alias,expected_iri", [
-        ("readproperty", "td:readProperty"),
-        ("writeproperty", "td:writeProperty"),
-        ("observeproperty", "td:observeProperty"),
-        ("unobserveproperty", "td:unobserveProperty"),
-        ("invokeaction", "td:invokeAction"),
-        ("queryaction", "td:queryAction"),
-        ("cancelaction", "td:cancelAction"),
-        ("subscribeevent", "td:subscribeEvent"),
-        ("unsubscribeevent", "td:unsubscribeEvent"),
-        ("readallproperties", "td:readAllProperties"),
-        ("writeallproperties", "td:writeAllProperties"),
-        ("readmultipleproperties", "td:readMultipleProperties"),
-        ("writemultipleproperties", "td:writeMultipleProperties"),
-        ("observeallproperties", "td:observeAllProperties"),
-        ("unobserveallproperties", "td:unobserveAllProperties"),
-        ("queryallactions", "td:queryAllActions"),
-        ("subscribeallevents", "td:subscribeAllEvents"),
-        ("unsubscribeallevents", "td:unsubscribeAllEvents"),
-    ])
+    @pytest.mark.parametrize(
+        "alias,expected_iri",
+        [
+            ("readproperty", "td:readProperty"),
+            ("writeproperty", "td:writeProperty"),
+            ("observeproperty", "td:observeProperty"),
+            ("unobserveproperty", "td:unobserveProperty"),
+            ("invokeaction", "td:invokeAction"),
+            ("queryaction", "td:queryAction"),
+            ("cancelaction", "td:cancelAction"),
+            ("subscribeevent", "td:subscribeEvent"),
+            ("unsubscribeevent", "td:unsubscribeEvent"),
+            ("readallproperties", "td:readAllProperties"),
+            ("writeallproperties", "td:writeAllProperties"),
+            ("readmultipleproperties", "td:readMultipleProperties"),
+            ("writemultipleproperties", "td:writeMultipleProperties"),
+            ("observeallproperties", "td:observeAllProperties"),
+            ("unobserveallproperties", "td:unobserveAllProperties"),
+            ("queryallactions", "td:queryAllActions"),
+            ("subscribeallevents", "td:subscribeAllEvents"),
+            ("unsubscribeallevents", "td:unsubscribeAllEvents"),
+        ],
+    )
     def test_operation_type_aliases(self, hctl_upstream, merged, alias, expected_iri):
         """Operation type aliases emitted by postprocessor from enum meaning declarations.
 
@@ -438,6 +482,69 @@ class TestHctlModule:
 # CROSS-MODULE PATTERNS
 # ===================================================================
 
+
+class TestTypeAtTypeConflation:
+    """Demonstrate upstream bug: type → @type conflation.
+
+    When a property has both ``@type`` (RDF class, e.g. saref:Temperature)
+    and ``type`` (JSON Schema data type, e.g. "number"), the upstream context
+    merges them because it maps ``type → @type``.  After expand → compact,
+    upstream produces ``type: ["saref:Temperature", "number"]`` — two
+    entirely different semantics smashed into one key.
+
+    Our context maps ``type → jsonschema:type``, keeping them separate.
+    """
+
+    TD = {
+        "@type": "Thing",
+        "title": "My Thing",
+        "properties": {
+            "temperature": {
+                "@type": "saref:Temperature",
+                "type": "number",
+                "title": "Current temperature",
+            }
+        },
+    }
+
+    @staticmethod
+    def _roundtrip_script(context_path: str) -> str:
+        td_json = json.dumps(TestTypeAtTypeConflation.TD)
+        return textwrap.dedent(f"""\
+            const jsonld = require('{JSONLD_MODULE}');
+            const fs = require('fs');
+            const ctx = JSON.parse(fs.readFileSync('{context_path}', 'utf8'))['@context'];
+            const sarefCtx = {{"saref": "https://saref.etsi.org/core/"}};
+
+            async function main() {{
+                const doc = {td_json};
+                doc["@context"] = [ctx, sarefCtx];
+                const expanded = await jsonld.expand(doc);
+                const compacted = await jsonld.compact(expanded, doc["@context"]);
+                const prop = (compacted.properties || {{}}).temperature || {{}};
+                console.log(JSON.stringify({{
+                    at_type: prop["@type"] || null,
+                    type: prop.type || null,
+                }}));
+            }}
+            main();
+        """)
+
+    def test_upstream_conflates_type_and_at_type(self):
+        """Upstream merges type and @type into a single array."""
+        result = _run_jsonld_js(self._roundtrip_script(str(UP / "td-context-1.1.jsonld")))
+        assert result["at_type"] is None, "upstream should lose @type (merged into type)"
+        assert isinstance(result["type"], list), "upstream should merge type+@type into array"
+        assert "saref:Temperature" in result["type"], "RDF class should be in merged type array"
+        assert "number" in result["type"], "data type should be in merged type array"
+
+    def test_ours_keeps_type_and_at_type_separate(self):
+        """Our context preserves the semantic distinction."""
+        result = _run_jsonld_js(self._roundtrip_script(str(GEN / "context.jsonld")))
+        assert result["at_type"] == "saref:Temperature", "@type must be the RDF class only"
+        assert result["type"] == "number", "type must be the JSON Schema data type only"
+
+
 class TestCrossModulePatterns:
     """Tests for patterns that repeat across modules."""
 
@@ -469,7 +576,6 @@ class TestCrossModulePatterns:
             sd = merged.get("securityDefinitions", {})
             if isinstance(sd, dict) and "@context" in sd:
                 sd_val = sd["@context"].get(key, {})
-                if isinstance(sd_val, dict) and sd_val.get("@type") == "xsd:anyURI":
-                    if key not in wrong:
-                        wrong.append(key)
+                if isinstance(sd_val, dict) and sd_val.get("@type") == "xsd:anyURI" and key not in wrong:
+                    wrong.append(key)
         assert wrong == [], f"Properties using xsd:anyURI instead of @id: {wrong}"

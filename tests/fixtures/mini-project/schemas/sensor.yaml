@@ -1,0 +1,58 @@
+id: https://example.org/sensor
+name: sensor
+title: Sensor Vocabulary
+description: A tiny vocabulary unrelated to the Thing Description, used to test the toolchain.
+license: MIT
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  sen: https://example.org/sensor#
+  xsd: http://www.w3.org/2001/XMLSchema#
+
+default_prefix: sen
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+  Sensor:
+    class_uri: sen:Sensor
+    description: A device that measures one quantity.
+    slots:
+      - serialNumber
+      - unit
+      - readings
+    slot_usage:
+      serialNumber:
+        required: true
+
+  Reading:
+    class_uri: sen:Reading
+    description: One measured value.
+    slots:
+      - measuredValue
+      - measuredAt
+    slot_usage:
+      measuredValue:
+        required: true
+
+slots:
+  serialNumber:
+    slot_uri: sen:serialNumber
+    range: string
+  unit:
+    slot_uri: sen:unit
+    range: string
+  readings:
+    slot_uri: sen:hasReading
+    range: Reading
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  measuredValue:
+    slot_uri: sen:measuredValue
+    range: float
+  measuredAt:
+    slot_uri: sen:measuredAt
+    range: datetime

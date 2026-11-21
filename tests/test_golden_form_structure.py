@@ -58,12 +58,12 @@ def _extract_section(html: str, section_id: str) -> str:
     depth = 0
     i = start
     while i < len(html):
-        if html[i:i+8] == "<section":
+        if html[i : i + 8] == "<section":
             depth += 1
-        elif html[i:i+10] == "</section>":
+        elif html[i : i + 10] == "</section>":
             depth -= 1
             if depth == 0:
-                return html[start:i + 10]
+                return html[start : i + 10]
         i += 1
     return ""
 
@@ -77,12 +77,12 @@ def _extract_section_by_heading_id(html: str, heading_id: str) -> str:
     depth = 0
     i = start
     while i < len(html):
-        if html[i:i+8] == "<section":
+        if html[i : i + 8] == "<section":
             depth += 1
-        elif html[i:i+10] == "</section>":
+        elif html[i : i + 10] == "</section>":
             depth -= 1
             if depth == 0:
-                return html[start:i + 10]
+                return html[start : i + 10]
         i += 1
     return ""
 
@@ -141,9 +141,7 @@ class TestResponseAssertionPlacement:
     def test_expected_response_assertion_is_in_expected_response_section(
         self, generated_html: str, assertion_id: str
     ) -> None:
-        expected_response_section = _extract_section_by_heading_id(
-            generated_html, "expectedresponse"
-        )
+        expected_response_section = _extract_section_by_heading_id(generated_html, "expectedresponse")
         assert expected_response_section, "ExpectedResponse section not found"
         assert f'id="{assertion_id}"' in expected_response_section, (
             f"Assertion '{assertion_id}' not found in ExpectedResponse section"
@@ -176,9 +174,7 @@ class TestResponseAssertionPlacement:
     def test_additional_expected_response_assertion_is_not_in_expected_response_section(
         self, generated_html: str, assertion_id: str
     ) -> None:
-        expected_response_section = _extract_section_by_heading_id(
-            generated_html, "expectedresponse"
-        )
+        expected_response_section = _extract_section_by_heading_id(generated_html, "expectedresponse")
         assert f'id="{assertion_id}"' not in expected_response_section, (
             f"Assertion '{assertion_id}' should not be in ExpectedResponse section"
         )

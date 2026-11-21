@@ -232,9 +232,9 @@ wotsec:oneOf
 .
 
 wotsec:proxy
-    rdf:type owl:DatatypeProperty ;
+    rdf:type owl:ObjectProperty ;
     rdfs:label "proxy"@en ;
-    skos:definition "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint."@en ;
+    skos:definition "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint."@en ;
     rdfs:domain wotsec:SecurityScheme ;
     rdfs:range xsd:anyURI ;
     rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
@@ -263,10 +263,22 @@ wotsec:refresh
     skos:inScheme <https://www.w3.org/2019/wot/security> ;
 .
 
+wotsec:scheme
+    rdf:type owl:DatatypeProperty ;
+    rdfs:label "scheme"@en ;
+    skos:definition "Identification of the security mechanism being configured."@en ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;
+    skos:inScheme <https://www.w3.org/2019/wot/security> ;
+.
+
 wotsec:scopes
     rdf:type owl:DatatypeProperty ;
     rdfs:label "scopes"@en ;
     skos:definition "Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an  authorization server and associated with forms in order to identify what resources a client may access and how."@en ;
+    schema:domainIncludes
+        <https://www.w3.org/2019/wot/hypermedia#Form> ,
+        wotsec:OAuth2SecurityScheme ;
     rdfs:domain wotsec:OAuth2SecurityScheme ;
     rdfs:range xsd:string ;
     rdfs:isDefinedBy <https://www.w3.org/2019/wot/security> ;

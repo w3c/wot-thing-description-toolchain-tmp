@@ -1,12 +1,13 @@
 """TD-instance gate.
 
 The generated JSON Schema must accept every ``*-valid`` sample and reject every
-``*-invalid`` one, for both TD 1.1 and TD 2.0. The samples on disk are the TD 1.1
-ones; the TD 2.0 variant is derived per test by rewriting @context (as_td20 in
+``*-invalid`` one, for both TD 1.1 and td-next. The samples on disk are the TD 1.1
+ones; the td-next variant is derived per test by rewriting @context (as_td_next in
 baselines.py). Valid samples the schema wrongly rejects (known fidelity gaps) are
 listed in the known-failures file and marked xfail(strict): a fix that makes one
 pass forces removing it there, so the list can only shrink.
 """
+
 from __future__ import annotations
 
 import json
@@ -16,7 +17,7 @@ import pytest
 from jsonschema import validators
 from jsonschema.exceptions import best_match
 
-from .baselines import TD_VERSIONS, as_td20, load_baseline
+from .baselines import TD_VERSIONS, as_td_next, load_baseline
 from .rejections import defined_at, main_rejection, rejection_details
 
 TESTS_DIR = Path(__file__).resolve().parent
@@ -29,7 +30,7 @@ KNOWN_FAILURES = TESTS_DIR / "known_failures" / "td_gate.txt"
 @pytest.fixture(scope="session")
 def validator():
     if not SCHEMA_PATH.exists():
-        pytest.skip(f"Generated schema not found at {SCHEMA_PATH}; run `wotis generate-wot-resources` first.")
+        pytest.skip(f"Generated schema not found at {SCHEMA_PATH}; run `wot-toolchain generate-wot-resources` first.")
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     cls = validators.validator_for(schema)
     cls.check_schema(schema)
@@ -51,8 +52,8 @@ def _samples():
 def test_td_instance(validator, rejections, new_failures, td_path: Path, version: str, baselined):
     expected_valid = "invalid" not in td_path.name.lower()
     instance = json.loads(td_path.read_text(encoding="utf-8"))
-    if version == "td20":
-        instance = as_td20(instance)
+    if version == "td-next":
+        instance = as_td_next(instance)
     errors = list(validator.iter_errors(instance))
     if expected_valid:
         sample = f"{version}/{td_path.relative_to(DATA_DIR).as_posix()}"
@@ -79,7 +80,8 @@ def test_known_failures_are_valid_samples():
 def test_known_failures_entries_resolve():
     known_failures = load_baseline(KNOWN_FAILURES)
     missing = sorted(
-        p for p in known_failures
+        p
+        for p in known_failures
         if p.split("/", 1)[0] not in TD_VERSIONS or not (DATA_DIR / p.split("/", 1)[1]).exists()
     )
     assert not missing, f"known-failures entries do not match <version>/<existing sample>: {missing}"

@@ -1,4 +1,5 @@
 """Provide shared pytest options and test reporting."""
+
 import os
 from pathlib import Path
 
@@ -111,5 +112,5 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         md += html_findings
         md.append("```")
         md.append("")
-    with open(step_summary, "a", encoding="utf-8") as fh:
+    with Path(step_summary).open("a", encoding="utf-8") as fh:
         fh.write("\n".join(md) + "\n")

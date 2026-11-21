@@ -1,0 +1,15 @@
+{
+    "@context": ["https://www.w3.org/2019/wot/td/v1", "https://www.w3.org/2022/wot/td/v1.1"],
+    "title": "TD with empty containers",
+    "@type": "Thing",
+    "id": "urn:uuid:e3d1b170-4a2f-4c89-bb91-2c7e8a1f6d33",
+    "security": ["nosec_sc"],
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    },
+    "properties": {},
+    "actions": {},
+    "events": {}
+}

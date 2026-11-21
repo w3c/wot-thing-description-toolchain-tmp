@@ -5,6 +5,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix schema: <http://schema.org/> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix td: <https://www.w3.org/2019/wot/td#> .
 @prefix vann: <http://purl.org/vocab/vann/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
@@ -103,7 +104,7 @@ hctl:forSubProtocol
 .
 
 hctl:hasAdditionalOutputSchema
-    rdf:type owl:DatatypeProperty ;
+    rdf:type owl:ObjectProperty ;
     rdfs:label "hasAdditionalOutputSchema"@en ;
     skos:definition "Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a DataSchema object, the name of a previous definition given in a schemaDefinitions map must be used."@en ;
     rdfs:domain hctl:AdditionalExpectedResponse ;
@@ -113,7 +114,7 @@ hctl:hasAdditionalOutputSchema
 .
 
 hctl:hasAnchor
-    rdf:type owl:DatatypeProperty ;
+    rdf:type owl:ObjectProperty ;
     rdfs:label "hasAnchor"@en ;
     skos:definition "Overrides the link context (by default the Thing itself identified by its id) with the given URI or IRI."@en ;
     rdfs:domain hctl:Link ;
@@ -138,7 +139,7 @@ hctl:hasOperationType
     rdfs:label "hasOperationType"@en ;
     skos:definition "Indicates the operation type (e.g., readproperty, writeproperty, observeproperty, etc.)"@en ;
     rdfs:domain hctl:Form ;
-    rdfs:range xsd:string ;
+    rdfs:range td:OperationType ;
     rdfs:isDefinedBy <https://www.w3.org/2019/wot/hypermedia> ;
     skos:inScheme <https://www.w3.org/2019/wot/hypermedia> ;
 .

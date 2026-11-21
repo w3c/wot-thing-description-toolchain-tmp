@@ -2,14 +2,14 @@ from pathlib import Path
 
 from linkml_runtime.utils.schemaview import SchemaView
 
-from src.wotis.specgen.tables import collect_slot_rows
+from wot_toolchain.specgen.tables import collect_slot_rows
 
 
 def _plain_markdown(text: str) -> str:
     return text or ""
 
 
-def test_td20_default_assignments_match_manual_golden_rows() -> None:
+def test_td_next_default_assignments_match_manual_golden_rows() -> None:
     cases = [
         ("resources/schemas/thing_description.yaml", "PropertyAffordance"),
         ("resources/schemas/thing_description.yaml", "ActionAffordance"),
@@ -53,30 +53,26 @@ def test_type_value_hints_are_independent_from_default_assignment() -> None:
     hypermedia = SchemaView("resources/schemas/hypermedia.yaml", merge_imports=True)
 
     basic_rows = {
-        row["assertion_id"]: row
-        for row in collect_slot_rows(security, "BasicSecurityScheme", _plain_markdown, "td")
+        row["assertion_id"]: row for row in collect_slot_rows(security, "BasicSecurityScheme", _plain_markdown, "td")
     }
     apikey_rows = {
-        row["assertion_id"]: row
-        for row in collect_slot_rows(security, "APIKeySecurityScheme", _plain_markdown, "td")
+        row["assertion_id"]: row for row in collect_slot_rows(security, "APIKeySecurityScheme", _plain_markdown, "td")
     }
     bearer_rows = {
-        row["assertion_id"]: row
-        for row in collect_slot_rows(security, "BearerSecurityScheme", _plain_markdown, "td")
+        row["assertion_id"]: row for row in collect_slot_rows(security, "BearerSecurityScheme", _plain_markdown, "td")
     }
-    form_rows = {
-        row["assertion_id"]: row
-        for row in collect_slot_rows(hypermedia, "Form", _plain_markdown, "td")
-    }
+    form_rows = {row["assertion_id"]: row for row in collect_slot_rows(hypermedia, "Form", _plain_markdown, "td")}
 
     xsd = "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#"
     s = f'<a href="{xsd}string"><code>string</code></a>'
 
     assert basic_rows["td-vocab-in--BasicSecurityScheme"]["range_text"] == (
-        f"{s} (one of <code>header</code>, <code>query</code>, <code>body</code>, <code>cookie</code>, or <code>auto</code>)"
+        f"{s} (one of <code>header</code>, <code>query</code>, <code>body</code>, <code>cookie</code>, "
+        "or <code>auto</code>)"
     )
     assert apikey_rows["td-vocab-in--APIKeySecurityScheme"]["range_text"] == (
-        f"{s} (one of <code>header</code>, <code>query</code>, <code>body</code>, <code>cookie</code>, <code>uri</code>, or <code>auto</code>)"
+        f"{s} (one of <code>header</code>, <code>query</code>, <code>body</code>, <code>cookie</code>, "
+        "<code>uri</code>, or <code>auto</code>)"
     )
     assert bearer_rows["td-vocab-alg--BearerSecurityScheme"]["range_text"] == (
         f"{s} (e.g., <code>ES256</code>, or <code>ES512-256</code>)"

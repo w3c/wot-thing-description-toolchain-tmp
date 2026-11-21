@@ -2,6 +2,7 @@
 @prefix hctl: <https://www.w3.org/2019/wot/hypermedia#> .
 @prefix jsonschema: <https://www.w3.org/2019/wot/json-schema#> .
 @prefix linkml: <https://w3id.org/linkml/> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -61,18 +62,23 @@ hctl:FormShape a sh:NodeShape ;
                         sh:nodeKind sh:Literal ] ) ;
             sh:order 4 ;
             sh:path wotsec:scopes ],
-        [ sh:datatype xsd:string ;
-            sh:description "A security configuration is a security scheme applied to a (set of) affordance(s)." ;
+        [ sh:description "Indicates the operation type (e.g., readproperty, writeproperty, observeproperty, etc.)" ;
+            sh:in ( td:readProperty td:writeProperty td:observeProperty td:unobserveProperty td:invokeAction td:queryAction td:cancelAction td:subscribeEvent td:unsubscribeEvent td:readAllProperties td:writeAllProperties td:readMultipleProperties td:writeMultipleProperties td:observeAllProperties td:unobserveAllProperties td:queryAllActions td:subscribeAllEvents td:unsubscribeAllEvents ) ;
             sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 3 ;
-            sh:path td:hasSecurityConfiguration ],
+            sh:order 8 ;
+            sh:path hctl:hasOperationType ],
         [ sh:datatype xsd:string ;
             sh:description "Assign a content type based on a media type (e.g., text/plain) and potential parameters  (e.g., charset=utf-8) for the media type [RFC2046]." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path hctl:forContentType ],
+        [ sh:datatype xsd:string ;
+            sh:description "A security configuration is a security scheme applied to a (set of) affordance(s)." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 3 ;
+            sh:path td:hasSecurityConfiguration ],
         [ sh:description "Target URI of a submission target of a Form. See the note on URI/IRI." ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
@@ -85,12 +91,6 @@ hctl:FormShape a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 7 ;
             sh:path hctl:forSubProtocol ],
-        [ sh:datatype xsd:string ;
-            sh:description "Indicates the operation type (e.g., readproperty, writeproperty, observeproperty, etc.)" ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 8 ;
-            sh:path hctl:hasOperationType ],
         [ sh:class hctl:AdditionalExpectedResponse ;
             sh:description "This optional term can be used if additional expected responses are possible, e.g., for error reporting. Each additional response needs to be distinguished from others in some way (for example, by specifying a protocol-specific error code), and may also have its own data schema." ;
             sh:nodeKind sh:BlankNodeOrIRI ;
@@ -157,7 +157,7 @@ jsonschema:ArraySchemaShape a sh:NodeShape ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
     sh:property [ sh:description "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)." ;
-            sh:in ( "object" "array" "string" "number" "integer" "boolean" "null" ) ;
+            sh:in ( jsonschema:ObjectSchema jsonschema:ArraySchema jsonschema:StringSchema jsonschema:NumberSchema jsonschema:IntegerSchema jsonschema:BooleanSchema jsonschema:NullSchema ) ;
             sh:maxCount 1 ;
             sh:order 17 ;
             sh:path jsonschema:type ],
@@ -181,12 +181,6 @@ jsonschema:ArraySchemaShape a sh:NodeShape ;
         [ sh:description "Restricted set of values provided as an array." ;
             sh:order 13 ;
             sh:path jsonschema:enum ],
-        [ sh:class jsonschema:DataSchema ;
-            sh:description "Used to define the characteristics of an array." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 0 ;
-            sh:path jsonschema:items ],
         [ sh:datatype xsd:boolean ;
             sh:description "Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false). Also see Interaction Semantics for further information on the usage patterns and implications." ;
             sh:maxCount 1 ;
@@ -203,6 +197,12 @@ jsonschema:ArraySchemaShape a sh:NodeShape ;
             sh:nodeKind sh:IRI ;
             sh:order 12 ;
             sh:path jsonschema:allOf ],
+        [ sh:class jsonschema:DataSchema ;
+            sh:description "Used to define the characteristics of an array." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 0 ;
+            sh:path jsonschema:items ],
         [ sh:datatype xsd:nonNegativeInteger ;
             sh:description "Defines the maximum number of items that have to be in the array." ;
             sh:maxCount 1 ;
@@ -233,12 +233,11 @@ jsonschema:ArraySchemaShape a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 4 ;
             sh:path td:title ],
-        [ sh:datatype xsd:string ;
-            sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
+        [ sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
             sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
+            sh:nodeKind sh:IRI ;
             sh:order 10 ;
-            sh:path td:unit ],
+            sh:path qudt:unit ],
         [ sh:class td:MultiLanguage ;
             sh:description "Title of the TD element (Thing, interaction affordance or data schema) with language tag. By convention, a language tag must be added to the object of 'titleInLanguage' triples. Otherwise, use 'title'." ;
             sh:nodeKind sh:IRI ;
@@ -256,7 +255,13 @@ jsonschema:BooleanSchemaShape a sh:NodeShape ;
     rdfs:comment "Metadata describing data of type boolean. This subclass is indicated by the value boolean assigned to type in DataSchema instances." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class jsonschema:DataSchema ;
+    sh:property [ sh:datatype xsd:boolean ;
+            sh:description "Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false). Also see Interaction Semantics for further information on the usage patterns and implications." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 11 ;
+            sh:path jsonschema:readOnly ],
+        [ sh:class jsonschema:DataSchema ;
             sh:description "Used to ensure that the data is valid against all of the specified schemas in the array." ;
             sh:nodeKind sh:IRI ;
             sh:order 9 ;
@@ -271,15 +276,15 @@ jsonschema:BooleanSchemaShape a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 3 ;
             sh:path td:description ],
-        [ sh:description "Provides a constant value." ;
-            sh:maxCount 1 ;
-            sh:order 5 ;
-            sh:path jsonschema:const ],
         [ sh:class td:MultiLanguage ;
             sh:description "Title of the TD element (Thing, interaction affordance or data schema) with language tag. By convention, a language tag must be added to the object of 'titleInLanguage' triples. Otherwise, use 'title'." ;
             sh:nodeKind sh:IRI ;
             sh:order 2 ;
             sh:path td:titleInLanguage ],
+        [ sh:description "Provides a constant value." ;
+            sh:maxCount 1 ;
+            sh:order 5 ;
+            sh:path jsonschema:const ],
         [ sh:datatype xsd:string ;
             sh:description "Allows validation based on a format pattern such as \"date-time\", \"email\", \"uri\", etc." ;
             sh:maxCount 1 ;
@@ -291,12 +296,6 @@ jsonschema:BooleanSchemaShape a sh:NodeShape ;
             sh:nodeKind sh:IRI ;
             sh:order 4 ;
             sh:path td:descriptionInLanguage ],
-        [ sh:datatype xsd:string ;
-            sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 7 ;
-            sh:path td:unit ],
         [ sh:datatype xsd:string ;
             sh:description "Name of the data schema definition." ;
             sh:maxCount 1 ;
@@ -310,10 +309,15 @@ jsonschema:BooleanSchemaShape a sh:NodeShape ;
             sh:order 12 ;
             sh:path jsonschema:writeOnly ],
         [ sh:description "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)." ;
-            sh:in ( "object" "array" "string" "number" "integer" "boolean" "null" ) ;
+            sh:in ( jsonschema:ObjectSchema jsonschema:ArraySchema jsonschema:StringSchema jsonschema:NumberSchema jsonschema:IntegerSchema jsonschema:BooleanSchema jsonschema:NullSchema ) ;
             sh:maxCount 1 ;
             sh:order 14 ;
             sh:path jsonschema:type ],
+        [ sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 7 ;
+            sh:path qudt:unit ],
         [ sh:description "Restricted set of values provided as an array." ;
             sh:order 10 ;
             sh:path jsonschema:enum ],
@@ -325,20 +329,19 @@ jsonschema:BooleanSchemaShape a sh:NodeShape ;
         [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
             sh:maxCount 1 ;
             sh:order 6 ;
-            sh:path jsonschema:default ],
-        [ sh:datatype xsd:boolean ;
-            sh:description "Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false). Also see Interaction Semantics for further information on the usage patterns and implications." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 11 ;
-            sh:path jsonschema:readOnly ] ;
+            sh:path jsonschema:default ] ;
     sh:targetClass jsonschema:BooleanSchema .
 
 jsonschema:DataSchemaShape a sh:NodeShape ;
     rdfs:comment "A data schema describes the data format used. It can be used for validation." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type jsonschema:contentEncoding jsonschema:contentMediaType jsonschema:exclusiveMaximum jsonschema:exclusiveMinimum jsonschema:items jsonschema:maxItems jsonschema:maxLength jsonschema:maximum jsonschema:minItems jsonschema:minLength jsonschema:minimum jsonschema:multipleOf jsonschema:pattern jsonschema:required td:hasPropertyAffordance ) ;
-    sh:property [ sh:datatype xsd:string ;
+    sh:property [ sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 7 ;
+            sh:path qudt:unit ],
+        [ sh:datatype xsd:string ;
             sh:description "Name of the data schema definition." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
@@ -373,15 +376,15 @@ jsonschema:DataSchemaShape a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 3 ;
             sh:path td:description ],
+        [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
+            sh:maxCount 1 ;
+            sh:order 6 ;
+            sh:path jsonschema:default ],
         [ sh:class td:MultiLanguage ;
             sh:description "Title of the TD element (Thing, interaction affordance or data schema) with language tag. By convention, a language tag must be added to the object of 'titleInLanguage' triples. Otherwise, use 'title'." ;
             sh:nodeKind sh:IRI ;
             sh:order 2 ;
             sh:path td:titleInLanguage ],
-        [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
-            sh:maxCount 1 ;
-            sh:order 6 ;
-            sh:path jsonschema:default ],
         [ sh:datatype xsd:boolean ;
             sh:description "Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false). Also see Interaction Semantics for further information on the usage patterns and implications." ;
             sh:maxCount 1 ;
@@ -389,16 +392,10 @@ jsonschema:DataSchemaShape a sh:NodeShape ;
             sh:order 11 ;
             sh:path jsonschema:readOnly ],
         [ sh:description "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)." ;
-            sh:in ( "object" "array" "string" "number" "integer" "boolean" "null" ) ;
+            sh:in ( jsonschema:ObjectSchema jsonschema:ArraySchema jsonschema:StringSchema jsonschema:NumberSchema jsonschema:IntegerSchema jsonschema:BooleanSchema jsonschema:NullSchema ) ;
             sh:maxCount 1 ;
             sh:order 14 ;
             sh:path jsonschema:type ],
-        [ sh:datatype xsd:string ;
-            sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 7 ;
-            sh:path td:unit ],
         [ sh:class td:MultiLanguage ;
             sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema) with language tag. By convention, a language tag must be added to the object of 'descriptionInLanguage' triples. Otherwise, use 'description'." ;
             sh:nodeKind sh:IRI ;
@@ -420,7 +417,11 @@ jsonschema:IntegerSchemaShape a sh:NodeShape ;
     rdfs:comment "Metadata describing data of type integer. This subclass is indicated by the value integer assigned to type in DataSchema instances." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class td:MultiLanguage ;
+    sh:property [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
+            sh:maxCount 1 ;
+            sh:order 11 ;
+            sh:path jsonschema:default ],
+        [ sh:class td:MultiLanguage ;
             sh:description "Title of the TD element (Thing, interaction affordance or data schema) with language tag. By convention, a language tag must be added to the object of 'titleInLanguage' triples. Otherwise, use 'title'." ;
             sh:nodeKind sh:IRI ;
             sh:order 7 ;
@@ -429,12 +430,6 @@ jsonschema:IntegerSchemaShape a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:order 10 ;
             sh:path jsonschema:const ],
-        [ sh:datatype xsd:boolean ;
-            sh:description "Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false). Also see Interaction Semantics for further information on the usage patterns and implications." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 16 ;
-            sh:path jsonschema:readOnly ],
         [ sh:datatype xsd:integer ;
             sh:description "Specifies the multipleOf value number. The value must strictly greater than 0. Only applicable for associated number or integer types." ;
             sh:maxCount 1 ;
@@ -442,6 +437,17 @@ jsonschema:IntegerSchemaShape a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 4 ;
             sh:path jsonschema:multipleOf ],
+        [ sh:datatype xsd:boolean ;
+            sh:description "Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false). Also see Interaction Semantics for further information on the usage patterns and implications." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 16 ;
+            sh:path jsonschema:readOnly ],
+        [ sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 12 ;
+            sh:path qudt:unit ],
         [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
@@ -464,12 +470,6 @@ jsonschema:IntegerSchemaShape a sh:NodeShape ;
             sh:nodeKind sh:IRI ;
             sh:order 14 ;
             sh:path jsonschema:allOf ],
-        [ sh:datatype xsd:string ;
-            sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 12 ;
-            sh:path td:unit ],
         [ sh:description "Restricted set of values provided as an array." ;
             sh:order 15 ;
             sh:path jsonschema:enum ],
@@ -507,7 +507,7 @@ jsonschema:IntegerSchemaShape a sh:NodeShape ;
             sh:order 20 ;
             sh:path td:name ],
         [ sh:description "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)." ;
-            sh:in ( "object" "array" "string" "number" "integer" "boolean" "null" ) ;
+            sh:in ( jsonschema:ObjectSchema jsonschema:ArraySchema jsonschema:StringSchema jsonschema:NumberSchema jsonschema:IntegerSchema jsonschema:BooleanSchema jsonschema:NullSchema ) ;
             sh:maxCount 1 ;
             sh:order 19 ;
             sh:path jsonschema:type ],
@@ -522,29 +522,24 @@ jsonschema:IntegerSchemaShape a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 0 ;
-            sh:path jsonschema:minimum ],
-        [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
-            sh:maxCount 1 ;
-            sh:order 11 ;
-            sh:path jsonschema:default ] ;
+            sh:path jsonschema:minimum ] ;
     sh:targetClass jsonschema:IntegerSchema .
 
 jsonschema:NullSchemaShape a sh:NodeShape ;
     rdfs:comment "Metadata describing data of type null. This subclass is indicated by the value null assigned to type in DataSchema instances. This Subclass describes only one acceptable value, namely null. It is important to note that null does not mean the absence of a value. It is analogous to null in JavaScript, None in Python, null in Java and nil in Ruby programming languages. It can be used as part of a oneOf declaration, where it is used to indicate, that the data can also be null." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:string ;
-            sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 7 ;
-            sh:path td:unit ],
-        [ sh:datatype xsd:boolean ;
+    sh:property [ sh:datatype xsd:boolean ;
             sh:description "Boolean value that is a hint to indicate whether a property interaction / value is read only (=true) or not (=false). Also see Interaction Semantics for further information on the usage patterns and implications." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 11 ;
             sh:path jsonschema:readOnly ],
+        [ sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 7 ;
+            sh:path qudt:unit ],
         [ sh:class td:MultiLanguage ;
             sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema) with language tag. By convention, a language tag must be added to the object of 'descriptionInLanguage' triples. Otherwise, use 'description'." ;
             sh:nodeKind sh:IRI ;
@@ -580,6 +575,15 @@ jsonschema:NullSchemaShape a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 12 ;
             sh:path jsonschema:writeOnly ],
+        [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
+            sh:maxCount 1 ;
+            sh:order 6 ;
+            sh:path jsonschema:default ],
+        [ sh:description "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)." ;
+            sh:in ( jsonschema:ObjectSchema jsonschema:ArraySchema jsonschema:StringSchema jsonschema:NumberSchema jsonschema:IntegerSchema jsonschema:BooleanSchema jsonschema:NullSchema ) ;
+            sh:maxCount 1 ;
+            sh:order 14 ;
+            sh:path jsonschema:type ],
         [ sh:datatype xsd:string ;
             sh:description "Allows validation based on a format pattern such as \"date-time\", \"email\", \"uri\", etc." ;
             sh:maxCount 1 ;
@@ -591,15 +595,6 @@ jsonschema:NullSchemaShape a sh:NodeShape ;
             sh:nodeKind sh:IRI ;
             sh:order 2 ;
             sh:path td:titleInLanguage ],
-        [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
-            sh:maxCount 1 ;
-            sh:order 6 ;
-            sh:path jsonschema:default ],
-        [ sh:description "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)." ;
-            sh:in ( "object" "array" "string" "number" "integer" "boolean" "null" ) ;
-            sh:maxCount 1 ;
-            sh:order 14 ;
-            sh:path jsonschema:type ],
         [ sh:datatype xsd:string ;
             sh:description "Name of the data schema definition." ;
             sh:maxCount 1 ;
@@ -639,18 +634,17 @@ jsonschema:NumberSchemaShape a sh:NodeShape ;
             sh:nodeKind sh:IRI ;
             sh:order 7 ;
             sh:path td:titleInLanguage ],
+        [ sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 12 ;
+            sh:path qudt:unit ],
         [ sh:datatype xsd:string ;
             sh:description "Allows validation based on a format pattern such as \"date-time\", \"email\", \"uri\", etc." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 18 ;
             sh:path jsonschema:format ],
-        [ sh:datatype xsd:string ;
-            sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 12 ;
-            sh:path td:unit ],
         [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
             sh:maxCount 1 ;
             sh:order 11 ;
@@ -671,7 +665,7 @@ jsonschema:NumberSchemaShape a sh:NodeShape ;
             sh:order 3 ;
             sh:path jsonschema:exclusiveMaximum ],
         [ sh:description "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)." ;
-            sh:in ( "object" "array" "string" "number" "integer" "boolean" "null" ) ;
+            sh:in ( jsonschema:ObjectSchema jsonschema:ArraySchema jsonschema:StringSchema jsonschema:NumberSchema jsonschema:IntegerSchema jsonschema:BooleanSchema jsonschema:NullSchema ) ;
             sh:maxCount 1 ;
             sh:order 19 ;
             sh:path jsonschema:type ],
@@ -728,18 +722,17 @@ jsonschema:ObjectSchemaShape a sh:NodeShape ;
     rdfs:comment "Metadata describing data of type object. This subclass is indicated by the value object assigned to type in DataSchema instances." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
+    sh:property [ sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 9 ;
+            sh:path qudt:unit ],
+        [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
             sh:maxCount 1 ;
             sh:order 8 ;
             sh:path jsonschema:default ],
-        [ sh:datatype xsd:string ;
-            sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 9 ;
-            sh:path td:unit ],
         [ sh:description "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)." ;
-            sh:in ( "object" "array" "string" "number" "integer" "boolean" "null" ) ;
+            sh:in ( jsonschema:ObjectSchema jsonschema:ArraySchema jsonschema:StringSchema jsonschema:NumberSchema jsonschema:IntegerSchema jsonschema:BooleanSchema jsonschema:NullSchema ) ;
             sh:maxCount 1 ;
             sh:order 16 ;
             sh:path jsonschema:type ],
@@ -772,17 +765,17 @@ jsonschema:ObjectSchemaShape a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path jsonschema:required ],
-        [ sh:class jsonschema:DataSchema ;
-            sh:description "Data schema nested definitions." ;
-            sh:nodeKind sh:IRI ;
-            sh:order 0 ;
-            sh:path jsonschema:properties ],
         [ sh:datatype xsd:string ;
             sh:description "Allows validation based on a format pattern such as \"date-time\", \"email\", \"uri\", etc." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 15 ;
             sh:path jsonschema:format ],
+        [ sh:class jsonschema:DataSchema ;
+            sh:description "Data schema nested definitions." ;
+            sh:nodeKind sh:IRI ;
+            sh:order 0 ;
+            sh:path jsonschema:properties ],
         [ sh:class td:MultiLanguage ;
             sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema) with language tag. By convention, a language tag must be added to the object of 'descriptionInLanguage' triples. Otherwise, use 'description'." ;
             sh:nodeKind sh:IRI ;
@@ -852,31 +845,16 @@ jsonschema:StringSchemaShape a sh:NodeShape ;
             sh:order 3 ;
             sh:path jsonschema:contentEncoding ],
         [ sh:description "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)." ;
-            sh:in ( "object" "array" "string" "number" "integer" "boolean" "null" ) ;
+            sh:in ( jsonschema:ObjectSchema jsonschema:ArraySchema jsonschema:StringSchema jsonschema:NumberSchema jsonschema:IntegerSchema jsonschema:BooleanSchema jsonschema:NullSchema ) ;
             sh:maxCount 1 ;
             sh:order 19 ;
             sh:path jsonschema:type ],
-        [ sh:datatype xsd:string ;
-            sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 12 ;
-            sh:path td:unit ],
-        [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
-            sh:maxCount 1 ;
-            sh:order 11 ;
-            sh:path jsonschema:default ],
         [ sh:datatype xsd:nonNegativeInteger ;
             sh:description "Specifies the maximum length of a string. Only applicable for associated string types." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path jsonschema:maxLength ],
-        [ sh:class jsonschema:DataSchema ;
-            sh:description "Used to ensure that the data is valid against one of the specified schemas in the array. This can be used to describe multiple input or output schemas." ;
-            sh:nodeKind sh:IRI ;
-            sh:order 13 ;
-            sh:path jsonschema:oneOf ],
         [ sh:class jsonschema:DataSchema ;
             sh:description "Used to ensure that the data is valid against all of the specified schemas in the array." ;
             sh:nodeKind sh:IRI ;
@@ -893,11 +871,25 @@ jsonschema:StringSchemaShape a sh:NodeShape ;
             sh:nodeKind sh:IRI ;
             sh:order 7 ;
             sh:path td:titleInLanguage ],
+        [ sh:description "Supply a default value. The value SHOULD validate against the data schema in which it resides." ;
+            sh:maxCount 1 ;
+            sh:order 11 ;
+            sh:path jsonschema:default ],
+        [ sh:class jsonschema:DataSchema ;
+            sh:description "Used to ensure that the data is valid against one of the specified schemas in the array. This can be used to describe multiple input or output schemas." ;
+            sh:nodeKind sh:IRI ;
+            sh:order 13 ;
+            sh:path jsonschema:oneOf ],
         [ sh:description "Specifies the MIME type of the contents of a string value, as described in RFC 2046." ;
             sh:in ( "image/png" "audio/mpeg" ) ;
             sh:maxCount 1 ;
             sh:order 4 ;
             sh:path jsonschema:contentMediaType ],
+        [ sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 12 ;
+            sh:path qudt:unit ],
         [ sh:description "Restricted set of values provided as an array." ;
             sh:order 15 ;
             sh:path jsonschema:enum ],
@@ -930,12 +922,7 @@ wotsec:APIKeySecuritySchemeShape a sh:NodeShape ;
     rdfs:comment "API key authentication security configuration identified by the term apikey. This scheme is to be used when the  access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 5 ;
-            sh:path wotsec:proxy ],
-        [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
+    sh:property [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 3 ;
@@ -970,7 +957,12 @@ wotsec:APIKeySecuritySchemeShape a sh:NodeShape ;
             sh:minCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 6 ;
-            sh:path td:scheme ] ;
+            sh:path wotsec:scheme ],
+        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 5 ;
+            sh:path wotsec:proxy ] ;
     sh:targetClass wotsec:APIKeySecurityScheme .
 
 wotsec:AutoSecuritySchemeShape a sh:NodeShape ;
@@ -993,6 +985,11 @@ wotsec:AutoSecuritySchemeShape a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path td:description ],
+        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 3 ;
+            sh:path wotsec:proxy ],
         [ sh:datatype xsd:string ;
             sh:description "Identification of the security mechanism being configured." ;
             sh:in ( "auto" ) ;
@@ -1000,12 +997,7 @@ wotsec:AutoSecuritySchemeShape a sh:NodeShape ;
             sh:minCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 4 ;
-            sh:path td:scheme ],
-        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 3 ;
-            sh:path wotsec:proxy ] ;
+            sh:path wotsec:scheme ] ;
     sh:targetClass wotsec:AutoSecurityScheme .
 
 wotsec:BasicSecuritySchemeShape a sh:NodeShape ;
@@ -1028,19 +1020,11 @@ wotsec:BasicSecuritySchemeShape a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 3 ;
             sh:path td:description ],
-        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint." ;
+        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
             sh:order 5 ;
             sh:path wotsec:proxy ],
-        [ sh:datatype xsd:string ;
-            sh:description "Identification of the security mechanism being configured." ;
-            sh:in ( "basic" ) ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 6 ;
-            sh:path td:scheme ],
         [ sh:class td:MultiLanguage ;
             sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema) with language tag. By convention, a language tag must be added to the object of 'descriptionInLanguage' triples. Otherwise, use 'description'." ;
             sh:nodeKind sh:IRI ;
@@ -1051,23 +1035,50 @@ wotsec:BasicSecuritySchemeShape a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 7 ;
-            sh:path td:security_scheme_key ] ;
+            sh:path td:security_scheme_key ],
+        [ sh:datatype xsd:string ;
+            sh:description "Identification of the security mechanism being configured." ;
+            sh:in ( "basic" ) ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 6 ;
+            sh:path wotsec:scheme ] ;
     sh:targetClass wotsec:BasicSecurityScheme .
 
 wotsec:BearerSecuritySchemeShape a sh:NodeShape ;
     rdfs:comment "Bearer Token security configuration for situations where bearer tokens are used independently of OAuth2." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class td:MultiLanguage ;
-            sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema) with language tag. By convention, a language tag must be added to the object of 'descriptionInLanguage' triples. Otherwise, use 'description'." ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Name of the security scheme definition." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 10 ;
+            sh:path td:security_scheme_key ],
+        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint." ;
+            sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
-            sh:order 7 ;
-            sh:path td:descriptionInLanguage ],
+            sh:order 8 ;
+            sh:path wotsec:proxy ],
         [ sh:description "URI of the authorization server." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
             sh:order 0 ;
             sh:path wotsec:authorization ],
+        [ sh:class td:MultiLanguage ;
+            sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema) with language tag. By convention, a language tag must be added to the object of 'descriptionInLanguage' triples. Otherwise, use 'description'." ;
+            sh:nodeKind sh:IRI ;
+            sh:order 7 ;
+            sh:path td:descriptionInLanguage ],
+        [ sh:datatype xsd:string ;
+            sh:description "Identification of the security mechanism being configured." ;
+            sh:in ( "bearer" ) ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 9 ;
+            sh:path wotsec:scheme ],
         [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
@@ -1088,31 +1099,12 @@ wotsec:BearerSecuritySchemeShape a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:order 3 ;
             sh:path wotsec:alg ],
-        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 8 ;
-            sh:path wotsec:proxy ],
         [ sh:datatype xsd:string ;
             sh:description "Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
-            sh:path wotsec:name ],
-        [ sh:datatype xsd:string ;
-            sh:description "Identification of the security mechanism being configured." ;
-            sh:in ( "bearer" ) ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 9 ;
-            sh:path td:scheme ],
-        [ sh:datatype xsd:string ;
-            sh:description "Name of the security scheme definition." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 10 ;
-            sh:path td:security_scheme_key ] ;
+            sh:path wotsec:name ] ;
     sh:targetClass wotsec:BearerSecurityScheme .
 
 wotsec:ComboSecuritySchemeShape a sh:NodeShape ;
@@ -1125,22 +1117,16 @@ wotsec:ComboSecuritySchemeShape a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path wotsec:allOf ],
+        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 5 ;
+            sh:path wotsec:proxy ],
         [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 3 ;
             sh:path td:description ],
-        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 5 ;
-            sh:path wotsec:proxy ],
-        [ sh:datatype xsd:string ;
-            sh:description "Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, will allow access. Only one may be chosen for use." ;
-            sh:minInclusive 2 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 0 ;
-            sh:path wotsec:oneOf ],
         [ sh:datatype xsd:string ;
             sh:description "Identification of the security mechanism being configured." ;
             sh:in ( "combo" ) ;
@@ -1148,7 +1134,13 @@ wotsec:ComboSecuritySchemeShape a sh:NodeShape ;
             sh:minCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 6 ;
-            sh:path td:scheme ],
+            sh:path wotsec:scheme ],
+        [ sh:datatype xsd:string ;
+            sh:description "Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, will allow access. Only one may be chosen for use." ;
+            sh:minInclusive 2 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path wotsec:oneOf ],
         [ sh:datatype xsd:string ;
             sh:description "Name of the security scheme definition." ;
             sh:maxCount 1 ;
@@ -1166,7 +1158,12 @@ wotsec:DigestSecuritySchemeShape a sh:NodeShape ;
     rdfs:comment "Digest Access Authentication security configuration. This scheme is similar to basic authentication but with  added features to avoid man-in-the-middle attacks." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:string ;
+    sh:property [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 6 ;
+            sh:path wotsec:proxy ],
+        [ sh:datatype xsd:string ;
             sh:description "Name of the security scheme definition." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
@@ -1179,7 +1176,7 @@ wotsec:DigestSecuritySchemeShape a sh:NodeShape ;
             sh:minCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 7 ;
-            sh:path td:scheme ],
+            sh:path wotsec:scheme ],
         [ sh:datatype xsd:string ;
             sh:description "Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer." ;
             sh:maxCount 1 ;
@@ -1191,11 +1188,6 @@ wotsec:DigestSecuritySchemeShape a sh:NodeShape ;
             sh:nodeKind sh:IRI ;
             sh:order 5 ;
             sh:path td:descriptionInLanguage ],
-        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 6 ;
-            sh:path wotsec:proxy ],
         [ sh:description "Specifies the location of security authentication information." ;
             sh:in ( "header" "query" "body" "cookie" "uri" "auto" ) ;
             sh:maxCount 1 ;
@@ -1228,7 +1220,15 @@ wotsec:NoSecuritySchemeShape a sh:NodeShape ;
             sh:nodeKind sh:IRI ;
             sh:order 2 ;
             sh:path td:descriptionInLanguage ],
-        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint." ;
+        [ sh:datatype xsd:string ;
+            sh:description "Identification of the security mechanism being configured." ;
+            sh:in ( "nosec" ) ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 4 ;
+            sh:path wotsec:scheme ],
+        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
             sh:order 3 ;
@@ -1237,29 +1237,18 @@ wotsec:NoSecuritySchemeShape a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
-            sh:path td:description ],
-        [ sh:datatype xsd:string ;
-            sh:description "Identification of the security mechanism being configured." ;
-            sh:in ( "nosec" ) ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 4 ;
-            sh:path td:scheme ] ;
+            sh:path td:description ] ;
     sh:targetClass wotsec:NoSecurityScheme .
 
 wotsec:OAuth2SecuritySchemeShape a sh:NodeShape ;
     rdfs:comment "OAuth 2.0 authentication security configuration for systems conformant with RFC6749 and RFC8252." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:string ;
-            sh:description "Identification of the security mechanism being configured." ;
-            sh:in ( "oauth2" ) ;
+    sh:property [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
             sh:maxCount 1 ;
-            sh:minCount 1 ;
             sh:nodeKind sh:Literal ;
-            sh:order 9 ;
-            sh:path td:scheme ],
+            sh:order 6 ;
+            sh:path td:description ],
         [ sh:class td:MultiLanguage ;
             sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema) with language tag. By convention, a language tag must be added to the object of 'descriptionInLanguage' triples. Otherwise, use 'description'." ;
             sh:nodeKind sh:IRI ;
@@ -1277,6 +1266,11 @@ wotsec:OAuth2SecuritySchemeShape a sh:NodeShape ;
             sh:minCount 1 ;
             sh:order 4 ;
             sh:path wotsec:flow ],
+        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 8 ;
+            sh:path wotsec:proxy ],
         [ sh:description "URI of the authorization server." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
@@ -1294,45 +1288,43 @@ wotsec:OAuth2SecuritySchemeShape a sh:NodeShape ;
                         sh:nodeKind sh:Literal ] ) ;
             sh:order 3 ;
             sh:path wotsec:scopes ],
-        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint." ;
+        [ sh:datatype xsd:string ;
+            sh:description "Identification of the security mechanism being configured." ;
+            sh:in ( "oauth2" ) ;
             sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 8 ;
-            sh:path wotsec:proxy ],
+            sh:minCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 9 ;
+            sh:path wotsec:scheme ],
         [ sh:description "URI of the refresh server." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
             sh:order 2 ;
-            sh:path wotsec:refresh ],
-        [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 6 ;
-            sh:path td:description ] ;
+            sh:path wotsec:refresh ] ;
     sh:targetClass wotsec:OAuth2SecurityScheme .
 
 wotsec:PSKSecuritySchemeShape a sh:NodeShape ;
     rdfs:comment "Pre-shared key authentication security configuration. This is meant to identify that a standard is used for  pre-shared keys such as TLS-PSK." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:string ;
+    sh:property [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 4 ;
+            sh:path wotsec:proxy ],
+        [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path td:description ],
+        [ sh:datatype xsd:string ;
             sh:description "Identification of the security mechanism being configured." ;
             sh:in ( "psk" ) ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 5 ;
-            sh:path td:scheme ],
-        [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 2 ;
-            sh:path td:description ],
-        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 4 ;
-            sh:path wotsec:proxy ],
+            sh:path wotsec:scheme ],
         [ sh:class td:MultiLanguage ;
             sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema) with language tag. By convention, a language tag must be added to the object of 'descriptionInLanguage' triples. Otherwise, use 'description'." ;
             sh:nodeKind sh:IRI ;
@@ -1356,17 +1348,12 @@ wotsec:SecuritySchemeShape a sh:NodeShape ;
     rdfs:comment "Metadata describing the configuration of a security mechanism. The value assigned to the name scheme MUST be defined  within a Vocabulary included in the Thing Description. For all security schemes, any keys, passwords, or other  sensitive information directly providing access MUST NOT be stored in the TD and should instead be shared and  stored out-of-band via other mechanisms." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type jsonschema:format wotsec:alg wotsec:allOf wotsec:apikeyIn wotsec:authorization wotsec:flow wotsec:identity wotsec:in wotsec:name wotsec:oneOf wotsec:qop wotsec:refresh wotsec:scopes wotsec:token ) ;
-    sh:property [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 3 ;
-            sh:path wotsec:proxy ],
-        [ sh:description "Identification of the security mechanism being configured." ;
-            sh:in ( "nosec" "combo" "basic" "digest" "bearer" "psk" "oauth2" "apikey" "auto" ) ;
+    sh:property [ sh:description "Identification of the security mechanism being configured." ;
+            sh:in ( wotsec:NoSecurityScheme wotsec:ComboSecurityScheme wotsec:BasicSecurityScheme wotsec:DigestSecurityScheme wotsec:BearerSecurityScheme wotsec:PSKSecurityScheme wotsec:OAuth2SecurityScheme wotsec:APIKeySecurityScheme wotsec:AutoSecurityScheme ) ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
             sh:order 4 ;
-            sh:path td:scheme ],
+            sh:path wotsec:scheme ],
         [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
@@ -1377,6 +1364,11 @@ wotsec:SecuritySchemeShape a sh:NodeShape ;
             sh:nodeKind sh:IRI ;
             sh:order 2 ;
             sh:path td:descriptionInLanguage ],
+        [ sh:description "URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 3 ;
+            sh:path wotsec:proxy ],
         [ sh:datatype xsd:string ;
             sh:description "Name of the security scheme definition." ;
             sh:maxCount 1 ;
@@ -1528,8 +1520,14 @@ td:EventAffordanceShape a sh:NodeShape ;
 td:InteractionAffordanceShape a sh:NodeShape ;
     rdfs:comment "Metadata of a Thing that shows the possible choices to Consumers, thereby suggesting how Consumers may interact with the Thing. There are many types of potential affordances, but W3C WoT defines three types of Interaction Affordances: Properties, Actions, and Events." ;
     sh:closed false ;
-    sh:ignoredProperties ( rdf:type jsonschema:allOf jsonschema:const jsonschema:default jsonschema:enum jsonschema:format jsonschema:oneOf jsonschema:readOnly jsonschema:type jsonschema:writeOnly td:hasCancellationSchema td:hasInputSchema td:hasNotificationResponseSchema td:hasNotificationSchema td:hasOutputSchema td:hasSubscriptionSchema td:isIdempotent td:isObservable td:isSafe td:isSynchronous td:unit ) ;
-    sh:property [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
+    sh:ignoredProperties ( qudt:unit rdf:type jsonschema:allOf jsonschema:const jsonschema:default jsonschema:enum jsonschema:format jsonschema:oneOf jsonschema:readOnly jsonschema:type jsonschema:writeOnly td:hasCancellationSchema td:hasInputSchema td:hasNotificationResponseSchema td:hasNotificationSchema td:hasOutputSchema td:hasSubscriptionSchema td:isIdempotent td:isObservable td:isSafe td:isSynchronous ) ;
+    sh:property [ sh:class hctl:Form ;
+            sh:description "Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. The array cannot be empty." ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 5 ;
+            sh:path td:hasForm ],
+        [ sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema)." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 3 ;
@@ -1539,16 +1537,16 @@ td:InteractionAffordanceShape a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path td:title ],
-        [ sh:class td:MultiLanguage ;
-            sh:description "Title of the TD element (Thing, interaction affordance or data schema) with language tag. By convention, a language tag must be added to the object of 'titleInLanguage' triples. Otherwise, use 'title'." ;
-            sh:nodeKind sh:IRI ;
-            sh:order 2 ;
-            sh:path td:titleInLanguage ],
         [ sh:class jsonschema:DataSchema ;
             sh:description "Define URI template variables according to RFC6570 as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the href upon the execution of the operation. If the same variable is both declared in Thing level uriVariables and in Interaction Affordance level, the Interaction Affordance level variable takes precedence." ;
             sh:nodeKind sh:IRI ;
             sh:order 6 ;
             sh:path td:hasUriTemplateSchema ],
+        [ sh:class td:MultiLanguage ;
+            sh:description "Title of the TD element (Thing, interaction affordance or data schema) with language tag. By convention, a language tag must be added to the object of 'titleInLanguage' triples. Otherwise, use 'title'." ;
+            sh:nodeKind sh:IRI ;
+            sh:order 2 ;
+            sh:path td:titleInLanguage ],
         [ sh:datatype xsd:string ;
             sh:description "Indexing property to store entity names when serializing them in a JSON-LD @index container." ;
             sh:maxCount 1 ;
@@ -1559,13 +1557,7 @@ td:InteractionAffordanceShape a sh:NodeShape ;
             sh:description "Description of the TD element (Thing, interaction affordance, security scheme or data schema) with language tag. By convention, a language tag must be added to the object of 'descriptionInLanguage' triples. Otherwise, use 'description'." ;
             sh:nodeKind sh:IRI ;
             sh:order 4 ;
-            sh:path td:descriptionInLanguage ],
-        [ sh:class hctl:Form ;
-            sh:description "Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. The array cannot be empty." ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 5 ;
-            sh:path td:hasForm ] ;
+            sh:path td:descriptionInLanguage ] ;
     sh:targetClass td:InteractionAffordance .
 
 td:MultiLanguageShape a sh:NodeShape ;
@@ -1590,7 +1582,12 @@ td:PropertyAffordanceShape a sh:NodeShape ;
     rdfs:comment "An Interaction Affordance that exposes state of the Thing. This state can be retrieved (read) and/or updated (write). Things can also choose to make Properties observable by pushing the new state after a change." ;
     sh:closed true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:description "Restricted set of values provided as an array." ;
+    sh:property [ sh:class jsonschema:DataSchema ;
+            sh:description "Used to ensure that the data is valid against all of the specified schemas in the array." ;
+            sh:nodeKind sh:IRI ;
+            sh:order 10 ;
+            sh:path jsonschema:allOf ],
+        [ sh:description "Restricted set of values provided as an array." ;
             sh:order 11 ;
             sh:path jsonschema:enum ],
         [ sh:class hctl:Form ;
@@ -1635,28 +1632,22 @@ td:PropertyAffordanceShape a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:order 7 ;
             sh:path jsonschema:default ],
-        [ sh:description "Title of the TD element (Thing, interaction affordance or data schema)." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 2 ;
-            sh:path td:title ],
         [ sh:description "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)." ;
-            sh:in ( "object" "array" "string" "number" "integer" "boolean" "null" ) ;
+            sh:in ( jsonschema:ObjectSchema jsonschema:ArraySchema jsonschema:StringSchema jsonschema:NumberSchema jsonschema:IntegerSchema jsonschema:BooleanSchema jsonschema:NullSchema ) ;
             sh:maxCount 1 ;
             sh:order 15 ;
             sh:path jsonschema:type ],
-        [ sh:datatype xsd:string ;
-            sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 8 ;
-            sh:path td:unit ],
         [ sh:datatype xsd:string ;
             sh:description "Name of the data schema definition." ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 16 ;
             sh:path td:name ],
+        [ sh:description "Title of the TD element (Thing, interaction affordance or data schema)." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path td:title ],
         [ sh:class jsonschema:DataSchema ;
             sh:description "Used to ensure that the data is valid against one of the specified schemas in the array. This can be used to describe multiple input or output schemas." ;
             sh:nodeKind sh:IRI ;
@@ -1673,16 +1664,16 @@ td:PropertyAffordanceShape a sh:NodeShape ;
             sh:nodeKind sh:IRI ;
             sh:order 3 ;
             sh:path td:titleInLanguage ],
+        [ sh:description "Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 8 ;
+            sh:path qudt:unit ],
         [ sh:class jsonschema:DataSchema ;
             sh:description "Define URI template variables according to RFC6570 as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the href upon the execution of the operation. If the same variable is both declared in Thing level uriVariables and in Interaction Affordance level, the Interaction Affordance level variable takes precedence." ;
             sh:nodeKind sh:IRI ;
             sh:order 18 ;
-            sh:path td:hasUriTemplateSchema ],
-        [ sh:class jsonschema:DataSchema ;
-            sh:description "Used to ensure that the data is valid against all of the specified schemas in the array." ;
-            sh:nodeKind sh:IRI ;
-            sh:order 10 ;
-            sh:path jsonschema:allOf ] ;
+            sh:path td:hasUriTemplateSchema ] ;
     sh:targetClass td:PropertyAffordance .
 
 td:ThingShape a sh:NodeShape ;

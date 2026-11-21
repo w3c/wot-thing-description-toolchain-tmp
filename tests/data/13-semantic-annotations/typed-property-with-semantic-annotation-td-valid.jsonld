@@ -1,0 +1,27 @@
+{
+    "@context": [
+        "https://www.w3.org/2022/wot/td/v1.1",
+        { "saref": "https://saref.etsi.org/core/" }
+    ],
+    "id": "urn:uuid:7e3c1a6d-b9f2-4a8e-91c5-d4e6f7a8b9c0",
+    "title": "Temperature Sensor",
+    "$title": "Semantic type + data type",
+    "$description": "Property with both @type (RDF class) and type (JSON Schema data type). Upstream conflates these because type maps to @type.",
+    "@type": "Thing",
+    "securityDefinitions": {
+        "nosec_sc": {"scheme": "nosec"}
+    },
+    "security": "nosec_sc",
+    "properties": {
+        "temperature": {
+            "@type": "saref:Temperature",
+            "type": "number",
+            "title": "Current temperature",
+            "unit": "qudt:DEG_C",
+            "readOnly": true,
+            "forms": [{
+                "href": "https://sensor.example.com/temperature"
+            }]
+        }
+    }
+}

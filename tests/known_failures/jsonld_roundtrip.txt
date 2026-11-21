@@ -1,0 +1,9 @@
+# Known JSON-LD expand -> compact roundtrip divergences.
+# One entry per line: <path relative to tests/data/>
+# xfail(strict=True): a fix that makes a test pass forces removing it here.
+# This list can only shrink.
+#
+# Empty containers: a JSON-LD limitation, not a TD or toolchain defect. An empty
+# @container:@index map ({"properties": {}}) expands to no triples, so compaction
+# cannot restore the term under its original key and shape.
+1-simple-default/empty-containers-td-valid.jsonld

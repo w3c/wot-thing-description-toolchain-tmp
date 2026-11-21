@@ -59,9 +59,8 @@ def test_template_crossrefs_resolve():
             continue
         unresolved.append(f"  line {line_no}: [[[#{target}]]]")
 
-    assert not unresolved, (
-        f"{len(unresolved)} cross-reference(s) do not resolve to any known ID:\n"
-        + "\n".join(unresolved)
+    assert not unresolved, f"{len(unresolved)} cross-reference(s) do not resolve to any known ID:\n" + "\n".join(
+        unresolved
     )
 
 
@@ -80,7 +79,6 @@ def test_no_duplicate_snippet_ids():
             id_to_sources.setdefault(gid, []).append(f"group:{name}")
 
     duplicates = {sid: srcs for sid, srcs in id_to_sources.items() if len(srcs) > 1}
-    assert not duplicates, (
-        "Duplicate IDs:\n"
-        + "\n".join(f"  {sid}: {', '.join(srcs)}" for sid, srcs in duplicates.items())
+    assert not duplicates, "Duplicate IDs:\n" + "\n".join(
+        f"  {sid}: {', '.join(srcs)}" for sid, srcs in duplicates.items()
     )

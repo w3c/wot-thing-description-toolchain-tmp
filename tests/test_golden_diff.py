@@ -1,4 +1,5 @@
 """Check generated artifacts against committed snapshots."""
+
 from __future__ import annotations
 
 import difflib
@@ -10,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from .tmp.spec_html_compare import generated_sections_html
+from .spec_html_compare import generated_sections_html
 
 TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent
@@ -20,13 +21,14 @@ GOLDENS_DIR = TESTS_DIR / "snapshots"
 @pytest.fixture(scope="session", autouse=True)
 def regenerate_artifacts():
     venv_bin = Path(sys.executable).parent
-    wotis_bin = venv_bin / "wotis"
+    cli_bin = venv_bin / "wot-toolchain"
     subprocess.run(
-        [str(wotis_bin), "generate-wot-resources", "-d"],
+        [str(cli_bin), "generate-wot-resources", "-d"],
         cwd=REPO_ROOT,
         check=True,
         capture_output=True,
     )
+
 
 def _normalize_json(path: Path) -> str:
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -61,7 +63,7 @@ def _walk(old, new, path: list, changes: list) -> None:
             else:
                 _walk(old[key], new[key], path + [key], changes)
     elif isinstance(old, list) and isinstance(new, list) and len(old) == len(new):
-        for index, (old_item, new_item) in enumerate(zip(old, new)):
+        for index, (old_item, new_item) in enumerate(zip(old, new, strict=True)):
             _walk(old_item, new_item, path + [index], changes)
     elif old != new:
         changes.append(("changed", path))
@@ -70,7 +72,8 @@ def _walk(old, new, path: list, changes: list) -> None:
 def _pattern(path: list) -> str:
     # names become *: entries of $defs and properties, terms of the root @context, list indexes
     parts = []
-    for parent, part in zip([None] + path, path):
+    # the shifted copy is one longer, its last element has no part to pair with
+    for parent, part in zip([None] + path, path, strict=False):
         if isinstance(part, int):
             parts.append("[*]")
         elif parent in ("$defs", "properties") or (parent == "@context" and len(parts) == 1):
@@ -113,12 +116,14 @@ def test_golden_matches_generated(request, name: str, gen_path: Path, normalize)
 
     is_json = name.endswith(".json") or name.endswith(".jsonld")
     summary = _json_change_summary(golden, current) if is_json else []
-    diff = list(difflib.unified_diff(
-        golden.splitlines(), current.splitlines(), f"snapshots/{name}", f"generated {name}", lineterm=""
-    ))
+    diff = list(
+        difflib.unified_diff(
+            golden.splitlines(), current.splitlines(), f"snapshots/{name}", f"generated {name}", lineterm=""
+        )
+    )
     step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if step_summary:
-        with open(step_summary, "a", encoding="utf-8") as fh:
+        with Path(step_summary).open("a", encoding="utf-8") as fh:
             fh.write(f"### Golden diff: {name} ({len(diff)} changed lines)\n\n")
             if summary:
                 fh.write("```\n" + "\n".join(summary) + "\n```\n\n")

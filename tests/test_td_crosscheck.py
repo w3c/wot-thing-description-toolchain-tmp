@@ -1,11 +1,12 @@
 """Cross-check the generated schema against the W3C ground-truth schemas.
 
 For every sample, the generated schema's accept/reject verdict must match the
-ground-truth schema's. The samples on disk are the TD 1.1 ones; the TD 2.0
-variant is derived per test by rewriting @context (as_td20 in baselines.py).
+ground-truth schema's. The samples on disk are the TD 1.1 ones; the td-next
+variant is derived per test by rewriting @context (as_td_next in baselines.py).
 Known divergences are listed with a version prefix and marked xfail(strict),
 so the list can only shrink.
 """
+
 from __future__ import annotations
 
 import json
@@ -15,7 +16,7 @@ import jsonschema
 import pytest
 from jsonschema import validators
 
-from .baselines import TD_VERSIONS, as_td20, load_baseline
+from .baselines import TD_VERSIONS, as_td_next, load_baseline
 from .rejections import defined_at, main_rejection
 
 TESTS_DIR = Path(__file__).resolve().parent
@@ -27,7 +28,7 @@ DIVERGENCES = TESTS_DIR / "known_failures" / "td_crosscheck.txt"
 
 GROUND_TRUTH_SCHEMAS = {
     "td11": GROUND_TRUTH / "td11-json-schema-validation.json",
-    "td20": GROUND_TRUTH / "td20-json-schema-validation.json",
+    "td-next": GROUND_TRUTH / "td-next-json-schema-validation.json",
 }
 
 
@@ -54,7 +55,9 @@ def _samples():
             continue
         for path in sorted(DATA_DIR.rglob("*.jsonld")):
             sample = f"{version}/{path.relative_to(DATA_DIR).as_posix()}"
-            marks = [pytest.mark.xfail(strict=True, reason="known divergence from W3C schema")] if sample in known else []
+            marks = (
+                [pytest.mark.xfail(strict=True, reason="known divergence from W3C schema")] if sample in known else []
+            )
             params.append(pytest.param(path, version, sample in known, id=sample, marks=marks))
     return params
 
@@ -62,7 +65,7 @@ def _samples():
 @pytest.fixture(scope="session")
 def generated_validator():
     if not SCHEMA_PATH.exists():
-        pytest.skip("Generated schema not found; run `wotis generate-wot-resources` first.")
+        pytest.skip("Generated schema not found; run `wot-toolchain generate-wot-resources` first.")
     return _make_validator(SCHEMA_PATH)
 
 
@@ -83,8 +86,8 @@ def test_generated_agrees_with_ground_truth(
     generated_validator, golden_validators, new_failures, td_path: Path, version: str, baselined
 ):
     instance = json.loads(td_path.read_text(encoding="utf-8"))
-    if version == "td20":
-        instance = as_td20(instance)
+    if version == "td-next":
+        instance = as_td_next(instance)
     gen_errors = list(generated_validator.iter_errors(instance))
     generated = not gen_errors
     golden = _accepts(golden_validators(version), instance)
@@ -95,8 +98,7 @@ def test_generated_agrees_with_ground_truth(
             src = defined_at(spath)
             schema_where = f"{spath}, defined at {src}" if src else spath
             new_failures.append(
-                f"crosscheck {sample}: generated rejects, W3C accepts: "
-                f"at {where} (schema: {schema_where}): {msg}"
+                f"crosscheck {sample}: generated rejects, W3C accepts: at {where} (schema: {schema_where}): {msg}"
             )
         else:
             new_failures.append(f"crosscheck {sample}: generated accepts, W3C rejects")

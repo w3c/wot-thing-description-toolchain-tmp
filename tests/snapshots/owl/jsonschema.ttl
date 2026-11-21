@@ -330,6 +330,7 @@ jsonschema:type
     rdfs:label "type"@en ;
     skos:definition "Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null)."@en ;
     rdfs:domain jsonschema:DataSchema ;
+    rdfs:range xsd:string ;
     rdfs:isDefinedBy <https://www.w3.org/2019/wot/json-schema> ;
     skos:inScheme <https://www.w3.org/2019/wot/json-schema> ;
 .

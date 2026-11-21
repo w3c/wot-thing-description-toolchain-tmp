@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from src.wotis.generators.respec import (
+from wot_toolchain.generators.respec import (
     render_spec_content_annotation,
     render_subsections,
 )
@@ -50,7 +50,7 @@ def test_spec_content_renders_assertion_list_items() -> None:
 
     html = render_spec_content_annotation(annotations, _process_description)
 
-    assert '<ul id=' not in html
+    assert "<ul id=" not in html
     assert '<span class="rfc2119-assertion" id="td-context-ns-thing-mandatory">' in html
     assert "<a>Thing Description</a> <em>MUST</em> include context." in html
     assert "<li>Plain list item.</li>" in html
@@ -78,7 +78,7 @@ def test_spec_content_renders_assertion_inside_paragraph() -> None:
     html = render_spec_content_annotation(annotations, _process_description)
 
     assert html.startswith("<p>Before. ")
-    assert '<p id=' not in html
+    assert "<p id=" not in html
     assert '<span class="rfc2119-assertion" id="td-processor-bidi-isolation">' in html
     assert "<a>TD Processors</a> <em>MUST</em> isolate text." in html
     assert html.endswith(" After.</p>")
@@ -147,9 +147,7 @@ def test_enum_table_renders_columns() -> None:
         }
     }
 
-    html = render_spec_content_annotation(
-        annotations, _process_description, schema_view=sv
-    )
+    html = render_spec_content_annotation(annotations, _process_description, schema_view=sv)
 
     assert '<div id="test-table">' in html
     assert '<table class="def numbered">' in html
@@ -197,9 +195,7 @@ def test_enum_table_extracts_comment_columns() -> None:
         }
     }
 
-    html = render_spec_content_annotation(
-        annotations, _process_description, schema_view=sv
-    )
+    html = render_spec_content_annotation(annotations, _process_description, schema_view=sv)
 
     assert "<td>readproperty</td>" in html
     assert "No correlation" in html
@@ -238,7 +234,10 @@ def test_render_subsections_structure() -> None:
     assert "<h4>Test Subsection</h4>" in html
     assert "Some content." in html
     assert '<section id="sec-other">' in html
-    assert "class=" not in html.split("sec-other")[1].split(">")[0] or 'class="informative"' not in html.split("sec-other")[1]
+    assert (
+        "class=" not in html.split("sec-other")[1].split(">")[0]
+        or 'class="informative"' not in html.split("sec-other")[1]
+    )
     assert "<h4>Other Subsection</h4>" in html
     assert "<li>Item one.</li>" in html
 

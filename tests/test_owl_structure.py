@@ -4,6 +4,7 @@ These do NOT compare against upstream targets (which may themselves be wrong).
 They verify parse validity, ontology headers, label coverage, and absence of
 generator artifacts — properties that must hold regardless of spec interpretation.
 """
+
 from __future__ import annotations
 
 from pathlib import Path

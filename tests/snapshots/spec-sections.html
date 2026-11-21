@@ -493,7 +493,7 @@ The data schema for each of the property meta-interactions is constructed by com
       <td><code>unit</code>
       </td><td>Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition (also see Section <a href="#semantic-annotations-example-version-units">Semantic Annotations</a>).
       </td><td>optional
-      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
+      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"><code>anyURI</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-oneOf--DataSchema">
       <td><code>oneOf</code>
       </td><td>Used to ensure that the data is valid against one of the specified schemas in the array. This can be used to describe multiple input or output schemas.
@@ -825,7 +825,7 @@ If multiple parameters are needed for a security scheme, repeat the security sch
       </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map">Map</a> of <a href="#multilanguage"><code>MultiLanguage</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-proxy--SecurityScheme">
       <td><code>proxy</code>
-      </td><td>URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.
+      </td><td>URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint.
       </td><td>optional
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"><code>anyURI</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-scheme--SecurityScheme">

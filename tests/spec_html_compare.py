@@ -1,4 +1,5 @@
 """Compare generated and upstream specification HTML by DOM structure."""
+
 from __future__ import annotations
 
 import re
@@ -89,9 +90,7 @@ def compare_tables(context: str, golden_table: HtmlElement, generated_table: Htm
     golden_headers = [normalize_text(th.text_content()) for th in golden_table.cssselect("th")]
     generated_headers = [normalize_text(th.text_content()) for th in generated_table.cssselect("th")]
     if golden_headers != generated_headers:
-        findings.append(
-            f"{context}: header row differs - golden {golden_headers} | generated {generated_headers}"
-        )
+        findings.append(f"{context}: header row differs - golden {golden_headers} | generated {generated_headers}")
 
     golden_rows = {row_key(r): r for r in table_rows(golden_table)}
     generated_rows = {row_key(r): r for r in table_rows(generated_table)}
@@ -110,11 +109,10 @@ def compare_tables(context: str, golden_table: HtmlElement, generated_table: Htm
         generated_cells = generated_rows[key].cssselect("td")
         if len(golden_cells) != len(generated_cells):
             findings.append(
-                f"{context}, row '{key}': {len(golden_cells)} cells in golden, "
-                f"{len(generated_cells)} in generated"
+                f"{context}, row '{key}': {len(golden_cells)} cells in golden, {len(generated_cells)} in generated"
             )
             continue
-        for column, (golden_cell, generated_cell) in enumerate(zip(golden_cells, generated_cells)):
+        for column, (golden_cell, generated_cell) in enumerate(zip(golden_cells, generated_cells, strict=True)):
             golden_text = normalize_text(golden_cell.text_content())
             generated_text = normalize_text(generated_cell.text_content())
             if golden_text != generated_text:

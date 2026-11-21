@@ -1,4 +1,5 @@
 """Validate the governance metadata for approved upstream divergences."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,8 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-
-TESTS_DIR = Path(__file__).resolve().parent.parent
+TESTS_DIR = Path(__file__).resolve().parent
 DIVERGENCES_DIR = TESTS_DIR / "approved_divergences"
 DOCUMENTS = {
     "html.yaml": {"semantic-correction", "editorial-correction"},
@@ -16,9 +16,7 @@ DOCUMENTS = {
 
 
 @pytest.mark.parametrize(("filename", "categories"), DOCUMENTS.items())
-def test_approved_divergence_document_is_well_formed(
-    filename: str, categories: set[str]
-) -> None:
+def test_approved_divergence_document_is_well_formed(filename: str, categories: set[str]) -> None:
     document = yaml.safe_load((DIVERGENCES_DIR / filename).read_text(encoding="utf-8"))
 
     assert set(document) == {"schema_version", "upstream", "policy", "divergences"}

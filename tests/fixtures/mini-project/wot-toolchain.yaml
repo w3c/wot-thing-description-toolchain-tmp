@@ -1,0 +1,15 @@
+# A minimal project that is not the Thing Description: it proves the toolchain needs no TD knowledge.
+main_schema: schemas/sensor.yaml
+output_dir: gens
+
+generators:
+  - jsonschema
+  - jsonldcontext
+
+jsonschema:
+  top_class: Sensor
+
+modules:
+  - schema: schemas/sensor.yaml
+    prefix: sen
+    context: sensor-context.jsonld

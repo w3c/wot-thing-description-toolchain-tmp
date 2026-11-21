@@ -35,30 +35,21 @@ def manifest() -> dict:
 
 def test_manifest_valid(manifest: dict, manifest_validator: Draft7Validator):
     errors = list(manifest_validator.iter_errors(manifest))
-    assert not errors, (
-        f"Manifest validation errors:\n"
-        + "\n".join(f"  {e.json_path}: {e.message}" for e in errors)
-    )
+    assert not errors, "Manifest validation errors:\n" + "\n".join(f"  {e.json_path}: {e.message}" for e in errors)
 
 
 def test_hide_show_mutually_exclusive(manifest: dict):
     """No snippet should have both hide_paths and show_paths."""
     violations = [
-        name for name, meta in manifest.get("snippets", {}).items()
-        if meta.get("hide_paths") and meta.get("show_paths")
+        name for name, meta in manifest.get("snippets", {}).items() if meta.get("hide_paths") and meta.get("show_paths")
     ]
-    assert not violations, (
-        f"Snippets with both hide_paths and show_paths: {', '.join(violations)}"
-    )
+    assert not violations, f"Snippets with both hide_paths and show_paths: {', '.join(violations)}"
 
 
 def test_snippet_json_files_exist(manifest: dict):
     """Every snippet in manifest must have a corresponding .json file."""
     snippets_dir = MANIFEST_PATH.parent
-    missing = [
-        name for name in manifest.get("snippets", {})
-        if not (snippets_dir / f"{name}.json").exists()
-    ]
+    missing = [name for name in manifest.get("snippets", {}) if not (snippets_dir / f"{name}.json").exists()]
     assert not missing, f"Missing .json files: {', '.join(missing)}"
 
 

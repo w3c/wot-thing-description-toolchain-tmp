@@ -2,108 +2,20 @@
   "@context": {
     "@version": 1.1,
     "@vocab": "https://www.w3.org/2019/wot/td#",
-    "APIKeySecurityScheme": {
-      "@id": "wotsec:APIKeySecurityScheme"
-    },
     "ActionAffordance": {
       "@id": "ActionAffordance"
-    },
-    "AdditionalExpectedResponse": {
-      "@id": "hctl:AdditionalExpectedResponse"
-    },
-    "ArraySchema": {
-      "@id": "jsonschema:ArraySchema"
-    },
-    "AutoSecurityScheme": {
-      "@id": "wotsec:AutoSecurityScheme"
-    },
-    "BasicSecurityScheme": {
-      "@id": "wotsec:BasicSecurityScheme"
-    },
-    "BearerSecurityScheme": {
-      "@id": "wotsec:BearerSecurityScheme"
-    },
-    "BooleanSchema": {
-      "@id": "jsonschema:BooleanSchema"
-    },
-    "ComboSecurityScheme": {
-      "@id": "wotsec:ComboSecurityScheme"
-    },
-    "DataSchema": {
-      "@id": "jsonschema:DataSchema"
-    },
-    "DigestSecurityScheme": {
-      "@id": "wotsec:DigestSecurityScheme"
     },
     "EventAffordance": {
       "@id": "EventAffordance"
     },
-    "ExpectedResponse": {
-      "@id": "hctl:ExpectedResponse"
-    },
-    "Form": {
-      "@id": "hctl:Form"
-    },
-    "IntegerSchema": {
-      "@context": {
-        "exclusiveMaximum": {
-          "@id": "jsonschema:exclusiveMaximum",
-          "@type": "xsd:integer"
-        },
-        "exclusiveMinimum": {
-          "@id": "jsonschema:exclusiveMinimum",
-          "@type": "xsd:integer"
-        },
-        "maximum": {
-          "@id": "jsonschema:maximum",
-          "@type": "xsd:integer"
-        },
-        "minimum": {
-          "@id": "jsonschema:minimum",
-          "@type": "xsd:integer"
-        },
-        "multipleOf": {
-          "@id": "jsonschema:multipleOf",
-          "@type": "xsd:integer"
-        }
-      },
-      "@id": "jsonschema:IntegerSchema"
-    },
     "InteractionAffordance": {
       "@id": "InteractionAffordance"
-    },
-    "Link": {
-      "@id": "hctl:Link"
     },
     "MultiLanguage": {
       "@id": "MultiLanguage"
     },
-    "NoSecurityScheme": {
-      "@id": "wotsec:NoSecurityScheme"
-    },
-    "NullSchema": {
-      "@id": "jsonschema:NullSchema"
-    },
-    "NumberSchema": {
-      "@id": "jsonschema:NumberSchema"
-    },
-    "OAuth2SecurityScheme": {
-      "@id": "wotsec:OAuth2SecurityScheme"
-    },
-    "ObjectSchema": {
-      "@id": "jsonschema:ObjectSchema"
-    },
-    "PSKSecurityScheme": {
-      "@id": "wotsec:PSKSecurityScheme"
-    },
     "PropertyAffordance": {
       "@id": "PropertyAffordance"
-    },
-    "SecurityScheme": {
-      "@id": "wotsec:SecurityScheme"
-    },
-    "StringSchema": {
-      "@id": "jsonschema:StringSchema"
     },
     "Thing": {
       "@id": "Thing"
@@ -117,40 +29,14 @@
       "@index": "name",
       "@type": "@id"
     },
-    "additionalResponses": {
-      "@container": "@set",
-      "@id": "hctl:additionalReturns",
-      "@type": "@id"
-    },
-    "alg": {
-      "@id": "wotsec:alg"
-    },
-    "allOf": {
-      "@container": "@set",
-      "@id": "wotsec:allOf"
-    },
-    "anchor": {
-      "@id": "hctl:hasAnchor",
-      "@type": "@id"
-    },
-    "apikey": "wotsec:APIKeySecurityScheme",
-    "array": "jsonschema:ArraySchema",
-    "authorization": {
-      "@id": "wotsec:authorization",
-      "@type": "@id"
-    },
-    "auto": "wotsec:AutoSecurityScheme",
     "base": {
       "@id": "baseURI",
       "@type": "xsd:anyURI"
     },
-    "basic": "wotsec:BasicSecurityScheme",
     "bcp47": {
       "@id": "https://tools.ietf.org/html/bcp47",
       "@prefix": true
     },
-    "bearer": "wotsec:BearerSecurityScheme",
-    "boolean": "jsonschema:BooleanSchema",
     "cancelaction": "td:cancelAction",
     "cancellation": {
       "@context": {
@@ -251,6 +137,7 @@
           "@id": "hctl:hasAnchor",
           "@type": "@id"
         },
+        "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
           "@type": "@id"
@@ -260,6 +147,7 @@
           "@type": "xsd:anyURI"
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
+        "boolean": "jsonschema:BooleanSchema",
         "cancellation": {
           "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
           "@type": "@id"
@@ -332,6 +220,7 @@
         "instance": {
           "@id": "https://www.w3.org/2019/wot/td#instance"
         },
+        "integer": "jsonschema:IntegerSchema",
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -379,6 +268,9 @@
         "name": {
           "@id": "td:name"
         },
+        "null": "jsonschema:NullSchema",
+        "number": "jsonschema:NumberSchema",
+        "object": "jsonschema:ObjectSchema",
         "observable": {
           "@id": "https://www.w3.org/2019/wot/td#isObservable",
           "@type": "xsd:boolean"
@@ -428,8 +320,7 @@
           "@id": "jsonschema:required"
         },
         "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
+          "@id": "hctl:returns"
         },
         "safe": {
           "@id": "https://www.w3.org/2019/wot/td#isSafe",
@@ -447,6 +338,7 @@
           "@id": "hctl:hasSizes"
         },
         "skos": "http://www.w3.org/2004/02/skos/core#",
+        "string": "jsonschema:StringSchema",
         "success": {
           "@id": "hctl:isSuccess",
           "@type": "xsd:boolean"
@@ -495,22 +387,6 @@
       },
       "@id": "hasCancellationSchema",
       "@type": "@id"
-    },
-    "combo": "wotsec:ComboSecurityScheme",
-    "const": {
-      "@id": "jsonschema:const"
-    },
-    "contentCoding": {
-      "@id": "hctl:forContentCoding"
-    },
-    "contentEncoding": {
-      "@id": "jsonschema:contentEncoding"
-    },
-    "contentMediaType": {
-      "@id": "jsonschema:contentMediaType"
-    },
-    "contentType": {
-      "@id": "hctl:forContentType"
     },
     "created": {
       "@id": "dcterms:created",
@@ -615,6 +491,7 @@
           "@id": "hctl:hasAnchor",
           "@type": "@id"
         },
+        "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
           "@type": "@id"
@@ -624,6 +501,7 @@
           "@type": "xsd:anyURI"
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
+        "boolean": "jsonschema:BooleanSchema",
         "cancellation": {
           "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
           "@type": "@id"
@@ -704,6 +582,7 @@
         "instance": {
           "@id": "https://www.w3.org/2019/wot/td#instance"
         },
+        "integer": "jsonschema:IntegerSchema",
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -751,6 +630,9 @@
         "name": {
           "@id": "td:name"
         },
+        "null": "jsonschema:NullSchema",
+        "number": "jsonschema:NumberSchema",
+        "object": "jsonschema:ObjectSchema",
         "observable": {
           "@id": "https://www.w3.org/2019/wot/td#isObservable",
           "@type": "xsd:boolean"
@@ -800,8 +682,7 @@
           "@id": "jsonschema:required"
         },
         "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
+          "@id": "hctl:returns"
         },
         "safe": {
           "@id": "https://www.w3.org/2019/wot/td#isSafe",
@@ -819,6 +700,7 @@
           "@id": "hctl:hasSizes"
         },
         "skos": "http://www.w3.org/2004/02/skos/core#",
+        "string": "jsonschema:StringSchema",
         "success": {
           "@id": "hctl:isSuccess",
           "@type": "xsd:boolean"
@@ -967,6 +849,7 @@
           "@id": "hctl:hasAnchor",
           "@type": "@id"
         },
+        "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
           "@type": "@id"
@@ -976,6 +859,7 @@
           "@type": "xsd:anyURI"
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
+        "boolean": "jsonschema:BooleanSchema",
         "cancellation": {
           "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
           "@type": "@id"
@@ -1052,6 +936,7 @@
         "instance": {
           "@id": "https://www.w3.org/2019/wot/td#instance"
         },
+        "integer": "jsonschema:IntegerSchema",
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -1099,6 +984,9 @@
         "name": {
           "@id": "td:name"
         },
+        "null": "jsonschema:NullSchema",
+        "number": "jsonschema:NumberSchema",
+        "object": "jsonschema:ObjectSchema",
         "observable": {
           "@id": "https://www.w3.org/2019/wot/td#isObservable",
           "@type": "xsd:boolean"
@@ -1148,8 +1036,7 @@
           "@id": "jsonschema:required"
         },
         "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
+          "@id": "hctl:returns"
         },
         "safe": {
           "@id": "https://www.w3.org/2019/wot/td#isSafe",
@@ -1167,6 +1054,7 @@
           "@id": "hctl:hasSizes"
         },
         "skos": "http://www.w3.org/2004/02/skos/core#",
+        "string": "jsonschema:StringSchema",
         "success": {
           "@id": "hctl:isSuccess",
           "@type": "xsd:boolean"
@@ -1217,9 +1105,6 @@
       "@type": "@id"
     },
     "dcterms": "http://purl.org/dc/terms/",
-    "default": {
-      "@id": "jsonschema:default"
-    },
     "description": {
       "@id": "description"
     },
@@ -1227,32 +1112,13 @@
       "@container": "@language",
       "@id": "descriptionInLanguage"
     },
-    "digest": "wotsec:DigestSecurityScheme",
-    "enum": {
-      "@container": "@set",
-      "@id": "jsonschema:enum"
-    },
     "events": {
       "@container": "@index",
       "@id": "hasEventAffordance",
       "@index": "name",
       "@type": "@id"
     },
-    "exclusiveMaximum": {
-      "@id": "jsonschema:exclusiveMaximum",
-      "@type": "xsd:decimal"
-    },
-    "exclusiveMinimum": {
-      "@id": "jsonschema:exclusiveMinimum",
-      "@type": "xsd:decimal"
-    },
-    "flow": {
-      "@id": "wotsec:flow"
-    },
     "foaf": "http://xmlns.com/foaf/0.1/",
-    "format": {
-      "@id": "jsonschema:format"
-    },
     "forms": {
       "@container": "@set",
       "@context": {
@@ -1343,8 +1209,7 @@
         },
         "additionalResponses": {
           "@container": "@set",
-          "@id": "hctl:additionalReturns",
-          "@type": "@id"
+          "@id": "hctl:additionalReturns"
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
@@ -1518,15 +1383,15 @@
           "@id": "hctl:hasRelationType"
         },
         "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
+          "@id": "hctl:returns"
         },
         "safe": {
           "@id": "https://www.w3.org/2019/wot/td#isSafe",
           "@type": "xsd:boolean"
         },
         "schema": {
-          "@id": "hctl:hasAdditionalOutputSchema"
+          "@id": "hctl:hasAdditionalOutputSchema",
+          "@type": "@id"
         },
         "scopes": {
           "@id": "wotsec:scopes"
@@ -1588,30 +1453,16 @@
         "xml": "http://www.w3.org/XML/1998/namespace",
         "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
-      "@id": "hasForm",
-      "@type": "@id"
+      "@id": "hasForm"
     },
     "hasInstanceConfiguration": {
       "@id": "hasInstanceConfiguration"
     },
     "hctl": "https://www.w3.org/2019/wot/hypermedia#",
-    "href": {
-      "@id": "hctl:hasTarget",
-      "@type": "xsd:anyURI"
-    },
-    "hreflang": {
-      "@id": "hctl:hasHreflang"
-    },
     "id": "@id",
     "idempotent": {
       "@id": "isIdempotent",
       "@type": "xsd:boolean"
-    },
-    "identity": {
-      "@id": "wotsec:identity"
-    },
-    "in": {
-      "@id": "wotsec:in"
     },
     "input": {
       "@context": {
@@ -1712,6 +1563,7 @@
           "@id": "hctl:hasAnchor",
           "@type": "@id"
         },
+        "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
           "@type": "@id"
@@ -1721,6 +1573,7 @@
           "@type": "xsd:anyURI"
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
+        "boolean": "jsonschema:BooleanSchema",
         "cancellation": {
           "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
           "@type": "@id"
@@ -1805,6 +1658,7 @@
         "instance": {
           "@id": "https://www.w3.org/2019/wot/td#instance"
         },
+        "integer": "jsonschema:IntegerSchema",
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -1852,6 +1706,9 @@
         "name": {
           "@id": "td:name"
         },
+        "null": "jsonschema:NullSchema",
+        "number": "jsonschema:NumberSchema",
+        "object": "jsonschema:ObjectSchema",
         "observable": {
           "@id": "https://www.w3.org/2019/wot/td#isObservable",
           "@type": "xsd:boolean"
@@ -1905,8 +1762,7 @@
           "@id": "jsonschema:required"
         },
         "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
+          "@id": "hctl:returns"
         },
         "safe": {
           "@id": "https://www.w3.org/2019/wot/td#isSafe",
@@ -1924,6 +1780,7 @@
           "@id": "hctl:hasSizes"
         },
         "skos": "http://www.w3.org/2004/02/skos/core#",
+        "string": "jsonschema:StringSchema",
         "subscription": {
           "@id": "https://www.w3.org/2019/wot/td#hasSubscriptionSchema",
           "@type": "@id"
@@ -1980,12 +1837,7 @@
     "instance": {
       "@id": "instance"
     },
-    "integer": "jsonschema:IntegerSchema",
     "invokeaction": "td:invokeAction",
-    "items": {
-      "@id": "jsonschema:items",
-      "@type": "@id"
-    },
     "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
     "language_tag": "@id",
     "language_value": {
@@ -2081,8 +1933,7 @@
         },
         "additionalResponses": {
           "@container": "@set",
-          "@id": "hctl:additionalReturns",
-          "@type": "@id"
+          "@id": "hctl:additionalReturns"
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
@@ -2256,15 +2107,15 @@
           "@id": "hctl:hasRelationType"
         },
         "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
+          "@id": "hctl:returns"
         },
         "safe": {
           "@id": "https://www.w3.org/2019/wot/td#isSafe",
           "@type": "xsd:boolean"
         },
         "schema": {
-          "@id": "hctl:hasAdditionalOutputSchema"
+          "@id": "hctl:hasAdditionalOutputSchema",
+          "@type": "@id"
         },
         "scopes": {
           "@id": "wotsec:scopes"
@@ -2326,32 +2177,7 @@
         "xml": "http://www.w3.org/XML/1998/namespace",
         "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
-      "@id": "hasLink",
-      "@type": "@id"
-    },
-    "maxItems": {
-      "@id": "jsonschema:maxItems",
-      "@type": "xsd:nonNegativeInteger"
-    },
-    "maxLength": {
-      "@id": "jsonschema:maxLength",
-      "@type": "xsd:nonNegativeInteger"
-    },
-    "maximum": {
-      "@id": "jsonschema:maximum",
-      "@type": "xsd:decimal"
-    },
-    "minItems": {
-      "@id": "jsonschema:minItems",
-      "@type": "xsd:nonNegativeInteger"
-    },
-    "minLength": {
-      "@id": "jsonschema:minLength",
-      "@type": "xsd:nonNegativeInteger"
-    },
-    "minimum": {
-      "@id": "jsonschema:minimum",
-      "@type": "xsd:decimal"
+      "@id": "hasLink"
     },
     "model": {
       "@id": "model"
@@ -2360,32 +2186,15 @@
       "@id": "dcterms:modified",
       "@type": "xsd:dateTime"
     },
-    "multipleOf": {
-      "@id": "jsonschema:multipleOf",
-      "@type": "xsd:decimal"
-    },
     "name": {
       "@id": "td:name"
     },
-    "nosec": "wotsec:NoSecurityScheme",
-    "null": "jsonschema:NullSchema",
-    "number": "jsonschema:NumberSchema",
-    "oauth2": "wotsec:OAuth2SecurityScheme",
-    "object": "jsonschema:ObjectSchema",
     "observable": {
       "@id": "isObservable",
       "@type": "xsd:boolean"
     },
     "observeallproperties": "td:observeAllProperties",
     "observeproperty": "td:observeProperty",
-    "oneOf": {
-      "@container": "@set",
-      "@id": "wotsec:oneOf"
-    },
-    "op": {
-      "@id": "hctl:hasOperationType",
-      "@type": "@vocab"
-    },
     "output": {
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/json-schema#",
@@ -2485,6 +2294,7 @@
           "@id": "hctl:hasAnchor",
           "@type": "@id"
         },
+        "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
           "@type": "@id"
@@ -2494,6 +2304,7 @@
           "@type": "xsd:anyURI"
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
+        "boolean": "jsonschema:BooleanSchema",
         "cancellation": {
           "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
           "@type": "@id"
@@ -2574,6 +2385,7 @@
         "instance": {
           "@id": "https://www.w3.org/2019/wot/td#instance"
         },
+        "integer": "jsonschema:IntegerSchema",
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -2621,6 +2433,9 @@
         "name": {
           "@id": "td:name"
         },
+        "null": "jsonschema:NullSchema",
+        "number": "jsonschema:NumberSchema",
+        "object": "jsonschema:ObjectSchema",
         "observable": {
           "@id": "https://www.w3.org/2019/wot/td#isObservable",
           "@type": "xsd:boolean"
@@ -2674,8 +2489,7 @@
           "@id": "jsonschema:required"
         },
         "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
+          "@id": "hctl:returns"
         },
         "safe": {
           "@id": "https://www.w3.org/2019/wot/td#isSafe",
@@ -2693,6 +2507,7 @@
           "@id": "hctl:hasSizes"
         },
         "skos": "http://www.w3.org/2004/02/skos/core#",
+        "string": "jsonschema:StringSchema",
         "subscription": {
           "@id": "https://www.w3.org/2019/wot/td#hasSubscriptionSchema",
           "@type": "@id"
@@ -2747,9 +2562,6 @@
       "@type": "@id"
     },
     "owl": "http://www.w3.org/2002/07/owl#",
-    "pattern": {
-      "@id": "jsonschema:pattern"
-    },
     "profile": {
       "@id": "followsProfile",
       "@type": "xsd:anyURI"
@@ -2854,6 +2666,7 @@
           "@id": "hctl:hasAnchor",
           "@type": "@id"
         },
+        "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
           "@type": "@id"
@@ -2863,6 +2676,7 @@
           "@type": "xsd:anyURI"
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
+        "boolean": "jsonschema:BooleanSchema",
         "const": {
           "@id": "jsonschema:const"
         },
@@ -2931,6 +2745,7 @@
         "instance": {
           "@id": "https://www.w3.org/2019/wot/td#instance"
         },
+        "integer": "jsonschema:IntegerSchema",
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -2978,6 +2793,9 @@
         "name": {
           "@id": "https://www.w3.org/2019/wot/td#name"
         },
+        "null": "jsonschema:NullSchema",
+        "number": "jsonschema:NumberSchema",
+        "object": "jsonschema:ObjectSchema",
         "observable": {
           "@id": "https://www.w3.org/2019/wot/td#isObservable",
           "@type": "xsd:boolean"
@@ -3035,8 +2853,7 @@
           "@id": "jsonschema:required"
         },
         "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
+          "@id": "hctl:returns"
         },
         "safe": {
           "@id": "https://www.w3.org/2019/wot/td#isSafe",
@@ -3054,6 +2871,7 @@
           "@id": "hctl:hasSizes"
         },
         "skos": "http://www.w3.org/2004/02/skos/core#",
+        "string": "jsonschema:StringSchema",
         "success": {
           "@id": "hctl:isSuccess",
           "@type": "xsd:boolean"
@@ -3104,398 +2922,27 @@
       "@index": "name",
       "@type": "@id"
     },
-    "propertyName": {
-      "@id": "jsonschema:propertyName"
-    },
-    "proxy": {
-      "@id": "wotsec:proxy",
-      "@type": "@id"
-    },
-    "psk": "wotsec:PSKSecurityScheme",
-    "qop": {
-      "@id": "wotsec:qop"
-    },
     "qudt": "http://qudt.org/schema/qudt/",
     "queryaction": "td:queryAction",
     "queryallactions": "td:queryAllActions",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "readOnly": {
-      "@id": "jsonschema:readOnly",
-      "@type": "xsd:boolean"
-    },
     "readallproperties": "td:readAllProperties",
     "readmultipleproperties": "td:readMultipleProperties",
     "readproperty": "td:readProperty",
-    "refresh": {
-      "@id": "wotsec:refresh",
-      "@type": "@id"
-    },
-    "rel": {
-      "@id": "hctl:hasRelationType"
-    },
-    "required": {
-      "@container": "@set",
-      "@id": "jsonschema:required"
-    },
-    "response": {
-      "@id": "hctl:returns",
-      "@type": "@id"
-    },
     "safe": {
       "@id": "isSafe",
       "@type": "xsd:boolean"
     },
     "schema": {
-      "@id": "hctl:hasAdditionalOutputSchema"
+      "@id": "hctl:hasAdditionalOutputSchema",
+      "@type": "@id"
     },
     "schemaDefinitions": {
       "@container": "@index",
-      "@context": {
-        "@vocab": "https://www.w3.org/2019/wot/json-schema#",
-        "APIKeySecurityScheme": {
-          "@id": "wotsec:APIKeySecurityScheme"
-        },
-        "ActionAffordance": {
-          "@id": "https://www.w3.org/2019/wot/td#ActionAffordance"
-        },
-        "AdditionalExpectedResponse": {
-          "@id": "hctl:AdditionalExpectedResponse"
-        },
-        "ArraySchema": {
-          "@id": "jsonschema:ArraySchema"
-        },
-        "AutoSecurityScheme": {
-          "@id": "wotsec:AutoSecurityScheme"
-        },
-        "BasicSecurityScheme": {
-          "@id": "wotsec:BasicSecurityScheme"
-        },
-        "BearerSecurityScheme": {
-          "@id": "wotsec:BearerSecurityScheme"
-        },
-        "BooleanSchema": {
-          "@id": "jsonschema:BooleanSchema"
-        },
-        "ComboSecurityScheme": {
-          "@id": "wotsec:ComboSecurityScheme"
-        },
-        "DataSchema": {
-          "@id": "jsonschema:DataSchema"
-        },
-        "DigestSecurityScheme": {
-          "@id": "wotsec:DigestSecurityScheme"
-        },
-        "EventAffordance": {
-          "@id": "https://www.w3.org/2019/wot/td#EventAffordance"
-        },
-        "ExpectedResponse": {
-          "@id": "hctl:ExpectedResponse"
-        },
-        "Form": {
-          "@id": "hctl:Form"
-        },
-        "IntegerSchema": {
-          "@id": "jsonschema:IntegerSchema"
-        },
-        "InteractionAffordance": {
-          "@id": "https://www.w3.org/2019/wot/td#InteractionAffordance"
-        },
-        "Link": {
-          "@id": "hctl:Link"
-        },
-        "MultiLanguage": {
-          "@id": "https://www.w3.org/2019/wot/td#MultiLanguage"
-        },
-        "NoSecurityScheme": {
-          "@id": "wotsec:NoSecurityScheme"
-        },
-        "NullSchema": {
-          "@id": "jsonschema:NullSchema"
-        },
-        "NumberSchema": {
-          "@id": "jsonschema:NumberSchema"
-        },
-        "OAuth2SecurityScheme": {
-          "@id": "wotsec:OAuth2SecurityScheme"
-        },
-        "ObjectSchema": {
-          "@id": "jsonschema:ObjectSchema"
-        },
-        "PSKSecurityScheme": {
-          "@id": "wotsec:PSKSecurityScheme"
-        },
-        "PropertyAffordance": {
-          "@id": "https://www.w3.org/2019/wot/td#PropertyAffordance"
-        },
-        "SecurityScheme": {
-          "@id": "wotsec:SecurityScheme"
-        },
-        "StringSchema": {
-          "@id": "jsonschema:StringSchema"
-        },
-        "Thing": {
-          "@id": "https://www.w3.org/2019/wot/td#Thing"
-        },
-        "VersionInfo": {
-          "@id": "https://www.w3.org/2019/wot/td#VersionInfo"
-        },
-        "allOf": {
-          "@container": "@set",
-          "@id": "jsonschema:allOf",
-          "@type": "@id"
-        },
-        "anchor": {
-          "@id": "hctl:hasAnchor",
-          "@type": "@id"
-        },
-        "authorization": {
-          "@id": "wotsec:authorization",
-          "@type": "@id"
-        },
-        "base": {
-          "@id": "https://www.w3.org/2019/wot/td#baseURI",
-          "@type": "xsd:anyURI"
-        },
-        "bcp47": "https://tools.ietf.org/html/bcp47",
-        "const": {
-          "@id": "jsonschema:const"
-        },
-        "contentCoding": {
-          "@id": "hctl:forContentCoding"
-        },
-        "contentEncoding": {
-          "@id": "jsonschema:contentEncoding"
-        },
-        "contentMediaType": {
-          "@id": "jsonschema:contentMediaType"
-        },
-        "contentType": {
-          "@id": "hctl:forContentType"
-        },
-        "created": {
-          "@id": "dcterms:created",
-          "@type": "xsd:dateTime"
-        },
-        "dcterms": "http://purl.org/dc/terms/",
-        "default": {
-          "@id": "jsonschema:default"
-        },
-        "description": {
-          "@id": "td:description"
-        },
-        "descriptions": {
-          "@container": "@language",
-          "@id": "td:descriptionInLanguage"
-        },
-        "enum": {
-          "@container": "@set",
-          "@id": "jsonschema:enum"
-        },
-        "exclusiveMaximum": {
-          "@id": "jsonschema:exclusiveMaximum",
-          "@type": "xsd:decimal"
-        },
-        "exclusiveMinimum": {
-          "@id": "jsonschema:exclusiveMinimum",
-          "@type": "xsd:decimal"
-        },
-        "foaf": "http://xmlns.com/foaf/0.1/",
-        "format": {
-          "@id": "jsonschema:format"
-        },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
-        "hctl": "https://www.w3.org/2019/wot/hypermedia#",
-        "href": {
-          "@id": "hctl:hasTarget",
-          "@type": "xsd:anyURI"
-        },
-        "hreflang": {
-          "@id": "hctl:hasHreflang"
-        },
-        "id": "@id",
-        "idempotent": {
-          "@id": "https://www.w3.org/2019/wot/td#isIdempotent",
-          "@type": "xsd:boolean"
-        },
-        "identity": {
-          "@id": "wotsec:identity"
-        },
-        "instance": {
-          "@id": "https://www.w3.org/2019/wot/td#instance"
-        },
-        "items": {
-          "@id": "jsonschema:items",
-          "@type": "@id"
-        },
-        "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
-        "language_tag": "@id",
-        "language_value": {
-          "@id": "https://www.w3.org/2019/wot/td#language_value"
-        },
-        "maxItems": {
-          "@id": "jsonschema:maxItems",
-          "@type": "xsd:nonNegativeInteger"
-        },
-        "maxLength": {
-          "@id": "jsonschema:maxLength",
-          "@type": "xsd:nonNegativeInteger"
-        },
-        "maximum": {
-          "@id": "jsonschema:maximum",
-          "@type": "xsd:decimal"
-        },
-        "minItems": {
-          "@id": "jsonschema:minItems",
-          "@type": "xsd:nonNegativeInteger"
-        },
-        "minLength": {
-          "@id": "jsonschema:minLength",
-          "@type": "xsd:nonNegativeInteger"
-        },
-        "minimum": {
-          "@id": "jsonschema:minimum",
-          "@type": "xsd:decimal"
-        },
-        "model": {
-          "@id": "https://www.w3.org/2019/wot/td#model"
-        },
-        "modified": {
-          "@id": "dcterms:modified",
-          "@type": "xsd:dateTime"
-        },
-        "multipleOf": {
-          "@id": "jsonschema:multipleOf",
-          "@type": "xsd:decimal"
-        },
-        "name": {
-          "@id": "td:name"
-        },
-        "observable": {
-          "@id": "https://www.w3.org/2019/wot/td#isObservable",
-          "@type": "xsd:boolean"
-        },
-        "oneOf": {
-          "@container": "@set",
-          "@id": "jsonschema:oneOf",
-          "@type": "@id"
-        },
-        "owl": "http://www.w3.org/2002/07/owl#",
-        "pattern": {
-          "@id": "jsonschema:pattern"
-        },
-        "profile": {
-          "@id": "https://www.w3.org/2019/wot/td#followsProfile",
-          "@type": "xsd:anyURI"
-        },
-        "properties": {
-          "@container": "@index",
-          "@id": "jsonschema:properties",
-          "@index": "propertyName",
-          "@type": "@id"
-        },
-        "propertyName": {
-          "@id": "jsonschema:propertyName"
-        },
-        "proxy": {
-          "@id": "wotsec:proxy",
-          "@type": "@id"
-        },
-        "qudt": "http://qudt.org/schema/qudt/",
-        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        "readOnly": {
-          "@id": "jsonschema:readOnly",
-          "@type": "xsd:boolean"
-        },
-        "refresh": {
-          "@id": "wotsec:refresh",
-          "@type": "@id"
-        },
-        "rel": {
-          "@id": "hctl:hasRelationType"
-        },
-        "required": {
-          "@container": "@set",
-          "@id": "jsonschema:required"
-        },
-        "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
-        },
-        "safe": {
-          "@id": "https://www.w3.org/2019/wot/td#isSafe",
-          "@type": "xsd:boolean"
-        },
-        "schema": "http://schema.org/",
-        "scopes": {
-          "@id": "wotsec:scopes"
-        },
-        "security": {
-          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
-        },
-        "shex": "http://www.w3.org/ns/shex#",
-        "sizes": {
-          "@id": "hctl:hasSizes"
-        },
-        "skos": "http://www.w3.org/2004/02/skos/core#",
-        "success": {
-          "@id": "hctl:isSuccess",
-          "@type": "xsd:boolean"
-        },
-        "support": {
-          "@id": "https://www.w3.org/2019/wot/td#supportContact",
-          "@type": "xsd:anyURI"
-        },
-        "synchronous": {
-          "@id": "https://www.w3.org/2019/wot/td#isSynchronous",
-          "@type": "xsd:boolean"
-        },
-        "td": "https://www.w3.org/2019/wot/td#",
-        "title": {
-          "@id": "td:title"
-        },
-        "titles": {
-          "@container": "@language",
-          "@id": "td:titleInLanguage"
-        },
-        "tm": "https://www.w3.org/2019/wot/tm#",
-        "token": {
-          "@id": "wotsec:token",
-          "@type": "@id"
-        },
-        "type": {
-          "@id": "jsonschema:type",
-          "@type": "@vocab"
-        },
-        "unit": {
-          "@id": "qudt:unit",
-          "@type": "@vocab"
-        },
-        "vann": "http://purl.org/vocab/vann/",
-        "version": {
-          "@id": "https://www.w3.org/2019/wot/td#versionInfo",
-          "@type": "@id"
-        },
-        "wotsec": "https://www.w3.org/2019/wot/security#",
-        "writeOnly": {
-          "@id": "jsonschema:writeOnly",
-          "@type": "xsd:boolean"
-        },
-        "xml": "http://www.w3.org/XML/1998/namespace",
-        "xsd": "http://www.w3.org/2001/XMLSchema#"
-      },
       "@id": "schemaDefinitions",
       "@index": "hasInstanceConfiguration",
       "@type": "@id"
-    },
-    "scheme": {
-      "@id": "@type"
-    },
-    "scopes": {
-      "@id": "wotsec:scopes"
     },
     "security": {
       "@id": "hasSecurityConfiguration"
@@ -3593,21 +3040,27 @@
         },
         "allOf": {
           "@container": "@set",
-          "@id": "wotsec:allOf"
+          "@id": "wotsec:allOf",
+          "@type": "@id"
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
           "@type": "@id"
         },
+        "apikey": "wotsec:APIKeySecurityScheme",
         "authorization": {
           "@id": "wotsec:authorization",
           "@type": "@id"
         },
+        "auto": "wotsec:AutoSecurityScheme",
         "base": {
           "@id": "https://www.w3.org/2019/wot/td#baseURI",
           "@type": "xsd:anyURI"
         },
+        "basic": "wotsec:BasicSecurityScheme",
         "bcp47": "https://tools.ietf.org/html/bcp47",
+        "bearer": "wotsec:BearerSecurityScheme",
+        "combo": "wotsec:ComboSecurityScheme",
         "const": {
           "@id": "jsonschema:const"
         },
@@ -3632,6 +3085,7 @@
           "@container": "@language",
           "@id": "td:descriptionInLanguage"
         },
+        "digest": "wotsec:DigestSecurityScheme",
         "exclusiveMaximum": {
           "@id": "jsonschema:exclusiveMaximum",
           "@type": "xsd:decimal"
@@ -3719,13 +3173,16 @@
         "name": {
           "@id": "wotsec:name"
         },
+        "nosec": "wotsec:NoSecurityScheme",
+        "oauth2": "wotsec:OAuth2SecurityScheme",
         "observable": {
           "@id": "https://www.w3.org/2019/wot/td#isObservable",
           "@type": "xsd:boolean"
         },
         "oneOf": {
           "@container": "@set",
-          "@id": "wotsec:oneOf"
+          "@id": "wotsec:oneOf",
+          "@type": "@id"
         },
         "owl": "http://www.w3.org/2002/07/owl#",
         "pattern": {
@@ -3742,6 +3199,7 @@
           "@id": "wotsec:proxy",
           "@type": "@id"
         },
+        "psk": "wotsec:PSKSecurityScheme",
         "qop": {
           "@id": "wotsec:qop"
         },
@@ -3760,14 +3218,17 @@
           "@id": "hctl:hasRelationType"
         },
         "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
+          "@id": "hctl:returns"
         },
         "safe": {
           "@id": "https://www.w3.org/2019/wot/td#isSafe",
           "@type": "xsd:boolean"
         },
         "schema": "http://schema.org/",
+        "scheme": {
+          "@id": "wotsec:scheme",
+          "@type": "@vocab"
+        },
         "scopes": {
           "@id": "wotsec:scopes"
         },
@@ -3822,14 +3283,7 @@
       "@type": "@id"
     },
     "shex": "http://www.w3.org/ns/shex#",
-    "sizes": {
-      "@id": "hctl:hasSizes"
-    },
     "skos": "http://www.w3.org/2004/02/skos/core#",
-    "string": "jsonschema:StringSchema",
-    "subprotocol": {
-      "@id": "hctl:forSubProtocol"
-    },
     "subscribeallevents": "td:subscribeAllEvents",
     "subscribeevent": "td:subscribeEvent",
     "subscription": {
@@ -3931,6 +3385,7 @@
           "@id": "hctl:hasAnchor",
           "@type": "@id"
         },
+        "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
           "@type": "@id"
@@ -3940,6 +3395,7 @@
           "@type": "xsd:anyURI"
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
+        "boolean": "jsonschema:BooleanSchema",
         "cancellation": {
           "@id": "https://www.w3.org/2019/wot/td#hasCancellationSchema",
           "@type": "@id"
@@ -4020,6 +3476,7 @@
         "instance": {
           "@id": "https://www.w3.org/2019/wot/td#instance"
         },
+        "integer": "jsonschema:IntegerSchema",
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -4067,6 +3524,9 @@
         "name": {
           "@id": "td:name"
         },
+        "null": "jsonschema:NullSchema",
+        "number": "jsonschema:NumberSchema",
+        "object": "jsonschema:ObjectSchema",
         "observable": {
           "@id": "https://www.w3.org/2019/wot/td#isObservable",
           "@type": "xsd:boolean"
@@ -4116,8 +3576,7 @@
           "@id": "jsonschema:required"
         },
         "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
+          "@id": "hctl:returns"
         },
         "safe": {
           "@id": "https://www.w3.org/2019/wot/td#isSafe",
@@ -4135,6 +3594,7 @@
           "@id": "hctl:hasSizes"
         },
         "skos": "http://www.w3.org/2004/02/skos/core#",
+        "string": "jsonschema:StringSchema",
         "subscription": {
           "@id": "https://www.w3.org/2019/wot/td#hasSubscriptionSchema",
           "@type": "@id"
@@ -4188,10 +3648,6 @@
       "@id": "hasSubscriptionSchema",
       "@type": "@id"
     },
-    "success": {
-      "@id": "hctl:isSuccess",
-      "@type": "xsd:boolean"
-    },
     "support": {
       "@id": "supportContact",
       "@type": "xsd:anyURI"
@@ -4209,18 +3665,6 @@
       "@id": "titleInLanguage"
     },
     "tm": "https://www.w3.org/2019/wot/tm#",
-    "token": {
-      "@id": "wotsec:token",
-      "@type": "@id"
-    },
-    "type": {
-      "@id": "jsonschema:type",
-      "@type": "@vocab"
-    },
-    "unit": {
-      "@id": "qudt:unit",
-      "@type": "@vocab"
-    },
     "unobserveallproperties": "td:unobserveAllProperties",
     "unobserveproperty": "td:unobserveProperty",
     "unsubscribeallevents": "td:unsubscribeAllEvents",
@@ -4325,6 +3769,7 @@
           "@id": "hctl:hasAnchor",
           "@type": "@id"
         },
+        "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
           "@type": "@id"
@@ -4334,6 +3779,7 @@
           "@type": "xsd:anyURI"
         },
         "bcp47": "https://tools.ietf.org/html/bcp47",
+        "boolean": "jsonschema:BooleanSchema",
         "const": {
           "@id": "jsonschema:const"
         },
@@ -4402,6 +3848,7 @@
         "instance": {
           "@id": "https://www.w3.org/2019/wot/td#instance"
         },
+        "integer": "jsonschema:IntegerSchema",
         "items": {
           "@id": "jsonschema:items",
           "@type": "@id"
@@ -4449,6 +3896,9 @@
         "name": {
           "@id": "https://www.w3.org/2019/wot/td#name"
         },
+        "null": "jsonschema:NullSchema",
+        "number": "jsonschema:NumberSchema",
+        "object": "jsonschema:ObjectSchema",
         "observable": {
           "@id": "https://www.w3.org/2019/wot/td#isObservable",
           "@type": "xsd:boolean"
@@ -4498,8 +3948,7 @@
           "@id": "jsonschema:required"
         },
         "response": {
-          "@id": "hctl:returns",
-          "@type": "@id"
+          "@id": "hctl:returns"
         },
         "safe": {
           "@id": "https://www.w3.org/2019/wot/td#isSafe",
@@ -4517,6 +3966,7 @@
           "@id": "hctl:hasSizes"
         },
         "skos": "http://www.w3.org/2004/02/skos/core#",
+        "string": "jsonschema:StringSchema",
         "success": {
           "@id": "hctl:isSuccess",
           "@type": "xsd:boolean"
@@ -4573,10 +4023,6 @@
       "@type": "@id"
     },
     "wotsec": "https://www.w3.org/2019/wot/security#",
-    "writeOnly": {
-      "@id": "jsonschema:writeOnly",
-      "@type": "xsd:boolean"
-    },
     "writeallproperties": "td:writeAllProperties",
     "writemultipleproperties": "td:writeMultipleProperties",
     "writeproperty": "td:writeProperty",

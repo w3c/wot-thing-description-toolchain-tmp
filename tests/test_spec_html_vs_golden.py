@@ -1,4 +1,5 @@
 """Compare generated vocabulary sections with upstream specification HTML."""
+
 from __future__ import annotations
 
 from collections import Counter
@@ -22,10 +23,11 @@ from .spec_html_compare import (
 )
 
 TESTS_DIR = Path(__file__).resolve().parent
-REPO_ROOT = TESTS_DIR.parent.parent
+REPO_ROOT = TESTS_DIR.parent
 GOLDEN_PATH = REPO_ROOT / "resources" / "upstream" / "html" / "index.html"
 GENERATED_PATH = REPO_ROOT / "resources" / "gens" / "index.html"
-DIVERGENCES_PATH = TESTS_DIR.parent / "approved_divergences" / "html.yaml"
+DIVERGENCES_PATH = TESTS_DIR / "approved_divergences" / "html.yaml"
+
 
 @pytest.fixture(scope="module")
 def golden_tree():
@@ -37,7 +39,9 @@ def golden_tree():
 @pytest.fixture(scope="module")
 def generated_tree():
     if not GENERATED_PATH.exists():
-        pytest.skip(f"Generated HTML not found at {GENERATED_PATH}; run `wotis generate-wot-resources -d` first.")
+        pytest.skip(
+            f"Generated HTML not found at {GENERATED_PATH}; run `wot-toolchain generate-wot-resources -d` first."
+        )
     return parse_html(GENERATED_PATH)
 
 
@@ -221,7 +225,4 @@ def test_internal_links_resolve(generated_tree) -> None:
         if target.startswith(RENDER_TIME_ID_PREFIXES) or target in RENDER_TIME_IDS:
             continue
         broken.add(target)
-    assert not broken, (
-        f"{len(broken)} link target(s) missing in the generated file: "
-        + ", ".join(sorted(broken))
-    )
+    assert not broken, f"{len(broken)} link target(s) missing in the generated file: " + ", ".join(sorted(broken))

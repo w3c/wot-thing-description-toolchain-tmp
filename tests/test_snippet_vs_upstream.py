@@ -1,4 +1,5 @@
 """Compare generated snippets with upstream inline examples."""
+
 from __future__ import annotations
 
 import json
@@ -6,7 +7,6 @@ import re
 from collections.abc import Callable
 from pathlib import Path
 
-import lxml.html
 import pytest
 import yaml
 from lxml.html import HtmlElement
@@ -14,24 +14,18 @@ from lxml.html import HtmlElement
 from .spec_html_compare import normalize_text, parse_html
 
 TESTS_DIR = Path(__file__).resolve().parent
-REPO_ROOT = TESTS_DIR.parent.parent
+REPO_ROOT = TESTS_DIR.parent
 UPSTREAM_PATH = REPO_ROOT / "resources" / "upstream" / "html" / "index.html"
 GENERATED_PATH = REPO_ROOT / "resources" / "gens" / "index.html"
-APPROVED_DIVERGENCES_PATH = TESTS_DIR.parent / "approved_divergences" / "snippets.yaml"
+APPROVED_DIVERGENCES_PATH = TESTS_DIR / "approved_divergences" / "snippets.yaml"
 _MISSING = object()
 
 _JSON_STRING_RE = re.compile(r'"(?:[^"\\]|\\.)*"')
-_JSONC_COMMENT_RE = re.compile(
-    _JSON_STRING_RE.pattern + r"|/\*.*?\*/" r"|//[^\n]*", re.DOTALL
-)
-_ELLIPSIS_OBJECT_RE = re.compile(
-    r"\{\s*(?://\s*\.\.\.\s*|/\*\s*\.\.\.\s*\*/\s*)\}", re.MULTILINE
-)
+_JSONC_COMMENT_RE = re.compile(_JSON_STRING_RE.pattern + r"|/\*.*?\*/" r"|//[^\n]*", re.DOTALL)
+_ELLIPSIS_OBJECT_RE = re.compile(r"\{\s*(?://\s*\.\.\.\s*|/\*\s*\.\.\.\s*\*/\s*)\}", re.MULTILINE)
 _ELLIPSIS_ARRAY_RE = re.compile(r"\[\s*(?://\s*\.\.\.\s*|\.\.\.\s*)\]", re.MULTILINE)
 _ELLIPSIS_BLOCK_VALUE_RE = re.compile(r":\s*/\*\s*\.\.\.\s*\*/")
-_ELLIPSIS_LINE_VALUE_RE = re.compile(
-    r":\s*//\s*\.\.\.\s*,?\s*(?=\n)", re.MULTILINE
-)
+_ELLIPSIS_LINE_VALUE_RE = re.compile(r":\s*//\s*\.\.\.\s*,?\s*(?=\n)", re.MULTILINE)
 _ELLIPSIS_LINE_RE = re.compile(r"^\s*(?://\s*)?\.\.\.\s*$", re.MULTILINE)
 _TRAILING_COMMA_RE = re.compile(r",\s*([}\]])")
 
@@ -39,6 +33,7 @@ _TRAILING_COMMA_RE = re.compile(r",\s*([}\]])")
 def _strip_jsonc(text: str) -> str:
     def _keep_strings(m: re.Match[str]) -> str:
         return m.group(0) if m.group(0).startswith('"') else ""
+
     return _JSONC_COMMENT_RE.sub(_keep_strings, text)
 
 
@@ -47,7 +42,7 @@ def _transform_outside_json_strings(text: str, transform: Callable[[str], str]) 
     parts: list[str] = []
     start = 0
     for match in _JSON_STRING_RE.finditer(text):
-        parts.append(transform(text[start:match.start()]))
+        parts.append(transform(text[start : match.start()]))
         parts.append(match.group())
         start = match.end()
     parts.append(transform(text[start:]))
@@ -66,9 +61,7 @@ def _normalize_illustrative_jsonc(text: str) -> str:
     """Make upstream's ellipsis notation comparable as JSONC placeholders."""
     normalized = _transform_outside_json_strings(text, _normalize_illustrative_tokens)
     normalized = _strip_jsonc(normalized)
-    return _transform_outside_json_strings(
-        normalized, lambda chunk: _TRAILING_COMMA_RE.sub(r"\1", chunk)
-    )
+    return _transform_outside_json_strings(normalized, lambda chunk: _TRAILING_COMMA_RE.sub(r"\1", chunk))
 
 
 def _try_parse_json(text: str) -> object | None:
@@ -149,7 +142,7 @@ def _extract_pre_text(element: HtmlElement) -> str:
 
 def _examples_by_id(tree: HtmlElement) -> dict[str, HtmlElement]:
     result: dict[str, HtmlElement] = {}
-    for el in tree.cssselect('aside.example[id], pre.example[id]'):
+    for el in tree.cssselect("aside.example[id], pre.example[id]"):
         eid = el.get("id")
         if eid:
             result[eid] = el
@@ -235,36 +228,37 @@ def _compare_example_json(example_id: str, upstream_el: HtmlElement, generated_e
     return diffs
 
 
-@pytest.mark.parametrize("example_id", [
-    "simple-thing-description-sample",
-    "thing-description-full-serialization",
-    "td-model-example-lamp",
-    "thing-serialization-sample",
-    "security-basic-example",
-    "multiple-security-definitions1",
-    "multiple-security-definitions2a",
-    "multiple-security-definitions2b",
-    "example-oauth2-scopes",
-    "property-serialization-sample",
-    "action-serialization-sample",
-    "event-serialization-sample",
-    "link-serialization-sample",
-    "form-serialization-sample",
-    "td-forms-readall-example",
-    "td-forms-urivariables-thing-example",
-    "dataschema-serialization-sample",
-    "saref-state-annotation-example",
-    "saref-geolocation-annotation-example",
-    "saref-geolocation-annotation-example-2",
-    "saref-geolocation-annotation-example-3",
-    "example-payload-binding",
-    "td-model-example-basic-on-off",
-    "td-model-example-smart-lamp-control",
-    "td-model-example-tmRef",
-])
-def test_example_json_matches_upstream(
-    upstream_tree, generated_tree, approved_snippet_divergences, example_id
-):
+@pytest.mark.parametrize(
+    "example_id",
+    [
+        "simple-thing-description-sample",
+        "thing-description-full-serialization",
+        "td-model-example-lamp",
+        "thing-serialization-sample",
+        "security-basic-example",
+        "multiple-security-definitions1",
+        "multiple-security-definitions2a",
+        "multiple-security-definitions2b",
+        "example-oauth2-scopes",
+        "property-serialization-sample",
+        "action-serialization-sample",
+        "event-serialization-sample",
+        "link-serialization-sample",
+        "form-serialization-sample",
+        "td-forms-readall-example",
+        "td-forms-urivariables-thing-example",
+        "dataschema-serialization-sample",
+        "saref-state-annotation-example",
+        "saref-geolocation-annotation-example",
+        "saref-geolocation-annotation-example-2",
+        "saref-geolocation-annotation-example-3",
+        "example-payload-binding",
+        "td-model-example-basic-on-off",
+        "td-model-example-smart-lamp-control",
+        "td-model-example-tmRef",
+    ],
+)
+def test_example_json_matches_upstream(upstream_tree, generated_tree, approved_snippet_divergences, example_id):
     upstream_examples = _examples_by_id(upstream_tree)
     generated_examples = _examples_by_id(generated_tree)
 
@@ -324,7 +318,7 @@ def test_tabbed_group_matches_upstream(upstream_tree, generated_tree, group_titl
             f"[{group_title}] tab count differs: upstream={len(upstream_tabs)}, generated={len(generated_tabs)}"
         )
 
-    for i, (up_text, gen_text) in enumerate(zip(upstream_tabs, generated_tabs)):
+    for i, (up_text, gen_text) in enumerate(zip(upstream_tabs, generated_tabs, strict=True)):
         up_json = _try_parse_json(up_text)
         gen_json = _try_parse_json(gen_text)
         if up_json is not None and gen_json is not None:

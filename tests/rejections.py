@@ -1,4 +1,5 @@
 """Summarize JSON Schema validation failures."""
+
 import re
 from pathlib import Path
 
@@ -11,9 +12,23 @@ MAX_MESSAGE = 120
 # JSON Schema keywords that can appear in a schema path but are not
 # definition names in the LinkML source
 _KEYWORDS = {
-    "$defs", "properties", "items", "anyOf", "allOf", "oneOf", "not",
-    "additionalProperties", "patternProperties", "type", "pattern",
-    "required", "enum", "const", "format", "contains", "...",
+    "$defs",
+    "properties",
+    "items",
+    "anyOf",
+    "allOf",
+    "oneOf",
+    "not",
+    "additionalProperties",
+    "patternProperties",
+    "type",
+    "pattern",
+    "required",
+    "enum",
+    "const",
+    "format",
+    "contains",
+    "...",
 }
 
 _index = None

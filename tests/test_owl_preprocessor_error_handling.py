@@ -1,0 +1,139 @@
+"""The OWL preprocessor must report unresolvable prefix declarations instead of silently skipping elements."""
+
+from __future__ import annotations
+
+import textwrap
+from pathlib import Path
+
+import pytest
+
+from wot_toolchain.errors import SchemaError
+from wot_toolchain.preprocessors.owl_preprocessor import preprocess_for_gen_owl
+
+_HEADER = """\
+id: https://example.org/s
+name: s
+default_prefix: ex
+{curi_maps}
+prefixes:
+  ex: https://example.org/s#
+  linkml: https://w3id.org/linkml/
+imports:
+  - linkml:types
+"""
+
+# Each body reaches exactly one CURIE expansion site of the preprocessor before any other.
+_SLOT_URI = """\
+slots:
+  foo:
+    slot_uri: ex:bar
+    range: string
+classes:
+  Thing:
+    class_uri: ex:Thing
+    slots: [foo]
+"""
+
+_ATTRIBUTE_SLOT_URI = """\
+classes:
+  Thing:
+    class_uri: ex:Thing
+    attributes:
+      foo:
+        slot_uri: ex:bar
+        range: string
+"""
+
+_MIXIN_CLASS_URI = """\
+classes:
+  Named:
+    mixin: true
+    class_uri: ex:Named
+  Thing:
+    class_uri: ex:Thing
+    mixins: [Named]
+"""
+
+_FOREIGN_ENUM_URI = """\
+imports:
+  - linkml:types
+  - other
+classes:
+  Thing:
+    class_uri: ex:Thing
+"""
+
+_PERMISSIBLE_VALUE_MEANING = """\
+enums:
+  Color:
+    enum_uri: ex:Color
+    permissible_values:
+      red:
+        meaning: ex:Red
+classes:
+  Thing:
+    class_uri: ex:Thing
+"""
+
+_OTHER_SCHEMA = """\
+id: https://example.org/other
+name: other
+default_prefix: ex
+prefixes:
+  ex: https://example.org/s#
+enums:
+  Shade:
+    enum_uri: ex:Shade
+    permissible_values:
+      dark: {}
+"""
+
+_CASES = {
+    "slot_uri": (_SLOT_URI, "slot_uri 'ex:bar' of slot 'foo'"),
+    "attribute_slot_uri": (_ATTRIBUTE_SLOT_URI, "slot_uri 'ex:bar' of attribute 'foo'"),
+    "mixin_class_uri": (_MIXIN_CLASS_URI, "class_uri 'ex:Named' of mixin 'Named'"),
+    "foreign_enum_uri": (_FOREIGN_ENUM_URI, "enum_uri 'ex:Shade' of enum 'Shade'"),
+    "permissible_value_meaning": (_PERMISSIBLE_VALUE_MEANING, "meaning 'ex:Red' of permissible value 'Color.red'"),
+}
+
+
+def _write_schema(tmp_path: Path, body: str, *, curi_maps: str) -> Path:
+    header = _HEADER.format(curi_maps=curi_maps)
+    if body.startswith("imports:"):
+        header = header[: header.index("imports:")]
+    (tmp_path / "other.yaml").write_text(_OTHER_SCHEMA, encoding="utf-8")
+    schema = tmp_path / "s.yaml"
+    schema.write_text(header + textwrap.dedent(body), encoding="utf-8")
+    return schema
+
+
+@pytest.mark.parametrize("case", sorted(_CASES))
+def test_unknown_curi_map_raises_schema_error_naming_schema_and_element(tmp_path: Path, case: str) -> None:
+    body, element = _CASES[case]
+    schema = _write_schema(tmp_path, body, curi_maps="default_curi_maps:\n  - no_such_map")
+
+    with pytest.raises(SchemaError) as excinfo:
+        preprocess_for_gen_owl(str(schema))
+
+    message = str(excinfo.value)
+    assert str(schema) in message
+    assert element in message
+    assert "Unknown prefix map: no_such_map" in message
+    assert isinstance(excinfo.value.__cause__, ValueError)
+
+
+@pytest.mark.parametrize("case", sorted(_CASES))
+def test_same_schema_without_bad_curi_map_preprocesses(tmp_path: Path, case: str) -> None:
+    body, _ = _CASES[case]
+    schema = _write_schema(tmp_path, body, curi_maps="")
+
+    assert "name: s" in preprocess_for_gen_owl(str(schema))
+
+
+def test_slot_is_renamed_to_local_name_of_its_slot_uri(tmp_path: Path) -> None:
+    schema = _write_schema(tmp_path, _SLOT_URI, curi_maps="")
+
+    output = preprocess_for_gen_owl(str(schema))
+
+    assert "  bar:\n" in output
+    assert "  foo:\n" not in output

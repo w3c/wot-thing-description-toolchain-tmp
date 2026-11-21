@@ -14,10 +14,12 @@ from typing import Any
 
 import pytest
 
+from .baselines import load_baseline
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CONTEXT_PATH = REPO_ROOT / "resources/gens/jsonldcontext/context.jsonld"
 TEST_DATA = Path(__file__).parent / "data"
-JSONLD_MODULE = "/tmp/node_modules/jsonld"
+JSONLD_MODULE = str(REPO_ROOT / "node_modules" / "jsonld")
 
 _WOT_CONTEXT_URLS = {
     "https://www.w3.org/2022/wot/td/v1.1",
@@ -33,6 +35,8 @@ def _valid_instances() -> list[Path]:
 def _instance_id(path: Path) -> str:
     return str(path.relative_to(TEST_DATA))
 
+
+KNOWN_ROUNDTRIP_FAILURES = Path(__file__).parent / "known_failures" / "jsonld_roundtrip.txt"
 
 _instances = _valid_instances()
 _instance_ids = [_instance_id(p) for p in _instances]
@@ -209,7 +213,21 @@ class TestJsonldExpand:
         assert result["typesAreIris"], "@type not expanded to IRI"
 
 
-@pytest.mark.parametrize("instance_path", _instances, ids=_instance_ids)
+def _roundtrip_params() -> list[Any]:
+    known = load_baseline(KNOWN_ROUNDTRIP_FAILURES)
+    return [
+        pytest.param(
+            path,
+            id=sample,
+            marks=[pytest.mark.xfail(strict=True, reason="known JSON-LD roundtrip divergence")]
+            if sample in known
+            else [],
+        )
+        for path, sample in zip(_instances, _instance_ids, strict=True)
+    ]
+
+
+@pytest.mark.parametrize("instance_path", _roundtrip_params())
 class TestJsonldCompactRoundtrip:
     """Verify expand → compact recovers original document."""
 
@@ -218,6 +236,4 @@ class TestJsonldCompactRoundtrip:
         if result["status"] == "error":
             pytest.fail(f"JSON-LD processing error: {result['message']}")
         if result["status"] == "fail":
-            pytest.fail(
-                f"Compact roundtrip diverged on key(s): {result['diverged']}"
-            )
+            pytest.fail(f"Compact roundtrip diverged on key(s): {result['diverged']}")

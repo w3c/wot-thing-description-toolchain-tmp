@@ -7,7 +7,6 @@ from pathlib import Path
 
 from rdflib import Graph, Literal, URIRef
 
-
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CONTEXT_PATH = REPO_ROOT / "resources/gens/jsonldcontext/context.jsonld"
 JSON_SCHEMA_PATH = REPO_ROOT / "resources/gens/jsonschema/jsonschema.json"
@@ -64,7 +63,7 @@ def test_context_scopes_derive_from_range_ownership() -> None:
     assert context["links"]["@context"]["@vocab"].endswith("hypermedia#")
     assert context["forms"]["@context"]["@vocab"].endswith("hypermedia#")
     assert context["securityDefinitions"]["@context"]["@vocab"].endswith("security#")
-    assert context["schemaDefinitions"]["@context"]["@vocab"].endswith("json-schema#")
+    assert "@context" not in context["schemaDefinitions"]
     assert context["uriVariables"]["@context"]["@vocab"].endswith("json-schema#")
     assert context["input"]["@context"]["@vocab"].endswith("json-schema#")
     assert "@context" not in context["allOf"]

@@ -1,4 +1,5 @@
 """Compare the generated assertion inventory with the upstream inventory."""
+
 from __future__ import annotations
 
 import csv
@@ -8,10 +9,10 @@ import pytest
 import yaml
 
 TESTS_DIR = Path(__file__).resolve().parent
-REPO_ROOT = TESTS_DIR.parent.parent
+REPO_ROOT = TESTS_DIR.parent
 OUR_CSV = REPO_ROOT / "resources" / "gens" / "assertions" / "assertions.csv"
 UPSTREAM_CSV = REPO_ROOT / "resources" / "upstream" / "assertions.csv"
-APPROVED_DIVERGENCES = TESTS_DIR.parent / "approved_divergences" / "html.yaml"
+APPROVED_DIVERGENCES = TESTS_DIR / "approved_divergences" / "html.yaml"
 
 
 def assertion_rows(path: Path) -> dict[str, dict[str, str]]:
@@ -31,7 +32,7 @@ def approved_assertion_divergences() -> dict[str, str]:
 
 def test_assertion_ids_vs_upstream() -> None:
     if not OUR_CSV.exists():
-        pytest.skip(f"Assertion CSV not found at {OUR_CSV}; run `wotis generate-wot-resources -d` first.")
+        pytest.skip(f"Assertion CSV not found at {OUR_CSV}; run `wot-toolchain generate-wot-resources -d` first.")
 
     ours = assertion_rows(OUR_CSV)
     upstream = assertion_rows(UPSTREAM_CSV)
@@ -66,7 +67,4 @@ def test_assertion_ids_vs_upstream() -> None:
         for assertion_id in sorted(ours)
         if ours[assertion_id]["Status"] != upstream[assertion_id]["Status"]
     ]
-    assert not status_differences, (
-        "assertion status differences: "
-        + ", ".join(status_differences)
-    )
+    assert not status_differences, "assertion status differences: " + ", ".join(status_differences)
