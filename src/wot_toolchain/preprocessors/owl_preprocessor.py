@@ -60,8 +60,11 @@ def preprocess_for_gen_owl(schema_path: str) -> str:
 
     Raises:
         SchemaError: If a CURIE of the schema cannot be expanded because its prefix declarations
-            (for example ``default_curi_maps``) cannot be resolved.
+            (for example ``default_curi_maps``) cannot be resolved, a local import does not exist,
+            or the ``default_prefix`` is not declared.
     """
+    # Before merging: LinkML's merge would fail on a missing import with an untyped FileNotFoundError.
+    enum_namespaces = _collect_enum_namespaces(schema_path)
     view = SchemaView(schema_path, merge_imports=True)
     local_view = SchemaView(schema_path, merge_imports=False)
     local_schema = _get_schema(local_view)
@@ -76,7 +79,7 @@ def preprocess_for_gen_owl(schema_path: str) -> str:
 
     merged_schema = _get_schema(view)
     s: SchemaDefinition = copy.deepcopy(merged_schema)
-    _assign_enum_uris(s, schema_path, view)
+    _assign_enum_uris(s, enum_namespaces)
     renames = _collect_renames(s, namespace, view)
     _apply_renames(s, renames)
     _strip_no_uri_classes(s, no_uri_classes)
@@ -96,11 +99,20 @@ def preprocess_for_gen_owl(schema_path: str) -> str:
 
 
 def _namespace(view: SchemaView) -> str:
+    """Return the namespace URI of the default prefix of the schema of ``view``.
+
+    Raises:
+        SchemaError: If the schema has no ``default_prefix`` or it is not declared in ``prefixes``.
+    """
     schema = _get_schema(view)
+    source = schema.source_file or schema.name
     dp = schema.default_prefix
-    assert dp is not None, f"Schema {schema.name} has no default_prefix"
-    prefix = cast(Prefix, cast(_Prefixes, schema.prefixes)[dp])
-    return str(prefix.prefix_reference)
+    if dp is None:
+        raise SchemaError(f"{source}: schema has no default_prefix; declare one under 'default_prefix'.")
+    prefixes = cast(_Prefixes, schema.prefixes)
+    if dp not in prefixes:
+        raise SchemaError(f"{source}: default_prefix {dp!r} is not declared in prefixes; declare it under 'prefixes'.")
+    return str(cast(Prefix, prefixes[dp]).prefix_reference)
 
 
 def _expand_curie(view: SchemaView, curie: str, element: str) -> str:
@@ -116,20 +128,24 @@ def _expand_curie(view: SchemaView, curie: str, element: str) -> str:
         raise SchemaError(f"{schema.source_file or schema.name}: cannot expand {element}: {exc}") from exc
 
 
-def _assign_enum_uris(s: SchemaDefinition, schema_path: str, view: SchemaView) -> None:
-    """Set enum_uri on enums that lack one, using originating sub-schema namespace."""
-    schema_dir = Path(schema_path).parent
+def _collect_enum_namespaces(schema_path: str) -> dict[str, str]:
+    """Map each enum of the local imports of ``schema_path`` to the namespace of its originating sub-schema.
+
+    Raises:
+        SchemaError: If a local (non-CURIE) import does not resolve to an existing file.
+    """
     root_schema = _get_schema(SchemaView(schema_path, merge_imports=False))
 
     enum_to_ns: dict[str, str] = {}
 
-    def _walk(imports: list[str], base_dir: Path) -> None:
+    def _walk(importer: str, imports: list[str], base_dir: Path) -> None:
         for import_name in imports:
-            if import_name.startswith("linkml:"):
+            # CURIE imports (e.g. linkml:types) are resolved by LinkML, not from the local directory.
+            if ":" in import_name:
                 continue
             import_path = base_dir / f"{import_name}.yaml"
-            if not import_path.exists():
-                continue
+            if not import_path.is_file():
+                raise SchemaError(f"{importer}: imports {import_name!r} but {import_path} does not exist.")
             sub_schema = _get_schema(SchemaView(str(import_path), merge_imports=False))
             dp = sub_schema.default_prefix
             prefixes = cast(_Prefixes, sub_schema.prefixes)
@@ -139,11 +155,15 @@ def _assign_enum_uris(s: SchemaDefinition, schema_path: str, view: SchemaView) -
                     if str(ename) not in enum_to_ns:
                         enum_to_ns[str(ename)] = sub_ns
             sub_imports = cast(list[str], sub_schema.imports or [])
-            _walk(sub_imports, import_path.parent)
+            _walk(str(import_path), sub_imports, import_path.parent)
 
     root_imports = cast(list[str], root_schema.imports or [])
-    _walk(root_imports, schema_dir)
+    _walk(schema_path, root_imports, Path(schema_path).parent)
+    return enum_to_ns
 
+
+def _assign_enum_uris(s: SchemaDefinition, enum_to_ns: dict[str, str]) -> None:
+    """Set enum_uri on enums that lack one, using originating sub-schema namespace."""
     for ename, edef in cast(_Enums, s.enums).items():
         if edef.enum_uri:
             continue

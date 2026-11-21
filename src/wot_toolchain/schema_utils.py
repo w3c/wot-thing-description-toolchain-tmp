@@ -13,9 +13,14 @@ from .errors import SchemaError
 
 
 def get_schema(sv: SchemaView) -> SchemaDefinition:
-    """Return the SchemaDefinition from a SchemaView, asserting it exists."""
+    """Return the SchemaDefinition of a SchemaView.
+
+    Raises:
+        SchemaError: The SchemaView has no schema loaded.
+    """
     schema = sv.schema
-    assert schema is not None
+    if schema is None:
+        raise SchemaError("SchemaView has no schema loaded; construct it from a LinkML schema file or definition.")
     return schema
 
 

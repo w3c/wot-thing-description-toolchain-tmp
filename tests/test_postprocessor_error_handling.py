@@ -9,7 +9,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 from wot_toolchain.errors import SchemaError
 from wot_toolchain.postprocessors.jsonld_context_postprocessor import post_process_jsonld_context
 from wot_toolchain.postprocessors.jsonschema_postprocessor import post_process_jsonschema
-from wot_toolchain.schema_utils import resolve_prefix_namespace
+from wot_toolchain.schema_utils import get_schema, resolve_prefix_namespace
 
 SCHEMA_HEADER = """
 id: https://example.org/probe
@@ -156,3 +156,17 @@ def test_identifier_slot_removal_leaves_non_class_def_untouched() -> None:
     raw = {"$defs": {"Synthetic": synthetic}}
     processed = post_process_jsonschema(raw, sv)
     assert processed["$defs"]["Synthetic"] == synthetic
+
+
+def test_get_schema_without_loaded_schema_raises_schema_error() -> None:
+    sv = _schema_view("classes:\n  A: {}\n")
+    sv.schema = None
+
+    with pytest.raises(SchemaError, match="no schema loaded"):
+        get_schema(sv)
+
+
+def test_get_schema_returns_loaded_schema_definition() -> None:
+    sv = _schema_view("classes:\n  A: {}\n")
+
+    assert get_schema(sv).name == "probe"

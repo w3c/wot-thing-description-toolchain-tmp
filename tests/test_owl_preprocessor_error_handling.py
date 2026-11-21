@@ -137,3 +137,69 @@ def test_slot_is_renamed_to_local_name_of_its_slot_uri(tmp_path: Path) -> None:
 
     assert "  bar:\n" in output
     assert "  foo:\n" not in output
+
+
+def _write_root_schema(tmp_path: Path, header_overrides: str, imports: str) -> Path:
+    schema = tmp_path / "root.yaml"
+    schema.write_text(
+        textwrap.dedent(
+            f"""\
+            id: https://example.org/root
+            name: root
+            {header_overrides}
+            prefixes:
+              ex: https://example.org/root#
+              linkml: https://w3id.org/linkml/
+            imports:
+              - linkml:types
+            {imports}
+            classes:
+              Thing:
+                class_uri: ex:Thing
+            """
+        ),
+        encoding="utf-8",
+    )
+    return schema
+
+
+def test_undeclared_default_prefix_raises_schema_error_naming_prefix_and_schema(tmp_path: Path) -> None:
+    schema = _write_root_schema(tmp_path, "default_prefix: zz", "")
+
+    with pytest.raises(SchemaError, match=r"default_prefix 'zz' is not declared") as excinfo:
+        preprocess_for_gen_owl(str(schema))
+
+    assert str(schema) in str(excinfo.value)
+
+
+def test_omitted_default_prefix_raises_schema_error_naming_schema(tmp_path: Path) -> None:
+    # LinkML substitutes the schema id for an omitted default_prefix, which is never a declared prefix.
+    schema = _write_root_schema(tmp_path, "", "")
+
+    with pytest.raises(SchemaError, match=r"default_prefix .* is not declared") as excinfo:
+        preprocess_for_gen_owl(str(schema))
+
+    assert str(schema) in str(excinfo.value)
+
+
+def test_missing_local_import_raises_schema_error_naming_importer_and_path(tmp_path: Path) -> None:
+    schema = _write_root_schema(tmp_path, "default_prefix: ex", "  - missing_module")
+
+    with pytest.raises(SchemaError, match=r"imports 'missing_module'") as excinfo:
+        preprocess_for_gen_owl(str(schema))
+
+    message = str(excinfo.value)
+    assert str(schema) in message
+    assert str(tmp_path / "missing_module.yaml") in message
+
+
+def test_missing_transitive_local_import_names_the_importing_sub_schema(tmp_path: Path) -> None:
+    (tmp_path / "middle.yaml").write_text(_OTHER_SCHEMA + "imports:\n  - gone\n", encoding="utf-8")
+    schema = _write_root_schema(tmp_path, "default_prefix: ex", "  - middle")
+
+    with pytest.raises(SchemaError, match=r"imports 'gone'") as excinfo:
+        preprocess_for_gen_owl(str(schema))
+
+    message = str(excinfo.value)
+    assert str(tmp_path / "middle.yaml") in message
+    assert str(tmp_path / "gone.yaml") in message
