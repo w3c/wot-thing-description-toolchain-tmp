@@ -18,6 +18,7 @@ from linkml_runtime.utils.formatutils import camelcase
 from linkml_runtime.utils.schemaview import SchemaView
 
 from ..errors import SchemaError
+from ..model.names import is_non_ontological_enum, local_name
 from ..schema_utils import default_prefix, load_schema_view
 from ..schema_utils import get_schema as _get_schema
 
@@ -178,7 +179,7 @@ def _collect_renames(s: SchemaDefinition, namespace: str, view: SchemaView) -> d
         if not slot_def.slot_uri:
             continue
         expanded = _expand_curie(view, slot_def.slot_uri, f"slot_uri {slot_def.slot_uri!r} of slot {slot_name!r}")
-        new_name = expanded.split("#")[-1].split("/")[-1]
+        new_name = local_name(expanded)
         in_ns = expanded.startswith(namespace)
         needs_rename = new_name != slot_name
         has_at = slot_name.startswith("@")
@@ -239,7 +240,7 @@ def _attr_slot_name(attr_name: str, attr_def: SlotDefinition, view: SchemaView) 
     if not attr_def.slot_uri:
         return attr_name
     expanded = _expand_curie(view, attr_def.slot_uri, f"slot_uri {attr_def.slot_uri!r} of attribute {attr_name!r}")
-    return expanded.split("#")[-1].split("/")[-1]
+    return local_name(expanded)
 
 
 def _strip_non_local(
@@ -292,7 +293,7 @@ def _strip_discriminator_slots(s: SchemaDefinition, view: SchemaView) -> None:
 def _strip_non_ontological_enums(s: SchemaDefinition) -> None:
     """Remove enums without enum_uri or with linkml: enum_uri (type discriminators)."""
     enums = cast(_Enums, s.enums)
-    to_remove = [name for name, edef in enums.items() if not edef.enum_uri or str(edef.enum_uri).startswith("linkml:")]
+    to_remove = [name for name, edef in enums.items() if is_non_ontological_enum(edef)]
     for name in to_remove:
         del enums[name]
 
@@ -319,9 +320,9 @@ def _fix_enum_pv_labels(s: SchemaDefinition, view: SchemaView) -> None:
             if not pv.meaning:
                 continue
             expanded = _expand_curie(view, pv.meaning, f"meaning {pv.meaning!r} of permissible value '{ename}.{key}'")
-            local_name = expanded.split("#")[-1].split("/")[-1]
-            if local_name and local_name != key:
-                renames.append((key, local_name))
+            pv_name = local_name(expanded)
+            if pv_name and pv_name != key:
+                renames.append((key, pv_name))
         for old_key, new_key in renames:
             pv = pvs.pop(old_key)
             pv.text = new_key
