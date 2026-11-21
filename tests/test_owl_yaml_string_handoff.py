@@ -3,12 +3,14 @@
 import tempfile
 import warnings
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
 import pytest
 from linkml.generators.owlgen import OwlSchemaGenerator
 
 from wot_toolchain import pipeline
+from wot_toolchain.artifacts.owl.generator import WotOwlGenerator
+from wot_toolchain.artifacts.owl.options import OwlOptions
 from wot_toolchain.config import GEN_OWL_OPTIONS, load_project
 from wot_toolchain.preprocessors.owl_preprocessor import preprocess_for_gen_owl
 
@@ -40,11 +42,13 @@ def test_run_gen_owl_hands_over_yaml_string(monkeypatch: pytest.MonkeyPatch) -> 
     """_run_gen_owl passes the preprocessed YAML itself, not a temp file path, to the generator."""
     received: list[object] = []
 
-    def spy(schema: object, **kwargs: Any) -> OwlSchemaGenerator:
-        received.append(schema)
-        return OwlSchemaGenerator(schema, **kwargs)
+    class Spy(WotOwlGenerator):
+        @classmethod
+        def from_options(cls, schema: Any, options: OwlOptions) -> Self:
+            received.append(schema)
+            return super().from_options(schema, options)
 
-    monkeypatch.setattr(pipeline, "OwlSchemaGenerator", spy)
+    monkeypatch.setattr(pipeline, "WotOwlGenerator", Spy)
     schema_path = _schema_path("hctl")
     pipeline._run_gen_owl(schema_path)
     assert received == [preprocess_for_gen_owl(str(schema_path))]
