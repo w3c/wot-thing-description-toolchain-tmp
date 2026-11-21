@@ -13,6 +13,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 
 from ..errors import SchemaError
 from ..schema_utils import annotation_str_value as _annotation_value
+from ..schema_utils import get_schema
 from . import curie_prefix, resolve_prefix_namespace
 
 JSONLD_RESERVED_SLOT_NAMES = frozenset({"@context", "@type"})
@@ -312,42 +313,50 @@ def _remove_linkml_internals(context: dict[str, Any]) -> None:
 
 
 def _remove_non_root_terms(context: dict[str, Any], schema_view: SchemaView) -> None:
-    """Remove non-td module terms from root context.
+    """Remove terms outside the main schema's default prefix from the root context.
 
     The LinkML context generator and enum-alias step emit all slots, class
     names, and enum value aliases at root level.  Per the WoT TD 1.1 context,
-    only td-vocabulary terms (plus a small whitelist) belong at root — all
-    other module terms are already present inside scoped ``@context`` blocks
-    built by ``build_module_context``.
+    only terms of the main vocabulary (the schema's ``default_prefix``) plus a
+    small whitelist belong at root — all other module terms are already present
+    inside scoped ``@context`` blocks built by ``build_module_context``.
+
+    Args:
+        context: Root ``@context`` dict, modified in place.
+        schema_view: SchemaView of the main schema.
+
+    Raises:
+        SchemaError: The SchemaView has no schema loaded.
     """
-    td_slots: set[str] = set()
-    non_td_slots: set[str] = set()
+    root_prefix = get_schema(schema_view).default_prefix
+    root_slots: set[str] = set()
+    non_root_slots: set[str] = set()
     for slot in schema_view.all_slots().values():
         key = _slot_key(slot)
         prefix = curie_prefix(str(slot.slot_uri) if slot.slot_uri else None)
-        if prefix is None or prefix == "td":
-            td_slots.add(key)
+        if prefix is None or prefix == root_prefix:
+            root_slots.add(key)
         else:
-            non_td_slots.add(key)
-    non_td_slots -= td_slots
+            non_root_slots.add(key)
+    non_root_slots -= root_slots
 
-    td_classes: set[str] = set()
-    non_td_classes: set[str] = set()
+    root_classes: set[str] = set()
+    non_root_classes: set[str] = set()
     for cls in schema_view.all_classes().values():
         prefix = curie_prefix(str(cls.class_uri) if cls.class_uri else None)
-        if prefix is None or prefix == "td":
-            td_classes.add(cls.name)
+        if prefix is None or prefix == root_prefix:
+            root_classes.add(cls.name)
         else:
-            non_td_classes.add(cls.name)
-    non_td_classes -= td_classes
+            non_root_classes.add(cls.name)
+    non_root_classes -= root_classes
 
-    non_td_enum_aliases: set[str] = set()
+    non_root_enum_aliases: set[str] = set()
     for enum_def in schema_view.all_enums().values():
         for pv_name, pv in enum_def.permissible_values.items():
             if pv.meaning:
                 meaning_prefix = curie_prefix(str(pv.meaning))
-                if meaning_prefix and meaning_prefix != "td":
-                    non_td_enum_aliases.add(str(pv_name))
+                if meaning_prefix and meaning_prefix != root_prefix:
+                    non_root_enum_aliases.add(str(pv_name))
 
     remove = set()
     for key in context:
@@ -355,7 +364,7 @@ def _remove_non_root_terms(context: dict[str, Any], schema_view: SchemaView) -> 
             continue
         if key in _ROOT_WHITELIST:
             continue
-        if key in non_td_slots or key in non_td_classes or key in non_td_enum_aliases:
+        if key in non_root_slots or key in non_root_classes or key in non_root_enum_aliases:
             remove.add(key)
 
     for key in remove:

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml_runtime.utils.schemaview import SchemaView
@@ -170,3 +172,21 @@ def test_get_schema_returns_loaded_schema_definition() -> None:
     sv = _schema_view("classes:\n  A: {}\n")
 
     assert get_schema(sv).name == "probe"
+
+
+def test_root_context_keeps_terms_of_the_schema_default_prefix() -> None:
+    sv = _schema_view(
+        """
+slots:
+  label:
+    slot_uri: ex:label
+    range: string
+classes:
+  Probe:
+    class_uri: ex:Probe
+    slots: [label]
+"""
+    )
+    root = json.loads(_jsonld_context(sv))["@context"]
+    assert "label" in root
+    assert "Probe" in root
