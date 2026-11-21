@@ -60,9 +60,11 @@ def test_first_class_comes_from_the_manifest(repo_project: Project) -> None:
     assert "Thing" in classes
 
 
-def test_sections_come_from_the_manifest(repo_project: Project) -> None:
+def test_sections_come_from_the_manifest(repo_project: Project, tmp_path: Path) -> None:
     security = next(s for s in _spec(repo_project).sections if s.id == "sec-security-vocabulary-definition")
-    spec = dataclasses.replace(_spec(repo_project), sections=(security,), first_class=None)
+    template = tmp_path / "security.template.html"
+    template.write_text(f"<section id='{security.id}'>%section('{security.id}')%</section>\n", encoding="utf-8")
+    spec = dataclasses.replace(_spec(repo_project), template=template, sections=(security,), first_class=None)
 
     classes = _rendered_classes(spec, repo_project.main_schema)
 

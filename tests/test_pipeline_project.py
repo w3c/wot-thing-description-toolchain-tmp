@@ -126,13 +126,14 @@ def _mini_project_with_spec(tmp_path: Path, sensor: dict[str, object]) -> Path:
     )
     (snippets / "sensor.json").write_text(json.dumps(sensor), encoding="utf-8")
     (root / "spec" / "glossary.yaml").write_text(yaml.safe_dump({"terms": {}}), encoding="utf-8")
-    (root / "spec" / "template.html").write_text("<section id='sec-sensor'>%s</section>\n", encoding="utf-8")
+    (root / "spec" / "template.html").write_text(
+        "<section id='sec-sensor'>%section('sec-sensor')%</section>\n", encoding="utf-8"
+    )
     manifest = root / "wot-toolchain.yaml"
     document = yaml.safe_load(manifest.read_text(encoding="utf-8"))
     document["spec"] = {
         "template": "spec/template.html",
         "output": "spec-out/index.html",
-        "placeholder": "%s",
         "vocab_id_prefix": "sen",
         "sections": [{"id": "sec-sensor", "schema": "schemas/sensor.yaml"}],
         "snippets": "spec/snippets",

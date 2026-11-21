@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from pathlib import Path
 
 import pytest
@@ -98,24 +97,7 @@ def test_table_assertions_propagate_slot_induction_failures(tmp_path: Path) -> N
 def test_assemble_missing_template_raises_generation_error(tmp_path: Path) -> None:
     template = tmp_path / "missing.template.html"
     with pytest.raises(GenerationError, match="missing.template.html"):
-        assemble(template, "<p>x</p>", out_path=tmp_path / "out.html", placeholder="%s")
-
-
-def test_assemble_warns_about_unreplaced_placeholders_naming_the_files(
-    tmp_path: Path, caplog: pytest.LogCaptureFixture
-) -> None:
-    template = tmp_path / "index.template.html"
-    template.write_text("<p>%s</p><p>%s</p><p>%s</p>", encoding="utf-8")
-    out = tmp_path / "index.html"
-    with caplog.at_level(logging.WARNING):
-        assemble(template, "first", out_path=out, placeholder="%s")
-    [record] = [r for r in caplog.records if r.levelno == logging.WARNING]
-    message = record.getMessage()
-    assert "2" in message
-    assert str(template) in message
-    assert str(out) in message
-    assert not message.startswith("Warning")
-    assert out.read_text(encoding="utf-8") == "<p>first</p><p>%s</p><p>%s</p>"
+        assemble(template, {"sec": "<p>x</p>"}, out_path=tmp_path / "out.html")
 
 
 def test_process_fragments_length_mismatch_raises_generation_error(tmp_path: Path) -> None:

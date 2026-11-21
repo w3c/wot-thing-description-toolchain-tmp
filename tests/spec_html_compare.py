@@ -10,7 +10,7 @@ import lxml.html
 from lxml.html import HtmlElement
 
 # The sections the pipeline generates: resources/index.template.html holds
-# exactly four "%s" placeholders and each one sits inside one of these.
+# one %section('<id>')% marker inside each of these.
 GENERATED_SECTION_IDS = [
     "sec-core-vocabulary-definition",
     "sec-data-schema-vocabulary-definition",

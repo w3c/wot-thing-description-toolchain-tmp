@@ -78,11 +78,10 @@ class SpecConfig:
     Attributes:
         template: Absolute path of the HTML specification template.
         output: Absolute path of the rendered specification.
-        placeholder: Placeholder in the template that marks where generated content goes.
         vocab_id_prefix: Leading part of every vocabulary-table assertion ID, ``<vocab_id_prefix>-vocab-...``,
             shared by all sections regardless of the module that defines the class.
         first_class: Class whose table is rendered first, or ``None`` to keep schema order.
-        sections: Sections to fill, in template order.
+        sections: Sections to fill, each into the template's ``%section('<id>')%`` marker.
         snippets: Directory holding the example snippets.
         glossary: Glossary file used for cross-references.
         extra_asserts: HTML file with assertions not stated as separate sentences in the text, or ``None``.
@@ -99,7 +98,6 @@ class SpecConfig:
 
     template: Path
     output: Path
-    placeholder: str
     vocab_id_prefix: str
     first_class: str | None
     sections: tuple[SpecSection, ...]
@@ -156,7 +154,7 @@ _JSONSCHEMA_KEYS = _Keys((), ("top_class",))
 _JSONLD_KEYS = _Keys((), ("extra_root_terms",))
 _MODULE_KEYS = _Keys(("schema", "prefix"), ("ontology", "context", "diagram"))
 _SPEC_KEYS = _Keys(
-    ("template", "output", "placeholder", "vocab_id_prefix", "sections", "snippets", "glossary"),
+    ("template", "output", "vocab_id_prefix", "sections", "snippets", "glossary"),
     (
         "first_class",
         "extra_asserts",
@@ -278,7 +276,6 @@ def _parse_spec(root: _Node, modules: tuple[Module, ...]) -> SpecConfig | None:
     return SpecConfig(
         template=spec.input_path("template", "file"),
         output=spec.output_path("output"),
-        placeholder=spec.string("placeholder"),
         vocab_id_prefix=spec.string("vocab_id_prefix"),
         first_class=spec.optional_string("first_class"),
         sections=tuple(_parse_section(node, module_prefixes) for node in spec.mappings("sections", _SECTION_KEYS)),

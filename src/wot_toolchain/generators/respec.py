@@ -463,7 +463,8 @@ def generate_respec_spec(spec: SpecConfig, main_schema: Path) -> None:
         )
         for section, classes in zip(spec.sections, _classes_per_section(spec.sections, spec.first_class), strict=True)
     ]
-    fragments = process_fragments([section.id for section in spec.sections], fragments, spec.glossary)
+    section_ids = [section.id for section in spec.sections]
+    fragments = process_fragments(section_ids, fragments, spec.glossary)
 
     snippet_errors = validate_all_snippets(spec.snippets, spec.snippet_validation_schemas)
     if snippet_errors:
@@ -472,7 +473,9 @@ def generate_respec_spec(spec: SpecConfig, main_schema: Path) -> None:
         )
     template = process_snippet_placeholders(spec.template.read_text(encoding="utf-8"), spec.snippets)
 
-    assemble(spec.template, *fragments, out_path=spec.output, placeholder=spec.placeholder, template_content=template)
+    assemble(
+        spec.template, dict(zip(section_ids, fragments, strict=True)), out_path=spec.output, template_content=template
+    )
 
     if spec.assertions_csv is not None:
         foreign_prefixes = sorted({section.prefix for section in spec.sections} - {spec.vocab_id_prefix})

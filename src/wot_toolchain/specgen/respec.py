@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Mapping
 from pathlib import Path
 
 from jinja2 import Environment, PackageLoader, select_autoescape
@@ -12,6 +13,7 @@ from ..errors import GenerationError
 from .snippets import load_snippet_manifest, render_snippet, render_snippet_group
 
 _SNIPPET_PLACEHOLDER_RE = re.compile(r"%snippet\('([^']+)'\)%")
+_SECTION_PLACEHOLDER_RE = re.compile(r"%section\('([^']+)'\)%")
 
 
 def process_snippet_placeholders(text: str, snippets_dir: Path) -> str:
@@ -59,22 +61,22 @@ def build_jinja_env() -> Environment:
 
 def assemble(
     template_path: Path,
-    *fragments_html: str,
+    fragments_by_section: Mapping[str, str],
+    *,
     out_path: Path,
-    placeholder: str,
     template_content: str | None = None,
 ) -> None:
-    """Replace ``placeholder`` in the template with each fragment in turn and write the result to ``out_path``.
+    """Replace each ``%section('<id>')%`` in the template with the fragment of that section and write ``out_path``.
 
     Args:
-        template_path: Template file; read only when ``template_content`` is not given.
-        *fragments_html: HTML fragments; each replaces the first remaining occurrence of ``placeholder``.
+        template_path: Template file; read only when ``template_content`` is not given, named in errors.
+        fragments_by_section: HTML fragment per section id.
         out_path: Output file; its parent directories are created.
-        placeholder: Marker text in the template.
         template_content: Template text to use instead of reading ``template_path``.
 
     Raises:
-        GenerationError: ``template_content`` is not given and ``template_path`` does not exist.
+        GenerationError: ``template_content`` is not given and ``template_path`` does not exist,
+            a marker names no given section, or a given section has no marker.
     """
     if template_content is not None:
         final_content = template_content
@@ -82,22 +84,27 @@ def assemble(
         if not template_path.exists():
             raise GenerationError(f"Specification template not found: {template_path}")
         final_content = template_path.read_text(encoding="utf-8")
-    for fragment in fragments_html:
-        final_content = final_content.replace(placeholder, fragment, 1)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(final_content, encoding="utf-8")
-    unreplaced = final_content.count(placeholder)
-    if unreplaced:
-        logging.warning(
-            "%d occurrence(s) of placeholder %r were not replaced in %s: template %s has more placeholders than "
-            "the %d fragment(s) given",
-            unreplaced,
-            placeholder,
-            out_path,
-            template_path,
-            len(fragments_html),
+
+    marked = set(_SECTION_PLACEHOLDER_RE.findall(final_content))
+    unknown = sorted(marked - fragments_by_section.keys())
+    if unknown:
+        raise GenerationError(
+            f"Specification template {template_path} has %section()% markers for section id(s) {unknown} "
+            "that are not in spec.sections"
+        )
+    unused = sorted(fragments_by_section.keys() - marked)
+    if unused:
+        raise GenerationError(
+            f"Section id(s) {unused} in spec.sections have no %section()% marker in specification template "
+            f"{template_path}"
         )
 
+    final_content = _SECTION_PLACEHOLDER_RE.sub(lambda m: fragments_by_section[m.group(1)], final_content)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(final_content, encoding="utf-8")
+
     logging.info(
-        "Wrote assembled ReSpec document to %s (%d total chars injected)", out_path, sum(len(f) for f in fragments_html)
+        "Wrote assembled ReSpec document to %s (%d total chars injected)",
+        out_path,
+        sum(len(f) for f in fragments_by_section.values()),
     )

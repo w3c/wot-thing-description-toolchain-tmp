@@ -33,7 +33,6 @@ BASE_MANIFEST: dict[str, Any] = {
     "spec": {
         "template": "spec/template.html",
         "output": "out/index.html",
-        "placeholder": "%s",
         "vocab_id_prefix": "core",
         "first_class": "Root",
         "sections": [
@@ -113,7 +112,6 @@ def test_valid_manifest_resolves_paths_against_manifest_directory(project_dir: P
         spec=SpecConfig(
             template=project_dir / "spec/template.html",
             output=project_dir / "out/index.html",
-            placeholder="%s",
             vocab_id_prefix="core",
             first_class="Root",
             sections=(
@@ -278,7 +276,6 @@ def test_unknown_key_is_rejected(
         (("spec",), "sections", "spec.sections"),
         (("spec",), "snippets", "spec.snippets"),
         (("spec",), "glossary", "spec.glossary"),
-        (("spec",), "placeholder", "spec.placeholder"),
         (("spec",), "vocab_id_prefix", "spec.vocab_id_prefix"),
         (("spec", "sections", 1), "id", "spec.sections[1].id"),
         (("spec", "sections", 1), "schema", "spec.sections[1].schema"),
@@ -310,7 +307,6 @@ def test_missing_required_key_is_rejected(
         ("modules[0].prefix", ["core"]),
         ("modules[0].ontology", True),
         ("spec.sections", "sec-core"),
-        ("spec.placeholder", 7),
         ("spec.vocab_id_prefix", 7),
         ("spec.vocab_id_prefix", ""),
         ("spec.snippet_validation_schemas", ["spec/instance-schema.json"]),
