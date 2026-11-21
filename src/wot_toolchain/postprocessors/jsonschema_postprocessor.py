@@ -562,11 +562,6 @@ def _clean_metadata(schema: dict, sv: SchemaView) -> None:
     else:
         schema.pop("version", None)
 
-    if "required" in schema:
-        req = schema["required"]
-        if "name" in req:
-            req.remove("name")
-
 
 def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     """Return a transformed copy of raw LinkML JSON Schema output; ``raw_schema`` is not modified.

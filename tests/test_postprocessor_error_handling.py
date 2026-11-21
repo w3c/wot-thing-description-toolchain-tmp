@@ -329,3 +329,9 @@ def test_ref_to_linkml_any_class_not_named_any_is_unconstrained() -> None:
 def test_ref_to_unmarked_class_named_any_is_kept() -> None:
     body = "classes:\n  Any: {}\n  Holder: {}\n"
     assert _holder_property(body, "Any") == {"$ref": "#/$defs/Any"}
+
+
+def test_root_required_entry_named_name_is_kept() -> None:
+    raw = {"$defs": {}, "required": ["name", "serial"]}
+    processed = post_process_jsonschema(raw, _schema_view("classes:\n  A: {}\n"))
+    assert processed["required"] == ["name", "serial"]
