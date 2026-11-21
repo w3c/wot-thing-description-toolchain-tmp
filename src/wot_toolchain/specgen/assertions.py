@@ -149,10 +149,6 @@ def extract_all_table_assertions(
     seen: set[str] = set()
 
     for _section_id, schema_path in section_schemas.items():
-        if not schema_path.exists():
-            logging.warning("Skipping missing schema for assertions: %s", schema_path)
-            continue
-
         prefix = prefix_map.get(schema_path.stem, schema_path.stem)
 
         # merge_imports=False: only classes defined in THIS file,
@@ -213,8 +209,6 @@ def extract_inline_assertions(
     seen: set[str] = set()
 
     for _section_id, schema_path in section_schemas.items():
-        if not schema_path.exists():
-            continue
         prefix = prefix_map.get(schema_path.stem, schema_path.stem)
         sv = load_schema_view(schema_path, merge_imports=False)
 
@@ -238,27 +232,6 @@ def extract_inline_assertions(
 
     assertions.sort(key=lambda a: a.id)
     return assertions
-
-
-def extract_all_assertions(
-    section_schemas: dict[str, Path],
-    prefix_map: dict[str, str],
-) -> list[Assertion]:
-    """Combined, deduplicated, sorted list of table + inline assertions.
-
-    Raises:
-        SchemaError: A section schema is not a file or is not valid YAML.
-    """
-    combined = extract_all_table_assertions(section_schemas, prefix_map) + extract_inline_assertions(
-        section_schemas, prefix_map
-    )
-    seen: set[str] = set()
-    unique: list[Assertion] = []
-    for a in sorted(combined, key=lambda x: x.id):
-        if a.id not in seen:
-            seen.add(a.id)
-            unique.append(a)
-    return unique
 
 
 def extract_html_assertions(html_path: Path) -> list[Assertion]:
