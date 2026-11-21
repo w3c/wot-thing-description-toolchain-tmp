@@ -317,7 +317,7 @@ def _remove_non_root_terms(context: dict[str, Any], schema_view: SchemaView, ext
     names, and enum value aliases at root level.  Only terms of the main
     vocabulary (the schema's ``default_prefix``) plus the project's extra root
     terms belong at root — all other module terms are already present inside
-    scoped ``@context`` blocks built by ``build_module_context``.
+    scoped ``@context`` blocks built by ``_module_terms``.
 
     Args:
         context: Root ``@context`` dict, modified in place.
@@ -486,7 +486,35 @@ def build_module_context(
     generator: ContextGenerator,
     prefix: str,
 ) -> dict[str, Any]:
-    """Build a standalone JSON-LD context dict for one vocabulary module."""
+    """Build a standalone JSON-LD context dict for one vocabulary module.
+
+    The context declares every schema prefix its CURIEs reference, so it expands on its own.
+    A term whose name equals a prefix keeps its term definition.
+    """
+    terms = _module_terms(schema_view, generator, prefix)
+    referenced = _referenced_prefixes(terms)
+    prefixes = {name: ns for name, ns in _prefix_declarations(schema_view).items() if name in referenced}
+    return {"@vocab": terms["@vocab"], **prefixes, **terms}
+
+
+def _referenced_prefixes(node: Any) -> set[str]:
+    """Collect the prefix part of every CURIE-shaped string value in a context node."""
+    if isinstance(node, str):
+        prefix = curie_prefix(node)
+        return {prefix} if prefix else set()
+    if isinstance(node, dict):
+        return set().union(*(_referenced_prefixes(value) for value in node.values()))
+    if isinstance(node, list):
+        return set().union(*(_referenced_prefixes(item) for item in node))
+    return set()
+
+
+def _module_terms(
+    schema_view: SchemaView,
+    generator: ContextGenerator,
+    prefix: str,
+) -> dict[str, Any]:
+    """Build the ``@vocab`` and term definitions of one vocabulary module, without prefix declarations."""
     ns = resolve_prefix_namespace(schema_view, prefix)
     context: dict[str, Any] = {"@vocab": ns}
     slots = _context_slots(schema_view)
@@ -575,7 +603,8 @@ def build_module_context(
 
 def _module_contexts(schema_view: SchemaView, generator: ContextGenerator) -> dict[str, dict[str, Any]]:
     scopes = {scope for slot in _context_slots(schema_view) if (scope := _context_scope(schema_view, slot))}
-    return {scope: build_module_context(schema_view, generator, scope) for scope in scopes}
+    # Scoped blocks inherit prefixes from _apply_root_mapping, so they take the terms alone.
+    return {scope: _module_terms(schema_view, generator, scope) for scope in scopes}
 
 
 def _prefix_declarations(schema_view: SchemaView) -> dict[str, str]:
