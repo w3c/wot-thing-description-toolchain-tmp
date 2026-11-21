@@ -38,6 +38,7 @@ from __future__ import annotations
 import csv
 import logging
 import re
+from collections.abc import Collection
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -289,8 +290,20 @@ def html_assertions_to_csv(
     html_path: Path,
     out_path: Path,
     extra_asserts_path: Path | None = None,
+    foreign_vocab_id_prefixes: Collection[str] = (),
 ) -> None:
-    """Extract assertions from final HTML (and optional extra-asserts.html) and write CSV."""
+    """Extract assertions from final HTML (and optional extra-asserts.html) and write CSV.
+
+    Args:
+        html_path: The final specification HTML.
+        out_path: The CSV file to write.
+        extra_asserts_path: Optional HTML file with further assertions to merge in.
+        foreign_vocab_id_prefixes: Prefixes that vocabulary-table assertion IDs must not use,
+            see ``validate_html_assertion_inventory``.
+
+    Raises:
+        GenerationError: The assertion inventory of ``html_path`` is invalid; no CSV is written.
+    """
     assertions = extract_html_assertions(html_path)
     extra_ids: set[str] = set()
     if extra_asserts_path and extra_asserts_path.exists():
@@ -306,7 +319,9 @@ def html_assertions_to_csv(
     pending_path = out_path.with_name(out_path.name + ".pending")
     assertions_to_csv(assertions, pending_path)
     try:
-        problems = validate_html_assertion_inventory(html_path, pending_path, extra_ids=extra_ids)
+        problems = validate_html_assertion_inventory(
+            html_path, pending_path, extra_ids=extra_ids, foreign_vocab_id_prefixes=foreign_vocab_id_prefixes
+        )
         if problems:
             raise GenerationError(f"Assertion inventory of {html_path} is invalid:\n" + "\n".join(problems))
         pending_path.replace(out_path)
@@ -335,8 +350,20 @@ def validate_html_assertion_inventory(
     html_path: Path,
     csv_path: Path | None = None,
     extra_ids: set[str] | None = None,
+    foreign_vocab_id_prefixes: Collection[str] = (),
 ) -> list[str]:
-    """Return compatibility problems for the final HTML assertion inventory."""
+    """Return compatibility problems for the final HTML assertion inventory.
+
+    Args:
+        html_path: The final specification HTML.
+        csv_path: Optional assertion CSV whose IDs must match those of the HTML.
+        extra_ids: IDs allowed in the CSV without appearing in the HTML.
+        foreign_vocab_id_prefixes: Prefixes whose ``<prefix>-vocab-...`` IDs are reported, e.g. the module
+            prefixes that differ from the ``vocab_id_prefix`` all vocabulary tables share.
+
+    Returns:
+        One message per problem; empty if the inventory is valid.
+    """
     doc = html.fromstring(html_path.read_text(encoding="utf-8", errors="replace"))
     elements = _assertion_elements(doc)
     ids = [element.get("id") for element in elements if element.get("id")]
@@ -353,7 +380,7 @@ def validate_html_assertion_inventory(
     foreign_prefix_ids = sorted(
         assertion_id
         for assertion_id in ids
-        if assertion_id.startswith(("jsonschema-vocab-", "wotsec-vocab-", "hctl-vocab-"))
+        if assertion_id.startswith(tuple(f"{prefix}-vocab-" for prefix in foreign_vocab_id_prefixes))
     )
     if foreign_prefix_ids:
         problems.append(f"foreign table assertion prefixes: {', '.join(foreign_prefix_ids[:20])}")

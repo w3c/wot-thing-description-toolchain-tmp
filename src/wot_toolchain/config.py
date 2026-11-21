@@ -63,10 +63,12 @@ class SpecSection:
     Attributes:
         id: HTML id of the section in the specification template.
         schema: Absolute path of the module schema rendered into the section.
+        prefix: Prefix of that module.
     """
 
     id: str
     schema: Path
+    prefix: str
 
 
 @dataclass(frozen=True)
@@ -258,7 +260,7 @@ def _parse_spec(root: _Node, modules: tuple[Module, ...]) -> SpecConfig | None:
     spec = root.optional_mapping("spec", _SPEC_KEYS)
     if spec is None:
         return None
-    module_schemas = {module.schema for module in modules}
+    module_prefixes = {module.schema: module.prefix for module in modules}
     static_schemas, generated_schemas = _parse_validation_schemas(spec)
     return SpecConfig(
         template=spec.input_path("template", "file"),
@@ -266,7 +268,7 @@ def _parse_spec(root: _Node, modules: tuple[Module, ...]) -> SpecConfig | None:
         placeholder=spec.string("placeholder"),
         vocab_id_prefix=spec.string("vocab_id_prefix"),
         first_class=spec.optional_string("first_class"),
-        sections=tuple(_parse_section(node, module_schemas) for node in spec.mappings("sections", _SECTION_KEYS)),
+        sections=tuple(_parse_section(node, module_prefixes) for node in spec.mappings("sections", _SECTION_KEYS)),
         snippets=spec.input_path("snippets", "directory"),
         glossary=spec.input_path("glossary", "file"),
         extra_asserts=spec.optional_input_path("extra_asserts", "file"),
@@ -276,15 +278,15 @@ def _parse_spec(root: _Node, modules: tuple[Module, ...]) -> SpecConfig | None:
     )
 
 
-def _parse_section(node: _Node, module_schemas: set[Path]) -> SpecSection:
+def _parse_section(node: _Node, module_prefixes: Mapping[Path, str]) -> SpecSection:
     schema = node.input_path("schema", "file")
-    if schema not in module_schemas:
+    if schema not in module_prefixes:
         raise node.error(
             node.child("schema"),
             f"{schema} is not the schema of any module",
             "Use the schema path of one of the entries under 'modules'.",
         )
-    return SpecSection(id=node.string("id"), schema=schema)
+    return SpecSection(id=node.string("id"), schema=schema, prefix=module_prefixes[schema])
 
 
 def _parse_validation_schemas(spec: _Node) -> tuple[Mapping[str, Path], Mapping[str, str]]:

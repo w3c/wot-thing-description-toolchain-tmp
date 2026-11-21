@@ -117,8 +117,8 @@ def test_valid_manifest_resolves_paths_against_manifest_directory(project_dir: P
             vocab_id_prefix="core",
             first_class="Root",
             sections=(
-                SpecSection("sec-extra", project_dir / "schemas/extra.yaml"),
-                SpecSection("sec-core", project_dir / "schemas/core.yaml"),
+                SpecSection("sec-extra", project_dir / "schemas/extra.yaml", "extra"),
+                SpecSection("sec-core", project_dir / "schemas/core.yaml", "core"),
             ),
             snippets=project_dir / "spec/snippets",
             glossary=project_dir / "spec/glossary.yaml",

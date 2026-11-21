@@ -467,7 +467,8 @@ def generate_respec_spec(spec: SpecConfig, main_schema: Path) -> None:
     assemble(spec.template, *fragments, out_path=spec.output, placeholder=spec.placeholder, template_content=template)
 
     if spec.assertions_csv is not None:
-        html_assertions_to_csv(spec.output, spec.assertions_csv, spec.extra_asserts)
+        foreign_prefixes = sorted({section.prefix for section in spec.sections} - {spec.vocab_id_prefix})
+        html_assertions_to_csv(spec.output, spec.assertions_csv, spec.extra_asserts, foreign_prefixes)
 
 
 def _process_description(raw_text: str) -> str:

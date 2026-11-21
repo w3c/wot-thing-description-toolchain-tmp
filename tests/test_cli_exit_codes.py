@@ -13,7 +13,12 @@ from click.testing import CliRunner
 
 from wot_toolchain.cli import main
 from wot_toolchain.errors import ExternalToolError, GenerationError
-from wot_toolchain.specgen.assertions import ASSERTION_INLINE, html_assertions_to_csv
+from wot_toolchain.specgen.assertions import (
+    ASSERTION_INLINE,
+    ASSERTION_TABLE,
+    html_assertions_to_csv,
+    validate_html_assertion_inventory,
+)
 from wot_toolchain.specgen.bikeshed_processor import _split_by_markers, process_fragments
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -86,6 +91,24 @@ def test_invalid_assertion_inventory_raises_and_writes_no_csv(tmp_path: Path) ->
     with pytest.raises(GenerationError):
         html_assertions_to_csv(html, out)
     assert not out.exists()
+
+
+def _table_assertion_html(tmp_path: Path, *ids: str) -> Path:
+    rows = "".join(f'<tr class="{ASSERTION_TABLE}" id="{assertion_id}"><td>x</td></tr>' for assertion_id in ids)
+    html = tmp_path / "index.html"
+    html.write_text(f"<html><body><table>{rows}</table></body></html>", encoding="utf-8")
+    return html
+
+
+def test_inventory_flags_vocab_ids_of_given_foreign_prefixes(tmp_path: Path) -> None:
+    html = _table_assertion_html(tmp_path, "core-vocab-a--Root", "extra-vocab-b--Item")
+    problems = validate_html_assertion_inventory(html, foreign_vocab_id_prefixes=("extra",))
+    assert problems == ["foreign table assertion prefixes: extra-vocab-b--Item"]
+
+
+def test_inventory_knows_no_foreign_prefixes_by_itself(tmp_path: Path) -> None:
+    html = _table_assertion_html(tmp_path, "jsonschema-vocab-a--A", "wotsec-vocab-b--B", "hctl-vocab-c--C")
+    assert validate_html_assertion_inventory(html) == []
 
 
 def test_quiet_is_a_flag() -> None:
