@@ -6,6 +6,20 @@
 
 This toolchain uses **one LinkML schema as the single source of truth** and generates all official W3C artifacts from it. Consistency is structural and semantic.
 
+**This repository is an installable tool and library consumed by other repositories.** Each consumer keeps its own LinkML schemas and its own `wot-toolchain.yaml` manifest and installs a pinned git tag of this package (no PyPI release):
+
+```bash
+uv tool install git+https://github.com/w3c/wot-thing-description-toolchain-tmp@<tag>
+```
+
+- First consumer: `w3c/wot-thing-description`; its LinkML schemas will live there under `linkml/`.
+- Second consumer (later): `w3c/wot-binding-templates`.
+- The schemas and test data in this repository target the next TD version, labelled `td-next`.
+
+Rule for agents: **no TD-specific knowledge in Python.** Project-specific configuration (file names, prefixes, labels, sections, paths) goes into the manifest — not into new LinkML annotations and not into hard-coded names in `src/wot_toolchain/`.
+
+Release-quality outputs: JSON Schema, spec HTML with assertions CSV, JSON-LD context. Experimental: OWL, SHACL, class diagrams (visualization).
+
 **One LinkML schema → generate all artifacts:**
 
 | Artifact | Path |
@@ -16,9 +30,29 @@ This toolchain uses **one LinkML schema as the single source of truth** and gene
 | SHACL Shapes (experimental) | `resources/gens/shacl/shapes.shacl.ttl` |
 | OWL Ontologies (experimental) | `resources/gens/owl/` (`td.ttl`, `tm.ttl`, `hctl.ttl`, `wotsec.ttl`, `jsonschema.ttl`) |
 | Class diagrams (experimental) | `resources/gens/visualization/*.svg` |
-| Assertion CSVs | `resources/gens/assertions/` |
+| Assertion CSV | `resources/gens/assertions/assertions.csv` |
+| Merged LinkML schema | `resources/gens/linkml/linkml.yaml` |
 
-Output paths and generators are configured in the project manifest `wot-toolchain.yaml`.
+Output paths and generators are configured in the project manifest `wot-toolchain.yaml`: each generator listed under `generators` writes into `<output_dir>/<generator>/`; the spec HTML and assertions CSV paths come from `spec.output` and `spec.assertions_csv`.
+
+### CLI
+
+```bash
+wot-toolchain [-v|-vv|-q] generate-wot-resources [OPTIONS]
+wot-toolchain diff-report GENERATED REFERENCE
+```
+
+`generate-wot-resources` options:
+
+| Option | Effect |
+|---|---|
+| `-c`, `--config PATH` | Project manifest (default `wot-toolchain.yaml` in the current directory) |
+| `-i`, `--input_schema PATH` | LinkML schema to use instead of the manifest's `main_schema` |
+| `-d`, `--generate_docs` | Also build the specification from the manifest's `spec` section (requires `bikeshed`) |
+| `--output-dir DIR` | Replaces the manifest's `output_dir` for generator artifacts only; it does **not** redirect `spec.output` (spec HTML) or `spec.assertions_csv` |
+| `--only GENERATOR` | Run only this generator; repeatable; must be listed in the manifest's `generators` |
+
+`diff-report` prints a Markdown report of the JSON paths in which `GENERATED` differs from `REFERENCE`; differences do not fail the command. Errors derived from `WotToolchainError` (`errors.py`) are logged and exit with status 1.
 
 ## Codebase Layout
 
@@ -33,9 +67,12 @@ resources/schemas/          ← SOURCE OF TRUTH (edit here, not in gens/)
   README.md                 ← points to docs/guidelines/ (read before touching schemas)
 
 src/wot_toolchain/
-  cli.py                    ← entry point: wot-toolchain generate-wot-resources [-d] | diff-report GENERATED REFERENCE
-  config.py                 ← project manifest loading
-  pipeline.py               ← runs the LinkML generators and postprocessors
+  cli.py                    ← entry point: wot-toolchain generate-wot-resources | diff-report (see CLI above)
+  config.py                 ← project manifest loading and validation
+  errors.py                 ← WotToolchainError and subclasses (manifest, schema, generation, external tool)
+  pipeline.py               ← run_pipeline; the _gen_* artifact generators and their _DISPATCH table
+  diff_report.py            ← JSON structural diff used by diff-report
+  schema_utils.py           ← SchemaView loading and annotation helpers
   generators/               ← spec (respec.py) and class-diagram (visualization.py) generators
   preprocessors/            ← owl_preprocessor.py
   postprocessors/           ← adjust raw LinkML output to meet W3C WoT TD requirements
@@ -145,11 +182,13 @@ Two categories with different update policies:
 | Directory | Type | Update policy |
 |---|---|---|
 | `resources/upstream/` | W3C reference artifacts, hand-verified, authoritative | Require explicit maintainer approval in PR description; never auto-update |
-| `tests/snapshots/` | Machine-updatable snapshots | Update via `--update-goldens` flag when an intentional change is verified |
+| `tests/snapshots/` | Machine-updatable snapshots | Update via `--update-goldens` flag, only after explicit maintainer approval |
+
+Snapshots, goldens and known-failure baselines (`tests/known_failures/`, `tests/approved_divergences/`) are never updated without explicit maintainer approval.
 
 **When a golden diff CI job fails:**
 1. Read the diff — is it expected from the schema change?
-2. If expected: run `uv run pytest tests/test_golden_diff.py --update-goldens`, commit the updated snapshot, explain in PR description.
+2. If expected: report the diff and get maintainer approval; then run `uv run pytest tests/test_golden_diff.py --update-goldens`, commit the updated snapshot, explain in PR description.
 3. If unexpected: the change has a side-effect — investigate before updating.
 4. `--update-goldens` only rewrites `tests/snapshots/`; files in `resources/upstream/` require human review.
 
@@ -263,12 +302,13 @@ Files with high concurrent-edit risk. Check for in-progress PRs before touching.
 - Keep branches focused — one logical change per PR.
 - Before opening a PR, rebase on latest `main` and re-run generation to ensure clean output.
 
-## Current Priorities (2026-07)
+## Current Priorities (2026-11)
 
-1. JSON Schema correctness — all td11 + td-next instance validations pass.
-2. HTML spec correctness — structure and vocabulary tables match `resources/upstream/html/index.html`.
-3. Snippet validity — all `.json` files validate against the schemas in `spec.snippet_validation_schemas`.
-4. Assertion CSVs — assertions match anchors in `index.html`.
+Everything in this section is **PLANNED and not yet implemented** unless stated otherwise.
+
+1. **Generators as modules (PLANNED).** Current state: the artifact generators are private `_gen_*` functions in `src/wot_toolchain/pipeline.py`, dispatched through its `_DISPATCH` dict; the generator names are validated against `KNOWN_GENERATORS` in `config.py`; `--only` filters the manifest's `generators`; each generator writes to `<output_dir>/<name>/`. Planned: each generator becomes its own module under `src/wot_toolchain/generators/` with the contract `(project, sv, output_dir) -> None`, and one registry feeds both `--only` and the output directory mapping. This is a pure move: zero change in generated output.
+2. **Consumer rollout (PLANNED), in this order:** this toolchain repository first; then a release tag; then a branch in `w3c/wot-thing-description` with the schemas under `linkml/`, its own manifest and a preview workflow, opened as a side-by-side draft PR; then instance-based tests there.
+3. Snapshots, goldens and known-failure baselines change only with explicit maintainer approval (current rule; see Golden Files).
 
 Out of scope for now: automated ontology/SHACL consistency (the reference ontologies in `resources/upstream/ontology/` are used for reference only).
 
