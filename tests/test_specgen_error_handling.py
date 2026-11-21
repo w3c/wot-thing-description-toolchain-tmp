@@ -7,12 +7,13 @@ from pathlib import Path
 
 import pytest
 from linkml_runtime.linkml_model.meta import ClassDefinition, SlotDefinition
+from linkml_runtime.utils.schemaview import SchemaView
 
 from wot_toolchain.errors import GenerationError, SchemaError
 from wot_toolchain.specgen.assertions import extract_all_table_assertions, extract_inline_assertions
 from wot_toolchain.specgen.bikeshed_processor import process_fragments
 from wot_toolchain.specgen.respec import assemble
-from wot_toolchain.specgen.tables import get_assignment
+from wot_toolchain.specgen.tables import collect_slot_rows, get_assignment
 
 _SCHEMA_HEADER = """\
 id: https://example.org/mod
@@ -116,3 +117,9 @@ def test_assemble_warns_about_unreplaced_placeholders_naming_the_files(
 def test_process_fragments_length_mismatch_raises_generation_error(tmp_path: Path) -> None:
     with pytest.raises(GenerationError, match=r"2 section ids but 1 fragment"):
         process_fragments(["a", "b"], ["<p>x</p>"], tmp_path / "glossary.yaml")
+
+
+def test_slot_rows_display_unaliased_at_name_slot_under_its_own_name(tmp_path: Path) -> None:
+    schema = _write_schema(tmp_path, 'slots:\n  "@name": {}\nclasses:\n  Sensor:\n    slots: ["@name"]\n')
+    [row] = collect_slot_rows(SchemaView(str(schema)), "Sensor", lambda text: text)
+    assert row["slot_name"] == "@name"
