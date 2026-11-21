@@ -118,6 +118,8 @@ class Project:
         top_class: Root class of the generated JSON Schema, or ``None`` for the generator default.
         modules: Vocabulary modules, in manifest order.
         spec: Specification build settings, or ``None`` if the project builds no specification.
+        extra_root_terms: Terms outside the main schema's default prefix that stay in the root of the merged
+            JSON-LD context, in manifest order. Written under ``jsonld`` in the manifest.
     """
 
     manifest_path: Path
@@ -127,6 +129,7 @@ class Project:
     top_class: str | None
     modules: tuple[Module, ...]
     spec: SpecConfig | None
+    extra_root_terms: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -139,8 +142,9 @@ class _Keys:
         return self.required + self.optional
 
 
-_PROJECT_KEYS = _Keys(("main_schema", "output_dir", "generators", "modules"), ("jsonschema", "spec"))
+_PROJECT_KEYS = _Keys(("main_schema", "output_dir", "generators", "modules"), ("jsonschema", "jsonld", "spec"))
 _JSONSCHEMA_KEYS = _Keys((), ("top_class",))
+_JSONLD_KEYS = _Keys((), ("extra_root_terms",))
 _MODULE_KEYS = _Keys(("schema", "prefix"), ("ontology", "context", "diagram"))
 _SPEC_KEYS = _Keys(
     ("template", "output", "placeholder", "sections", "snippets", "glossary"),
@@ -180,6 +184,7 @@ def load_project(manifest_path: Path) -> Project:
         top_class=top_class,
         modules=modules,
         spec=_parse_spec(root, modules),
+        extra_root_terms=_parse_extra_root_terms(root),
     )
 
 
@@ -213,6 +218,19 @@ def _parse_generators(root: _Node) -> tuple[str, ...]:
 def _parse_top_class(root: _Node) -> str | None:
     jsonschema = root.optional_mapping("jsonschema", _JSONSCHEMA_KEYS)
     return None if jsonschema is None else jsonschema.optional_string("top_class")
+
+
+def _parse_extra_root_terms(root: _Node) -> tuple[str, ...]:
+    jsonld = root.optional_mapping("jsonld", _JSONLD_KEYS)
+    if jsonld is None or "extra_root_terms" not in jsonld.values:
+        return ()
+    terms: list[str] = []
+    for key_path, value in jsonld.list_items("extra_root_terms"):
+        term = jsonld.as_string(value, key_path)
+        if term in terms:
+            raise jsonld.error(key_path, f"duplicate extra root term {term!r}", "List each term once.")
+        terms.append(term)
+    return tuple(terms)
 
 
 def _parse_modules(root: _Node) -> tuple[Module, ...]:

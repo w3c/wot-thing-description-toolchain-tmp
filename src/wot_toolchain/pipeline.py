@@ -155,7 +155,9 @@ def _gen_jsonldcontext(project: Project, sv: SchemaView, output_dir: Path) -> No
         module_ctx = build_module_context(sv, module_gen, module.prefix)
         doc = json.dumps({"@context": module_ctx}, indent=2)
         (output_dir / module.context).write_text(doc)
-    merged = post_process_jsonld_context(sv, _context_generator(sv).serialize())
+    merged = post_process_jsonld_context(
+        sv, _context_generator(sv).serialize(), extra_root_terms=project.extra_root_terms
+    )
     (output_dir / "context.jsonld").write_text(merged)
 
 

@@ -30,9 +30,9 @@ def _schema_view(body: str) -> SchemaView:
     return SchemaView(SCHEMA_HEADER + body)
 
 
-def _jsonld_context(sv: SchemaView) -> str:
+def _jsonld_context(sv: SchemaView, extra_root_terms: tuple[str, ...] = ()) -> str:
     serialized = ContextGenerator(sv.schema, mergeimports=True, fix_multivalue_containers=True).serialize()
-    return post_process_jsonld_context(sv, serialized)
+    return post_process_jsonld_context(sv, serialized, extra_root_terms=extra_root_terms)
 
 
 def test_undeclared_prefix_raises_schema_error_naming_prefix_and_schema() -> None:
@@ -227,3 +227,32 @@ def test_root_context_with_omitted_default_prefix_raises_schema_error() -> None:
 
     with pytest.raises(SchemaError, match=rf"default_prefix '{substituted}' is not declared.*'probe'"):
         _jsonld_context(sv)
+
+
+FOREIGN_SLOT_SCHEMA = """
+slots:
+  stamp:
+    slot_uri: a:stamp
+    range: string
+classes:
+  Probe:
+    class_uri: ex:Probe
+    slots: [stamp]
+"""
+
+
+def test_root_context_drops_term_outside_default_prefix() -> None:
+    root = json.loads(_jsonld_context(_schema_view(FOREIGN_SLOT_SCHEMA)))["@context"]
+
+    assert "stamp" not in root
+
+
+def test_root_context_keeps_extra_root_term_outside_default_prefix() -> None:
+    root = json.loads(_jsonld_context(_schema_view(FOREIGN_SLOT_SCHEMA), ("stamp",)))["@context"]
+
+    assert root["stamp"] == {"@id": "a:stamp"}
+
+
+def test_extra_root_term_missing_from_generated_context_raises_schema_error_naming_term() -> None:
+    with pytest.raises(SchemaError, match=r"'nowhere'"):
+        _jsonld_context(_schema_view(FOREIGN_SLOT_SCHEMA), ("nowhere",))

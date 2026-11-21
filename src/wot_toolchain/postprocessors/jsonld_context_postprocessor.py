@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Collection
 from copy import deepcopy
 from typing import Any
 
@@ -13,14 +14,11 @@ from linkml_runtime.utils.schemaview import SchemaView
 
 from ..errors import SchemaError
 from ..schema_utils import annotation_str_value as _annotation_value
-from ..schema_utils import default_prefix
+from ..schema_utils import default_prefix, get_schema
 from . import curie_prefix, resolve_prefix_namespace
 
 JSONLD_RESERVED_SLOT_NAMES = frozenset({"@context", "@type"})
 JSONLD_FIXED_TERM_MAPPINGS = {"id": "@id"}
-
-# Non-td-prefixed terms that upstream places at root level.
-_ROOT_WHITELIST = frozenset({"schema", "created", "modified"})
 
 
 def _expand_curie(schema_view: SchemaView, curie: str) -> str:
@@ -312,23 +310,32 @@ def _remove_linkml_internals(context: dict[str, Any]) -> None:
             _remove_linkml_internals(val["@context"])
 
 
-def _remove_non_root_terms(context: dict[str, Any], schema_view: SchemaView) -> None:
+def _remove_non_root_terms(context: dict[str, Any], schema_view: SchemaView, extra_root_terms: Collection[str]) -> None:
     """Remove terms outside the main schema's default prefix from the root context.
 
     The LinkML context generator and enum-alias step emit all slots, class
-    names, and enum value aliases at root level.  Per the WoT TD 1.1 context,
-    only terms of the main vocabulary (the schema's ``default_prefix``) plus a
-    small whitelist belong at root — all other module terms are already present
-    inside scoped ``@context`` blocks built by ``build_module_context``.
+    names, and enum value aliases at root level.  Only terms of the main
+    vocabulary (the schema's ``default_prefix``) plus the project's extra root
+    terms belong at root — all other module terms are already present inside
+    scoped ``@context`` blocks built by ``build_module_context``.
 
     Args:
         context: Root ``@context`` dict, modified in place.
         schema_view: SchemaView of the main schema.
+        extra_root_terms: Terms outside the default prefix that stay in the root context.
 
     Raises:
-        SchemaError: The SchemaView has no schema loaded, or its ``default_prefix``
-            is unset or not declared in its ``prefixes``.
+        SchemaError: The SchemaView has no schema loaded, its ``default_prefix``
+            is unset or not declared in its ``prefixes``, or an extra root term
+            is not in the generated root context.
     """
+    missing = [term for term in extra_root_terms if term not in context]
+    if missing:
+        raise SchemaError(
+            f"Extra root term(s) {', '.join(map(repr, missing))} are not in the JSON-LD context generated from "
+            f"schema {get_schema(schema_view).name!r}. Remove them from 'jsonld.extra_root_terms' in the manifest "
+            "or define them in the schema."
+        )
     root_prefix = default_prefix(schema_view)
     root_slots: set[str] = set()
     non_root_slots: set[str] = set()
@@ -363,7 +370,7 @@ def _remove_non_root_terms(context: dict[str, Any], schema_view: SchemaView) -> 
     for key in context:
         if key.startswith("@"):
             continue
-        if key in _ROOT_WHITELIST:
+        if key in extra_root_terms:
             continue
         if key in non_root_slots or key in non_root_classes or key in non_root_enum_aliases:
             remove.add(key)
@@ -735,12 +742,26 @@ def _apply_class_mappings(
             _apply_root_mapping(context, schema_view, slot, module_contexts)
 
 
-def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str) -> str:
+def post_process_jsonld_context(
+    schema_view: SchemaView, serialized_schema: str, *, extra_root_terms: Collection[str]
+) -> str:
     """Add schema-declared scoped contexts and index predicates to LinkML output.
 
     LinkML natively emits container mappings when
     ``fix_multivalue_containers`` is enabled. It does not currently emit the
     RDF predicate represented by a keyed map, or scoped vocabulary contexts.
+
+    Args:
+        schema_view: SchemaView of the main schema.
+        serialized_schema: JSON-LD context serialized by LinkML's ``ContextGenerator``.
+        extra_root_terms: Terms outside the schema's default prefix that stay in the root context.
+
+    Returns:
+        The post-processed JSON-LD context document, serialized as JSON.
+
+    Raises:
+        SchemaError: Schema content cannot be composed into a JSON-LD context (the message names the
+            offending element), or an extra root term is not in the generated root context.
     """
     document = json.loads(serialized_schema)
     context = document["@context"]
@@ -767,6 +788,6 @@ def post_process_jsonld_context(schema_view: SchemaView, serialized_schema: str)
     _fix_type_designator_mapping(context, schema_view)
     _add_enum_value_aliases(context, schema_view)
     _remove_linkml_internals(context)
-    _remove_non_root_terms(context, schema_view)
+    _remove_non_root_terms(context, schema_view, extra_root_terms)
     context["@version"] = 1.1
     return json.dumps(document, indent=2)

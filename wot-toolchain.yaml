@@ -16,6 +16,12 @@ generators:
 jsonschema:
   top_class: Thing
 
+# The merged JSON-LD context keeps only terms of the main schema's default prefix (td) at its root; terms of
+# other vocabularies live in scoped contexts. These terms are outside td but the upstream TD context places
+# them at its root: schema (hctl:hasAdditionalOutputSchema), created and modified (dcterms).
+jsonld:
+  extra_root_terms: [schema, created, modified]
+
 # ontology, context and diagram are output file names, written to <output_dir>/owl, jsonldcontext and visualization.
 modules:
   - schema: resources/schemas/thing_description.yaml

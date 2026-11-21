@@ -471,3 +471,43 @@ def test_malformed_generated_validation_schema_is_rejected(
     manifest["spec"]["snippet_validation_schemas"]["instance"] = entry
 
     load_expecting_error(project_dir, manifest, "spec.snippet_validation_schemas.instance", fragment)
+
+
+# --- JSON-LD root context terms --------------------------------------------------------------------------------------
+
+
+def test_extra_root_terms_are_loaded_in_manifest_order(project_dir: Path, manifest: dict[str, Any]) -> None:
+    manifest["jsonld"] = {"extra_root_terms": ["schema", "created", "modified"]}
+
+    project = load_project(write_manifest(project_dir, manifest))
+
+    assert project.extra_root_terms == ("schema", "created", "modified")
+
+
+def test_extra_root_terms_default_to_empty(project_dir: Path, manifest: dict[str, Any]) -> None:
+    project = load_project(write_manifest(project_dir, manifest))
+
+    assert project.extra_root_terms == ()
+
+
+def test_repository_manifest_keeps_upstream_root_terms() -> None:
+    assert load_project(REPO_ROOT / MANIFEST_NAME).extra_root_terms == ("schema", "created", "modified")
+
+
+@pytest.mark.parametrize(
+    ("jsonld", "key_path", "fragment"),
+    [
+        (["schema"], "jsonld", "must be a mapping"),
+        ({"extra_root_terms": "schema"}, "jsonld.extra_root_terms", "must be a list"),
+        ({"extra_root_terms": [7]}, "jsonld.extra_root_terms[0]", "must be a non-empty string"),
+        ({"extra_root_terms": []}, "jsonld.extra_root_terms", "must not be empty"),
+        ({"extra_root_terms": ["schema", "schema"]}, "jsonld.extra_root_terms[1]", "duplicate extra root term"),
+        ({"colour": "blue"}, "jsonld.colour", "unknown key"),
+    ],
+)
+def test_invalid_extra_root_terms_are_rejected(
+    project_dir: Path, manifest: dict[str, Any], jsonld: Any, key_path: str, fragment: str
+) -> None:
+    manifest["jsonld"] = jsonld
+
+    load_expecting_error(project_dir, manifest, key_path, fragment)
