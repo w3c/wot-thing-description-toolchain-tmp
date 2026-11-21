@@ -1,3 +1,4 @@
+default_schema: td
 snippets:
   action-serialization:
     id: action-serialization-sample
@@ -10,6 +11,7 @@ snippets:
     - security
     - actions.*.forms.*
   basic-on-off-tm:
+    schema: tm
     id: td-model-example-basic-on-off
     title: Basic On/Off Thing Model Definition
     layout: pre
@@ -188,6 +190,7 @@ snippets:
   led-td:
     title: LED TD
   led-tm:
+    schema: tm
     title: LED TM
   link-electric-drive:
     id: link-electric-drive
@@ -234,6 +237,7 @@ snippets:
   mqtt-binding-expanded:
     validate: false
   multi-sensor-tm:
+    schema: tm
     id: td-model-example-relative-tmRef
     title: Multi Sensor Thing Model re-using definitions with relative imports
     layout: pre
@@ -446,6 +450,7 @@ snippets:
     id: simple-thing-description-sample
     title: Thing Description sample
   smart-lamp-control-tm:
+    schema: tm
     id: td-model-example-smart-lamp-control
     title: Smart Lamp Control Thing Model Definition
     layout: pre
@@ -453,6 +458,7 @@ snippets:
     layout: pre
     validate: false
   smart-pump-tm:
+    schema: tm
     layout: pre
     validate: false
   smart-ventilator-selfcontained-td:
@@ -462,6 +468,7 @@ snippets:
   smart-ventilator-td:
     title: Top level Smart Ventilator TD
   smart-ventilator-tm:
+    schema: tm
     title: Smart Ventilator TM
   td-context-extension:
     id: thing-description-full-serialization
@@ -503,6 +510,7 @@ snippets:
     layout: pre
     validate: false
   thermostat-placeholder-tm:
+    schema: tm
     layout: pre
     validate: false
   thing-serialization:
@@ -521,34 +529,42 @@ snippets:
     - links.*
     - forms.*
   tm-extend-import:
+    schema: tm
     id: td-model-example-smart-lamp-control-extend-import
     title: Smart Lamp Control Thing Model with extend and import mechanism
     layout: pre
   tm-extending-dim:
+    schema: tm
     id: tm-extending-dim
     title: Extending Smart Control Lamp with a modified dim constrained
     layout: pre
   tm-model-sample:
+    schema: tm
     id: td-model-example-lamp
     title: Thing Model sample
     layout: pre
   tm-optional-overwrite:
+    schema: tm
     id: tm-optional-overwrite
     title: Thing Model overwrites tm:optional of the previous Thing Model example.
     layout: pre
   tm-optional:
+    schema: tm
     id: tm-optional
     title: Thing Model with the tm:optional term for interaction affordances.
     layout: pre
   tm-overwrite:
+    schema: tm
     id: td-model-example-tmRef2
     title: Smart Lamp Control extend and overwrite existing definitions
     layout: pre
   tm-ref-import:
+    schema: tm
     id: td-model-example-tmRef
     title: Smart Lamp Control imports existing definition
     layout: pre
   tm-versioning:
+    schema: tm
     id: tm-versioning
     title: Thing Model versioning
     layout: pre
@@ -595,6 +611,7 @@ snippets:
   ventilation-td:
     title: Ventilation TD
   ventilation-tm:
+    schema: tm
     title: Ventilation TM
   version-info:
     id: semantic-annotations-example-version-units-ver

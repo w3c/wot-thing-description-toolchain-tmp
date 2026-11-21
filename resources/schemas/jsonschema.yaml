@@ -143,7 +143,7 @@ slots:
     inlined_as_list: true
     annotations:
       skos:note: >-
-        The upstream JSON Schema ontology defines `jsonschema:allOf`, but the current TD 2.0 Data Schema vocabulary table does not list it; confirm its inclusion with the WoT Working Group.
+        The upstream JSON Schema ontology defines `jsonschema:allOf`, but the current td-next Data Schema vocabulary table does not list it; confirm its inclusion with the WoT Working Group.
       spec_exclude: true
   propertyName:
     description: >-

@@ -159,7 +159,7 @@ slots:
   base:
     description: >-
       Define the base URI that is used for all relative URI references throughout a TD document.
-      In TD instances, all relative URIs are resolved relative to the base URI using the algorithm defined in [RFC3986]. 
+      In TD instances, all relative URIs are resolved relative to the base URI using the algorithm defined in [RFC3986].
       base does not affect the URIs used in @context and the IRIs used within Linked Data graphs that are relevant when semantic processing is applied to TD instances.
     slot_uri: td:baseURI
     domain: Thing
@@ -291,6 +291,7 @@ slots:
     slot_uri: td:schemaDefinitions
     domain: Thing
     annotations:
+      jsonld_context: none
       jsonld_index: td:hasInstanceConfiguration
       spec_description: >-
         Set of named data schemas. To be used in a schema name-value pair inside an `AdditionalExpectedResponse` object.
@@ -390,7 +391,7 @@ classes:
               - id: td-context-ns-thing-mandatory
                 text: |
                   The `@context` name-value pair *MUST* contain the anyURI `https://www.w3.org/ns/wot-next/td` in order
-                  to identify the document as a TD 2.0 which would allow Consumers to use the newly introduced terms.
+                  to identify the document as a td-next TD which would allow Consumers to use the newly introduced terms.
               - id: td-context-ns-thing-optional
                 text: |
                   When `@context` is an Array, the anyURI `https://www.w3.org/ns/wot-next/td` *MAY* be followed by elements of type

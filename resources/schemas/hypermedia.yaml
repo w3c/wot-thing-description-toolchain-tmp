@@ -294,7 +294,7 @@ slots:
     range: string
   contentType:
     description: >-
-      Assign a content type based on a media type (e.g., text/plain) and potential parameters 
+      Assign a content type based on a media type (e.g., text/plain) and potential parameters
       (e.g., charset=utf-8) for the media type [RFC2046].
     slot_uri: hctl:forContentType
     annotations:
@@ -393,7 +393,7 @@ classes:
         required: true
       type:
         description: >-
-          Target attribute providing a hint indicating what the media type [RFC2046] of the result of 
+          Target attribute providing a hint indicating what the media type [RFC2046] of the result of
           dereferencing the link should be.
         annotations:
           spec_description: >-
@@ -418,7 +418,7 @@ classes:
         range: uri
       sizes:
         description: >-
-          Target attribute that specifies one or more sizes for the referenced icon. Only applicable for relation 
+          Target attribute that specifies one or more sizes for the referenced icon. Only applicable for relation
           type "icon". The value pattern follows {Height}x{Width} (e.g., "16x16", "16x16 32x32").
         slot_uri: hctl:hasSizes
         domain: Link
@@ -426,7 +426,7 @@ classes:
         pattern: "^(\\d+x\\d+)(\\s+\\d+x\\d+)*$"
       hreflang:
         description: >-
-          The hreflang attribute specifies the language of a linked document. The value of this must be a valid 
+          The hreflang attribute specifies the language of a linked document. The value of this must be a valid
           language tag [BCP47].
         annotations:
           spec_description: >-
@@ -466,7 +466,7 @@ classes:
           slot: op
           enum: OperationType
       spec_description: >-
-        A form can be viewed as a statement of "To perform an **operation type** operation on **form context**, make a **request method** request to **submission target**" where the optional **form fields** may further describe the required request. 
+        A form can be viewed as a statement of "To perform an **operation type** operation on **form context**, make a **request method** request to **submission target**" where the optional **form fields** may further describe the required request.
         In Thing Descriptions, the **form context** is the surrounding Object, such as Properties, Actions, and Events or the Thing itself for meta-interactions.
       spec_content:
         value:

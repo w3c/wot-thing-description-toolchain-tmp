@@ -115,7 +115,7 @@ slots:
   scheme:
     description: Identification of the security mechanism being configured.
     required: true
-    designates_type: true
+    slot_uri: wotsec:scheme
     range: SecuritySchemeList
   alg:
     description: Encoding, encryption, or digest algorithm (e.g., ES256, ES512-256).
@@ -162,15 +162,15 @@ slots:
       - This feature is at risk.
   scopes:
     description: >-
-      Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an 
+      Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an
       authorization server and associated with forms in order to identify what resources a client may access and how.
     slot_uri: wotsec:scopes
     domain: OAuth2SecurityScheme
     range: string
     annotations:
       spec_description: >-
-        Set of authorization scope identifiers provided as an array. 
-        These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources 
+        Set of authorization scope identifiers provided as an array.
+        These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources
         a client may access and how. The values associated with a form SHOULD be chosen from those defined in an `OAuth2SecurityScheme` active on that form.
     any_of:
       - range: string
@@ -238,9 +238,9 @@ slots:
 classes:
   SecurityScheme:
     description: >-
-      Metadata describing the configuration of a security mechanism. The value assigned to the name scheme MUST be defined 
-      within a Vocabulary included in the Thing Description. For all security schemes, any keys, passwords, or other 
-      sensitive information directly providing access MUST NOT be stored in the TD and should instead be shared and 
+      Metadata describing the configuration of a security mechanism. The value assigned to the name scheme MUST be defined
+      within a Vocabulary included in the Thing Description. For all security schemes, any keys, passwords, or other
+      sensitive information directly providing access MUST NOT be stored in the TD and should instead be shared and
       stored out-of-band via other mechanisms.
     class_uri: wotsec:SecurityScheme
     annotations:
@@ -380,7 +380,7 @@ classes:
           - nosec
   AutoSecurityScheme:
     description: >-
-      An automatic authentication security configuration identified by the term auto. This scheme indicates that the security 
+      An automatic authentication security configuration identified by the term auto. This scheme indicates that the security
       parameters are going to be negotiated by the underlying protocols at runtime.
     class_uri: wotsec:AutoSecurityScheme
     is_a: SecurityScheme
@@ -453,7 +453,7 @@ classes:
                 - auto
   DigestSecurityScheme:
     description: >-
-      Digest Access Authentication security configuration. This scheme is similar to basic authentication but with 
+      Digest Access Authentication security configuration. This scheme is similar to basic authentication but with
       added features to avoid man-in-the-middle attacks.
     class_uri: wotsec:DigestSecurityScheme
     is_a: SecurityScheme
@@ -495,15 +495,15 @@ classes:
                 - auth-int
   APIKeySecurityScheme:
     description: >-
-      API key authentication security configuration identified by the term apikey. This scheme is to be used when the 
+      API key authentication security configuration identified by the term apikey. This scheme is to be used when the
       access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.
     class_uri: wotsec:APIKeySecurityScheme
     is_a: SecurityScheme
     annotations:
       spec_description: >-
-        API key authentication security configuration identified by the Vocabulary Term `apikey` (i.e., "scheme": "apikey"). 
-        This scheme is to be used when the access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider. 
-        In this case the key may not be using a standard token format. 
+        API key authentication security configuration identified by the Vocabulary Term `apikey` (i.e., "scheme": "apikey").
+        This scheme is to be used when the access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.
+        In this case the key may not be using a standard token format.
         This scheme indicates that the key provided by the service provider needs to be supplied as part of service requests using the mechanism indicated by the `in` field.
     extra_slots:
       allowed: true
@@ -600,14 +600,14 @@ classes:
                 - ES512-256
   PSKSecurityScheme:
     description: >-
-      Pre-shared key authentication security configuration. This is meant to identify that a standard is used for 
+      Pre-shared key authentication security configuration. This is meant to identify that a standard is used for
       pre-shared keys such as TLS-PSK.
     class_uri: wotsec:PSKSecurityScheme
     is_a: SecurityScheme
     annotations:
       spec_description: >-
-        Pre-shared key authentication security configuration identified by the Vocabulary Term `psk` (i.e., "scheme": "psk"). 
-        This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[RFC4279]], 
+        Pre-shared key authentication security configuration identified by the Vocabulary Term `psk` (i.e., "scheme": "psk").
+        This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[RFC4279]],
         and that the ciphersuite used for keys will be established during protocol negotiation.
     extra_slots:
       allowed: true
@@ -625,7 +625,7 @@ classes:
     is_a: SecurityScheme
     annotations:
       spec_description: >-
-        OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]], 
+        OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]],
         identified by the Vocabulary Term `oauth2` (i.e., "scheme": "oauth2").
       spec_content:
         value:
