@@ -93,6 +93,8 @@ class SpecConfig:
             under ``snippet_validation_schemas`` in the manifest.
         range_labels: Text shown in the vocabulary tables' type column for a LinkML range, keyed by range name,
             read-only; ranges without an entry are shown under their own name.
+        default_values_anchor: Fragment id of the section the "with default" assignment links to, or ``None`` to
+            show it as plain text.
     """
 
     template: Path
@@ -110,6 +112,7 @@ class SpecConfig:
         default_factory=lambda: MappingProxyType({}), hash=False
     )
     range_labels: Mapping[str, str] = field(default_factory=lambda: MappingProxyType({}), hash=False)
+    default_values_anchor: str | None = None
 
 
 @dataclass(frozen=True)
@@ -154,7 +157,14 @@ _JSONLD_KEYS = _Keys((), ("extra_root_terms",))
 _MODULE_KEYS = _Keys(("schema", "prefix"), ("ontology", "context", "diagram"))
 _SPEC_KEYS = _Keys(
     ("template", "output", "placeholder", "vocab_id_prefix", "sections", "snippets", "glossary"),
-    ("first_class", "extra_asserts", "assertions_csv", "snippet_validation_schemas", "range_labels"),
+    (
+        "first_class",
+        "extra_asserts",
+        "assertions_csv",
+        "snippet_validation_schemas",
+        "range_labels",
+        "default_values_anchor",
+    ),
 )
 _SECTION_KEYS = _Keys(("id", "schema"))
 _GENERATED_SCHEMA_KEYS = _Keys(("generated",))
@@ -279,6 +289,7 @@ def _parse_spec(root: _Node, modules: tuple[Module, ...]) -> SpecConfig | None:
         snippet_validation_schemas=static_schemas,
         generated_snippet_validation_schemas=generated_schemas,
         range_labels=_parse_range_labels(spec),
+        default_values_anchor=spec.optional_string("default_values_anchor"),
     )
 
 

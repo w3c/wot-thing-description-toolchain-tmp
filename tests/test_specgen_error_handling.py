@@ -156,3 +156,22 @@ def test_slot_rows_display_ranges_under_their_configured_labels(tmp_path: Path) 
         '<a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"><code>anyURI</code></a>',
         '<a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#datetime"><code>datetime</code></a>',
     ]
+
+
+_DEFAULTED_SLOT_SCHEMA = (
+    "slots:\n  safe:\n    annotations:\n      spec_default: true\nclasses:\n  Sensor:\n    slots: [safe]\n"
+)
+
+
+def test_slot_rows_link_default_assignment_to_configured_anchor(tmp_path: Path) -> None:
+    schema = _write_schema(tmp_path, _DEFAULTED_SLOT_SCHEMA)
+    [row] = collect_slot_rows(
+        SchemaView(str(schema)), "Sensor", lambda text: text, default_values_anchor="sec-defaults"
+    )
+    assert row["assignment"] == '<a href="#sec-defaults">with default</a>'
+
+
+def test_slot_rows_show_default_assignment_as_plain_text_without_anchor(tmp_path: Path) -> None:
+    schema = _write_schema(tmp_path, _DEFAULTED_SLOT_SCHEMA)
+    [row] = collect_slot_rows(SchemaView(str(schema)), "Sensor", lambda text: text)
+    assert row["assignment"] == "with default"

@@ -533,6 +533,39 @@ def test_invalid_range_labels_are_rejected(
     load_expecting_error(project_dir, manifest, key_path, fragment)
 
 
+# --- anchor of the default values section ----------------------------------------------------------------------------
+
+
+def test_default_values_anchor_is_loaded(project_dir: Path, manifest: dict[str, Any]) -> None:
+    manifest["spec"]["default_values_anchor"] = "sec-defaults"
+
+    spec = load_project(write_manifest(project_dir, manifest)).spec
+
+    assert spec is not None
+    assert spec.default_values_anchor == "sec-defaults"
+
+
+def test_default_values_anchor_defaults_to_none(project_dir: Path, manifest: dict[str, Any]) -> None:
+    spec = load_project(write_manifest(project_dir, manifest)).spec
+
+    assert spec is not None
+    assert spec.default_values_anchor is None
+
+
+def test_repository_manifest_links_defaults_to_the_published_default_values_section() -> None:
+    spec = load_project(REPO_ROOT / MANIFEST_NAME).spec
+
+    assert spec is not None
+    assert spec.default_values_anchor == "sec-default-values"
+
+
+@pytest.mark.parametrize("anchor", ["", 7, None, ["sec-default-values"], {"id": "sec-default-values"}])
+def test_invalid_default_values_anchor_is_rejected(project_dir: Path, manifest: dict[str, Any], anchor: Any) -> None:
+    manifest["spec"]["default_values_anchor"] = anchor
+
+    load_expecting_error(project_dir, manifest, "spec.default_values_anchor", "must be a non-empty string")
+
+
 # --- JSON-LD root context terms --------------------------------------------------------------------------------------
 
 

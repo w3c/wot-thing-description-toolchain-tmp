@@ -65,6 +65,8 @@ spec:
     datetime: dateTime
     NonNegativeInteger: unsignedInt
     decimal: double
+  # The "with default" assignment in the vocabulary tables links to this section of the TD specification template.
+  default_values_anchor: sec-default-values
   first_class: Thing
   sections:
     - id: sec-core-vocabulary-definition
