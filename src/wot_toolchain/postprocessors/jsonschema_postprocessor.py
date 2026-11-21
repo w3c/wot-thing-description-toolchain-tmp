@@ -11,12 +11,15 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
+from linkml_runtime.linkml_model.meta import ClassDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
 from ..errors import SchemaError
 from ..schema_utils import annotation_tag_value as _get_annotation_value
 
 logger = logging.getLogger(__name__)
+
+LINKML_ANY_URI = "https://w3id.org/linkml/Any"
 
 
 @dataclass
@@ -326,6 +329,99 @@ def _simplify_exclusive_minimum(schema: dict) -> None:
     _walk_schema(schema, _fix)
 
 
+def _extract_ref_name(ref: str) -> str | None:
+    for prefix in ("#/$defs/", "#/definitions/"):
+        if ref.startswith(prefix):
+            return ref[len(prefix) :]
+    return None
+
+
+def _is_linkml_any(sv: SchemaView, cls_def: ClassDefinition) -> bool:
+    """Return whether the class stands for ``linkml:Any``, written as a CURIE or as the expanded URI."""
+    return bool(cls_def.class_uri) and sv.expand_curie(str(cls_def.class_uri)) == LINKML_ANY_URI
+
+
+def _drop_candidate_defs(defs: dict, sv: SchemaView, config: TransformConfig) -> set[str]:
+    """Return the defs of classes with no standalone use in the published JSON Schema.
+
+    These are classes for ``linkml:Any``, the tree root (its content is the top-level schema), abstract classes, and
+    enum-subset-partitioned classes (replaced by their per-subset variants).
+
+    Args:
+        defs: The ``$defs`` of the schema being post-processed.
+        sv: The schema view of the LinkML schema.
+        config: The transforms read from the ``jsonschema_*`` annotations.
+
+    Returns:
+        The names of the candidate defs present in ``defs``.
+    """
+    partitioned = {esp.class_name for esp in config.enum_subset_partitions}
+    return {
+        name
+        for name, cls_def in sv.all_classes().items()
+        if name in defs
+        and (_is_linkml_any(sv, cls_def) or cls_def.tree_root or cls_def.abstract or name in partitioned)
+    }
+
+
+def _referenced_def_names(obj: Any) -> set[str]:
+    """Return the names of all defs that a ``$ref`` anywhere in ``obj`` points to.
+
+    Args:
+        obj: A JSON Schema fragment.
+
+    Returns:
+        The referenced def names.
+    """
+    if isinstance(obj, list):
+        return set().union(*(_referenced_def_names(item) for item in obj))
+    if not isinstance(obj, dict):
+        return set()
+    names = set().union(*(_referenced_def_names(value) for value in obj.values()))
+    ref = obj.get("$ref")
+    ref_name = _extract_ref_name(ref) if isinstance(ref, str) else None
+    if ref_name is not None:
+        names.add(ref_name)
+    return names
+
+
+def _unreferenced_candidates(schema: dict, candidates: set[str]) -> set[str]:
+    """Return the candidate defs that no ``$ref`` outside the dropped defs points to.
+
+    Starts from dropping every candidate and keeps each one still referenced, until no kept def references a dropped
+    one, so dropping the result can never leave a dangling ``$ref``.
+
+    Args:
+        schema: The JSON Schema being post-processed.
+        candidates: The names of the defs that may be dropped.
+
+    Returns:
+        The names of the candidates that can be dropped.
+    """
+    top_level = {key: value for key, value in schema.items() if key != "$defs"}
+    dropped = set(candidates)
+    while True:
+        kept_defs = {name: defn for name, defn in schema.get("$defs", {}).items() if name not in dropped}
+        still_referenced = dropped & _referenced_def_names([top_level, kept_defs])
+        if not still_referenced:
+            return dropped
+        dropped -= still_referenced
+
+
+def _remove_unreferenced_candidate_defs(schema: dict, sv: SchemaView, config: TransformConfig) -> None:
+    """Delete the defs of drop-candidate classes that no ``$ref`` in the schema points to.
+
+    Args:
+        schema: The JSON Schema being post-processed, after its ``$ref`` values are resolved.
+        sv: The schema view of the LinkML schema.
+        config: The transforms read from the ``jsonschema_*`` annotations.
+    """
+    defs = schema.get("$defs", {})
+    for name in _unreferenced_candidates(schema, _drop_candidate_defs(defs, sv, config)):
+        del defs[name]
+        logger.debug(f"Removed unreferenced def: {name}")
+
+
 def _remove_excluded_defs(schema: dict, sv: SchemaView, config: TransformConfig) -> None:
     defs = schema.get("$defs", {})
     to_remove = set()
@@ -339,8 +435,6 @@ def _remove_excluded_defs(schema: dict, sv: SchemaView, config: TransformConfig)
     for enum_name in sv.all_enums():
         if enum_name in defs:
             to_remove.add(enum_name)
-
-    to_remove.update(["Any", "Thing", "InteractionAffordance", "Form"])
 
     for name in to_remove:
         if name in defs:
@@ -387,12 +481,6 @@ def _resolve_refs(schema: dict, sv: SchemaView) -> None:
         pvs = list(enum_def.permissible_values.keys()) if enum_def.permissible_values else []
         if pvs:
             enum_values[enum_name] = pvs
-
-    def _extract_ref_name(ref: str) -> str | None:
-        for prefix in ("#/$defs/", "#/definitions/"):
-            if ref.startswith(prefix):
-                return ref[len(prefix) :]
-        return None
 
     def _is_string_map(cls_name: str | None) -> bool:
         if cls_name is None or cls_name not in sv.all_classes():
@@ -503,6 +591,8 @@ def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     _remove_identifier_slots(schema, schema_view)
     _remove_excluded_defs(schema, schema_view, config)
     _resolve_refs(schema, schema_view)
+    # After _resolve_refs: it erases refs to linkml:Any defs and drops anyOf branches that still reference candidates.
+    _remove_unreferenced_candidate_defs(schema, schema_view, config)
     _clean_metadata(schema, schema_view)
 
     if schema_view.schema.title:

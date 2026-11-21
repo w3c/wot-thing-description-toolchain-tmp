@@ -256,3 +256,60 @@ def test_root_context_keeps_extra_root_term_outside_default_prefix() -> None:
 def test_extra_root_term_missing_from_generated_context_raises_schema_error_naming_term() -> None:
     with pytest.raises(SchemaError, match=r"'nowhere'"):
         _jsonld_context(_schema_view(FOREIGN_SLOT_SCHEMA), ("nowhere",))
+
+
+def _remaining_defs(body: str, defs: dict) -> set[str]:
+    return set(post_process_jsonschema({"$defs": defs}, _schema_view(body))["$defs"])
+
+
+def test_unreferenced_def_of_linkml_any_class_is_dropped() -> None:
+    body = "classes:\n  Wildcard:\n    class_uri: linkml:Any\n"
+    assert _remaining_defs(body, {"Wildcard": {"type": "object"}}) == set()
+
+
+def test_unreferenced_def_of_tree_root_class_is_dropped() -> None:
+    body = "classes:\n  Root:\n    tree_root: true\n"
+    assert _remaining_defs(body, {"Root": {"type": "object"}}) == set()
+
+
+def test_unreferenced_def_of_abstract_class_is_dropped() -> None:
+    body = "classes:\n  Base:\n    abstract: true\n"
+    assert _remaining_defs(body, {"Base": {"type": "object"}}) == set()
+
+
+def test_unreferenced_def_of_enum_subset_partitioned_class_is_dropped_and_its_variants_kept() -> None:
+    body = """
+subsets:
+  reads:
+    description: Read operations.
+enums:
+  Op:
+    permissible_values:
+      get: {in_subset: [reads]}
+slots:
+  op: {range: Op}
+classes:
+  Split:
+    slots: [op]
+    annotations:
+      jsonschema_enum_subset_partition:
+        value: {slot: op, enum: Op}
+"""
+    remaining = _remaining_defs(body, {"Split": {"type": "object", "properties": {"op": {"type": "string"}}}})
+    assert remaining == {"Split_element_base", "Split_element_reads"}
+
+
+def test_drop_candidate_still_referenced_is_kept() -> None:
+    body = "classes:\n  Base:\n    abstract: true\n"
+    defs = {"Base": {"type": "object"}, "Holder": {"type": "object", "properties": {"b": {"$ref": "#/$defs/Base"}}}}
+    assert _remaining_defs(body, defs) == {"Base", "Holder"}
+
+
+def test_drop_candidate_referenced_only_by_dropped_defs_is_dropped() -> None:
+    body = "classes:\n  Root:\n    tree_root: true\n  Base:\n    abstract: true\n"
+    defs = {"Base": {"type": "object"}, "Root": {"type": "object", "properties": {"b": {"$ref": "#/$defs/Base"}}}}
+    assert _remaining_defs(body, defs) == set()
+
+
+def test_def_of_unmarked_class_named_form_is_kept() -> None:
+    assert _remaining_defs("classes:\n  Form: {}\n", {"Form": {"type": "object"}}) == {"Form"}
