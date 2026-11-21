@@ -13,68 +13,64 @@ jobs:
   static-analysis:
     name: Static analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
       - name: Ruff check
         run: uv run ruff check .
 
+      - name: Ruff format check
+        run: uv run ruff format --check src tests scripts
+
+      - name: Mypy
+        run: uv run mypy
+
       - name: LinkML schema lint (non-blocking)
-        # the schemas still have known lint issues, so this does not fail the build yet
+        # Known debt: `|| true` discards the exit status, so lint findings never fail the build.
+        # Remove it once the schemas lint clean.
         run: uv run linkml-lint resources/schemas/ || true
 
   build:
-    name: Build resources & package
+    name: Build resources and package
     needs: static-analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
-      - name: Install Graphviz (needed for generating diagrams)
+      - name: Install Graphviz
         run: sudo apt-get update -qq && sudo apt-get install -y -qq graphviz
 
       - name: Generate WoT resources
-        run: uv run wotis generate-wot-resources -d
-
-      - name: Check generated artifacts
-        # the CLI logs errors but still exits 0, so check the output files here
-        run: |
-          for f in \
-            resources/gens/jsonschema/jsonschema.json \
-            resources/gens/jsonldcontext/context.jsonld \
-            resources/gens/shacl/shapes.shacl.ttl \
-            resources/gens/owl/td.ttl \
-            resources/gens/owl/hctl.ttl \
-            resources/gens/owl/wotsec.ttl \
-            resources/gens/owl/jsonschema.ttl \
-            resources/gens/linkml/linkml.yaml \
-            resources/gens/index.html; do
-            test -s "$f" || { echo "missing or empty: $f"; exit 1; }
-          done
-          uv run python -c "import json; assert isinstance(json.load(open('resources/gens/jsonschema/jsonschema.json')), dict)"
+        run: uv run wot-toolchain generate-wot-resources -d
 
       - name: Build Python package
         run: uv build
 
       - name: Upload generated resources
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: WoT TD artifacts
+          name: wot-generated-resources
           path: resources/gens/
           if-no-files-found: error
 
       - name: Upload Python package
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: python-package
           path: dist/
@@ -84,18 +80,21 @@ jobs:
     name: Test gates
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
       - name: Download generated resources
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: WoT TD artifacts
+          name: wot-generated-resources
           path: resources/gens/
 
       - name: TD instance gate
@@ -108,30 +107,33 @@ jobs:
         run: uv run pytest tests/test_spec_content_rendering.py tests/test_golden_form_structure.py -v
 
       - name: Spec HTML vs upstream golden
-        run: uv run pytest tests/tmp/test_spec_html_vs_golden.py -v
+        run: uv run pytest tests/test_spec_html_vs_golden.py -v
 
       - name: Assertion inventory vs upstream
-        run: uv run pytest tests/tmp/test_assertion_inventory.py -v
+        run: uv run pytest tests/test_assertion_inventory.py -v
 
       - name: Default assignments
-        run: uv run pytest tests/tmp/test_default_assignments.py -v
+        run: uv run pytest tests/test_default_assignments.py -v
 
   golden-diff:
     name: Golden diff
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
       - name: Download generated resources
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: WoT TD artifacts
+          name: wot-generated-resources
           path: resources/gens/
 
       - name: Golden diff

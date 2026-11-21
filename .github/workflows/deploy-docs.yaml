@@ -1,47 +1,60 @@
-name: Deploy Thing Description Specification to GitHub Pages
+name: Deploy specification to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  build_and_deploy:
+  build:
+    name: Build specification
     runs-on: ubuntu-latest
-    env:
-      DOCS_OUTPUT_PATH: resources/gens
-
+    timeout-minutes: 30
+    permissions:
+      contents: read
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v7
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
 
       - name: Set up Python
         run: uv python install 3.14
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
-      - name: Install Graphviz (needed for generating diagrams)
+      - name: Install Graphviz
         run: sudo apt-get update -qq && sudo apt-get install -y -qq graphviz
 
-      - name: Generate Thing Description Specification
-        run: uv run wotis generate-wot-resources -d
+      - name: Generate WoT resources and specification
+        run: uv run wot-toolchain generate-wot-resources -d
 
-      - name: Check index.html was generated
-        # the CLI logs errors but still exits 0, so check the output here
-        run: test -s resources/gens/index.html
-
-      - name: Upload Generated Artifacts
-        uses: actions/upload-pages-artifact@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          name: wotis-generated-docs
-          path: ${{ env.DOCS_OUTPUT_PATH }}
+          path: resources/gens
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
