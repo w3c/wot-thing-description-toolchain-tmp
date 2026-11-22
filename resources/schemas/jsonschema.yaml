@@ -152,7 +152,6 @@ slots:
     range: string
     annotations:
       spec_exclude: true
-      owl_domain: DataSchema
   type:
     description: >-
       Assignment of JSON-based data types compatible with JSON Schema (one of boolean, integer, number, string, object, array, or null).
