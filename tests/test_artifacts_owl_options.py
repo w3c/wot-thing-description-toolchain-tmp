@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from linkml.generators import owlgen
 from linkml.generators.owlgen import OwlSchemaGenerator
-from rdflib import OWL, RDF, RDFS, SKOS, XSD, Graph, URIRef
+from rdflib import DCTERMS, OWL, RDF, RDFS, SKOS, XSD, Graph, Namespace, URIRef
 from rdflib.compare import graph_diff, to_isomorphic
 
 from wot_toolchain.artifacts.owl.generator import WotOwlGenerator
@@ -95,6 +95,33 @@ def test_non_default_options_map_to_upstream_arguments(hctl_yaml: str) -> None:
 _NAMED_RANGES = {RDFS.range, OWL.unionOf, RDF.first, RDF.rest}
 # WotOwlGenerator tags labels and definitions with the schema language; upstream leaves them untagged.
 _LANGUAGE_TAGGED = {RDFS.label, SKOS.definition}
+
+_PAV = Namespace("http://purl.org/pav/")
+_SCHEMA = Namespace("http://schema.org/")
+_VANN = Namespace("http://purl.org/vocab/vann/")
+# WotOwlGenerator writes the published ontology header; upstream writes the schema metaslots instead.
+_WOT_HEADER = {
+    DCTERMS.creator,
+    DCTERMS.license,
+    DCTERMS.publisher,
+    DCTERMS.title,
+    _VANN.preferredNamespacePrefix,
+    _VANN.preferredNamespaceUri,
+    _SCHEMA.name,
+    _SCHEMA.url,
+    RDF.type,
+    RDFS.comment,
+    OWL.versionInfo,
+}
+_UPSTREAM_HEADER = {
+    DCTERMS.license,
+    DCTERMS.publisher,
+    DCTERMS.title,
+    _PAV.createdBy,
+    _PAV.createdOn,
+    _PAV.lastUpdatedOn,
+    _PAV.version,
+}
 # Upstream emits slot restrictions, cardinalities and anonymous ranges, which WotOwlGenerator suppresses.
 _RESTRICTIONS = {
     RDF.type,
@@ -117,20 +144,38 @@ _RESTRICTIONS = {
     [
         (
             "td",
-            {RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf, *_NAMED_RANGES, *_LANGUAGE_TAGGED},
-            {SKOS.exactMatch, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf, *_RESTRICTIONS, *_LANGUAGE_TAGGED},
+            {
+                RDFS.isDefinedBy,
+                RDFS.seeAlso,
+                RDFS.subClassOf,
+                RDFS.subPropertyOf,
+                *_NAMED_RANGES,
+                *_LANGUAGE_TAGGED,
+                *_WOT_HEADER,
+            },
+            {
+                SKOS.exactMatch,
+                RDFS.seeAlso,
+                RDFS.subClassOf,
+                RDFS.subPropertyOf,
+                *_RESTRICTIONS,
+                *_LANGUAGE_TAGGED,
+                *_UPSTREAM_HEADER,
+            },
         ),
         (
             "hctl",
-            {RDFS.isDefinedBy, *_NAMED_RANGES, *_LANGUAGE_TAGGED},
+            {RDFS.isDefinedBy, *_NAMED_RANGES, *_LANGUAGE_TAGGED, *_WOT_HEADER},
             {
                 SKOS.exactMatch,
                 RDFS.subClassOf,
                 OWL.onDatatype,
                 OWL.withRestrictions,
                 XSD.pattern,
+                RDFS.seeAlso,
                 *_RESTRICTIONS,
                 *_LANGUAGE_TAGGED,
+                *_UPSTREAM_HEADER,
             },
         ),
     ],

@@ -81,7 +81,6 @@ def preprocess_for_gen_owl(schema_path: str) -> str:
     _infer_ranges_from_branches(s)
     _clear_constraints(s)
     _strip_dangling_slot_refs(s)
-    _strip_schema_metadata(s)
     return yaml_dumper.dumps(s)
 
 
@@ -363,20 +362,6 @@ def _strip_no_uri_original_slots(s: SchemaDefinition, original_no_uri_slots: set
     slots = cast(_Slots, s.slots)
     present = {name for name in slots if name in original_no_uri_slots}
     _remove_slots(s, present)
-
-
-def _strip_schema_metadata(s: SchemaDefinition) -> None:
-    """Strip schema metadata — postprocessor reconstructs from unmerged schema."""
-    s.title = None
-    s.description = None
-    s.created_by = None
-    s.contributors = []
-    s.license = None
-    s.created_on = None
-    s.last_updated_on = None
-    s.version = None
-    s.see_also = []
-    s.annotations = {}
 
 
 def _infer_ranges_from_branches(s: SchemaDefinition) -> None:

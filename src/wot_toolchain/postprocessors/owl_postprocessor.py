@@ -4,17 +4,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from linkml_runtime.linkml_model.meta import SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
-from rdflib import BNode, Graph, Literal, Namespace, URIRef
-from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, VANN
+from rdflib import Graph, Namespace, URIRef
+from rdflib.namespace import OWL, RDF, RDFS
 from rdflib.plugin import register
 from rdflib.serializer import Serializer
 from rdflib.term import Node
-
-from ..errors import SchemaError
-from ..schema_utils import get_schema as _get_schema
-from . import resolve_prefix_namespace
 
 SCHEMA = Namespace("http://schema.org/")
 LINKML = Namespace("https://w3id.org/linkml/")
@@ -53,31 +48,15 @@ def postprocess_owl_graph(
     sv_merged: SchemaView | None = None,
 ) -> None:
     """Clean the gen-owl graph in place and write the per-module OWL vocabulary file."""
-    sv = SchemaView(str(schema_dir / schema_file), merge_imports=False)
     if sv_merged is None:
         sv_merged = SchemaView(str(schema_dir / schema_file), merge_imports=True)
-    ns = _module_namespace(sv)
-    onto_iri = _ontology_iri(sv)
-
     _strip_linkml_ranges(g)
     _add_domain_includes(g, sv_merged)
-
-    _add_ontology_header(g, sv, ns, onto_iri)
 
     g.namespace_manager.bind("schema", SCHEMA, override=True, replace=True)
     output_dir.mkdir(parents=True, exist_ok=True)
     ttl = g.serialize(format="wot-turtle")
     (output_dir / output_file).write_text(ttl, encoding="utf-8")
-
-
-def _module_namespace(sv: SchemaView) -> str:
-    dp = _get_schema(sv).default_prefix
-    assert dp is not None
-    return resolve_prefix_namespace(sv, dp)
-
-
-def _ontology_iri(sv: SchemaView) -> URIRef:
-    return URIRef(_get_schema(sv).id)
 
 
 def _demote_to_datatype(g: Graph, props: set[Node]) -> None:
@@ -128,64 +107,3 @@ def _add_domain_includes(g: Graph, sv: SchemaView) -> None:
             continue
         for cu in class_uris:
             g.add((prop_iri, SCHEMA.domainIncludes, URIRef(sv.expand_curie(cu))))
-
-
-def _add_ontology_header(g: Graph, sv: SchemaView, ns: str, onto_iri: URIRef) -> None:
-    schema = _get_schema(sv)
-
-    g.add((onto_iri, RDF.type, OWL.Ontology))
-    g.remove((onto_iri, RDFS.label, None))
-    if schema.title:
-        g.add((onto_iri, DCTERMS.title, Literal(f"{schema.title} Ontology", lang="en")))
-        g.add((onto_iri, RDFS.label, Literal(schema.title, lang="en")))
-    g.remove((onto_iri, RDFS.comment, None))
-    if schema.title:
-        owl_comment = f"Ontology for the W3C Web of Things {schema.title} vocabulary."
-        g.add((onto_iri, RDFS.comment, Literal(owl_comment, lang="en")))
-    g.add((onto_iri, VANN.preferredNamespacePrefix, Literal(schema.default_prefix)))
-    g.add((onto_iri, VANN.preferredNamespaceUri, Literal(ns)))
-    if schema.version:
-        g.add((onto_iri, OWL.versionInfo, Literal(schema.version)))
-    if schema.license:
-        g.add((onto_iri, DCTERMS.license, URIRef(schema.license)))
-    g.remove((onto_iri, DCTERMS.creator, None))
-    if schema.created_by:
-        g.add((onto_iri, DCTERMS.creator, URIRef(schema.created_by)))
-    for contributor in schema.contributors or []:
-        g.add((onto_iri, DCTERMS.contributor, URIRef(str(contributor))))
-
-    publisher = _publisher_node(g, schema)
-    if publisher is not None:
-        g.add((onto_iri, DCTERMS.publisher, publisher))
-
-
-def _publisher_node(g: Graph, schema: SchemaDefinition) -> BNode | None:
-    """Return a schema:Organization node for the schema's publisher annotation, or None if it declares none.
-
-    Raises:
-        SchemaError: If the ``dcterms:publisher`` annotation is declared but is not a complete schema:Organization.
-    """
-    annotation = (schema.annotations or {}).get("dcterms:publisher")
-    if annotation is None:
-        return None
-    value = annotation.value
-    try:
-        org_type = value["@type"]
-        name = value["schema:name"]
-        url = value["schema:url"]
-    except (KeyError, TypeError) as exc:
-        raise SchemaError(_malformed_publisher(schema)) from exc
-    if org_type != "schema:Organization" or not name or not url:
-        raise SchemaError(_malformed_publisher(schema))
-    node = BNode()
-    g.add((node, RDF.type, SCHEMA.Organization))
-    g.add((node, SCHEMA.name, Literal(name)))
-    g.add((node, SCHEMA.url, URIRef(url)))
-    return node
-
-
-def _malformed_publisher(schema: SchemaDefinition) -> str:
-    return (
-        f"{schema.source_file or schema.name}: annotation 'dcterms:publisher' must be a mapping with "
-        "'@type: schema:Organization' and non-empty 'schema:name' and 'schema:url'."
-    )

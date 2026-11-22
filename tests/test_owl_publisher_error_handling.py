@@ -8,8 +8,8 @@ from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF
 
+from wot_toolchain.artifacts.owl.header import SCHEMA, _publisher_node
 from wot_toolchain.errors import SchemaError
-from wot_toolchain.postprocessors.owl_postprocessor import SCHEMA, _publisher_node
 
 _HEADER = """\
 id: https://example.org/s

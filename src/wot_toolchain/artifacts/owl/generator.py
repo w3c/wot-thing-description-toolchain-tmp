@@ -19,6 +19,7 @@ from linkml_runtime.linkml_model.meta import (
 )
 from rdflib import OWL, RDF, RDFS, SKOS, BNode, Literal, URIRef
 
+from wot_toolchain.artifacts.owl.header import add_ontology_header
 from wot_toolchain.artifacts.owl.options import OwlOptions, PermissibleValueKind
 from wot_toolchain.schema_utils import resolve_prefix_namespace
 
@@ -112,13 +113,18 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
         )
         return expr
 
-    def add_metadata(self, e: Definition | PermissibleValue, uri: URIRef) -> None:
-        """Emit the annotations of ``e`` in the published form.
+    def add_metadata(self, e: SchemaDefinition | Definition | PermissibleValue, uri: URIRef) -> None:
+        """Emit the annotations of ``e`` in the published form; for the schema itself, the ontology header.
 
         Own scheme, alias as label, no exact_mappings, rdfs:isDefinedBy for elements of the schema's own namespace,
         IRI values of resource annotations (rdfs:seeAlso, rdfs:subClassOf, rdfs:isDefinedBy) and expandable CURIE
         values of rdfs:subPropertyOf annotations as IRIs.
         """
+        # Upstream describes the ontology with the schema's metaslots through this same hook (owlgen.py:344),
+        # e.g. pav:version, skos:definition and the schema name as label; the published header differs.
+        if isinstance(e, SchemaDefinition):
+            add_ontology_header(self.graph, e, uri, self._own_namespace())
+            return
         # Upstream maps from_schema to skos:inScheme (owlgen.py:358), so merged imports would name their own schema.
         # Upstream maps exact_mappings to skos:exactMatch, which the published ontologies do not carry.
         # Upstream maps name to rdfs:label and alias to skos:prefLabel; the published label is the alias.

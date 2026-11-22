@@ -22,7 +22,7 @@ How they were gathered: by reading the code, `git log -S`, and the upstream link
 | `_infer_ranges_from_branches` :396 | DEAD | Changed nothing on current schemas. | 1de8d8eb | high (current schemas only) |
 | `_clear_constraints` :437 | WOT-SHAPING | Prevents blank-node `owl:Restriction` axioms, which the WoT ontology does not use. It also sets `multivalued=True`; the effect of that on functional-property axioms was not measured. | 14af5fb8, 1de8d8eb | high |
 | `_strip_dangling_slot_refs` :409 | WOT-SHAPING (plumbing) | Removes references to slots that earlier passes deleted. | cd92fc45 | high |
-| `_strip_schema_metadata` :382 | WOT-SHAPING | Stops gen-owl emitting metamodel predicates and a second ontology header. Postprocess `_add_ontology_header` rebuilds the header. | 1de8d8eb | medium |
+| `_strip_schema_metadata` :382 (removed; now `WotOwlGenerator.add_metadata`) | WOT-SHAPING | Stopped gen-owl emitting metamodel predicates and a second ontology header. The generator now emits the header for the schema itself instead of the upstream schema metadata, so nothing has to be cleared. | 1de8d8eb | medium |
 
 ## OWL postprocess (`postprocessors/owl_postprocessor.py`, `postprocess_owl` :33-72, call order)
 
@@ -42,7 +42,7 @@ How they were gathered: by reading the code, `git log -S`, and the upstream link
 | `_add_domain_includes` :224 | UPSTREAM-GAP | gen-owl cannot emit `schema:domainIncludes` for properties used by several classes. | 2b2da5fd; known-linkml-gaps.md #11; owl-accepted-differences.md P3 | high |
 | `_add_is_defined_by` :254 (removed; now `WotOwlGenerator.add_metadata`) | WOT-SHAPING | Adds `rdfs:isDefinedBy <ontology>` to every local term. | 2b2da5fd; owl-rdf-modeling.md §5a | medium-high |
 | `_add_lang_tags` | REMOVED | Deleted in step 16c-7: `WotOwlGenerator` sets upstream `default_language` and emits the `@en` tags itself; output unchanged. | 2b2da5fd | low-medium |
-| `_add_ontology_header` :271 | WOT-SHAPING | Builds the ontology header from the schema's `annotations:`. `_publisher_node` :309 silently returns None when the annotation is malformed, instead of failing. | f198fbf1 | high |
+| `_add_ontology_header` :271 (removed; now `WotOwlGenerator.add_metadata`, `artifacts/owl/header.py`) | WOT-SHAPING | Builds the ontology header from the schema's metadata slots (`title`, `version`, `license`, `created_by`, `contributors`) and its `dcterms:publisher` annotation. `_publisher_node` raises `SchemaError` when the annotation is malformed. | f198fbf1 | high |
 | `g.bind("schema", ...)` :69 | COSMETIC | Sets the prefix name used in the output. | owl_postprocessor.py:69 | high |
 
 ## Serializer (`serializers/wot_turtle.py`)
