@@ -29,7 +29,7 @@ htmlcov/
 resources/gens/
 
 # Local reference ontologies used for OWL comparison
-resources/upstream/ontology/target/
+resources/upstream/
 
 # Scratch directory
 /tmp/
