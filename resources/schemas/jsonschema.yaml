@@ -141,9 +141,10 @@ slots:
     multivalued: true
     range: DataSchema
     inlined_as_list: true
-    annotations:
-      skos:note: >-
+    comments:
+      - >-
         The upstream JSON Schema ontology defines `jsonschema:allOf`, but the current td-next Data Schema vocabulary table does not list it; confirm its inclusion with the WoT Working Group.
+    annotations:
       spec_exclude: true
   propertyName:
     description: >-

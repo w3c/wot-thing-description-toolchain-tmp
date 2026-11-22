@@ -138,12 +138,11 @@ slots:
   in:
     description: Specifies the location of security authentication information.
     slot_uri: wotsec:in
-    annotations:
-      skos:note: >-
-        The API Key security scheme maps the JSON member `in` to `wotsec:apikeyIn`, while Basic, Digest, and Bearer schemes map it to `wotsec:in`.
     range: SecurityLocationType
     comments:
       - Default value should be provided by implementations
+      - >-
+        The API Key security scheme maps the JSON member `in` to `wotsec:apikeyIn`, while Basic, Digest, and Bearer schemes map it to `wotsec:in`.
   "@name":
     description: >-
       Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.
@@ -217,8 +216,8 @@ slots:
     domain: ComboSecurityScheme
     implements:
       - owl:ObjectProperty
-    annotations:
-      skos:note: >-
+    comments:
+      - >-
         In a Combo security scheme, `oneOf` maps to `wotsec:oneOf` rather than the distinct `jsonschema:oneOf` term.
     range: string
     multivalued: true
