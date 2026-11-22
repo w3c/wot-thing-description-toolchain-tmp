@@ -108,22 +108,11 @@ def _require_external_tools(project: Project, *, generate_docs: bool) -> None:
 
 
 def _gen_jsonschema(project: Project, sv: SchemaView, output_dir: Path) -> None:
-    # LinkML JSON Schema generator crashes on designates_type when the slot
-    # range is an enum (calls type_ancestors on enum name).  Temporarily
-    # clear the flag — JSON Schema output doesn't use it.
-    patched_slots = []
-    for slot in sv.all_slots().values():
-        if slot.designates_type:
-            patched_slots.append(slot)
-            slot.designates_type = False
     try:
         gen = WotJsonSchemaGenerator.from_options(sv.schema, JsonSchemaOptions(top_class=project.top_class))
         raw = json.loads(gen.serialize())
     except ValueError as exc:
         raise GenerationError(f"Could not generate the JSON Schema from {project.main_schema}: {exc}") from exc
-    finally:
-        for slot in patched_slots:
-            slot.designates_type = True
     processed = post_process_jsonschema(raw, sv)
     with (output_dir / JSON_SCHEMA_FILES["jsonschema"]).open("w", encoding="utf-8") as f:
         json.dump(processed, f, indent=2, ensure_ascii=False)
