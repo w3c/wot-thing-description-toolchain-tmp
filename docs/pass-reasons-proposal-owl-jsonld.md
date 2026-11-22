@@ -4,24 +4,24 @@ These tags and reasons are unconfirmed proposals for the user to review. Nothing
 
 How they were gathered: by reading the code, `git log -S`, and the upstream linkml 1.12.0 generators in `.venv`. Raw upstream output (no pre- or postprocessing) was generated for td, hctl and wotsec (OWL) and `thing_description.yaml` (context), then compared pass by pass. "DEAD" means the pass changed nothing on the current `resources/schemas`. Test fixtures were not run.
 
-## OWL preprocess (`preprocessors/owl_preprocessor.py`, `preprocess_for_gen_owl` :59-99, call order)
+## OWL preprocess (`OWL_PRE_PASSES` in `artifacts/owl/pre_passes.py`, run by `preprocess_for_gen_owl` in `preprocessors/owl_preprocessor.py`, call order)
 
 | Pass | Proposed tag | Proposed reason | Evidence | Confidence |
 |---|---|---|---|---|
-| `_assign_enum_uris` :164 | WOT-SHAPING (or UPSTREAM-GAP) | Gives each enum a URI in the namespace of the module that defines it. Upstream falls back to the default prefix of the merged schema. Question: do you count that upstream fallback as an upstream gap? | 1de8d8eb; owlgen.py:1611-1618 | medium |
-| `_collect_renames` :175 + `_apply_renames` :190 | WOT-SHAPING | Renames slots to the local name of their `slot_uri`. With `use_native_uris=False`, gen-owl already builds IRIs from `slot_uri`, so the only measured effect is on `rdfs:label` (0 IRI changes). The docstring example "td:hasForm not td:forms" is stale. Question: should labels be the JSON key or the `slot_uri` local name? | 14af5fb8, bb61d75f; owlgen.py:1609,1628 | high |
-| `_strip_no_uri_classes` :331 | WOT-SHAPING | Removes classes without `class_uri`, which have no term in the ontology. | 1de8d8eb | medium-high |
-| `_strip_foreign_mixins` :348 | WOT-SHAPING | Prevents `subClassOf` links into another module's classes (e.g. PropertyAffordance ⊄ DataSchema). | cd92fc45 | high |
-| `_promote_attributes` :209 | UPSTREAM-GAP | gen-owl gives class attributes no global `rdfs:range`. | 1de8d8eb; owlgen.py:193-198; guidelines/owl-rdf-modeling.md:126-140 | high |
-| `_strip_non_local` :245 | WOT-SHAPING | Keeps only the module's own slots and enums. | 1de8d8eb | medium-high |
-| `_strip_jsonld_slots` :274 | WOT-SHAPING | `@`-keyword slots are JSON serialization details, not ontology terms. | 1de8d8eb | high |
-| `_strip_no_uri_original_slots` :375 | WOT-SHAPING | Removes slots without `slot_uri`. | 1de8d8eb | medium-high |
-| `_strip_discriminator_slots` :281 | DEAD | Changed nothing on current schemas. | 1de8d8eb | high (current schemas only) |
-| `_strip_non_ontological_enums` :292 | WOT-SHAPING | Enums without `enum_uri` are JSON-Schema-only. Keeping them produced double-`#` IRIs, which pyoxigraph rejected. | 443e80e5; owl-rdf-modeling.md §7 | high |
-| `_fix_enum_pv_labels` :305 | WOT-SHAPING | Renames permissible-value keys to the local name of their `meaning`, so the value IRIs and labels follow the WoT vocabulary. | cd92fc45; owlgen.py:1212 | high |
-| `_infer_ranges_from_branches` :396 | DEAD | Changed nothing on current schemas. | 1de8d8eb | high (current schemas only) |
-| `_clear_constraints` :437 | WOT-SHAPING | Prevents blank-node `owl:Restriction` axioms, which the WoT ontology does not use. It also sets `multivalued=True`; the effect of that on functional-property axioms was not measured. | 14af5fb8, 1de8d8eb | high |
-| `_strip_dangling_slot_refs` :409 | WOT-SHAPING (plumbing) | Removes references to slots that earlier passes deleted. | cd92fc45 | high |
+| `_assign_enum_uris` | WOT-SHAPING (or UPSTREAM-GAP) | Gives each enum a URI in the namespace of the module that defines it. Upstream falls back to the default prefix of the merged schema. Question: do you count that upstream fallback as an upstream gap? | 1de8d8eb; owlgen.py:1611-1618 | medium |
+| `_collect_renames` + `_apply_renames` | WOT-SHAPING | Renames slots to the local name of their `slot_uri`. With `use_native_uris=False`, gen-owl already builds IRIs from `slot_uri`, so the only measured effect is on `rdfs:label` (0 IRI changes). The docstring example "td:hasForm not td:forms" is stale. Question: should labels be the JSON key or the `slot_uri` local name? | 14af5fb8, bb61d75f; owlgen.py:1609,1628 | high |
+| `_strip_no_uri_classes` | WOT-SHAPING | Removes classes without `class_uri`, which have no term in the ontology. | 1de8d8eb | medium-high |
+| `_strip_foreign_mixins` | WOT-SHAPING | Prevents `subClassOf` links into another module's classes (e.g. PropertyAffordance ⊄ DataSchema). | cd92fc45 | high |
+| `_promote_attributes` | UPSTREAM-GAP | gen-owl gives class attributes no global `rdfs:range`. | 1de8d8eb; owlgen.py:193-198; guidelines/owl-rdf-modeling.md:126-140 | high |
+| `_strip_non_local` | WOT-SHAPING | Keeps only the module's own slots and enums. | 1de8d8eb | medium-high |
+| `_strip_jsonld_slots` | WOT-SHAPING | `@`-keyword slots are JSON serialization details, not ontology terms. | 1de8d8eb | high |
+| `_strip_no_uri_original_slots` | WOT-SHAPING | Removes slots without `slot_uri`. | 1de8d8eb | medium-high |
+| `_strip_discriminator_slots` | DEAD | Changed nothing on current schemas. | 1de8d8eb | high (current schemas only) |
+| `_strip_non_ontological_enums` | WOT-SHAPING | Enums without `enum_uri` are JSON-Schema-only. Keeping them produced double-`#` IRIs, which pyoxigraph rejected. | 443e80e5; owl-rdf-modeling.md §7 | high |
+| `_fix_enum_pv_labels` | WOT-SHAPING | Renames permissible-value keys to the local name of their `meaning`, so the value IRIs and labels follow the WoT vocabulary. | cd92fc45; owlgen.py:1212 | high |
+| `_infer_ranges_from_branches` | DEAD | Changed nothing on current schemas. | 1de8d8eb | high (current schemas only) |
+| `_clear_constraints` | WOT-SHAPING | Prevents blank-node `owl:Restriction` axioms, which the WoT ontology does not use. It also sets `multivalued=True`; the effect of that on functional-property axioms was not measured. | 14af5fb8, 1de8d8eb | high |
+| `_strip_dangling_slot_refs` | WOT-SHAPING (plumbing) | Removes references to slots that earlier passes deleted. | cd92fc45 | high |
 | `_strip_schema_metadata` :382 (removed; now `WotOwlGenerator.add_metadata`) | WOT-SHAPING | Stopped gen-owl emitting metamodel predicates and a second ontology header. The generator now emits the header for the schema itself instead of the upstream schema metadata, so nothing has to be cleared. | 1de8d8eb | medium |
 
 ## OWL postprocess (`OWL_PASSES` in `artifacts/owl/passes.py`, run by `postprocess_owl_graph` in `postprocessors/owl_postprocessor.py`, call order)
