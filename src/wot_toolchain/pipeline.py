@@ -20,6 +20,8 @@ from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
 from .artifacts.jsonschema.options import JsonSchemaOptions
 from .artifacts.owl.generator import WotOwlGenerator
 from .artifacts.owl.options import OwlOptions, PermissibleValueKind
+from .artifacts.owl.postprocess import postprocess_owl_graph
+from .artifacts.owl.preprocess import preprocess_for_gen_owl
 from .artifacts.registry import Artifact, ArtifactRegistry
 from .artifacts.shacl.generator import WotShaclGenerator
 from .artifacts.shacl.options import ShaclOptions
@@ -33,9 +35,7 @@ from .postprocessors.jsonld_context_postprocessor import (
     post_process_jsonld_context,
 )
 from .postprocessors.jsonschema_postprocessor import post_process_jsonschema
-from .postprocessors.owl_postprocessor import postprocess_owl_graph
 from .postprocessors.shacl_postprocessor import post_process_shacl
-from .preprocessors.owl_preprocessor import preprocess_for_gen_owl
 from .specgen.bikeshed_processor import require_bikeshed
 
 
