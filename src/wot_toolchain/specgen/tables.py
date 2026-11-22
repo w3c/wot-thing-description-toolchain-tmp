@@ -112,8 +112,8 @@ def get_assignment(
     """Return the assignment column text for a slot of a class.
 
     A truthy ``spec_default`` annotation gives ``with default``, linked to the section with fragment id
-    ``default_values_anchor`` if one is given; ``required`` or a positive ``minimum_value`` gives ``mandatory``;
-    otherwise ``optional``. Slot usage of the class overrides the slot.
+    ``default_values_anchor`` if one is given; ``required``, a positive ``minimum_value`` or a positive
+    ``minimum_cardinality`` gives ``mandatory``; otherwise ``optional``. Slot usage of the class overrides the slot.
     """
     usage = (class_def.slot_usage or {}).get(slot_name)
     if _has_default_assignment(slot_name, class_def, slot_def):
@@ -127,7 +127,16 @@ def get_assignment(
         min_value = usage.minimum_value
     if min_value is not None and _is_positive_number(min_value):
         return "mandatory"
+    if _minimum_cardinality(slot_def, usage):
+        return "mandatory"
     return "optional"
+
+
+def _minimum_cardinality(slot_def: SlotDefinition, usage: SlotDefinition | None) -> int:
+    """Return the least number of values of a slot; slot usage of the class overrides the slot."""
+    if usage and usage.minimum_cardinality is not None:
+        return int(usage.minimum_cardinality)
+    return int(slot_def.minimum_cardinality or 0)
 
 
 def _is_positive_number(value: Any) -> bool:

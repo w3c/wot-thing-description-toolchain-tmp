@@ -219,7 +219,7 @@ slots:
         In a Combo security scheme, `oneOf` maps to `wotsec:oneOf` rather than the distinct `jsonschema:oneOf` term.
     range: string
     multivalued: true
-    minimum_value: 2
+    minimum_cardinality: 2
   security_allOf:
     description: >-
       Array of two or more strings identifying other named security scheme definitions, all of which must be
@@ -229,7 +229,7 @@ slots:
     domain: ComboSecurityScheme
     range: string
     multivalued: true
-    minimum_value: 2
+    minimum_cardinality: 2
 classes:
   SecurityScheme:
     description: >-
