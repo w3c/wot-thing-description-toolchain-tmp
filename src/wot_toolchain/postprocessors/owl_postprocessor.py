@@ -61,7 +61,6 @@ def postprocess_owl_graph(
     _strip_foreign_subjects(g, ns, onto_iri)
     _strip_linkml_ranges(g)
     _fix_subproperty_literals(g, sv_merged)
-    _fix_uri_annotation_literals(g)
     _strip_orphan_blank_nodes(g)
     _strip_empty_blank_node_restrictions(g)
     _add_domain_includes(g, sv_merged)
@@ -152,19 +151,6 @@ def _fix_subproperty_literals(g: Graph, sv: SchemaView) -> None:
         if expanded and expanded != str(o):
             g.remove((s, RDFS.subPropertyOf, o))
             g.add((s, RDFS.subPropertyOf, URIRef(expanded)))
-
-
-def _fix_uri_annotation_literals(g: Graph) -> None:
-    """Convert Literal objects to URIRef for predicates that expect resources."""
-    _URI_PREDICATES = (RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf)
-    for pred in _URI_PREDICATES:
-        for s, _, o in list(g.triples((None, pred, None))):
-            if not isinstance(o, Literal):
-                continue
-            val = str(o)
-            if val.startswith(("http://", "https://", "urn:")):
-                g.remove((s, pred, o))
-                g.add((s, pred, URIRef(val)))
 
 
 def _add_domain_includes(g: Graph, sv: SchemaView) -> None:

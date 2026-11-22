@@ -214,7 +214,7 @@ def test_owl_emits_subproperty_annotation_as_literal_curie(owl: Graph) -> None:
     ],
 )
 def test_owl_emits_uri_annotation_as_literal(owl: Graph, subject: str, predicate: URIRef, iri: str) -> None:
-    """Guards owl_postprocessor._fix_uri_annotation_literals."""
+    """Guards WotOwlGenerator.add_metadata."""
     objects = set(owl.objects(URIRef(EX + subject), predicate))
     assert Literal(iri) in objects
     assert URIRef(iri) not in objects

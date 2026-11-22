@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from linkml.generators import owlgen
 from linkml.generators.owlgen import OwlSchemaGenerator
-from rdflib import OWL, RDFS, SKOS, Graph
+from rdflib import OWL, RDFS, SKOS, Graph, URIRef
 from rdflib.compare import graph_diff, to_isomorphic
 
 from wot_toolchain.artifacts.owl.generator import WotOwlGenerator
@@ -90,13 +90,25 @@ def test_non_default_options_map_to_upstream_arguments(hctl_yaml: str) -> None:
     assert wot.default_permissible_value_type == OWL.NamedIndividual
 
 
-@pytest.mark.parametrize("prefix", ["td", "hctl"])
-def test_default_options_graph_differs_from_todays_flags_graph_only_by_documented_overrides(prefix: str) -> None:
+@pytest.mark.parametrize(
+    ("prefix", "wot_only_predicates", "upstream_only_predicates"),
+    [
+        (
+            "td",
+            {RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf},
+            {SKOS.exactMatch, RDFS.seeAlso, RDFS.subClassOf},
+        ),
+        ("hctl", {RDFS.isDefinedBy}, {SKOS.exactMatch}),
+    ],
+)
+def test_default_options_graph_differs_from_todays_flags_graph_only_by_documented_overrides(
+    prefix: str, wot_only_predicates: set[URIRef], upstream_only_predicates: set[URIRef]
+) -> None:
     yaml_str = _preprocessed_yaml(prefix)
     wot = _graph(WotOwlGenerator.from_options(yaml_str, OwlOptions()))
     upstream = _graph(OwlSchemaGenerator(yaml_str, **TODAYS_FLAGS))
     _, wot_only, upstream_only = graph_diff(to_isomorphic(wot), to_isomorphic(upstream))
     assert len(wot) > 0
-    assert {predicate for _, predicate, _ in wot_only} == {RDFS.isDefinedBy}
+    assert {predicate for _, predicate, _ in wot_only} == wot_only_predicates
     assert len(upstream_only) > 0
-    assert {predicate for _, predicate, _ in upstream_only} == {SKOS.exactMatch}
+    assert {predicate for _, predicate, _ in upstream_only} == upstream_only_predicates

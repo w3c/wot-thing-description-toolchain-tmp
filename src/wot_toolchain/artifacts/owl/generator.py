@@ -25,6 +25,10 @@ _PERMISSIBLE_VALUE_TYPES: dict[PermissibleValueKind, URIRef] = {
     PermissibleValueKind.INSTANCE: OWL.Class,
 }
 
+# Annotation predicates whose IRI-looking values name resources, not strings.
+_RESOURCE_PREDICATES = frozenset({RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf})
+_IRI_PREFIXES = ("http://", "https://", "urn:")
+
 
 @dataclass
 class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships no type information
@@ -67,23 +71,40 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
     def add_metadata(self, e: Definition | PermissibleValue, uri: URIRef) -> None:
         """Emit the annotations of ``e`` in the published form.
 
-        Own scheme, alias as label, no exact_mappings, rdfs:isDefinedBy for elements of the schema's own namespace.
+        Own scheme, alias as label, no exact_mappings, rdfs:isDefinedBy for elements of the schema's own namespace,
+        IRI values of resource annotations (rdfs:seeAlso, rdfs:subClassOf, rdfs:isDefinedBy) as IRIs.
         """
         # Upstream maps from_schema to skos:inScheme (owlgen.py:358), so merged imports would name their own schema.
         # Upstream maps exact_mappings to skos:exactMatch, which the published ontologies do not carry.
         # Upstream maps name to rdfs:label and alias to skos:prefLabel; the published label is the alias.
         alias = getattr(e, "alias", None)
-        if e.from_schema or e.exact_mappings or alias:
+        # Upstream emits every CURIE-keyed annotation value as a Literal (owlgen.py:424), with no hook.
+        resource_annotations = self._resource_annotations(e)
+        if e.from_schema or e.exact_mappings or alias or resource_annotations:
             e = copy.copy(e)
+            # Item assignment, as linkml's own normalisation does; attribute assignment wraps a dict in a JsonObj.
+            e["annotations"] = {k: v for k, v in e.annotations.items() if k not in resource_annotations}
             e.exact_mappings = []
             if e.from_schema:
                 e.from_schema = str(self.graph.identifier)
             if alias:
                 e.name, e.alias = alias, None
         super().add_metadata(e, uri)
+        for predicate, value in resource_annotations.values():
+            self.graph.add((uri, predicate, URIRef(value)))
         # Upstream never emits rdfs:isDefinedBy; elements with a foreign IRI are defined elsewhere.
         if str(uri).startswith(self._own_namespace()):
             self.graph.add((uri, RDFS.isDefinedBy, self.graph.identifier))
+
+    def _resource_annotations(self, e: Definition | PermissibleValue) -> dict[str, tuple[URIRef, str]]:
+        """Return the annotations of ``e`` with an IRI value for a resource predicate, keyed by annotation key."""
+        found = {}
+        for key, annotation in e.annotations.items():
+            predicate = URIRef(self.schemaview.expand_curie(key)) if ":" in key else None
+            value = annotation.value
+            if predicate in _RESOURCE_PREDICATES and isinstance(value, str) and value.startswith(_IRI_PREFIXES):
+                found[key] = (predicate, value)
+        return found
 
     def _own_namespace(self) -> str:
         """Return the namespace IRI of the schema's default prefix."""
