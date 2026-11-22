@@ -146,7 +146,6 @@ _RESTRICTIONS = {
             "td",
             {
                 RDFS.isDefinedBy,
-                RDFS.seeAlso,
                 RDFS.subClassOf,
                 RDFS.subPropertyOf,
                 *_NAMED_RANGES,

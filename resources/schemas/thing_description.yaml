@@ -125,9 +125,8 @@ slots:
       - owl:ObjectProperty
     range: VersionInfo
     inlined: true
-    annotations:
-      rdfs:seeAlso:
-        value: http://schema.org/version
+    see_also:
+      - schema:version
   created:
     description: >-
       Provides information when the TD instance was created.
