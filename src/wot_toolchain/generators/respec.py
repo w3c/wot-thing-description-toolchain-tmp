@@ -498,7 +498,7 @@ def _classes_per_section(
     sections: Sequence[SpecSection], first_class: str | None, resolved: ResolvedProject
 ) -> list[list[str]]:
     """Return the names of the classes each section renders, in rendering order."""
-    classes = [list(resolved.module(section.schema).all_classes()) for section in sections]
+    classes = [list(resolved.module(section.schema).all_classes(imports=False)) for section in sections]
     if classes:
         # The first section's schema imports the other modules; their classes belong to their own sections.
         rendered_later = {name for later in classes[1:] for name in later}

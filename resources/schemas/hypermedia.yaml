@@ -31,6 +31,8 @@ prefixes:
 default_prefix: hctl
 imports:
   - linkml:types
+  - jsonschema
+  - wot_security
 
 subsets:
   property_ops:
@@ -576,8 +578,8 @@ classes:
       contentType: {}
       security:
         exactly_one_of:
-          - range: string
-          - range: string
+          - range: SecurityScheme
+          - range: SecurityScheme
             multivalued: true
             minimum_cardinality: 1
       scopes:
@@ -666,9 +668,7 @@ classes:
             Used to define the output data schema for an additional response if it differs from the default output data schema. Rather than a `DataSchema` object, the name of a previous definition given in a `schemaDefinitions` map must be used.
         slot_uri: hctl:hasAdditionalOutputSchema
         domain: AdditionalExpectedResponse
-        range: string
-        implements:
-          - owl:ObjectProperty
+        range: DataSchema
       contentType:
         description: >-
           Assign a content type based on a media type (e.g., text/plain) and potential parameters

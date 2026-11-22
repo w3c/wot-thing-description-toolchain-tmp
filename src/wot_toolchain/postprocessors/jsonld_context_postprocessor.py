@@ -393,14 +393,14 @@ def _fix_keyed_map_identifier_slots(context: dict[str, Any], schema_view: Schema
     """Replace identifier slots' ``@id`` mapping with their ontology predicate.
 
     LinkML emits ``"name": "@id"`` for ``identifier: true`` slots, making the
-    value the node identifier.  Keyed-map index properties are data properties
-    and must map to their declared ``slot_uri`` instead.  When no ``slot_uri``
+    value the node identifier.  A keyed map carries that name as its key, so
+    the slot maps to its declared ``slot_uri`` instead.  When no ``slot_uri``
     exists anywhere in the class hierarchy the slot is purely structural and
     is removed from the context.
     """
     identifier_fixes: dict[str, str | None] = {}
     for map_slot in _context_slots(schema_view):
-        if not _annotation_value(map_slot, "jsonld_index"):
+        if not _annotation_value(map_slot, "jsonld_index") and _annotation_value(map_slot, "jsonld_container") != "@id":
             continue
         if map_slot.range not in schema_view.all_classes():
             continue
@@ -428,6 +428,14 @@ def _fix_keyed_map_identifier_slots(context: dict[str, Any], schema_view: Schema
             context.pop(key, None)
 
 
+def _refers_by_name(schema_view: SchemaView, slot: SlotDefinition) -> bool:
+    """Check whether a value of ``slot`` is the name of a node defined elsewhere, not the node itself."""
+    if slot.range not in schema_view.all_classes() or not schema_view.get_identifier_slot(slot.range, use_key=True):
+        return False
+    holders = (slot, *slot.exactly_one_of, *slot.any_of)
+    return not any(holder.inlined or holder.inlined_as_list for holder in holders)
+
+
 def _context_scope(schema_view: SchemaView, slot: SlotDefinition) -> str | None:
     if explicit_scope := _annotation_value(slot, "jsonld_context"):
         if explicit_scope == "none":
@@ -438,7 +446,7 @@ def _context_scope(schema_view: SchemaView, slot: SlotDefinition) -> str | None:
                 "which the schema does not declare under 'prefixes'."
             )
         return explicit_scope
-    if slot.range not in schema_view.all_classes():
+    if slot.range not in schema_view.all_classes() or _refers_by_name(schema_view, slot):
         return None
 
     prefixes = {
@@ -728,12 +736,13 @@ def _apply_root_mapping(
         if container == "@language":
             entry.pop("@index", None)
             entry.pop("@type", None)
-        return
+            return
     index_iri = None
     if index := _annotation_value(slot, "jsonld_index"):
         index_iri = _expand_curie(schema_view, index)
         entry["@index"] = _curie_term_name(index)
-    if "@context" in entry and not index_iri:
+    is_keyed_map = index_iri is not None or container == "@id"
+    if "@context" in entry and not is_keyed_map:
         return
     if scope := _context_scope(schema_view, slot):
         scoped = deepcopy(module_contexts[scope])

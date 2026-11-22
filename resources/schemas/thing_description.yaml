@@ -253,8 +253,7 @@ slots:
     description: >-
       A security configuration is a security scheme applied to a (set of) affordance(s).
     slot_uri: td:hasSecurityConfiguration
-    implements:
-      - owl:ObjectProperty
+    range: SecurityScheme
     annotations:
       spec_description: >-
         Set of security definition names, chosen from those defined in `securityDefinitions`.
@@ -265,7 +264,7 @@ slots:
     slot_uri: td:definesSecurityScheme
     domain: Thing
     annotations:
-      jsonld_index: td:hasInstanceConfiguration
+      jsonld_container: "@id"
       spec_description: >-
         Set of named security configurations (definitions only).
         Not actually applied unless names are used in a `security` name-value pair.
@@ -291,7 +290,7 @@ slots:
     domain: Thing
     annotations:
       jsonld_context: none
-      jsonld_index: td:hasInstanceConfiguration
+      jsonld_container: "@id"
       spec_description: >-
         Set of named data schemas. To be used in a schema name-value pair inside an `AdditionalExpectedResponse` object.
     range: DataSchema
@@ -475,8 +474,8 @@ classes:
       security:
         required: true
         exactly_one_of:
-          - range: string
-          - range: string
+          - range: SecurityScheme
+          - range: SecurityScheme
             multivalued: true
             minimum_cardinality: 1
       profile:

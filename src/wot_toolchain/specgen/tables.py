@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
@@ -178,6 +178,31 @@ def _link(name: str, sv: SchemaView, type_hrefs: dict[str, str] | None = None) -
     return f'<a href="{_XSD_BASE}{name}"><code>{name}</code></a>'
 
 
+def _identifier(class_name: str, sv: SchemaView) -> SlotDefinition | None:
+    """Return the slot that names an instance of ``class_name``, or ``None`` if instances have no name."""
+    # Not SchemaView.get_identifier_slot: it induces every slot, and a module lists slots only its importer defines.
+    slots = sv.all_slots()
+    for name in sv.class_ancestors(class_name):
+        class_def = sv.get_class(name)
+        candidates = [*class_def.attributes.values(), *(slots[slot] for slot in class_def.slots if slot in slots)]
+        for candidate in candidates:
+            if candidate.identifier or candidate.key:
+                return candidate
+    return None
+
+
+def _serialized_range(rng: str | None, holders: Iterable[Any], sv: SchemaView) -> str | None:
+    """Return the range a value of ``rng`` has in a document: the identifier's range for a reference by name."""
+    if rng is None or rng not in sv.all_classes():
+        return rng
+    identifier = _identifier(rng, sv)
+    if identifier is None or any(
+        getattr(holder, "inlined", None) or getattr(holder, "inlined_as_list", None) for holder in holders
+    ):
+        return rng
+    return identifier.range or sv.schema.default_range or "string"
+
+
 def slot_type_text(
     slot_name: str,
     slot_def: SlotDefinition,
@@ -194,9 +219,10 @@ def slot_type_text(
     linked via ``_link``. ``effective_range``, if given, replaces the slot's own ``range``. A range with an entry
     in ``range_labels`` is shown as that label instead of its name.
     """
-    raw_rng = effective_range if effective_range else getattr(slot_def, "range", None)
-    # Choice Logic (exactly_one_of or any_of)
     usage = (getattr(class_def, "slot_usage", None) or {}).get(slot_name)
+    raw_rng = effective_range if effective_range else getattr(slot_def, "range", None)
+    raw_rng = _serialized_range(raw_rng, (slot_def, usage), sv)
+    # Choice Logic (exactly_one_of or any_of)
     choices = None
     if usage:
         choices = getattr(usage, "exactly_one_of", None) or getattr(usage, "any_of", None)
@@ -210,6 +236,7 @@ def slot_type_text(
             alt_rng_raw = getattr(alt, "range", None)
             if not alt_rng_raw:
                 alt_rng_raw = raw_rng
+            alt_rng_raw = _serialized_range(alt_rng_raw, (alt, slot_def, usage), sv)
             if alt_rng_raw is not None and alt_rng_raw in all_enums:
                 enum_def = all_enums[alt_rng_raw]
                 is_uri = enum_def.enum_uri in ["linkml:uri", "anyURI"] or alt_rng_raw.lower() == "uri"

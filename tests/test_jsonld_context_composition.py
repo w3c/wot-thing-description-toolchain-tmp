@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from rdflib import Graph, Literal, URIRef
+from rdflib import Graph, URIRef
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CONTEXT_PATH = REPO_ROOT / "resources/gens/jsonldcontext/context.jsonld"
@@ -41,8 +41,6 @@ def test_indexed_maps_preserve_their_rdf_key_predicates() -> None:
     assert context["actions"]["@index"] == "name"
     assert context["events"]["@index"] == "name"
     assert context["uriVariables"]["@index"] == "name"
-    assert context["securityDefinitions"]["@index"] == "hasInstanceConfiguration"
-    assert context["schemaDefinitions"]["@index"] == "hasInstanceConfiguration"
 
     data_schema_context = context["properties"]["@context"]
     assert data_schema_context["properties"]["@index"] == "name"
@@ -90,7 +88,16 @@ def test_jsonld_keywords_expand_a_minimal_thing() -> None:
     ) in graph
 
 
-def test_security_references_expand_as_literals() -> None:
+def test_definition_maps_name_their_nodes_by_key() -> None:
+    context = _context()
+
+    for definitions in ("securityDefinitions", "schemaDefinitions"):
+        assert context[definitions]["@container"] == "@id"
+        assert "@index" not in context[definitions]
+    assert "hasInstanceConfiguration" not in context
+
+
+def test_security_references_expand_as_nodes() -> None:
     document = {
         "@context": _context(),
         "@type": "Thing",
@@ -100,8 +107,8 @@ def test_security_references_expand_as_literals() -> None:
     }
 
     graph = Graph()
-    graph.parse(data=json.dumps(document), format="json-ld")
+    graph.parse(data=json.dumps(document), format="json-ld", base="https://td.example.com/td.jsonld")
 
     predicate = URIRef("https://www.w3.org/2019/wot/td#hasSecurityConfiguration")
     values = set(graph.objects(URIRef("urn:example:thing"), predicate))
-    assert values == {Literal("basic_sc"), Literal("nosec_sc")}
+    assert values == {URIRef("https://td.example.com/basic_sc"), URIRef("https://td.example.com/nosec_sc")}

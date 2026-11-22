@@ -198,9 +198,6 @@
         "format": {
           "@id": "jsonschema:format"
         },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
         "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
@@ -331,7 +328,8 @@
           "@id": "wotsec:scopes"
         },
         "security": {
-          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+          "@type": "@id"
         },
         "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
@@ -560,9 +558,6 @@
         "format": {
           "@id": "jsonschema:format"
         },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
         "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
@@ -693,7 +688,8 @@
           "@id": "wotsec:scopes"
         },
         "security": {
-          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+          "@type": "@id"
         },
         "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
@@ -914,9 +910,6 @@
         "format": {
           "@id": "jsonschema:format"
         },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
         "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
@@ -1047,7 +1040,8 @@
           "@id": "wotsec:scopes"
         },
         "security": {
-          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+          "@type": "@id"
         },
         "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
@@ -1268,9 +1262,6 @@
         "format": {
           "@id": "jsonschema:format"
         },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
         "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
@@ -1397,7 +1388,8 @@
           "@id": "wotsec:scopes"
         },
         "security": {
-          "@id": "td:hasSecurityConfiguration"
+          "@id": "td:hasSecurityConfiguration",
+          "@type": "@id"
         },
         "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
@@ -1454,9 +1446,6 @@
         "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "hasForm"
-    },
-    "hasInstanceConfiguration": {
-      "@id": "hasInstanceConfiguration"
     },
     "hctl": "https://www.w3.org/2019/wot/hypermedia#",
     "id": "@id",
@@ -1632,9 +1621,6 @@
         "format": {
           "@id": "jsonschema:format"
         },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
         "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
@@ -1773,7 +1759,8 @@
           "@id": "wotsec:scopes"
         },
         "security": {
-          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+          "@type": "@id"
         },
         "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
@@ -1992,9 +1979,6 @@
         "format": {
           "@id": "jsonschema:format"
         },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
         "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
@@ -2121,7 +2105,8 @@
           "@id": "wotsec:scopes"
         },
         "security": {
-          "@id": "td:hasSecurityConfiguration"
+          "@id": "td:hasSecurityConfiguration",
+          "@type": "@id"
         },
         "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
@@ -2363,9 +2348,6 @@
         "format": {
           "@id": "jsonschema:format"
         },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
         "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
@@ -2500,7 +2482,8 @@
           "@id": "wotsec:scopes"
         },
         "security": {
-          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+          "@type": "@id"
         },
         "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
@@ -2723,9 +2706,6 @@
         "format": {
           "@id": "jsonschema:format"
         },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
         "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
@@ -2864,7 +2844,8 @@
           "@id": "wotsec:scopes"
         },
         "security": {
-          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+          "@type": "@id"
         },
         "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
@@ -2939,16 +2920,16 @@
       "@type": "@id"
     },
     "schemaDefinitions": {
-      "@container": "@index",
+      "@container": "@id",
       "@id": "schemaDefinitions",
-      "@index": "hasInstanceConfiguration",
       "@type": "@id"
     },
     "security": {
-      "@id": "hasSecurityConfiguration"
+      "@id": "hasSecurityConfiguration",
+      "@type": "@id"
     },
     "securityDefinitions": {
-      "@container": "@index",
+      "@container": "@id",
       "@context": {
         "@vocab": "https://www.w3.org/2019/wot/security#",
         "APIKeySecurityScheme": {
@@ -3100,9 +3081,6 @@
         "format": {
           "@id": "wotsec:format"
         },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
         "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
@@ -3231,7 +3209,8 @@
           "@id": "wotsec:scopes"
         },
         "security": {
-          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+          "@type": "@id"
         },
         "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
@@ -3277,7 +3256,6 @@
         "xsd": "http://www.w3.org/2001/XMLSchema#"
       },
       "@id": "definesSecurityScheme",
-      "@index": "hasInstanceConfiguration",
       "@type": "@id"
     },
     "shex": "http://www.w3.org/ns/shex#",
@@ -3452,9 +3430,6 @@
         "format": {
           "@id": "jsonschema:format"
         },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
         "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
@@ -3585,7 +3560,8 @@
           "@id": "wotsec:scopes"
         },
         "security": {
-          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+          "@type": "@id"
         },
         "shex": "http://www.w3.org/ns/shex#",
         "sizes": {
@@ -3824,9 +3800,6 @@
         "format": {
           "@id": "jsonschema:format"
         },
-        "hasInstanceConfiguration": {
-          "@id": "https://www.w3.org/2019/wot/td#hasInstanceConfiguration"
-        },
         "hctl": "https://www.w3.org/2019/wot/hypermedia#",
         "href": {
           "@id": "hctl:hasTarget",
@@ -3957,7 +3930,8 @@
           "@id": "wotsec:scopes"
         },
         "security": {
-          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration"
+          "@id": "https://www.w3.org/2019/wot/td#hasSecurityConfiguration",
+          "@type": "@id"
         },
         "shex": "http://www.w3.org/ns/shex#",
         "sizes": {

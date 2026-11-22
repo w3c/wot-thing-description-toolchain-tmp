@@ -23,7 +23,7 @@ TODAYS_SLOT_TERMS: dict[str, Any] = {
     "name": "@id",
     "forms": {"@type": "@id", "@container": "@set", "@id": "hasForm"},
     "actions": {"@type": "@id", "@container": "@index", "@id": "hasActionAffordance"},
-    "security": {"@id": "hasSecurityConfiguration"},
+    "security": {"@type": "@id", "@id": "hasSecurityConfiguration"},
     "op": {
         "@context": {"text": "skos:notation", "description": "skos:prefLabel", "meaning": "@id"},
         "@id": "hctl:hasOperationType",

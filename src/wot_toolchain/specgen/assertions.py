@@ -169,7 +169,7 @@ def extract_all_table_assertions(
         # matching how generators.respec builds file_to_classes.
         sv = load_schema_view(schema_path, merge_imports=False)
 
-        for class_name, class_def in sv.all_classes().items():
+        for class_name, class_def in sv.all_classes(imports=False).items():
             slot_names = list(getattr(class_def, "slots", None) or [])
             slot_names.extend((getattr(class_def, "attributes", None) or {}).keys())
 
@@ -226,7 +226,7 @@ def extract_inline_assertions(
         prefix = prefix_map.get(schema_path.stem, schema_path.stem)
         sv = load_schema_view(schema_path, merge_imports=False)
 
-        for class_name, class_def in sv.all_classes().items():
+        for class_name, class_def in sv.all_classes(imports=False).items():
             annotations = getattr(class_def, "annotations", None) or {}
             raw_desc = getattr(class_def, "description", "") or ""
             if _is_inline_assertion(annotations, raw_desc):
