@@ -201,7 +201,7 @@ def test_context_coerces_inlined_class_without_identifier_to_id(context: dict[st
 
 
 def test_owl_emits_subproperty_annotation_as_literal_curie(owl: Graph) -> None:
-    """Guards owl_postprocessor._fix_subproperty_literals."""
+    """Guards WotOwlGenerator.add_metadata."""
     assert set(owl.objects(URIRef(EX + "label"), RDFS.subPropertyOf)) == {Literal("dcterms:title")}
 
 

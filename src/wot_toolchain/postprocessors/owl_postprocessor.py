@@ -60,7 +60,6 @@ def postprocess_owl_graph(
 
     _strip_foreign_subjects(g, ns, onto_iri)
     _strip_linkml_ranges(g)
-    _fix_subproperty_literals(g, sv_merged)
     _strip_orphan_blank_nodes(g)
     _strip_empty_blank_node_restrictions(g)
     _add_domain_includes(g, sv_merged)
@@ -140,17 +139,6 @@ def _strip_orphan_blank_nodes(g: Graph) -> None:
         _remove_rdf_list(g, s)
         for triple in list(g.triples((s, None, None))):
             g.remove(triple)
-
-
-def _fix_subproperty_literals(g: Graph, sv: SchemaView) -> None:
-    """Convert rdfs:subPropertyOf Literal objects (gen-owl bug) to URIRef."""
-    for s, _, o in list(g.triples((None, RDFS.subPropertyOf, None))):
-        if not isinstance(o, Literal):
-            continue
-        expanded = sv.expand_curie(str(o))
-        if expanded and expanded != str(o):
-            g.remove((s, RDFS.subPropertyOf, o))
-            g.add((s, RDFS.subPropertyOf, URIRef(expanded)))
 
 
 def _add_domain_includes(g: Graph, sv: SchemaView) -> None:

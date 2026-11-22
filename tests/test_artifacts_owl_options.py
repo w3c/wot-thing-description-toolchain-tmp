@@ -95,8 +95,8 @@ def test_non_default_options_map_to_upstream_arguments(hctl_yaml: str) -> None:
     [
         (
             "td",
-            {RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf},
-            {SKOS.exactMatch, RDFS.seeAlso, RDFS.subClassOf},
+            {RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf},
+            {SKOS.exactMatch, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf},
         ),
         ("hctl", {RDFS.isDefinedBy}, {SKOS.exactMatch}),
     ],

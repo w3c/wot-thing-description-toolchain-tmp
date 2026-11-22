@@ -72,7 +72,8 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
         """Emit the annotations of ``e`` in the published form.
 
         Own scheme, alias as label, no exact_mappings, rdfs:isDefinedBy for elements of the schema's own namespace,
-        IRI values of resource annotations (rdfs:seeAlso, rdfs:subClassOf, rdfs:isDefinedBy) as IRIs.
+        IRI values of resource annotations (rdfs:seeAlso, rdfs:subClassOf, rdfs:isDefinedBy) and expandable CURIE
+        values of rdfs:subPropertyOf annotations as IRIs.
         """
         # Upstream maps from_schema to skos:inScheme (owlgen.py:358), so merged imports would name their own schema.
         # Upstream maps exact_mappings to skos:exactMatch, which the published ontologies do not carry.
@@ -97,14 +98,26 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
             self.graph.add((uri, RDFS.isDefinedBy, self.graph.identifier))
 
     def _resource_annotations(self, e: Definition | PermissibleValue) -> dict[str, tuple[URIRef, str]]:
-        """Return the annotations of ``e`` with an IRI value for a resource predicate, keyed by annotation key."""
+        """Return the annotations of ``e`` whose value names a resource, as (predicate, IRI) by annotation key."""
         found = {}
         for key, annotation in e.annotations.items():
-            predicate = URIRef(self.schemaview.expand_curie(key)) if ":" in key else None
-            value = annotation.value
-            if predicate in _RESOURCE_PREDICATES and isinstance(value, str) and value.startswith(_IRI_PREFIXES):
-                found[key] = (predicate, value)
+            if ":" not in key:
+                continue
+            predicate = URIRef(self.schemaview.expand_curie(key))
+            if iri := self._resource_iri(predicate, annotation.value):
+                found[key] = (predicate, iri)
         return found
+
+    def _resource_iri(self, predicate: URIRef, value: object) -> str | None:
+        """Return the IRI that ``value`` names as an object of ``predicate``, or None if it is a plain string."""
+        if not isinstance(value, str):
+            return None
+        if predicate in _RESOURCE_PREDICATES and value.startswith(_IRI_PREFIXES):
+            return value
+        if predicate == RDFS.subPropertyOf:
+            expanded: str | None = self.schemaview.expand_curie(value)
+            return expanded if expanded and expanded != value else None
+        return None
 
     def _own_namespace(self) -> str:
         """Return the namespace IRI of the schema's default prefix."""
