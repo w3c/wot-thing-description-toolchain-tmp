@@ -26,7 +26,7 @@ class OwlOptions:
 
     # Descriptions are emitted as skos:definition; RDFS emits rdfs:comment instead (owlgen.py:388).
     metadata_profile: MetadataProfile = MetadataProfile.LINKML
-    # Module scoping is done by the preprocessor today; True stops merging imports and emits owl:imports instead.
+    # True emits only elements named in the schema's own namespace, and owl:imports instead of merged imports.
     only_root_schema: bool = False
     # Upstream default owl:Class; the pipeline passes INSTANCE, which WotOwlGenerator emits itself.
     permissible_values: PermissibleValueKind = PermissibleValueKind.CLASS

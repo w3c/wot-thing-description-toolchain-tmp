@@ -59,7 +59,6 @@ def postprocess_owl_graph(
     ns = _module_namespace(sv)
     onto_iri = _ontology_iri(sv)
 
-    _strip_foreign_subjects(g, ns, onto_iri)
     _strip_linkml_ranges(g)
     _add_domain_includes(g, sv_merged)
 
@@ -79,17 +78,6 @@ def _module_namespace(sv: SchemaView) -> str:
 
 def _ontology_iri(sv: SchemaView) -> URIRef:
     return URIRef(_get_schema(sv).id)
-
-
-def _strip_foreign_subjects(g: Graph, local_ns: str, onto_iri: URIRef) -> None:
-    """Remove subjects outside this module's namespace (includes linkml: subjects)."""
-    onto_str = str(onto_iri)
-    to_remove = [
-        s for s in set(g.subjects()) if isinstance(s, URIRef) and not str(s).startswith(local_ns) and str(s) != onto_str
-    ]
-    for s in to_remove:
-        for triple in list(g.triples((s, None, None))):
-            g.remove(triple)
 
 
 def _demote_to_datatype(g: Graph, props: set[Node]) -> None:

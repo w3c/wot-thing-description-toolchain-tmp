@@ -190,7 +190,7 @@ def _run_gen_owl(schema_path: Path) -> Graph:
         # as_graph(), not serialize() and re-parse: serialize() only adds canonical text that the post passes
         # discard; the final serializer orders the output (guarded by tests/test_owl_determinism.py).
         return WotOwlGenerator.from_options(
-            yaml_str, OwlOptions(permissible_values=PermissibleValueKind.INSTANCE)
+            yaml_str, OwlOptions(only_root_schema=True, permissible_values=PermissibleValueKind.INSTANCE)
         ).as_graph()
 
 

@@ -28,7 +28,7 @@ How they were gathered: by reading the code, `git log -S`, and the upstream link
 
 | Pass | Proposed tag | Proposed reason | Evidence | Confidence |
 |---|---|---|---|---|
-| `_strip_foreign_subjects` :85 | WOT-SHAPING | Removes subjects that belong to other modules. | f198fbf1 | high |
+| `_strip_foreign_subjects` :85 (removed; now `WotOwlGenerator` `only_root_schema` overrides) | WOT-SHAPING | Skips elements whose IRI is outside the schema namespace, so subjects of other modules are never emitted. | f198fbf1 | high |
 | `_strip_linkml_ranges` (+ `_demote_to_datatype`) | WOT-SHAPING | Since `bba1748f` removes three `rdfs:range linkml:Any` triples in jsonschema (`enum`, `const`, `default`); nothing in the other modules. `_demote_to_datatype` changes nothing on current schemas. | f198fbf1 | high (current schemas only) |
 | `_fix_in_scheme` :124 (removed; now `WotOwlGenerator.add_metadata`) | DEAD | The raw `skos:inScheme` value is already the ontology IRI. | f198fbf1 | high (current schemas only) |
 | `_fix_subproperty_literals` :185 (removed; now `WotOwlGenerator.add_metadata`) | UPSTREAM-GAP | gen-owl writes CURIE-valued annotations as plain strings, so `rdfs:subPropertyOf` comes out as a literal instead of an IRI. | ee7835d4; owlgen.py:437-440 | high |

@@ -15,6 +15,7 @@ from linkml_runtime.linkml_model.meta import (
     PermissibleValue,
     SchemaDefinition,
     SlotDefinition,
+    TypeDefinition,
 )
 from rdflib import OWL, RDF, RDFS, SKOS, BNode, Literal, URIRef
 
@@ -41,6 +42,7 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
     """OWL generator configured as the WoT toolchain runs it."""
 
     permissible_values: PermissibleValueKind = PermissibleValueKind.CLASS
+    only_root_schema: bool = False
 
     @classmethod
     def from_options(cls, schema: SchemaDefinition | str, options: OwlOptions) -> Self:
@@ -65,16 +67,29 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
             mergeimports=not options.only_root_schema,
             default_permissible_value_type=_PERMISSIBLE_VALUE_TYPES[options.permissible_values],
             permissible_values=options.permissible_values,
+            only_root_schema=options.only_root_schema,
             # Published ontologies tag human-readable text @en; the schemas carry no in_language.
             default_language="en",
         )
 
     def add_class(self, cls: ClassDefinition) -> None:
         """Emit ``cls`` without linking its class_uri to its native URI."""
+        if self._is_out_of_scope(self._class_uri(cls.name)):
+            return
         super().add_class(cls)
         # Upstream adds class_uri skos:exactMatch native URI inline in add_class (owlgen.py:510-516), with no hook.
         mapped_uri = URIRef(self.schemaview.get_uri(cls, expand=True, native=not self.use_native_uris))
         self.graph.remove((self._class_uri(cls.name), SKOS.exactMatch, mapped_uri))
+
+    def add_slot(self, slot: SlotDefinition, attribute: bool = False) -> None:
+        """Emit ``slot`` unless it is out of scope."""
+        if not self._is_out_of_scope(self._prop_uri(slot)):
+            super().add_slot(slot, attribute)
+
+    def add_type(self, typ: TypeDefinition) -> None:
+        """Emit ``typ`` unless it is out of scope."""
+        if not self._is_out_of_scope(self._type_uri(typ.name)):
+            super().add_type(typ)
 
     def get_own_slots(self, cls: ClassDefinition | AnonymousClassExpression) -> list[SlotDefinition]:
         """Return no slots, so classes carry no slot restrictions; constraints are published as SHACL."""
@@ -166,8 +181,15 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
         """Return the namespace IRI of the schema's default prefix."""
         return resolve_prefix_namespace(self.schemaview, self.schemaview.schema.default_prefix)
 
+    def _is_out_of_scope(self, uri: URIRef) -> bool:
+        """Return whether ``only_root_schema`` excludes the element named ``uri``."""
+        # The modules share terms across namespaces, so a root element named by a foreign IRI is defined elsewhere.
+        return self.only_root_schema and not str(uri).startswith(self._own_namespace())
+
     def add_enum(self, e: EnumDefinition) -> None:
         """Emit ``e``; INSTANCE values are typed by the enum class only."""
+        if self._is_out_of_scope(self._enum_uri(e.name)):
+            return
         if self.permissible_values is not PermissibleValueKind.INSTANCE:
             super().add_enum(e)
             return
@@ -186,6 +208,8 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
     def _add_enum_instance(self, pv: PermissibleValue, enum_uri: URIRef) -> None:
         """Emit ``pv`` as an instance of ``enum_uri``, named by its ``meaning``."""
         pv_uri = URIRef(self.schemaview.expand_curie(pv.meaning))
+        if self._is_out_of_scope(pv_uri):
+            return
         self.add_metadata(pv, pv_uri)
         self.graph.add((pv_uri, RDF.type, enum_uri))
         self.graph.add((pv_uri, RDFS.label, Literal(pv.text, lang=self._resolve_language(pv))))
