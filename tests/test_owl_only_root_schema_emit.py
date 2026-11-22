@@ -4,7 +4,7 @@ import warnings
 from pathlib import Path
 
 import pytest
-from rdflib import Graph, URIRef
+from rdflib import OWL, RDF, Graph, URIRef
 
 from wot_toolchain.artifacts.owl.generator import WotOwlGenerator
 from wot_toolchain.artifacts.owl.options import OwlOptions, PermissibleValueKind
@@ -77,6 +77,9 @@ NAMESPACE = "https://example.org/root#"
 LOCAL = {URIRef(NAMESPACE + name) for name in ("Thing", "colour", "Colour", "red")}
 IMPORTED = URIRef("https://example.org/part#Part")
 BORROWED = URIRef("https://example.org/other#Borrowed")
+_DECLARATIONS = {
+    (RDF.type, kind) for kind in (OWL.AnnotationProperty, OWL.Class, OWL.ObjectProperty, OWL.DatatypeProperty)
+}
 
 
 def _graph(directory: Path, *, only_root_schema: bool) -> Graph:
@@ -100,7 +103,14 @@ def merged(tmp_path_factory: pytest.TempPathFactory) -> Graph:
 
 
 def test_only_root_schema_emits_only_own_namespace_subjects(scoped: Graph) -> None:
-    assert set(scoped.subjects()) == LOCAL | {ONTOLOGY}
+    described = {s for s, p, o in scoped if (p, o) not in _DECLARATIONS}
+    assert {s for s in described if isinstance(s, URIRef)} == LOCAL | {ONTOLOGY}
+
+
+def test_only_root_schema_only_declares_foreign_subjects(scoped: Graph) -> None:
+    foreign = {s for s in scoped.subjects() if isinstance(s, URIRef)} - LOCAL - {ONTOLOGY}
+    assert foreign
+    assert all((p, o) in _DECLARATIONS for s in foreign for p, o in scoped.predicate_objects(s))
 
 
 def test_default_options_keep_imported_and_foreign_subjects(merged: Graph) -> None:

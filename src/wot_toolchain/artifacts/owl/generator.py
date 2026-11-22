@@ -17,7 +17,8 @@ from linkml_runtime.linkml_model.meta import (
     SlotDefinition,
     TypeDefinition,
 )
-from rdflib import OWL, RDF, RDFS, SKOS, BNode, Literal, URIRef
+from rdflib import OWL, RDF, RDFS, SKOS, XSD, BNode, Graph, Literal, URIRef
+from rdflib.collection import Collection
 
 from wot_toolchain.artifacts.owl.header import add_ontology_header
 from wot_toolchain.artifacts.owl.options import OwlOptions, PermissibleValueKind
@@ -36,6 +37,49 @@ _IRI_PREFIXES = ("http://", "https://", "urn:")
 
 # Annotation predicates whose text the published ontologies tag with a language.
 _LANGUAGE_TAGGED_PREDICATES = frozenset({SKOS.definition, RDFS.comment, RDFS.label})
+
+# Vocabularies whose properties OWL 2 declares itself.
+_BUILT_IN_NAMESPACES = (str(RDF), str(RDFS), str(OWL))
+
+
+def declare_annotation_properties(graph: Graph) -> None:
+    """Declare as owl:AnnotationProperty each predicate of ``graph`` that is neither built in nor a logical property.
+
+    A property that an object or datatype property specialises is logical too: declaring it would pun it.
+    """
+    typed = {*graph.subjects(RDF.type, OWL.ObjectProperty), *graph.subjects(RDF.type, OWL.DatatypeProperty)}
+    logical = typed | {parent for child, parent in graph.subject_objects(RDFS.subPropertyOf) if child in typed}
+    for predicate in set(graph.predicates()) - logical:
+        if not str(predicate).startswith(_BUILT_IN_NAMESPACES):
+            graph.add((predicate, RDF.type, OWL.AnnotationProperty))
+
+
+def declare_super_properties(graph: Graph) -> None:
+    """Declare each undeclared parent of an object or datatype property of ``graph`` with the kind of its child."""
+    for kind in (OWL.ObjectProperty, OWL.DatatypeProperty):
+        for child in set(graph.subjects(RDF.type, kind)):
+            for parent in set(graph.objects(child, RDFS.subPropertyOf)):
+                if (parent, RDF.type, None) not in graph:
+                    graph.add((parent, RDF.type, kind))
+
+
+def declare_referenced_classes(graph: Graph) -> None:
+    """Declare as owl:Class each named resource that ``graph`` uses as a class without defining it.
+
+    An XSD datatype is never a class, whatever position it stands in.
+    """
+    object_properties = set(graph.subjects(RDF.type, OWL.ObjectProperty))
+    unions = [members for union, members in graph.subject_objects(OWL.unionOf) if (union, RDF.type, OWL.Class) in graph]
+    referenced = {
+        *graph.objects(None, RDFS.domain),
+        *graph.objects(None, RDFS.subClassOf),
+        *graph.objects(None, RDF.type),
+        *(range_ for property_, range_ in graph.subject_objects(RDFS.range) if property_ in object_properties),
+        *(member for members in unions for member in Collection(graph, members)),
+    }
+    for resource in referenced:
+        if isinstance(resource, URIRef) and not str(resource).startswith((*_BUILT_IN_NAMESPACES, str(XSD))):
+            graph.add((resource, RDF.type, OWL.Class))
 
 
 @dataclass
@@ -72,6 +116,14 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
             # Published ontologies tag human-readable text @en; the schemas carry no in_language.
             default_language="en",
         )
+
+    def as_graph(self) -> Graph:
+        """Build the ontology graph and declare the classes and properties it refers to."""
+        graph: Graph = super().as_graph()
+        declare_super_properties(graph)
+        declare_referenced_classes(graph)
+        declare_annotation_properties(graph)
+        return graph
 
     def add_class(self, cls: ClassDefinition) -> None:
         """Emit ``cls`` without linking its class_uri to its native URI."""

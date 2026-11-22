@@ -13,14 +13,9 @@ REPORT_HEADER = "OWL 2 DL Profile Report:"
 SHOWN_VIOLATIONS = 10
 ROBOT_TIMEOUT_SECONDS = 300
 
-_UNDECLARED_METADATA = "undeclared annotation properties (dcterms, vann, skos, schema), undeclared schema:Organization"
 KNOWN_DL_VIOLATIONS: dict[str, str] = {
-    "hctl": f"{_UNDECLARED_METADATA}; owl:ObjectProperty with xsd range (hctl:hasAnchor); undeclared td:OperationType",
-    "jsonschema": _UNDECLARED_METADATA,
-    "td": f"{_UNDECLARED_METADATA}; owl:ObjectProperty with xsd range; undeclared external classes "
-    "jsonschema:DataSchema, wotsec:SecurityScheme, hctl:Form also parsed as datatypes",
-    "tm": _UNDECLARED_METADATA,
-    "wotsec": f"{_UNDECLARED_METADATA}; owl:ObjectProperty with xsd range (wotsec:oneOf, allOf, authorization)",
+    "hctl": "owl:ObjectProperty with xsd range (hctl:hasAnchor, hctl:hasAdditionalOutputSchema)",
+    "wotsec": "owl:ObjectProperty with xsd range (wotsec:proxy, authorization, token, refresh, oneOf, allOf)",
 }
 
 

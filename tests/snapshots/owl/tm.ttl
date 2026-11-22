@@ -29,12 +29,60 @@
         ] ;
 .
 
+schema:Organization
+    rdf:type owl:Class ;
+.
+
 tm:ThingModel
     rdf:type owl:Class ;
     rdfs:label "ThingModel"@en ;
     skos:definition "A Thing Model is a description for a class of Things that have the same capabilities. It describes the Properties, Actions, and Events and common metadata that are shared for an entire group of Things. Compared to a Thing Description, a Thing Model does not contain enough information to identify or interact with a Thing instance."@en ;
     rdfs:isDefinedBy <https://www.w3.org/2019/wot/tm> ;
     skos:inScheme <https://www.w3.org/2019/wot/tm> ;
+.
+
+dcterms:contributor
+    rdf:type owl:AnnotationProperty ;
+.
+
+dcterms:creator
+    rdf:type owl:AnnotationProperty ;
+.
+
+dcterms:license
+    rdf:type owl:AnnotationProperty ;
+.
+
+dcterms:publisher
+    rdf:type owl:AnnotationProperty ;
+.
+
+dcterms:title
+    rdf:type owl:AnnotationProperty ;
+.
+
+vann:preferredNamespacePrefix
+    rdf:type owl:AnnotationProperty ;
+.
+
+vann:preferredNamespaceUri
+    rdf:type owl:AnnotationProperty ;
+.
+
+schema:name
+    rdf:type owl:AnnotationProperty ;
+.
+
+schema:url
+    rdf:type owl:AnnotationProperty ;
+.
+
+skos:definition
+    rdf:type owl:AnnotationProperty ;
+.
+
+skos:inScheme
+    rdf:type owl:AnnotationProperty ;
 .
 
 tm:optional

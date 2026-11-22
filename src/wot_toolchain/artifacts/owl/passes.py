@@ -58,6 +58,7 @@ def _add_domain_includes(g: Graph, sv: SchemaView) -> None:
         prop_iri = URIRef(uri_str)
         if not any(g.triples((prop_iri, None, None))):
             continue
+        g.add((SCHEMA.domainIncludes, RDF.type, OWL.AnnotationProperty))
         for cu in class_uris:
             g.add((prop_iri, SCHEMA.domainIncludes, URIRef(sv.expand_curie(cu))))
 

@@ -52,7 +52,8 @@ def test_label_coverage(owl_module):
     labeled = set(g.subjects(RDFS.label, None))
     classes = set(g.subjects(RDF.type, OWL.Class))
     props = set(g.subjects(RDF.type, OWL.ObjectProperty)) | set(g.subjects(RDF.type, OWL.DatatypeProperty))
-    unlabeled = (classes | props) - labeled
+    own = {term for term in classes | props if str(term).startswith(MODULES[module])}
+    unlabeled = own - labeled
     assert not unlabeled, f"{module}: missing rdfs:label on {[str(u) for u in sorted(unlabeled)]}"
 
 
