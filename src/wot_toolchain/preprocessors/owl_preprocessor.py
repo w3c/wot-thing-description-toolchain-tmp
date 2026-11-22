@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import cast
 
 from linkml_runtime.dumpers import yaml_dumper
-from linkml_runtime.linkml_model.meta import ClassDefinition, EnumDefinition, Prefix, SchemaDefinition, SlotDefinition
+from linkml_runtime.linkml_model.meta import ClassDefinition, Prefix, SchemaDefinition, SlotDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
 from ..artifacts.owl.pre_passes import OWL_PRE_PASSES, OwlPreContext
@@ -20,7 +20,6 @@ from ..schema_utils import get_schema as _get_schema
 
 _Slots = dict[str, SlotDefinition]
 _Classes = dict[str, ClassDefinition]
-_Enums = dict[str, EnumDefinition]
 _Prefixes = dict[str, Prefix]
 
 
@@ -45,7 +44,7 @@ def _context(schema_path: str) -> OwlPreContext:
         SchemaError: If the schema file or a local import does not exist, or the ``default_prefix`` is not declared.
     """
     # Before merging: LinkML's merge would fail on a missing import with an untyped FileNotFoundError.
-    enum_namespaces = _collect_enum_namespaces(schema_path)
+    _require_local_imports(schema_path)
     view = SchemaView(schema_path, merge_imports=True)
     local_schema = _get_schema(SchemaView(schema_path, merge_imports=False))
     local_slots = cast(_Slots, local_schema.slots)
@@ -53,8 +52,6 @@ def _context(schema_path: str) -> OwlPreContext:
     return OwlPreContext(
         view=view,
         namespace=_namespace(view),
-        local_schema_id=local_schema.id,
-        enum_namespaces=enum_namespaces,
         no_uri_classes=frozenset(name for name, cls in local_classes.items() if not cls.class_uri),
         original_no_uri_slots=frozenset(name for name, slot in local_slots.items() if not slot.slot_uri),
     )
@@ -70,15 +67,14 @@ def _namespace(view: SchemaView) -> str:
     return str(cast(Prefix, prefixes[default_prefix(view)]).prefix_reference)
 
 
-def _collect_enum_namespaces(schema_path: str) -> dict[str, str]:
-    """Map each enum of the local imports of ``schema_path`` to the namespace of its originating sub-schema.
+def _require_local_imports(schema_path: str) -> None:
+    """Check that ``schema_path`` and every local import reachable from it exist.
 
     Raises:
         SchemaError: If ``schema_path`` or a local (non-CURIE) import does not resolve to an existing file.
     """
     root_schema = _get_schema(load_schema_view(Path(schema_path), merge_imports=False))
 
-    enum_to_ns: dict[str, str] = {}
     # Import cycles are legal in LinkML; walk each file once so they do not recurse forever.
     visited: set[Path] = {Path(schema_path).resolve()}
 
@@ -94,16 +90,6 @@ def _collect_enum_namespaces(schema_path: str) -> dict[str, str]:
                 continue
             visited.add(import_path.resolve())
             sub_schema = _get_schema(SchemaView(str(import_path), merge_imports=False))
-            dp = sub_schema.default_prefix
-            prefixes = cast(_Prefixes, sub_schema.prefixes)
-            if dp and dp in prefixes:
-                sub_ns = str(cast(Prefix, prefixes[dp]).prefix_reference)
-                for ename in cast(_Enums, sub_schema.enums):
-                    if str(ename) not in enum_to_ns:
-                        enum_to_ns[str(ename)] = sub_ns
-            sub_imports = cast(list[str], sub_schema.imports or [])
-            _walk(str(import_path), sub_imports, import_path.parent)
+            _walk(str(import_path), cast(list[str], sub_schema.imports or []), import_path.parent)
 
-    root_imports = cast(list[str], root_schema.imports or [])
-    _walk(schema_path, root_imports, Path(schema_path).parent)
-    return enum_to_ns
+    _walk(schema_path, cast(list[str], root_schema.imports or []), Path(schema_path).parent)

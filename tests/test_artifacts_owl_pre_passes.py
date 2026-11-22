@@ -36,18 +36,13 @@ classes:
 """
 
 ORDER_BEFORE_THE_MOVE = [
-    "assign_enum_uris",
     "rename_slots_to_uri_local_names",
     "strip_no_uri_classes",
     "strip_foreign_mixins",
     "promote_attributes",
-    "strip_non_local",
-    "strip_jsonld_slots",
     "strip_no_uri_original_slots",
-    "strip_discriminator_slots",
     "strip_non_ontological_enums",
     "fix_enum_pv_labels",
-    "infer_ranges_from_branches",
     "clear_constraints",
     "strip_dangling_slot_refs",
 ]
@@ -70,8 +65,6 @@ def _context(view: SchemaView, **overrides: object) -> OwlPreContext:
     fields: dict[str, object] = {
         "view": view,
         "namespace": "https://example.org/",
-        "local_schema_id": "https://example.org/mini",
-        "enum_namespaces": {},
         "no_uri_classes": frozenset(),
         "original_no_uri_slots": frozenset(),
     }
@@ -139,7 +132,6 @@ def test_no_uri_slot_pass_removes_the_slots_named_by_the_context(schema_path: Pa
 def test_preprocess_for_gen_owl_runs_the_passes_and_returns_yaml(schema_path: Path) -> None:
     result = yaml.safe_load(preprocess_for_gen_owl(str(schema_path)))
 
-    # "@type" survives as "type": the rename pass runs before the JSON-LD keyword pass looks for "@" names.
     assert set(result["slots"]) == {"hasTitle", "type"}
     assert set(result["classes"]) == {"Thing"}
     assert result["classes"]["Thing"]["slots"] == ["hasTitle", "type"]

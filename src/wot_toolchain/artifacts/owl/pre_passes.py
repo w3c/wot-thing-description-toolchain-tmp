@@ -1,7 +1,6 @@
 """Ordered schema passes applied to the merged LinkML schema before gen-owl."""
 
 import copy
-from collections.abc import Mapping
 from collections.abc import Set as AbstractSet
 from dataclasses import dataclass
 from typing import Any, cast
@@ -14,7 +13,6 @@ from linkml_runtime.linkml_model.meta import (
     SchemaDefinition,
     SlotDefinition,
 )
-from linkml_runtime.utils.formatutils import camelcase
 from linkml_runtime.utils.schemaview import SchemaView
 
 from wot_toolchain.artifacts.passes import Pass, PassKind
@@ -34,8 +32,6 @@ class OwlPreContext:
 
     view: SchemaView
     namespace: str
-    local_schema_id: str
-    enum_namespaces: Mapping[str, str]
     no_uri_classes: AbstractSet[str]
     original_no_uri_slots: AbstractSet[str]
 
@@ -65,17 +61,6 @@ def _expand_curie(view: SchemaView, curie: str, element: str) -> str:
     except ValueError as exc:
         schema = _get_schema(view)
         raise SchemaError(f"{schema.source_file or schema.name}: cannot expand {element}: {exc}") from exc
-
-
-def _assign_enum_uris(s: SchemaDefinition, enum_to_ns: Mapping[str, str]) -> None:
-    """Set enum_uri on enums that lack one, using originating sub-schema namespace."""
-    for ename, edef in cast(_Enums, s.enums).items():
-        if edef.enum_uri:
-            continue
-        ns = enum_to_ns.get(str(ename))
-        if ns is None:
-            continue
-        edef.enum_uri = f"{ns}{camelcase(str(ename))}"
 
 
 def _collect_renames(s: SchemaDefinition, namespace: str, view: SchemaView) -> dict[str, str]:
@@ -146,53 +131,6 @@ def _attr_slot_name(attr_name: str, attr_def: SlotDefinition, view: SchemaView) 
         return attr_name
     expanded = _expand_curie(view, attr_def.slot_uri, f"slot_uri {attr_def.slot_uri!r} of attribute {attr_name!r}")
     return local_name(expanded)
-
-
-def _strip_non_local(
-    s: SchemaDefinition,
-    local_schema_id: str,
-    view: SchemaView,
-    local_ns: str,
-) -> None:
-    """Keep only slots/enums from this module (or with local-namespace enum_uri).
-
-    Raises:
-        SchemaError: If a CURIE cannot be expanded because the schema's prefix declarations cannot be resolved.
-    """
-    slots = cast(_Slots, s.slots)
-    foreign_slots = {name for name, slot in slots.items() if slot.from_schema != local_schema_id}
-    _remove_slots(s, foreign_slots)
-
-    enums = cast(_Enums, s.enums)
-    enums_to_remove: list[str] = []
-    for name, enum in enums.items():
-        if enum.from_schema == local_schema_id:
-            continue
-        if enum.enum_uri:
-            expanded = _expand_curie(view, enum.enum_uri, f"enum_uri {enum.enum_uri!r} of enum {name!r}")
-            if expanded.startswith(local_ns):
-                continue
-        enums_to_remove.append(name)
-    for name in enums_to_remove:
-        del enums[name]
-
-
-def _strip_jsonld_slots(s: SchemaDefinition) -> None:
-    """Remove JSON-LD keyword slots (@context, @type) — no OWL counterpart."""
-    slots = cast(_Slots, s.slots)
-    jsonld_slots = {name for name, slot in slots.items() if (slot.alias or "").startswith("@") or name.startswith("@")}
-    _remove_slots(s, jsonld_slots)
-
-
-def _strip_discriminator_slots(s: SchemaDefinition, view: SchemaView) -> None:
-    """Remove JSON discriminator slots (no slot_uri, range is enum without enum_uri)."""
-    enums = cast(_Enums, s.enums)
-    implicit_enum_names = {name for name, edef in enums.items() if not edef.enum_uri}
-    slots = cast(_Slots, s.slots)
-    discriminator_slots = {
-        name for name, slot in slots.items() if not slot.slot_uri and slot.range in implicit_enum_names
-    }
-    _remove_slots(s, discriminator_slots)
 
 
 def _strip_non_ontological_enums(s: SchemaDefinition) -> None:
@@ -283,19 +221,6 @@ def _strip_no_uri_original_slots(s: SchemaDefinition, original_no_uri_slots: Abs
     _remove_slots(s, present)
 
 
-def _infer_ranges_from_branches(s: SchemaDefinition) -> None:
-    """Promote range from union branches when all agree on one range."""
-    for slot_def in cast(_Slots, s.slots).values():
-        if slot_def.range:
-            continue
-        branches = list(slot_def.any_of or []) + list(slot_def.exactly_one_of or [])
-        if not branches:
-            continue
-        ranges = {b.range for b in branches if b.range}
-        if len(ranges) == 1:
-            slot_def.range = next(iter(ranges))
-
-
 def _strip_dangling_slot_refs(s: SchemaDefinition) -> None:
     """Remove class slot references that have no matching top-level slot definition."""
     existing = set(cast(_Slots, s.slots).keys())
@@ -342,13 +267,6 @@ def _rename_slots(s: SchemaDefinition, context: OwlPreContext) -> None:
 
 OWL_PRE_PASSES: tuple[Pass, ...] = (
     Pass(
-        name="assign_enum_uris",
-        kind=PassKind.WOT_SHAPING,
-        reason="Gives each enum a URI in the namespace of the module that defines it. Upstream falls back to the "
-        "default prefix of the merged schema.",
-        apply=lambda s, c: _assign_enum_uris(s, c.enum_namespaces),
-    ),
-    Pass(
         name="rename_slots_to_uri_local_names",
         kind=PassKind.WOT_SHAPING,
         reason="Renames slots to the local name of their slot_uri. gen-owl already builds IRIs from slot_uri, so the "
@@ -374,29 +292,10 @@ OWL_PRE_PASSES: tuple[Pass, ...] = (
         apply=lambda s, c: _promote_attributes(s, c.view),
     ),
     Pass(
-        name="strip_non_local",
-        kind=PassKind.WOT_SHAPING,
-        reason="Keeps only the module's own slots and enums.",
-        apply=lambda s, c: _strip_non_local(s, c.local_schema_id, c.view, c.namespace),
-    ),
-    Pass(
-        name="strip_jsonld_slots",
-        kind=PassKind.WOT_SHAPING,
-        reason="@-keyword slots are JSON serialization details, not ontology terms.",
-        apply=lambda s, c: _strip_jsonld_slots(s),
-    ),
-    Pass(
         name="strip_no_uri_original_slots",
         kind=PassKind.WOT_SHAPING,
         reason="Removes slots without slot_uri.",
         apply=lambda s, c: _strip_no_uri_original_slots(s, c.original_no_uri_slots),
-    ),
-    Pass(
-        name="strip_discriminator_slots",
-        kind=PassKind.WOT_SHAPING,
-        reason="Removes slots without slot_uri whose range is an enum without enum_uri. Changed nothing on current "
-        "schemas.",
-        apply=lambda s, c: _strip_discriminator_slots(s, c.view),
     ),
     Pass(
         name="strip_non_ontological_enums",
@@ -411,13 +310,6 @@ OWL_PRE_PASSES: tuple[Pass, ...] = (
         reason="Renames permissible-value keys to the local name of their meaning, so the value IRIs and labels "
         "follow the WoT vocabulary.",
         apply=lambda s, c: _fix_enum_pv_labels(s, c.view),
-    ),
-    Pass(
-        name="infer_ranges_from_branches",
-        kind=PassKind.WOT_SHAPING,
-        reason="Sets the range of a slot without one when all its any_of and exactly_one_of branches agree on one "
-        "range. Changed nothing on current schemas.",
-        apply=lambda s, c: _infer_ranges_from_branches(s),
     ),
     Pass(
         name="clear_constraints",

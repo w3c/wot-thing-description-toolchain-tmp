@@ -54,15 +54,6 @@ classes:
     mixins: [Named]
 """
 
-_FOREIGN_ENUM_URI = """\
-imports:
-  - linkml:types
-  - other
-classes:
-  Thing:
-    class_uri: ex:Thing
-"""
-
 _PERMISSIBLE_VALUE_MEANING = """\
 enums:
   Color:
@@ -92,16 +83,12 @@ _CASES = {
     "slot_uri": (_SLOT_URI, "slot_uri 'ex:bar' of slot 'foo'"),
     "attribute_slot_uri": (_ATTRIBUTE_SLOT_URI, "slot_uri 'ex:bar' of attribute 'foo'"),
     "mixin_class_uri": (_MIXIN_CLASS_URI, "class_uri 'ex:Named' of mixin 'Named'"),
-    "foreign_enum_uri": (_FOREIGN_ENUM_URI, "enum_uri 'ex:Shade' of enum 'Shade'"),
     "permissible_value_meaning": (_PERMISSIBLE_VALUE_MEANING, "meaning 'ex:Red' of permissible value 'Color.red'"),
 }
 
 
 def _write_schema(tmp_path: Path, body: str, *, curi_maps: str) -> Path:
     header = _HEADER.format(curi_maps=curi_maps)
-    if body.startswith("imports:"):
-        header = header[: header.index("imports:")]
-    (tmp_path / "other.yaml").write_text(_OTHER_SCHEMA, encoding="utf-8")
     schema = tmp_path / "s.yaml"
     schema.write_text(header + textwrap.dedent(body), encoding="utf-8")
     return schema
