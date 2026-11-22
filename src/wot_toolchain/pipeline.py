@@ -65,6 +65,7 @@ def run_pipeline(project: Project, *, generate_docs: bool = False) -> None:
         spec = _with_generated_validation_schemas(project, spec)
     _require_external_tools(project, generate_docs=generate_docs)
     resolved = ResolvedProject(project.main_schema)
+    resolved.validate()
     schema_view = resolved.merged
 
     for name in project.generators:

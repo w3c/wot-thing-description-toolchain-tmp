@@ -5,6 +5,7 @@ from pathlib import Path
 
 from linkml_runtime.utils.schemaview import SchemaView
 
+from wot_toolchain.model.annotations import validate_annotations
 from wot_toolchain.schema_utils import load_schema_view
 
 
@@ -24,6 +25,14 @@ class ResolvedProject:
             SchemaError: If the schema file is missing or is not valid YAML.
         """
         return self._view(self.main_schema, merge_imports=True)
+
+    def validate(self) -> None:
+        """Check the annotations of the merged view that the passes read.
+
+        Raises:
+            SchemaError: If the schema cannot be loaded or any of those annotations is malformed.
+        """
+        validate_annotations(self.merged)
 
     def module(self, schema: Path) -> SchemaView:
         """Return the view of ``schema`` without its imports merged.
