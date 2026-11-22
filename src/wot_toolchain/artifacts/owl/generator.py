@@ -16,7 +16,7 @@ from linkml_runtime.linkml_model.meta import (
     SchemaDefinition,
     SlotDefinition,
 )
-from rdflib import OWL, RDF, RDFS, SKOS, BNode, URIRef
+from rdflib import OWL, RDF, RDFS, SKOS, BNode, Literal, URIRef
 
 from wot_toolchain.artifacts.owl.options import OwlOptions, PermissibleValueKind
 from wot_toolchain.schema_utils import resolve_prefix_namespace
@@ -31,6 +31,9 @@ _PERMISSIBLE_VALUE_TYPES: dict[PermissibleValueKind, URIRef] = {
 # Annotation predicates whose IRI-looking values name resources, not strings.
 _RESOURCE_PREDICATES = frozenset({RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf})
 _IRI_PREFIXES = ("http://", "https://", "urn:")
+
+# Annotation predicates whose text the published ontologies tag with a language.
+_LANGUAGE_TAGGED_PREDICATES = frozenset({SKOS.definition, RDFS.comment, RDFS.label})
 
 
 @dataclass
@@ -62,6 +65,8 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
             mergeimports=not options.only_root_schema,
             default_permissible_value_type=_PERMISSIBLE_VALUE_TYPES[options.permissible_values],
             permissible_values=options.permissible_values,
+            # Published ontologies tag human-readable text @en; the schemas carry no in_language.
+            default_language="en",
         )
 
     def add_class(self, cls: ClassDefinition) -> None:
@@ -120,6 +125,20 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
         # Upstream never emits rdfs:isDefinedBy; elements with a foreign IRI are defined elsewhere.
         if str(uri).startswith(self._own_namespace()):
             self.graph.add((uri, RDFS.isDefinedBy, self.graph.identifier))
+        self._drop_untagged_predicate_languages(uri)
+
+    def _literal(self, value: str, element: Definition | PermissibleValue | None = None) -> Literal:
+        """Return ``value`` as a literal without a language tag."""
+        # Upstream tags annotation values through _literal (owlgen.py:439); the published ontologies do not.
+        return Literal(value)
+
+    def _drop_untagged_predicate_languages(self, uri: URIRef) -> None:
+        """Drop the language tag of each literal of ``uri`` outside label, definition and comment."""
+        # Upstream tags every string metaslot (owlgen.py:399), e.g. comments as skos:note.
+        for predicate, obj in list(self.graph.predicate_objects(uri)):
+            if isinstance(obj, Literal) and obj.language and predicate not in _LANGUAGE_TAGGED_PREDICATES:
+                self.graph.remove((uri, predicate, obj))
+                self.graph.add((uri, predicate, Literal(str(obj))))
 
     def _resource_annotations(self, e: Definition | PermissibleValue) -> dict[str, tuple[URIRef, str]]:
         """Return the annotations of ``e`` whose value names a resource, as (predicate, IRI) by annotation key."""
@@ -169,4 +188,4 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
         pv_uri = URIRef(self.schemaview.expand_curie(pv.meaning))
         self.add_metadata(pv, pv_uri)
         self.graph.add((pv_uri, RDF.type, enum_uri))
-        self.graph.add((pv_uri, RDFS.label, self._literal(pv.text, pv)))
+        self.graph.add((pv_uri, RDFS.label, Literal(pv.text, lang=self._resolve_language(pv))))

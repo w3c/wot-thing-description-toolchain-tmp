@@ -7,7 +7,7 @@ from pathlib import Path
 from linkml_runtime.linkml_model.meta import SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
-from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SKOS, VANN
+from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, VANN
 from rdflib.plugin import register
 from rdflib.serializer import Serializer
 from rdflib.term import Node
@@ -61,7 +61,6 @@ def postprocess_owl_graph(
     _strip_foreign_subjects(g, ns, onto_iri)
     _strip_linkml_ranges(g)
     _add_domain_includes(g, sv_merged)
-    _add_lang_tags(g)
 
     _add_ontology_header(g, sv, ns, onto_iri)
 
@@ -140,16 +139,6 @@ def _add_domain_includes(g: Graph, sv: SchemaView) -> None:
             continue
         for cu in class_uris:
             g.add((prop_iri, SCHEMA.domainIncludes, URIRef(sv.expand_curie(cu))))
-
-
-def _add_lang_tags(g: Graph, lang: str = "en") -> None:
-    """Add @en lang tag to plain-string literals on description/label predicates."""
-    _TAGGED_PREDICATES = (SKOS.definition, RDFS.comment, RDFS.label)
-    for pred in _TAGGED_PREDICATES:
-        for s, _, o in list(g.triples((None, pred, None))):
-            if isinstance(o, Literal) and o.language is None and o.datatype is None:
-                g.remove((s, pred, o))
-                g.add((s, pred, Literal(str(o), lang=lang)))
 
 
 def _add_ontology_header(g: Graph, sv: SchemaView, ns: str, onto_iri: URIRef) -> None:

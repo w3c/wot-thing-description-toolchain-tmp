@@ -99,9 +99,9 @@ These are semantically equivalent. Remaining differences from the hand-authored 
 
 | # | Difference | Target | Generated | Status | Notes |
 |---|-----------|--------|-----------|--------|-------|
-| L1 | `rdfs:comment` lang tag | `@en` on all | `@en` on all | FIXED | Postprocessor `_add_lang_tags` |
+| L1 | `rdfs:comment` lang tag | `@en` on all | `@en` on all | FIXED | `WotOwlGenerator` (`default_language` from the schema) |
 | L2 | `rdfs:label` lang tag | No `@en` in target | `@en` on all | ACCEPTED | Generated is stricter — acceptable |
-| L3 | `skos:definition` lang tag | N/A (not used in target) | `@en` on all | FIXED | Postprocessor `_add_lang_tags` |
+| L3 | `skos:definition` lang tag | N/A (not used in target) | `@en` on all | FIXED | `WotOwlGenerator` (`default_language` from the schema) |
 
 ### Extra Triples in Generated
 
@@ -136,7 +136,7 @@ These are semantically equivalent. Remaining differences from the hand-authored 
 | F4 | Enum subclasses not converted to individuals | Emitted as instances by `WotOwlGenerator.add_enum` (see [OWL Enum Modeling](owl-enum-modeling.md)) | 2026-10 |
 | F5 | Aliased labels wrong | Emitted by `WotOwlGenerator.add_metadata` | 2026-10 |
 | F6 | Multi-domain `schema:domainIncludes` | Added `_add_domain_includes` | 2026-10 |
-| F7 | Missing `@en` lang tags | Added `_add_lang_tags` postprocessor (resilient to upstream) | 2026-10 |
+| F7 | Missing `@en` lang tags | Added `_add_lang_tags` postprocessor, later replaced by language tags emitted in `WotOwlGenerator` | 2026-10 |
 | F8 | `hasInteractionAffordance` missing domain | Added `domain: Thing` to schema YAML | 2026-10 |
 | F9 | `hasInstanceConfiguration` missing domain | Added `domain: SecurityScheme` to schema YAML | 2026-10 |
 | F10 | `a` shorthand instead of `rdf:type` | Custom serializer `self.keywords = {}` (C1) | 2026-10 |

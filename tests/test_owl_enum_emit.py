@@ -61,8 +61,8 @@ def test_value_is_typed_by_its_enum_only(graph: Graph, value: URIRef) -> None:
 
 @pytest.mark.parametrize("value", VALUES)
 def test_value_is_labelled_and_defined(graph: Graph, value: URIRef) -> None:
-    assert set(graph.objects(value, RDFS.label)) == {Literal(value.fragment)}
-    assert set(graph.objects(value, SKOS.definition)) == {Literal(f"The colour {value.fragment.lower()}.")}
+    assert set(graph.objects(value, RDFS.label)) == {Literal(value.fragment, lang="en")}
+    assert set(graph.objects(value, SKOS.definition)) == {Literal(f"The colour {value.fragment.lower()}.", lang="en")}
 
 
 def test_no_upstream_enum_artifacts(graph: Graph) -> None:

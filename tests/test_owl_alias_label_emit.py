@@ -54,7 +54,7 @@ def graph(generator: WotOwlGenerator) -> Graph:
 
 
 def test_alias_is_the_only_label(graph: Graph) -> None:
-    assert set(graph.objects(ALIASED, RDFS.label)) == {Literal("in")}
+    assert set(graph.objects(ALIASED, RDFS.label)) == {Literal("in", lang="en")}
 
 
 def test_no_pref_label_is_emitted(graph: Graph) -> None:
@@ -62,7 +62,7 @@ def test_no_pref_label_is_emitted(graph: Graph) -> None:
 
 
 def test_slot_without_alias_keeps_its_name_as_label(graph: Graph) -> None:
-    assert set(graph.objects(PLAIN, RDFS.label)) == {Literal("colour")}
+    assert set(graph.objects(PLAIN, RDFS.label)) == {Literal("colour", lang="en")}
 
 
 def test_schema_alias_and_name_are_left_untouched(graph: Graph, generator: WotOwlGenerator) -> None:

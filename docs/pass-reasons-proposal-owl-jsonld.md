@@ -41,7 +41,7 @@ How they were gathered: by reading the code, `git log -S`, and the upstream link
 | `_strip_empty_blank_node_restrictions` | REMOVED | Deleted in step 16c-9: changed nothing in any module. | f198fbf1 | high (current schemas only) |
 | `_add_domain_includes` :224 | UPSTREAM-GAP | gen-owl cannot emit `schema:domainIncludes` for properties used by several classes. | 2b2da5fd; known-linkml-gaps.md #11; owl-accepted-differences.md P3 | high |
 | `_add_is_defined_by` :254 (removed; now `WotOwlGenerator.add_metadata`) | WOT-SHAPING | Adds `rdfs:isDefinedBy <ontology>` to every local term. | 2b2da5fd; owl-rdf-modeling.md §5a | medium-high |
-| `_add_lang_tags` :261 | UNCLEAR | Adds `@en` tags. Question 1: should upstream `default_language` (owlgen.py:244-267) replace this pass? Question 2: owl-rdf-modeling.md §8 says `rdfs:comment` gets no `@en`, but this pass tags it. Which is correct? | 2b2da5fd | low-medium |
+| `_add_lang_tags` | REMOVED | Deleted in step 16c-7: `WotOwlGenerator` sets upstream `default_language` and emits the `@en` tags itself; output unchanged. | 2b2da5fd | low-medium |
 | `_add_ontology_header` :271 | WOT-SHAPING | Builds the ontology header from the schema's `annotations:`. `_publisher_node` :309 silently returns None when the annotation is malformed, instead of failing. | f198fbf1 | high |
 | `g.bind("schema", ...)` :69 | COSMETIC | Sets the prefix name used in the output. | owl_postprocessor.py:69 | high |
 

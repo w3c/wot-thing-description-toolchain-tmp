@@ -93,6 +93,8 @@ def test_non_default_options_map_to_upstream_arguments(hctl_yaml: str) -> None:
 # WotOwlGenerator emits named rdfs:range values; the RDF list predicates come from bnode relabelling of the
 # unchanged enum covering unions in the isomorphic diff.
 _NAMED_RANGES = {RDFS.range, OWL.unionOf, RDF.first, RDF.rest}
+# WotOwlGenerator tags labels and definitions with the schema language; upstream leaves them untagged.
+_LANGUAGE_TAGGED = {RDFS.label, SKOS.definition}
 # Upstream emits slot restrictions, cardinalities and anonymous ranges, which WotOwlGenerator suppresses.
 _RESTRICTIONS = {
     RDF.type,
@@ -115,13 +117,21 @@ _RESTRICTIONS = {
     [
         (
             "td",
-            {RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf, *_NAMED_RANGES},
-            {SKOS.exactMatch, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf, *_RESTRICTIONS},
+            {RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf, *_NAMED_RANGES, *_LANGUAGE_TAGGED},
+            {SKOS.exactMatch, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf, *_RESTRICTIONS, *_LANGUAGE_TAGGED},
         ),
         (
             "hctl",
-            {RDFS.isDefinedBy, *_NAMED_RANGES},
-            {SKOS.exactMatch, RDFS.subClassOf, OWL.onDatatype, OWL.withRestrictions, XSD.pattern, *_RESTRICTIONS},
+            {RDFS.isDefinedBy, *_NAMED_RANGES, *_LANGUAGE_TAGGED},
+            {
+                SKOS.exactMatch,
+                RDFS.subClassOf,
+                OWL.onDatatype,
+                OWL.withRestrictions,
+                XSD.pattern,
+                *_RESTRICTIONS,
+                *_LANGUAGE_TAGGED,
+            },
         ),
     ],
 )
