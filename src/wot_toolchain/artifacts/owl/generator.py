@@ -135,9 +135,16 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
         self.graph.remove((self._class_uri(cls.name), SKOS.exactMatch, mapped_uri))
 
     def add_slot(self, slot: SlotDefinition, attribute: bool = False) -> None:
-        """Emit ``slot`` unless it is out of scope."""
-        if not self._is_out_of_scope(self._prop_uri(slot)):
-            super().add_slot(slot, attribute)
+        """Emit ``slot`` unless it is out of scope; an object property gets no XSD datatype as its range."""
+        uri = self._prop_uri(slot)
+        if self._is_out_of_scope(uri):
+            return
+        super().add_slot(slot, attribute)
+        # Upstream types a slot from ``implements`` before its range (owlgen.py:1673-1676) and still emits the range.
+        if (uri, RDF.type, OWL.ObjectProperty) in self.graph:
+            for range_ in list(self.graph.objects(uri, RDFS.range)):
+                if str(range_).startswith(str(XSD)):
+                    self.graph.remove((uri, RDFS.range, range_))
 
     def add_type(self, typ: TypeDefinition) -> None:
         """Emit ``typ`` unless it is out of scope."""

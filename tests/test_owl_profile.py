@@ -13,10 +13,7 @@ REPORT_HEADER = "OWL 2 DL Profile Report:"
 SHOWN_VIOLATIONS = 10
 ROBOT_TIMEOUT_SECONDS = 300
 
-KNOWN_DL_VIOLATIONS: dict[str, str] = {
-    "hctl": "owl:ObjectProperty with xsd range (hctl:hasAnchor, hctl:hasAdditionalOutputSchema)",
-    "wotsec": "owl:ObjectProperty with xsd range (wotsec:proxy, authorization, token, refresh, oneOf, allOf)",
-}
+KNOWN_DL_VIOLATIONS: dict[str, str] = {}
 
 
 def _robot_binary() -> str:
