@@ -15,7 +15,7 @@
     rdfs:comment "Ontology for the W3C Web of Things JSON Schema in RDF vocabulary."@en ;
     vann:preferredNamespacePrefix "jsonschema" ;
     vann:preferredNamespaceUri "https://www.w3.org/2019/wot/json-schema#" ;
-    owl:versionInfo "1.1" ;
+    owl:versionInfo "td-next" ;
     dcterms:license <http://purl.org/NET/rdflicense/cc-by4.0> ;
     dcterms:creator <mailto:mahda.noura@siemens.com> ;
     dcterms:contributor <https://vcharpenay.link/#me> ;
