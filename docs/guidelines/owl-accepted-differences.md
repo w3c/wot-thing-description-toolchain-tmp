@@ -131,10 +131,10 @@ These are semantically equivalent. Remaining differences from the hand-authored 
 | # | Issue | Resolution | Date |
 |---|-------|-----------|------|
 | F1 | `schema1:` prefix collision | `g.namespace_manager.bind("schema", SCHEMA, override=True, replace=True)` | 2026-10 |
-| F2 | `rdfs:isDefinedBy` missing | Added `_add_is_defined_by` postprocessor | 2026-10 |
-| F3 | `skos:inScheme` wrong IRI | Fixed `_fix_in_scheme` postprocessor | 2026-10 |
-| F4 | Enum subclasses not converted to individuals | Added `_convert_enum_subclasses_to_individuals` | 2026-10 |
-| F5 | Aliased labels wrong | Added `_fix_aliased_labels` | 2026-10 |
+| F2 | `rdfs:isDefinedBy` missing | Emitted by `WotOwlGenerator.add_metadata` | 2026-10 |
+| F3 | `skos:inScheme` wrong IRI | Emitted by `WotOwlGenerator.add_metadata` | 2026-10 |
+| F4 | Enum subclasses not converted to individuals | Emitted as instances by `WotOwlGenerator.add_enum` (see [OWL Enum Modeling](owl-enum-modeling.md)) | 2026-10 |
+| F5 | Aliased labels wrong | Emitted by `WotOwlGenerator.add_metadata` | 2026-10 |
 | F6 | Multi-domain `schema:domainIncludes` | Added `_add_domain_includes` | 2026-10 |
 | F7 | Missing `@en` lang tags | Added `_add_lang_tags` postprocessor (resilient to upstream) | 2026-10 |
 | F8 | `hasInteractionAffordance` missing domain | Added `domain: Thing` to schema YAML | 2026-10 |

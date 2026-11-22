@@ -30,17 +30,17 @@ How they were gathered: by reading the code, `git log -S`, and the upstream link
 |---|---|---|---|---|
 | `_strip_foreign_subjects` :85 | WOT-SHAPING | Removes subjects that belong to other modules. | f198fbf1 | high |
 | `_strip_linkml_ranges` :114 (+ `_demote_to_datatype` :104) | DEAD | Changed nothing on current schemas. | f198fbf1 | high (current schemas only) |
-| `_fix_in_scheme` :124 | DEAD | The raw `skos:inScheme` value is already the ontology IRI. | f198fbf1 | high (current schemas only) |
-| `_fix_subproperty_literals` :185 | UPSTREAM-GAP | gen-owl writes CURIE-valued annotations as plain strings, so `rdfs:subPropertyOf` comes out as a literal instead of an IRI. | ee7835d4; owlgen.py:437-440 | high |
-| `_fix_uri_annotation_literals` :196 | UPSTREAM-GAP | Same string-to-IRI repair for `rdfs:seeAlso` and `rdfs:subClassOf`. The `isDefinedBy` branch never fires. | cd92fc45 | high |
-| `_clean_exact_match` :219 | WOT-SHAPING | Removes the `skos:exactMatch` triples that `use_native_uris=False` produces. | f198fbf1; owlgen.py:513-515 | high |
-| `_clean_enum_artifacts` :130 | WOT-SHAPING | Removes the gen-owl `unionOf` and `linkml:permissible_values` triples. The double-`#`, `oneOf` and `NamedIndividual` branches never fire. | f198fbf1; owlgen.py:1234-1250 | high |
-| `_convert_enum_subclasses_to_individuals` :160 | WOT-SHAPING | gen-owl emits enum values as subclasses (`default_permissible_value_type=OWL.Class`); the WoT ontology uses instances. | f198fbf1; owlgen.py:164; owl-rdf-modeling.md §7 | high |
-| `_fix_aliased_labels` :209 | WOT-SHAPING | gen-owl turns `alias` into `skos:prefLabel`; this pass rewrites it as `rdfs:label`. Only wotsec is affected. | cd92fc45 | medium |
+| `_fix_in_scheme` :124 (removed; now `WotOwlGenerator.add_metadata`) | DEAD | The raw `skos:inScheme` value is already the ontology IRI. | f198fbf1 | high (current schemas only) |
+| `_fix_subproperty_literals` :185 (removed; now `WotOwlGenerator.add_metadata`) | UPSTREAM-GAP | gen-owl writes CURIE-valued annotations as plain strings, so `rdfs:subPropertyOf` comes out as a literal instead of an IRI. | ee7835d4; owlgen.py:437-440 | high |
+| `_fix_uri_annotation_literals` :196 (removed; now `WotOwlGenerator.add_metadata`) | UPSTREAM-GAP | Same string-to-IRI repair for `rdfs:seeAlso` and `rdfs:subClassOf`. The `isDefinedBy` branch never fires. | cd92fc45 | high |
+| `_clean_exact_match` :219 (removed; now `WotOwlGenerator.add_class`) | WOT-SHAPING | Removes the `skos:exactMatch` triples that `use_native_uris=False` produces. | f198fbf1; owlgen.py:513-515 | high |
+| `_clean_enum_artifacts` :130 (removed; now `WotOwlGenerator.add_enum`) | WOT-SHAPING | Removes the gen-owl `unionOf` and `linkml:permissible_values` triples. The double-`#`, `oneOf` and `NamedIndividual` branches never fire. | f198fbf1; owlgen.py:1234-1250 | high |
+| `_convert_enum_subclasses_to_individuals` :160 (removed; now `WotOwlGenerator.add_enum`) | WOT-SHAPING | gen-owl emits enum values as subclasses (`default_permissible_value_type=OWL.Class`); the WoT ontology uses instances. | f198fbf1; owlgen.py:164; owl-rdf-modeling.md §7 | high |
+| `_fix_aliased_labels` :209 (removed; now `WotOwlGenerator.add_metadata`) | WOT-SHAPING | gen-owl turns `alias` into `skos:prefLabel`; this pass rewrites it as `rdfs:label`. Only wotsec is affected. | cd92fc45 | medium |
 | `_strip_orphan_blank_nodes` :175 | WOT-SHAPING (plumbing) | Removes the OperationType `unionOf` list left behind after foreign subjects are stripped (only hctl is affected). | f198fbf1 | high |
 | `_strip_empty_blank_node_restrictions` :96 | DEAD | Changed nothing on current schemas. | f198fbf1 | high (current schemas only) |
 | `_add_domain_includes` :224 | UPSTREAM-GAP | gen-owl cannot emit `schema:domainIncludes` for properties used by several classes. | 2b2da5fd; known-linkml-gaps.md #11; owl-accepted-differences.md P3 | high |
-| `_add_is_defined_by` :254 | WOT-SHAPING | Adds `rdfs:isDefinedBy <ontology>` to every local term. | 2b2da5fd; owl-rdf-modeling.md §5a | medium-high |
+| `_add_is_defined_by` :254 (removed; now `WotOwlGenerator.add_metadata`) | WOT-SHAPING | Adds `rdfs:isDefinedBy <ontology>` to every local term. | 2b2da5fd; owl-rdf-modeling.md §5a | medium-high |
 | `_add_lang_tags` :261 | UNCLEAR | Adds `@en` tags. Question 1: should upstream `default_language` (owlgen.py:244-267) replace this pass? Question 2: owl-rdf-modeling.md §8 says `rdfs:comment` gets no `@en`, but this pass tags it. Which is correct? | 2b2da5fd | low-medium |
 | `_add_ontology_header` :271 | WOT-SHAPING | Builds the ontology header from the schema's `annotations:`. `_publisher_node` :309 silently returns None when the annotation is malformed, instead of failing. | f198fbf1 | high |
 | `g.bind("schema", ...)` :69 | COSMETIC | Sets the prefix name used in the output. | owl_postprocessor.py:69 | high |

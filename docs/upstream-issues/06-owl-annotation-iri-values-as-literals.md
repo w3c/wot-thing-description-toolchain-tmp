@@ -56,5 +56,5 @@ ex:Color rdfs:isDefinedBy rdflib.term.Literal('https://example.org/probe')
 every string value goes through `self._literal(v.value, e)` (line 439), which always returns a
 `Literal`. The value is never checked for being a CURIE or IRI.
 
-**Workaround in this repo:** `_fix_subproperty_literals` and `_fix_uri_annotation_literals` in
-`src/wot_toolchain/postprocessors/owl_postprocessor.py`.
+**Workaround in this repo:** the `WotOwlGenerator.add_metadata` override in
+`src/wot_toolchain/artifacts/owl/generator.py`.

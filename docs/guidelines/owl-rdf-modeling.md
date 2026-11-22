@@ -156,7 +156,7 @@ Examples: `atContext` (JSON-LD `@context`), `atType` (JSON-LD `@type`), identifi
 
 Several RDF predicates expect `URIRef` objects, but gen-owl emits annotation values as `Literal` strings. The postprocessor converts these automatically.
 
-**Rule: use annotation syntax in schema YAML for these predicates. The postprocessor's `_fix_uri_annotation_literals` and `_fix_subproperty_literals` handle the Literal→URIRef conversion.**
+**Rule: use annotation syntax in schema YAML for these predicates. `WotOwlGenerator.add_metadata` (`src/wot_toolchain/artifacts/owl/generator.py`) emits these values as URIRefs instead of Literals.**
 
 Affected predicates:
 
@@ -184,8 +184,8 @@ Both predicates are added automatically by the toolchain, not via schema annotat
 
 | Predicate | Source | Mechanism |
 |-----------|--------|-----------|
-| `rdfs:isDefinedBy` | Postprocessor `_add_is_defined_by` | Adds `rdfs:isDefinedBy <ontology-iri>` to every local subject (class/property in module namespace) |
-| `skos:inScheme` | gen-owl via `from_schema` | LinkML `from_schema` has `slot_uri: skos:inScheme`; gen-owl emits natively. Postprocessor `_fix_in_scheme` rewrites object to ontology IRI |
+| `rdfs:isDefinedBy` | `WotOwlGenerator.add_metadata` | Adds `rdfs:isDefinedBy <ontology-iri>` to every local subject (class/property in module namespace) |
+| `skos:inScheme` | gen-owl via `from_schema` | LinkML `from_schema` has `slot_uri: skos:inScheme`; gen-owl emits natively. `WotOwlGenerator.add_metadata` rewrites object to ontology IRI |
 
 **Rule: do NOT add `rdfs:isDefinedBy` or `skos:inScheme` annotations in schema YAML. The toolchain handles them automatically.**
 
