@@ -12,6 +12,7 @@ from rdflib.plugin import register
 from rdflib.serializer import Serializer
 from rdflib.term import Node
 
+from ..errors import SchemaError
 from ..schema_utils import get_schema as _get_schema
 from . import resolve_prefix_namespace
 
@@ -171,6 +172,11 @@ def _add_ontology_header(g: Graph, sv: SchemaView, ns: str, onto_iri: URIRef) ->
 
 
 def _publisher_node(g: Graph, schema: SchemaDefinition) -> BNode | None:
+    """Return a schema:Organization node for the schema's publisher annotation, or None if it declares none.
+
+    Raises:
+        SchemaError: If the ``dcterms:publisher`` annotation is declared but is not a complete schema:Organization.
+    """
     annotation = (schema.annotations or {}).get("dcterms:publisher")
     if annotation is None:
         return None
@@ -179,12 +185,19 @@ def _publisher_node(g: Graph, schema: SchemaDefinition) -> BNode | None:
         org_type = value["@type"]
         name = value["schema:name"]
         url = value["schema:url"]
-    except KeyError, TypeError:
-        return None
+    except (KeyError, TypeError) as exc:
+        raise SchemaError(_malformed_publisher(schema)) from exc
     if org_type != "schema:Organization" or not name or not url:
-        return None
+        raise SchemaError(_malformed_publisher(schema))
     node = BNode()
     g.add((node, RDF.type, SCHEMA.Organization))
     g.add((node, SCHEMA.name, Literal(name)))
     g.add((node, SCHEMA.url, URIRef(url)))
     return node
+
+
+def _malformed_publisher(schema: SchemaDefinition) -> str:
+    return (
+        f"{schema.source_file or schema.name}: annotation 'dcterms:publisher' must be a mapping with "
+        "'@type: schema:Organization' and non-empty 'schema:name' and 'schema:url'."
+    )
