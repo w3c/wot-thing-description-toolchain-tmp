@@ -52,8 +52,6 @@ addopts = "-ra"
 [tool.ruff]
 line-length = 120
 target-version = "py314"
-# Vendored BMAD agent tooling, not part of the wot_toolchain package.
-extend-exclude = ["_bmad", ".agents"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4", "PTH", "RET", "D"]
