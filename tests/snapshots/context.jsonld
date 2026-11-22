@@ -3040,8 +3040,7 @@
         },
         "allOf": {
           "@container": "@set",
-          "@id": "wotsec:allOf",
-          "@type": "@id"
+          "@id": "wotsec:allOf"
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
@@ -3181,8 +3180,7 @@
         },
         "oneOf": {
           "@container": "@set",
-          "@id": "wotsec:oneOf",
-          "@type": "@id"
+          "@id": "wotsec:oneOf"
         },
         "owl": "http://www.w3.org/2002/07/owl#",
         "pattern": {
