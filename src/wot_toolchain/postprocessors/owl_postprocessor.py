@@ -62,7 +62,6 @@ def postprocess_owl_graph(
     _strip_linkml_ranges(g)
     _fix_subproperty_literals(g, sv_merged)
     _fix_uri_annotation_literals(g)
-    _clean_exact_match(g)
     _fix_aliased_labels(g)
     _strip_orphan_blank_nodes(g)
     _strip_empty_blank_node_restrictions(g)
@@ -178,11 +177,6 @@ def _fix_aliased_labels(g: Graph) -> None:
         lang = pref_label.language if isinstance(pref_label, Literal) else None
         g.add((s, RDFS.label, Literal(str(pref_label), lang=lang)))
         g.remove((s, SKOS.prefLabel, pref_label))
-
-
-def _clean_exact_match(g: Graph) -> None:
-    for s, p, o in list(g.triples((None, SKOS.exactMatch, None))):
-        g.remove((s, p, o))
 
 
 def _add_domain_includes(g: Graph, sv: SchemaView) -> None:

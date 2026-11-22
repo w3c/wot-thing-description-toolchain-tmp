@@ -6,8 +6,14 @@ from typing import Self
 
 from linkml.generators import owlgen
 from linkml.generators.owlgen import OwlSchemaGenerator
-from linkml_runtime.linkml_model.meta import Definition, EnumDefinition, PermissibleValue, SchemaDefinition
-from rdflib import OWL, RDF, RDFS, URIRef
+from linkml_runtime.linkml_model.meta import (
+    ClassDefinition,
+    Definition,
+    EnumDefinition,
+    PermissibleValue,
+    SchemaDefinition,
+)
+from rdflib import OWL, RDF, RDFS, SKOS, URIRef
 
 from wot_toolchain.artifacts.owl.options import OwlOptions, PermissibleValueKind
 
@@ -50,12 +56,22 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
             permissible_values=options.permissible_values,
         )
 
+    def add_class(self, cls: ClassDefinition) -> None:
+        """Emit ``cls`` without linking its class_uri to its native URI."""
+        super().add_class(cls)
+        # Upstream adds class_uri skos:exactMatch native URI inline in add_class (owlgen.py:510-516), with no hook.
+        mapped_uri = URIRef(self.schemaview.get_uri(cls, expand=True, native=not self.use_native_uris))
+        self.graph.remove((self._class_uri(cls.name), SKOS.exactMatch, mapped_uri))
+
     def add_metadata(self, e: Definition | PermissibleValue, uri: URIRef) -> None:
-        """Emit the annotations of ``e``, placing it in the scheme of the ontology being generated."""
+        """Emit the annotations of ``e`` except exact_mappings, placing it in the scheme of the generated ontology."""
         # Upstream maps from_schema to skos:inScheme (owlgen.py:358), so merged imports would name their own schema.
-        if e.from_schema:
+        # Upstream maps exact_mappings to skos:exactMatch, which the published ontologies do not carry.
+        if e.from_schema or e.exact_mappings:
             e = copy.copy(e)
-            e.from_schema = str(self.graph.identifier)
+            e.exact_mappings = []
+            if e.from_schema:
+                e.from_schema = str(self.graph.identifier)
         super().add_metadata(e, uri)
 
     def add_enum(self, e: EnumDefinition) -> None:
