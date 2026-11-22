@@ -22,21 +22,6 @@ from ..model.names import is_non_ontological_enum, local_name
 from ..schema_utils import default_prefix, load_schema_view
 from ..schema_utils import get_schema as _get_schema
 
-# Fields gen-owl converts to blank-node owl:Restriction axioms not present in the WoT TD ontology.
-_LIST_CONSTRAINT_FIELDS = ("exactly_one_of", "any_of", "all_of", "none_of")
-_SCALAR_CONSTRAINT_FIELDS = (
-    "minimum_value",
-    "maximum_value",
-    "minimum_cardinality",
-    "maximum_cardinality",
-    "exact_cardinality",
-    "pattern",
-    "structured_pattern",
-    "equals_string",
-    "equals_number",
-)
-_LIST_CONSTRAINT_FIELDS_EXTRA = ("equals_string_in", "equals_number_in")
-
 _Slots = dict[str, SlotDefinition]
 _Classes = dict[str, ClassDefinition]
 _Enums = dict[str, EnumDefinition]
@@ -415,17 +400,6 @@ def _strip_dangling_slot_refs(s: SchemaDefinition) -> None:
             cls_def.slots = [sn for sn in cls_def.slots if str(sn) in existing]
 
 
-def _clear_slot_restrictions(slot: SlotDefinition) -> None:
-    for f in _LIST_CONSTRAINT_FIELDS + _LIST_CONSTRAINT_FIELDS_EXTRA:
-        setattr(slot, f, [])
-    for f in _SCALAR_CONSTRAINT_FIELDS:
-        setattr(slot, f, None)
-    slot.required = False
-    slot.identifier = False
-    slot.key = False
-    slot.multivalued = True
-
-
 _Annotations = dict[str, Any]
 
 
@@ -437,11 +411,9 @@ def _rdf_annotations(obj: SlotDefinition | ClassDefinition | EnumDefinition) -> 
 
 def _clear_constraints(s: SchemaDefinition) -> None:
     for slot_def in cast(_Slots, s.slots).values():
-        _clear_slot_restrictions(slot_def)
         slot_def.annotations = _rdf_annotations(slot_def)
     for class_def in cast(_Classes, s.classes).values():
         for attr_def in cast(dict[str, SlotDefinition], class_def.attributes or {}).values():
-            _clear_slot_restrictions(attr_def)
             attr_def.annotations = _rdf_annotations(attr_def)
         class_def.slot_usage = {}
         class_def.rules = []

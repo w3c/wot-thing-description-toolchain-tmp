@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from linkml.generators import owlgen
 from linkml.generators.owlgen import OwlSchemaGenerator
-from rdflib import OWL, RDFS, SKOS, Graph, URIRef
+from rdflib import OWL, RDF, RDFS, SKOS, XSD, Graph, URIRef
 from rdflib.compare import graph_diff, to_isomorphic
 
 from wot_toolchain.artifacts.owl.generator import WotOwlGenerator
@@ -90,15 +90,39 @@ def test_non_default_options_map_to_upstream_arguments(hctl_yaml: str) -> None:
     assert wot.default_permissible_value_type == OWL.NamedIndividual
 
 
+# WotOwlGenerator emits named rdfs:range values; the RDF list predicates come from bnode relabelling of the
+# unchanged enum covering unions in the isomorphic diff.
+_NAMED_RANGES = {RDFS.range, OWL.unionOf, RDF.first, RDF.rest}
+# Upstream emits slot restrictions, cardinalities and anonymous ranges, which WotOwlGenerator suppresses.
+_RESTRICTIONS = {
+    RDF.type,
+    RDF.first,
+    RDF.rest,
+    RDFS.range,
+    OWL.allValuesFrom,
+    OWL.complementOf,
+    OWL.datatypeComplementOf,
+    OWL.intersectionOf,
+    OWL.maxCardinality,
+    OWL.minCardinality,
+    OWL.onProperty,
+    OWL.unionOf,
+}
+
+
 @pytest.mark.parametrize(
     ("prefix", "wot_only_predicates", "upstream_only_predicates"),
     [
         (
             "td",
-            {RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf},
-            {SKOS.exactMatch, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf},
+            {RDFS.isDefinedBy, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf, *_NAMED_RANGES},
+            {SKOS.exactMatch, RDFS.seeAlso, RDFS.subClassOf, RDFS.subPropertyOf, *_RESTRICTIONS},
         ),
-        ("hctl", {RDFS.isDefinedBy}, {SKOS.exactMatch}),
+        (
+            "hctl",
+            {RDFS.isDefinedBy, *_NAMED_RANGES},
+            {SKOS.exactMatch, RDFS.subClassOf, OWL.onDatatype, OWL.withRestrictions, XSD.pattern, *_RESTRICTIONS},
+        ),
     ],
 )
 def test_default_options_graph_differs_from_todays_flags_graph_only_by_documented_overrides(

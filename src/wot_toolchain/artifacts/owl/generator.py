@@ -7,13 +7,16 @@ from typing import Self
 from linkml.generators import owlgen
 from linkml.generators.owlgen import OwlSchemaGenerator
 from linkml_runtime.linkml_model.meta import (
+    AnonymousClassExpression,
+    AnonymousSlotExpression,
     ClassDefinition,
     Definition,
     EnumDefinition,
     PermissibleValue,
     SchemaDefinition,
+    SlotDefinition,
 )
-from rdflib import OWL, RDF, RDFS, SKOS, URIRef
+from rdflib import OWL, RDF, RDFS, SKOS, BNode, URIRef
 
 from wot_toolchain.artifacts.owl.options import OwlOptions, PermissibleValueKind
 from wot_toolchain.schema_utils import resolve_prefix_namespace
@@ -67,6 +70,27 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
         # Upstream adds class_uri skos:exactMatch native URI inline in add_class (owlgen.py:510-516), with no hook.
         mapped_uri = URIRef(self.schemaview.get_uri(cls, expand=True, native=not self.use_native_uris))
         self.graph.remove((self._class_uri(cls.name), SKOS.exactMatch, mapped_uri))
+
+    def get_own_slots(self, cls: ClassDefinition | AnonymousClassExpression) -> list[SlotDefinition]:
+        """Return no slots, so classes carry no slot restrictions; constraints are published as SHACL."""
+        # Upstream turns each own slot into owl:Restriction and cardinality axioms inline in
+        # transform_class_expression (owlgen.py:703-791), with no hook.
+        return []
+
+    def transform_class_slot_expression(
+        self,
+        cls: ClassDefinition | AnonymousClassExpression | None,
+        slot: SlotDefinition | AnonymousSlotExpression,
+        main_slot: SlotDefinition | None = None,
+        owl_types: set[URIRef] | None = None,
+    ) -> URIRef | BNode | None:
+        """Return the named range of ``slot`` only; boolean branches and value constraints are published as SHACL."""
+        # Upstream intersects the range with branch and datatype-restriction expressions (owlgen.py:857-927).
+        named_range = SlotDefinition(name=(main_slot or slot).name, range=slot.range)
+        expr: URIRef | BNode | None = super().transform_class_slot_expression(
+            cls, named_range, main_slot or named_range, owl_types
+        )
+        return expr
 
     def add_metadata(self, e: Definition | PermissibleValue, uri: URIRef) -> None:
         """Emit the annotations of ``e`` in the published form.
