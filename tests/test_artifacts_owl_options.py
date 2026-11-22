@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from linkml.generators import owlgen
 from linkml.generators.owlgen import OwlSchemaGenerator
-from rdflib import OWL, SKOS, Graph
+from rdflib import OWL, RDFS, SKOS, Graph
 from rdflib.compare import graph_diff, to_isomorphic
 
 from wot_toolchain.artifacts.owl.generator import WotOwlGenerator
@@ -91,12 +91,12 @@ def test_non_default_options_map_to_upstream_arguments(hctl_yaml: str) -> None:
 
 
 @pytest.mark.parametrize("prefix", ["td", "hctl"])
-def test_default_options_graph_differs_from_todays_flags_graph_only_by_exact_match(prefix: str) -> None:
+def test_default_options_graph_differs_from_todays_flags_graph_only_by_documented_overrides(prefix: str) -> None:
     yaml_str = _preprocessed_yaml(prefix)
     wot = _graph(WotOwlGenerator.from_options(yaml_str, OwlOptions()))
     upstream = _graph(OwlSchemaGenerator(yaml_str, **TODAYS_FLAGS))
     _, wot_only, upstream_only = graph_diff(to_isomorphic(wot), to_isomorphic(upstream))
     assert len(wot) > 0
-    assert set(wot_only) == set()
+    assert {predicate for _, predicate, _ in wot_only} == {RDFS.isDefinedBy}
     assert len(upstream_only) > 0
     assert {predicate for _, predicate, _ in upstream_only} == {SKOS.exactMatch}

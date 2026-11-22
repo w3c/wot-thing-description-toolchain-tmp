@@ -16,6 +16,7 @@ from linkml_runtime.linkml_model.meta import (
 from rdflib import OWL, RDF, RDFS, SKOS, URIRef
 
 from wot_toolchain.artifacts.owl.options import OwlOptions, PermissibleValueKind
+from wot_toolchain.schema_utils import resolve_prefix_namespace
 
 # INSTANCE is emitted by WotOwlGenerator.add_enum, so upstream keeps its default for it.
 _PERMISSIBLE_VALUE_TYPES: dict[PermissibleValueKind, URIRef] = {
@@ -64,7 +65,10 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
         self.graph.remove((self._class_uri(cls.name), SKOS.exactMatch, mapped_uri))
 
     def add_metadata(self, e: Definition | PermissibleValue, uri: URIRef) -> None:
-        """Emit the annotations of ``e`` in the published form: own scheme, alias as label, no exact_mappings."""
+        """Emit the annotations of ``e`` in the published form.
+
+        Own scheme, alias as label, no exact_mappings, rdfs:isDefinedBy for elements of the schema's own namespace.
+        """
         # Upstream maps from_schema to skos:inScheme (owlgen.py:358), so merged imports would name their own schema.
         # Upstream maps exact_mappings to skos:exactMatch, which the published ontologies do not carry.
         # Upstream maps name to rdfs:label and alias to skos:prefLabel; the published label is the alias.
@@ -77,6 +81,13 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
             if alias:
                 e.name, e.alias = alias, None
         super().add_metadata(e, uri)
+        # Upstream never emits rdfs:isDefinedBy; elements with a foreign IRI are defined elsewhere.
+        if str(uri).startswith(self._own_namespace()):
+            self.graph.add((uri, RDFS.isDefinedBy, self.graph.identifier))
+
+    def _own_namespace(self) -> str:
+        """Return the namespace IRI of the schema's default prefix."""
+        return resolve_prefix_namespace(self.schemaview, self.schemaview.schema.default_prefix)
 
     def add_enum(self, e: EnumDefinition) -> None:
         """Emit ``e``; INSTANCE values are typed by the enum class only."""

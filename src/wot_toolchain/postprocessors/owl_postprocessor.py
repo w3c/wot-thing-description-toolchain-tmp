@@ -65,7 +65,6 @@ def postprocess_owl_graph(
     _strip_orphan_blank_nodes(g)
     _strip_empty_blank_node_restrictions(g)
     _add_domain_includes(g, sv_merged)
-    _add_is_defined_by(g, ns, onto_iri)
     _add_lang_tags(g)
 
     _add_ontology_header(g, sv, ns, onto_iri)
@@ -196,13 +195,6 @@ def _add_domain_includes(g: Graph, sv: SchemaView) -> None:
             continue
         for cu in class_uris:
             g.add((prop_iri, SCHEMA.domainIncludes, URIRef(sv.expand_curie(cu))))
-
-
-def _add_is_defined_by(g: Graph, local_ns: str, onto_iri: URIRef) -> None:
-    """Add rdfs:isDefinedBy to every local subject (class/property in module namespace)."""
-    for s in set(g.subjects()):
-        if isinstance(s, URIRef) and str(s).startswith(local_ns):
-            g.add((s, RDFS.isDefinedBy, onto_iri))
 
 
 def _add_lang_tags(g: Graph, lang: str = "en") -> None:
