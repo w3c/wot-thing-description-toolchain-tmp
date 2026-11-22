@@ -24,12 +24,12 @@ How they were gathered: by reading the code, `git log -S`, and the upstream link
 | `_strip_dangling_slot_refs` :409 | WOT-SHAPING (plumbing) | Removes references to slots that earlier passes deleted. | cd92fc45 | high |
 | `_strip_schema_metadata` :382 (removed; now `WotOwlGenerator.add_metadata`) | WOT-SHAPING | Stopped gen-owl emitting metamodel predicates and a second ontology header. The generator now emits the header for the schema itself instead of the upstream schema metadata, so nothing has to be cleared. | 1de8d8eb | medium |
 
-## OWL postprocess (`postprocessors/owl_postprocessor.py`, `postprocess_owl` :33-72, call order)
+## OWL postprocess (`OWL_PASSES` in `artifacts/owl/passes.py`, run by `postprocess_owl_graph` in `postprocessors/owl_postprocessor.py`, call order)
 
 | Pass | Proposed tag | Proposed reason | Evidence | Confidence |
 |---|---|---|---|---|
 | `_strip_foreign_subjects` :85 (removed; now `WotOwlGenerator` `only_root_schema` overrides) | WOT-SHAPING | Skips elements whose IRI is outside the schema namespace, so subjects of other modules are never emitted. | f198fbf1 | high |
-| `_strip_linkml_ranges` (+ `_demote_to_datatype`) | WOT-SHAPING | Since `bba1748f` removes three `rdfs:range linkml:Any` triples in jsonschema (`enum`, `const`, `default`); nothing in the other modules. `_demote_to_datatype` changes nothing on current schemas. | f198fbf1 | high (current schemas only) |
+| `_strip_linkml_ranges` (+ `_demote_to_datatype`) (`artifacts/owl/passes.py`) | WOT-SHAPING | Since `bba1748f` removes three `rdfs:range linkml:Any` triples in jsonschema (`enum`, `const`, `default`); nothing in the other modules. `_demote_to_datatype` changes nothing on current schemas. | f198fbf1 | high (current schemas only) |
 | `_fix_in_scheme` :124 (removed; now `WotOwlGenerator.add_metadata`) | DEAD | The raw `skos:inScheme` value is already the ontology IRI. | f198fbf1 | high (current schemas only) |
 | `_fix_subproperty_literals` :185 (removed; now `WotOwlGenerator.add_metadata`) | UPSTREAM-GAP | gen-owl writes CURIE-valued annotations as plain strings, so `rdfs:subPropertyOf` comes out as a literal instead of an IRI. | ee7835d4; owlgen.py:437-440 | high |
 | `_fix_uri_annotation_literals` :196 (removed; now `WotOwlGenerator.add_metadata`) | UPSTREAM-GAP | Same string-to-IRI repair for `rdfs:seeAlso` and `rdfs:subClassOf`. The `isDefinedBy` branch never fires. | cd92fc45 | high |
@@ -39,11 +39,11 @@ How they were gathered: by reading the code, `git log -S`, and the upstream link
 | `_fix_aliased_labels` :209 (removed; now `WotOwlGenerator.add_metadata`) | WOT-SHAPING | gen-owl turns `alias` into `skos:prefLabel`; this pass rewrites it as `rdfs:label`. Only wotsec is affected. | cd92fc45 | medium |
 | `_strip_orphan_blank_nodes` | REMOVED | Deleted in step 16c-9: `WotOwlGenerator` emits no blank nodes since `bba1748f`, the pass changed nothing in any module. | f198fbf1 | high (current schemas only) |
 | `_strip_empty_blank_node_restrictions` | REMOVED | Deleted in step 16c-9: changed nothing in any module. | f198fbf1 | high (current schemas only) |
-| `_add_domain_includes` :224 | UPSTREAM-GAP | gen-owl cannot emit `schema:domainIncludes` for properties used by several classes. | 2b2da5fd; known-linkml-gaps.md #11; owl-accepted-differences.md P3 | high |
+| `_add_domain_includes` (`artifacts/owl/passes.py`) | UPSTREAM-GAP | gen-owl cannot emit `schema:domainIncludes` for properties used by several classes. | 2b2da5fd; known-linkml-gaps.md #11; owl-accepted-differences.md P3 | high |
 | `_add_is_defined_by` :254 (removed; now `WotOwlGenerator.add_metadata`) | WOT-SHAPING | Adds `rdfs:isDefinedBy <ontology>` to every local term. | 2b2da5fd; owl-rdf-modeling.md §5a | medium-high |
 | `_add_lang_tags` | REMOVED | Deleted in step 16c-7: `WotOwlGenerator` sets upstream `default_language` and emits the `@en` tags itself; output unchanged. | 2b2da5fd | low-medium |
 | `_add_ontology_header` :271 (removed; now `WotOwlGenerator.add_metadata`, `artifacts/owl/header.py`) | WOT-SHAPING | Builds the ontology header from the schema's metadata slots (`title`, `version`, `license`, `created_by`, `contributors`) and its `dcterms:publisher` annotation. `_publisher_node` raises `SchemaError` when the annotation is malformed. | f198fbf1 | high |
-| `g.bind("schema", ...)` :69 | COSMETIC | Sets the prefix name used in the output. | owl_postprocessor.py:69 | high |
+| `g.bind("schema", ...)` (`postprocess_owl_graph`) | COSMETIC | Sets the prefix name used in the output. | owl_postprocessor.py | high |
 
 ## Serializer (`serializers/wot_turtle.py`)
 
