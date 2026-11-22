@@ -18,6 +18,7 @@ from .artifacts.jsonld_context.generator import WotContextGenerator
 from .artifacts.jsonld_context.options import JsonLdContextOptions
 from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
 from .artifacts.jsonschema.options import JsonSchemaOptions
+from .artifacts.jsonschema.postprocess import post_process_jsonschema
 from .artifacts.owl.generator import WotOwlGenerator
 from .artifacts.owl.options import OwlOptions, PermissibleValueKind
 from .artifacts.owl.postprocess import postprocess_owl_graph
@@ -34,7 +35,6 @@ from .postprocessors.jsonld_context_postprocessor import (
     build_module_context,
     post_process_jsonld_context,
 )
-from .postprocessors.jsonschema_postprocessor import post_process_jsonschema
 from .postprocessors.shacl_postprocessor import post_process_shacl
 from .specgen.bikeshed_processor import require_bikeshed
 

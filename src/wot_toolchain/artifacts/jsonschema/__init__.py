@@ -1,1 +1,1 @@
-"""JSON Schema artifact: typed options and the WoT generator subclass."""
+"""JSON Schema artifact: typed options, the WoT generator subclass and the post-processing passes."""
