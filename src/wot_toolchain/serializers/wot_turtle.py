@@ -83,7 +83,6 @@ class WotTurtleSerializer(LongTurtleSerializer):
                 s
                 for s in self._subjects
                 if s not in seen
-                and isinstance(s, type(next(iter(self._subjects), None)))
                 and not isinstance(s, BNode)
                 and any(
                     o
