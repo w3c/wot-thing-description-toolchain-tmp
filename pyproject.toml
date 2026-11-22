@@ -38,6 +38,7 @@ dev = [
     "build>=1.2",
     "mypy>=2.4.1",
     "pyld>=3.3.0",
+    "pyshacl>=0.40.2",
     "pytest>=8.0",
     "ruff>=0.6",
     "types-pyyaml>=6.0.12.20261113",

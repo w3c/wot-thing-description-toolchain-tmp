@@ -1,0 +1,73 @@
+# Known SHACL validation failures (valid samples the generated shapes reject).
+# One entry per line: <path relative to tests/data/>
+# xfail(strict=True): a fix that makes a sample conform forces removing it here.
+# This list can only shrink.
+# While every valid sample is listed, the invalid samples are rejected for the same
+# shape defects and prove nothing about the shapes.
+1-simple-default/basic-td-valid.jsonld
+1-simple-default/contentMedia-&-contentEncoding-td-valid.jsonld
+1-simple-default/contentType-td-valid.jsonld
+1-simple-default/defaults-td-valid.jsonld
+1-simple-default/empty-containers-td-valid.jsonld
+1-simple-default/form-serialization-td-valid.jsonld
+1-simple-default/minimal-td-valid.jsonld
+1-simple-default/simple-context-td-valid.jsonld
+10-response-and-additional-response/additional-responses-td-valid.jsonld
+10-response-and-additional-response/simple-response-td-valid.jsonld
+11-multilanguage/multilanguage-td-valid.jsonld
+11-multilanguage/multilanguage-title-description-td-valid.jsonld
+11-multilanguage/string-direction-td-valid.jsonld
+12-uri-variables/combined-uriVariables-href-td-valid.jsonld
+12-uri-variables/dynaic-uriVariables-td-valid.jsonld
+12-uri-variables/uri-href-structure-td-valid.jsonld
+13-semantic-annotations/semantic-td-valid.jsonld
+13-semantic-annotations/state-information-context-extension-td-valid.jsonld
+13-semantic-annotations/typed-property-with-semantic-annotation-td-valid.jsonld
+14-non-standard/additional-metadata-td-valid.jsonld
+14-non-standard/location-based-metadata-td-valid.jsonld
+15-link-relation-type/collection-rel-td-valid.jsonld
+15-link-relation-type/controlledBy-rel-td-valid.jsonld
+15-link-relation-type/item-rel-td-valid.jsonld
+15-link-relation-type/service-doc-rel-td-valid.jsonld
+2-properties/properties-href-td-valid.jsonld
+2-properties/properties-serializations-td-valid.jsonld
+2-properties/readOnly-td-valid.jsonld
+2-properties/writeOnly-td-valid.jsonld
+3-actions/action-href-td-valid.jsonld
+3-actions/action-serialization-td-valid.jsonld
+3-actions/actions-forms-td-valid.jsonld
+3-actions/response-td-valid.jsonld
+4-events/event-href-td-valid.jsonld
+4-events/event-serialization-td-valid.jsonld
+5-protocols/CoAP-block-wise-no-parameters-td-valid.jsonld
+5-protocols/CoAP-block-wise-parameters-td-valid.jsonld
+5-protocols/CoAP-content-negotiation-td-valid.jsonld
+5-protocols/CoAP-hop-limit-td-valid.jsonld
+5-protocols/CoAP-observing-resources-td-valid.jsonld
+5-protocols/CoAP-simple-td-defaults-td-valid.jsonld
+5-protocols/CoAP-simple-td-no-defaults-td-valid.jsonld
+5-protocols/extended-forms-multiple-op-td-valid.jsonld
+5-protocols/HTTP-readproperty-td-valid.jsonld
+5-protocols/HTTP-simple-td-defaults-td-valid.jsonld
+5-protocols/Modbus-multiple-operations-expanded.td.jsonld
+5-protocols/Modbus-multiple-operations-td-valid.jsonld
+5-protocols/Modbus-single-coil-td-valid.jsonld
+5-protocols/subprotocol-longpoll-td-valid.jsonld
+6-security-schemas/apikey-in-body-simplified-td-valid.jsonld
+6-security-schemas/apikey-in-body-td-valid.jsonld
+6-security-schemas/apikey-security-td-valid.jsonld
+6-security-schemas/basic-security-td-valid.jsonld
+6-security-schemas/combo-apikey-security-td-valid.jsonld
+6-security-schemas/combo-security-def-allOf-td-valid.jsonld
+6-security-schemas/combo-security-def-oneOf-td-valid.jsonld
+6-security-schemas/multiple-security-def-td-valid.jsonld
+6-security-schemas/multiple-security-forms-td-valid.jsonld
+6-security-schemas/noSec-security-td-valid.jsonld
+6-security-schemas/OAuth2-scopes-td-valid.jsonld
+6-security-schemas/securityDefinitions-td-valid.jsonld
+7-complex-data-schemas/data-schema-serialization-td-valid.jsonld
+7-complex-data-schemas/readOnly-&-writeOnly-td-valid.jsonld
+8-meta-interactions/readallproperties-td-valid.jsonld
+8-meta-interactions/top-level-uriVariables-td-valid.jsonld
+8-meta-interactions/writeallproperties-td-valid.jsonld
+9-versioning/versioning-td-valid.jsonld
