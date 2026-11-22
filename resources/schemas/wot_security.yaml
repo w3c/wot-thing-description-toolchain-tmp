@@ -183,30 +183,22 @@ slots:
       security configuration is for the endpoint.
     slot_uri: wotsec:proxy
     domain: SecurityScheme
-    implements:
-      - owl:ObjectProperty
     range: uri
     comments:
       - This feature is at risk.
   authorization:
     description: URI of the authorization server.
     slot_uri: wotsec:authorization
-    implements:
-      - owl:ObjectProperty
     range: uri
   refresh:
     description: URI of the refresh server.
     slot_uri: wotsec:refresh
     domain: OAuth2SecurityScheme
-    implements:
-      - owl:ObjectProperty
     range: uri
   token:
     description: URI of the token server.
     slot_uri: wotsec:token
     domain: OAuth2SecurityScheme
-    implements:
-      - owl:ObjectProperty
     range: uri
   security_oneOf:
     description: >-

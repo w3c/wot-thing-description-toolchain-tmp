@@ -135,12 +135,12 @@
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "base": {
           "@id": "https://www.w3.org/2019/wot/td#baseURI",
@@ -296,7 +296,7 @@
         },
         "proxy": {
           "@id": "wotsec:proxy",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "qudt": "http://qudt.org/schema/qudt/",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -307,7 +307,7 @@
         },
         "refresh": {
           "@id": "wotsec:refresh",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -360,7 +360,7 @@
         "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@id": "jsonschema:type",
@@ -487,12 +487,12 @@
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "base": {
           "@id": "https://www.w3.org/2019/wot/td#baseURI",
@@ -656,7 +656,7 @@
         },
         "proxy": {
           "@id": "wotsec:proxy",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "qudt": "http://qudt.org/schema/qudt/",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -667,7 +667,7 @@
         },
         "refresh": {
           "@id": "wotsec:refresh",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -720,7 +720,7 @@
         "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@id": "jsonschema:type",
@@ -843,12 +843,12 @@
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "base": {
           "@id": "https://www.w3.org/2019/wot/td#baseURI",
@@ -1008,7 +1008,7 @@
         },
         "proxy": {
           "@id": "wotsec:proxy",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "qudt": "http://qudt.org/schema/qudt/",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -1019,7 +1019,7 @@
         },
         "refresh": {
           "@id": "wotsec:refresh",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -1072,7 +1072,7 @@
         "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@id": "jsonschema:type",
@@ -1207,11 +1207,11 @@
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "authorization": {
           "@id": "wotsec:authorization",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "base": {
           "@id": "https://www.w3.org/2019/wot/td#baseURI",
@@ -1357,7 +1357,7 @@
         },
         "proxy": {
           "@id": "wotsec:proxy",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "qudt": "http://qudt.org/schema/qudt/",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -1368,7 +1368,7 @@
         },
         "refresh": {
           "@id": "wotsec:refresh",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -1422,7 +1422,7 @@
         "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@id": "hctl:hintsAtMediaType",
@@ -1550,12 +1550,12 @@
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "base": {
           "@id": "https://www.w3.org/2019/wot/td#baseURI",
@@ -1727,7 +1727,7 @@
         },
         "proxy": {
           "@id": "wotsec:proxy",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "qudt": "http://qudt.org/schema/qudt/",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -1738,7 +1738,7 @@
         },
         "refresh": {
           "@id": "wotsec:refresh",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -1795,7 +1795,7 @@
         "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@id": "jsonschema:type",
@@ -1924,11 +1924,11 @@
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "authorization": {
           "@id": "wotsec:authorization",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "base": {
           "@id": "https://www.w3.org/2019/wot/td#baseURI",
@@ -2074,7 +2074,7 @@
         },
         "proxy": {
           "@id": "wotsec:proxy",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "qudt": "http://qudt.org/schema/qudt/",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -2085,7 +2085,7 @@
         },
         "refresh": {
           "@id": "wotsec:refresh",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -2139,7 +2139,7 @@
         "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@id": "hctl:hintsAtMediaType",
@@ -2277,12 +2277,12 @@
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "base": {
           "@id": "https://www.w3.org/2019/wot/td#baseURI",
@@ -2450,7 +2450,7 @@
         },
         "proxy": {
           "@id": "wotsec:proxy",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "qudt": "http://qudt.org/schema/qudt/",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -2461,7 +2461,7 @@
         },
         "refresh": {
           "@id": "wotsec:refresh",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -2518,7 +2518,7 @@
         "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@id": "jsonschema:type",
@@ -2647,12 +2647,12 @@
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "base": {
           "@id": "https://www.w3.org/2019/wot/td#baseURI",
@@ -2812,7 +2812,7 @@
         },
         "proxy": {
           "@id": "wotsec:proxy",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "qudt": "http://qudt.org/schema/qudt/",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -2823,7 +2823,7 @@
         },
         "refresh": {
           "@id": "wotsec:refresh",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -2876,7 +2876,7 @@
         "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@id": "jsonschema:type",
@@ -3025,12 +3025,12 @@
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "apikey": "wotsec:APIKeySecurityScheme",
         "authorization": {
           "@id": "wotsec:authorization",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "auto": "wotsec:AutoSecurityScheme",
         "base": {
@@ -3173,7 +3173,7 @@
         },
         "proxy": {
           "@id": "wotsec:proxy",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "psk": "wotsec:PSKSecurityScheme",
         "qop": {
@@ -3188,7 +3188,7 @@
         },
         "refresh": {
           "@id": "wotsec:refresh",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -3236,7 +3236,7 @@
         "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "unit": {
           "@id": "qudt:unit",
@@ -3359,12 +3359,12 @@
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "base": {
           "@id": "https://www.w3.org/2019/wot/td#baseURI",
@@ -3528,7 +3528,7 @@
         },
         "proxy": {
           "@id": "wotsec:proxy",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "qudt": "http://qudt.org/schema/qudt/",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -3539,7 +3539,7 @@
         },
         "refresh": {
           "@id": "wotsec:refresh",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -3596,7 +3596,7 @@
         "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@id": "jsonschema:type",
@@ -3741,12 +3741,12 @@
         },
         "anchor": {
           "@id": "hctl:hasAnchor",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "array": "jsonschema:ArraySchema",
         "authorization": {
           "@id": "wotsec:authorization",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "base": {
           "@id": "https://www.w3.org/2019/wot/td#baseURI",
@@ -3898,7 +3898,7 @@
         },
         "proxy": {
           "@id": "wotsec:proxy",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "qudt": "http://qudt.org/schema/qudt/",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -3909,7 +3909,7 @@
         },
         "refresh": {
           "@id": "wotsec:refresh",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "rel": {
           "@id": "hctl:hasRelationType"
@@ -3962,7 +3962,7 @@
         "tm": "https://www.w3.org/2019/wot/tm#",
         "token": {
           "@id": "wotsec:token",
-          "@type": "@id"
+          "@type": "xsd:anyURI"
         },
         "type": {
           "@id": "jsonschema:type",

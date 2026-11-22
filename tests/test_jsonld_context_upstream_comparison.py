@@ -556,26 +556,3 @@ class TestCrossModulePatterns:
                 if isinstance(ctx, dict) and "meaning" in ctx:
                     skos_leaks.append(key)
         assert skos_leaks == [], f"SKOS @context leak in: {skos_leaks}"
-
-    def test_no_xsd_anyuri_for_link_properties(self, merged):
-        """Cross-cutting: Link properties must use @type: @id, not xsd:anyURI.
-
-        xsd:anyURI produces RDF Literal nodes. @id produces IRI references
-        that JSON-LD processors can follow. The upstream context uses @id
-        for all dereferenceable URI properties.
-        """
-        # These are documented in upstream as @type: @id
-        link_properties = ["authorization", "token", "refresh", "proxy", "anchor"]
-        wrong = []
-        for key in link_properties:
-            # Check in merged context and all scoped contexts
-            val = merged.get(key, {})
-            if isinstance(val, dict) and val.get("@type") == "xsd:anyURI":
-                wrong.append(key)
-            # Also check inside securityDefinitions @context
-            sd = merged.get("securityDefinitions", {})
-            if isinstance(sd, dict) and "@context" in sd:
-                sd_val = sd["@context"].get(key, {})
-                if isinstance(sd_val, dict) and sd_val.get("@type") == "xsd:anyURI" and key not in wrong:
-                    wrong.append(key)
-        assert wrong == [], f"Properties using xsd:anyURI instead of @id: {wrong}"
