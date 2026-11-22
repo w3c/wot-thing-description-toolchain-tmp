@@ -64,14 +64,18 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
         self.graph.remove((self._class_uri(cls.name), SKOS.exactMatch, mapped_uri))
 
     def add_metadata(self, e: Definition | PermissibleValue, uri: URIRef) -> None:
-        """Emit the annotations of ``e`` except exact_mappings, placing it in the scheme of the generated ontology."""
+        """Emit the annotations of ``e`` in the published form: own scheme, alias as label, no exact_mappings."""
         # Upstream maps from_schema to skos:inScheme (owlgen.py:358), so merged imports would name their own schema.
         # Upstream maps exact_mappings to skos:exactMatch, which the published ontologies do not carry.
-        if e.from_schema or e.exact_mappings:
+        # Upstream maps name to rdfs:label and alias to skos:prefLabel; the published label is the alias.
+        alias = getattr(e, "alias", None)
+        if e.from_schema or e.exact_mappings or alias:
             e = copy.copy(e)
             e.exact_mappings = []
             if e.from_schema:
                 e.from_schema = str(self.graph.identifier)
+            if alias:
+                e.name, e.alias = alias, None
         super().add_metadata(e, uri)
 
     def add_enum(self, e: EnumDefinition) -> None:

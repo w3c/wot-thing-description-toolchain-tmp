@@ -62,7 +62,6 @@ def postprocess_owl_graph(
     _strip_linkml_ranges(g)
     _fix_subproperty_literals(g, sv_merged)
     _fix_uri_annotation_literals(g)
-    _fix_aliased_labels(g)
     _strip_orphan_blank_nodes(g)
     _strip_empty_blank_node_restrictions(g)
     _add_domain_includes(g, sv_merged)
@@ -167,16 +166,6 @@ def _fix_uri_annotation_literals(g: Graph) -> None:
             if val.startswith(("http://", "https://", "urn:")):
                 g.remove((s, pred, o))
                 g.add((s, pred, URIRef(val)))
-
-
-def _fix_aliased_labels(g: Graph) -> None:
-    """When skos:prefLabel exists (from LinkML alias), use it as rdfs:label."""
-    for s, _, pref_label in list(g.triples((None, SKOS.prefLabel, None))):
-        for _, _, old_label in list(g.triples((s, RDFS.label, None))):
-            g.remove((s, RDFS.label, old_label))
-        lang = pref_label.language if isinstance(pref_label, Literal) else None
-        g.add((s, RDFS.label, Literal(str(pref_label), lang=lang)))
-        g.remove((s, SKOS.prefLabel, pref_label))
 
 
 def _add_domain_includes(g: Graph, sv: SchemaView) -> None:
