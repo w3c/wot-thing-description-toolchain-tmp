@@ -60,7 +60,6 @@ def postprocess_owl_graph(
 
     _strip_foreign_subjects(g, ns, onto_iri)
     _strip_linkml_ranges(g)
-    _fix_in_scheme(g, onto_iri)
     _fix_subproperty_literals(g, sv_merged)
     _fix_uri_annotation_literals(g)
     _clean_exact_match(g)
@@ -126,12 +125,6 @@ def _strip_linkml_ranges(g: Graph) -> None:
             linkml_ranged_props.add(s)
             g.remove((s, RDFS.range, o))
     _demote_to_datatype(g, linkml_ranged_props)
-
-
-def _fix_in_scheme(g: Graph, onto_iri: URIRef) -> None:
-    for s, p, o in list(g.triples((None, SKOS.inScheme, None))):
-        g.remove((s, p, o))
-        g.add((s, SKOS.inScheme, onto_iri))
 
 
 def _remove_rdf_list(g: Graph, node: Node | None) -> None:

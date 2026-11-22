@@ -1,11 +1,12 @@
 """Upstream linkml OWL generator with the WoT toolchain's fixed arguments."""
 
+import copy
 from dataclasses import dataclass
 from typing import Self
 
 from linkml.generators import owlgen
 from linkml.generators.owlgen import OwlSchemaGenerator
-from linkml_runtime.linkml_model.meta import EnumDefinition, PermissibleValue, SchemaDefinition
+from linkml_runtime.linkml_model.meta import Definition, EnumDefinition, PermissibleValue, SchemaDefinition
 from rdflib import OWL, RDF, RDFS, URIRef
 
 from wot_toolchain.artifacts.owl.options import OwlOptions, PermissibleValueKind
@@ -48,6 +49,14 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
             default_permissible_value_type=_PERMISSIBLE_VALUE_TYPES[options.permissible_values],
             permissible_values=options.permissible_values,
         )
+
+    def add_metadata(self, e: Definition | PermissibleValue, uri: URIRef) -> None:
+        """Emit the annotations of ``e``, placing it in the scheme of the ontology being generated."""
+        # Upstream maps from_schema to skos:inScheme (owlgen.py:358), so merged imports would name their own schema.
+        if e.from_schema:
+            e = copy.copy(e)
+            e.from_schema = str(self.graph.identifier)
+        super().add_metadata(e, uri)
 
     def add_enum(self, e: EnumDefinition) -> None:
         """Emit ``e``; INSTANCE values are typed by the enum class only."""
