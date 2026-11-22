@@ -6,8 +6,8 @@ from rdflib import Graph, Namespace, URIRef
 from rdflib.namespace import OWL, RDF, RDFS, XSD
 
 from wot_toolchain.artifacts.owl.passes import OWL_PASSES
+from wot_toolchain.artifacts.owl.postprocess import postprocess_owl_graph
 from wot_toolchain.artifacts.passes import Pass, PassKind
-from wot_toolchain.postprocessors.owl_postprocessor import postprocess_owl_graph
 
 SCHEMA = """\
 id: https://example.org/mini

@@ -2,8 +2,8 @@ import pytest
 from linkml_runtime.linkml_model.meta import EnumDefinition, SchemaDefinition, SlotDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
+from wot_toolchain.artifacts.owl.pre_passes import _attr_slot_name, _strip_non_ontological_enums
 from wot_toolchain.model.names import is_non_ontological_enum, local_name
-from wot_toolchain.preprocessors.owl_preprocessor import _attr_slot_name, _strip_non_ontological_enums
 
 LOCAL_NAME_CASES = {
     "hash_namespace": ("https://www.w3.org/2019/wot/td#name", "name"),

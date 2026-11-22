@@ -11,8 +11,8 @@ from linkml.generators.owlgen import OwlSchemaGenerator
 from wot_toolchain import pipeline
 from wot_toolchain.artifacts.owl.generator import WotOwlGenerator
 from wot_toolchain.artifacts.owl.options import OwlOptions
+from wot_toolchain.artifacts.owl.preprocess import preprocess_for_gen_owl
 from wot_toolchain.config import GEN_OWL_OPTIONS, load_project
-from wot_toolchain.preprocessors.owl_preprocessor import preprocess_for_gen_owl
 
 MANIFEST = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
 

@@ -1,12 +1,10 @@
 """Post-process raw LinkML SHACL output for WoT datatype constraints."""
 
-from __future__ import annotations
-
 from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import Graph
 
-from ..artifacts.passes import run_passes
-from ..artifacts.shacl.passes import SHACL_PASSES
+from wot_toolchain.artifacts.passes import run_passes
+from wot_toolchain.artifacts.shacl.passes import SHACL_PASSES
 
 
 def post_process_shacl(raw_shacl: str, schema_view: SchemaView) -> str:

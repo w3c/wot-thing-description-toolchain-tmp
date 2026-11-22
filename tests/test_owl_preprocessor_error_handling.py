@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from wot_toolchain.artifacts.owl.preprocess import preprocess_for_gen_owl
 from wot_toolchain.errors import SchemaError
-from wot_toolchain.preprocessors.owl_preprocessor import preprocess_for_gen_owl
 
 _HEADER = """\
 id: https://example.org/s

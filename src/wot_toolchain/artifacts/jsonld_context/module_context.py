@@ -1,13 +1,5 @@
-"""Legacy import path of the JSON-LD context transforms in ``wot_toolchain.artifacts.jsonld_context``.
+"""Standalone JSON-LD context of one vocabulary module, built from the schema's slots, classes and enums."""
 
-The per-module context builder and the merged-context entry point still live here: a test replaces
-``_native_slot_context`` on this module, which only reaches ``_module_terms`` while it is defined here.
-"""
-
-from __future__ import annotations
-
-import json
-from collections.abc import Collection
 from typing import Any
 
 from linkml.generators.jsonldcontextgen import ContextGenerator
@@ -15,55 +7,24 @@ from linkml_runtime.linkml_model.meta import SlotDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
 from wot_toolchain.artifacts.jsonld_context.coercions import SKOS_ENUM_KEYS as _SKOS_ENUM_KEYS
-from wot_toolchain.artifacts.jsonld_context.coercions import (
-    fix_enum_vocab_type_coercion as _fix_enum_vocab_type_coercion,
-)
-from wot_toolchain.artifacts.jsonld_context.coercions import (
-    fix_object_property_id_coercion as _fix_object_property_id_coercion,
-)
-from wot_toolchain.artifacts.jsonld_context.coercions import fix_vocab_type_coercion as _fix_vocab_type_coercion
-from wot_toolchain.artifacts.jsonld_context.coercions import (
-    remove_literal_type_coercion as _remove_literal_type_coercion,
-)
-from wot_toolchain.artifacts.jsonld_context.coercions import (
-    strip_datatype_property_id_coercion as _strip_datatype_property_id_coercion,
-)
-from wot_toolchain.artifacts.jsonld_context.coercions import (
-    strip_inlined_class_id_coercion as _strip_inlined_class_id_coercion,
-)
-from wot_toolchain.artifacts.jsonld_context.coercions import strip_skos_enum_contexts as _strip_skos_enum_contexts
 from wot_toolchain.artifacts.jsonld_context.generator import WotContextGenerator
 from wot_toolchain.artifacts.jsonld_context.identifiers import (
     fix_keyed_map_identifier_slots as _fix_keyed_map_identifier_slots,
 )
-from wot_toolchain.artifacts.jsonld_context.options import JsonLdContextOptions
-from wot_toolchain.artifacts.jsonld_context.passes import POST_SCOPING_PASSES, PRE_SCOPING_PASSES
-from wot_toolchain.artifacts.jsonld_context.scoped_contexts import apply_class_mappings as _apply_class_mappings
-from wot_toolchain.artifacts.jsonld_context.scoped_contexts import apply_root_mapping as _apply_root_mapping
 from wot_toolchain.artifacts.jsonld_context.scopes import context_scope as _context_scope
 from wot_toolchain.artifacts.jsonld_context.terms import context_slots as _context_slots
 from wot_toolchain.artifacts.jsonld_context.terms import curie_term_name as _curie_term_name
 from wot_toolchain.artifacts.jsonld_context.terms import prefix_declarations as _prefix_declarations
 from wot_toolchain.artifacts.jsonld_context.terms import slot_key as _slot_key
-from wot_toolchain.artifacts.passes import run_passes
 from wot_toolchain.schema_utils import annotation_str_value as _annotation_value
 from wot_toolchain.schema_utils import curie_prefix, resolve_prefix_namespace
 
-__all__ = [
-    "_fix_enum_vocab_type_coercion",
-    "_fix_object_property_id_coercion",
-    "_fix_vocab_type_coercion",
-    "_remove_literal_type_coercion",
-    "_strip_datatype_property_id_coercion",
-    "_strip_inlined_class_id_coercion",
-    "_strip_skos_enum_contexts",
-    "build_module_context",
-    "post_process_jsonld_context",
-]
 
+def native_slot_context(generator: ContextGenerator, slot: SlotDefinition) -> Any:
+    """Return the term definition the generator emits for a slot.
 
-def _native_slot_context(generator: ContextGenerator, slot: SlotDefinition) -> Any:
-    # Called unbound because build_module_context also accepts plain upstream generators.
+    Called unbound because build_module_context also accepts plain upstream generators.
+    """
     return WotContextGenerator.slot_term_definition(generator, slot)
 
 
@@ -144,7 +105,7 @@ def _module_terms(
         if key in seen_keys:
             continue
         seen_keys.add(key)
-        entry = _native_slot_context(generator, slot)
+        entry = native_slot_context(generator, slot)
         if key in cross_module and isinstance(entry, dict):
             bare_id = entry.get("@id", key)
             if ":" not in bare_id:
@@ -206,37 +167,3 @@ def _module_contexts(schema_view: SchemaView, generator: ContextGenerator) -> di
     scopes = {scope for slot in _context_slots(schema_view) if (scope := _context_scope(schema_view, slot))}
     # Scoped blocks inherit prefixes from _apply_root_mapping, so they take the terms alone.
     return {scope: _module_terms(schema_view, generator, scope) for scope in scopes}
-
-
-def post_process_jsonld_context(
-    schema_view: SchemaView, serialized_schema: str, *, extra_root_terms: Collection[str]
-) -> str:
-    """Add schema-declared scoped contexts and index predicates to LinkML output.
-
-    LinkML natively emits container mappings when
-    ``fix_multivalue_containers`` is enabled. It does not currently emit the
-    RDF predicate represented by a keyed map, or scoped vocabulary contexts.
-
-    Args:
-        schema_view: SchemaView of the main schema.
-        serialized_schema: JSON-LD context serialized by LinkML's ``ContextGenerator``.
-        extra_root_terms: Terms outside the schema's default prefix that stay in the root context.
-
-    Returns:
-        The post-processed JSON-LD context document, serialized as JSON.
-
-    Raises:
-        SchemaError: Schema content cannot be composed into a JSON-LD context (the message names the
-            offending element), or an extra root term is not in the generated root context.
-    """
-    document = json.loads(serialized_schema)
-    context = document["@context"]
-    run_passes(PRE_SCOPING_PASSES, context, schema_view, extra_root_terms)
-    generator = WotContextGenerator.from_options(schema_view.schema, JsonLdContextOptions())
-    module_contexts = _module_contexts(schema_view, generator)
-    for slot in schema_view.all_slots().values():
-        _apply_root_mapping(context, schema_view, slot, module_contexts)
-    _apply_class_mappings(schema_view, context, module_contexts)
-    run_passes(POST_SCOPING_PASSES, context, schema_view, extra_root_terms)
-    context["@version"] = 1.1
-    return json.dumps(document, indent=2)

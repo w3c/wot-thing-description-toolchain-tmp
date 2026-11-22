@@ -10,7 +10,7 @@ from rdflib.namespace import RDF, RDFS, SH, XSD
 
 from wot_toolchain.artifacts.passes import PassKind
 from wot_toolchain.artifacts.shacl.passes import SHACL_PASSES
-from wot_toolchain.postprocessors.shacl_postprocessor import post_process_shacl
+from wot_toolchain.artifacts.shacl.postprocess import post_process_shacl
 
 SCHEMA = """\
 id: https://example.org/mini

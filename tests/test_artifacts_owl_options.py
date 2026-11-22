@@ -10,8 +10,8 @@ from rdflib.compare import graph_diff, to_isomorphic
 
 from wot_toolchain.artifacts.owl.generator import WotOwlGenerator
 from wot_toolchain.artifacts.owl.options import MetadataProfile, OwlOptions, PermissibleValueKind
+from wot_toolchain.artifacts.owl.preprocess import preprocess_for_gen_owl
 from wot_toolchain.config import load_project
-from wot_toolchain.preprocessors.owl_preprocessor import preprocess_for_gen_owl
 
 MANIFEST = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
 

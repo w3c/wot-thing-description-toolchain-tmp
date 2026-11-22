@@ -7,7 +7,7 @@ from rdflib.collection import Collection
 from rdflib.namespace import RDF as RDF_NAMESPACE
 from rdflib.namespace import SH, XSD
 
-from wot_toolchain.postprocessors.shacl_postprocessor import post_process_shacl
+from wot_toolchain.artifacts.shacl.postprocess import post_process_shacl
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_PATH = REPO_ROOT / "resources" / "schemas" / "thing_description.yaml"

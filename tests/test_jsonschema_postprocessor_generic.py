@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from linkml_runtime.utils.schemaview import SchemaView
 
-from wot_toolchain.postprocessors.jsonschema_postprocessor import post_process_jsonschema
+from wot_toolchain.artifacts.jsonschema.postprocess import post_process_jsonschema
 
 SCHEMA_HEADER = """
 id: https://example.org/probe

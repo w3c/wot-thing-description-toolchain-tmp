@@ -9,7 +9,7 @@ import pytest
 from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
-from wot_toolchain.postprocessors.jsonld_context_postprocessor import build_module_context
+from wot_toolchain.artifacts.jsonld_context.module_context import build_module_context
 
 SENSOR_SCHEMA = Path(__file__).resolve().parent / "fixtures" / "mini-project" / "schemas" / "sensor.yaml"
 

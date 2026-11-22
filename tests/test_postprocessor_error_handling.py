@@ -8,9 +8,9 @@ import pytest
 from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
+from wot_toolchain.artifacts.jsonld_context.postprocess import post_process_jsonld_context
+from wot_toolchain.artifacts.jsonschema.postprocess import post_process_jsonschema
 from wot_toolchain.errors import SchemaError
-from wot_toolchain.postprocessors.jsonld_context_postprocessor import post_process_jsonld_context
-from wot_toolchain.postprocessors.jsonschema_postprocessor import post_process_jsonschema
 from wot_toolchain.schema_utils import default_prefix, get_schema, resolve_prefix_namespace
 
 SCHEMA_HEADER = """

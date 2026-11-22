@@ -7,9 +7,9 @@ from linkml_runtime.linkml_model.meta import SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
 from wot_toolchain.artifacts.owl.pre_passes import OWL_PRE_PASSES, OwlPreContext
+from wot_toolchain.artifacts.owl.preprocess import preprocess_for_gen_owl
 from wot_toolchain.artifacts.passes import Pass, PassKind
 from wot_toolchain.errors import SchemaError
-from wot_toolchain.preprocessors.owl_preprocessor import preprocess_for_gen_owl
 
 SCHEMA = """\
 id: https://example.org/mini

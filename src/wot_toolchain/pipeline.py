@@ -15,7 +15,9 @@ from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import Graph
 
 from .artifacts.jsonld_context.generator import WotContextGenerator
+from .artifacts.jsonld_context.module_context import build_module_context
 from .artifacts.jsonld_context.options import JsonLdContextOptions
+from .artifacts.jsonld_context.postprocess import post_process_jsonld_context
 from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
 from .artifacts.jsonschema.options import JsonSchemaOptions
 from .artifacts.jsonschema.postprocess import post_process_jsonschema
@@ -26,16 +28,12 @@ from .artifacts.owl.preprocess import preprocess_for_gen_owl
 from .artifacts.registry import Artifact, ArtifactRegistry
 from .artifacts.shacl.generator import WotShaclGenerator
 from .artifacts.shacl.options import ShaclOptions
+from .artifacts.shacl.postprocess import post_process_shacl
 from .config import JSON_SCHEMA_FILES, Project, SpecConfig
 from .errors import GenerationError, ManifestError
 from .generators.respec import generate_respec_spec
 from .generators.visualization import generate_visualizations, require_dot
 from .model.resolved import ResolvedProject
-from .postprocessors.jsonld_context_postprocessor import (
-    build_module_context,
-    post_process_jsonld_context,
-)
-from .postprocessors.shacl_postprocessor import post_process_shacl
 from .specgen.bikeshed_processor import require_bikeshed
 
 

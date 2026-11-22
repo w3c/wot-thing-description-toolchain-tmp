@@ -10,8 +10,9 @@ from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml_runtime.linkml_model.meta import SlotDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
+from wot_toolchain.artifacts.jsonld_context import coercions as coercion_rules
+from wot_toolchain.artifacts.jsonld_context import module_context as jsonld
 from wot_toolchain.config import load_project
-from wot_toolchain.postprocessors import jsonld_context_postprocessor as jsonld
 from wot_toolchain.schema_utils import load_schema_view
 
 MANIFEST = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
@@ -37,20 +38,20 @@ def _coercion(entry: Any) -> Coercion:
 
 def _apply_function_chain(context: dict[str, Any], schema_view: SchemaView) -> None:
     """Run the merged context's coercion passes in the order ``post_process_jsonld_context`` uses."""
-    jsonld._remove_literal_type_coercion(context)
-    jsonld._strip_skos_enum_contexts(context)
-    jsonld._strip_datatype_property_id_coercion(context, schema_view)
-    jsonld._strip_inlined_class_id_coercion(context, schema_view)
-    jsonld._fix_vocab_type_coercion(context, schema_view)
-    jsonld._fix_enum_vocab_type_coercion(context, schema_view)
-    jsonld._fix_object_property_id_coercion(context, schema_view)
+    coercion_rules.remove_literal_type_coercion(context)
+    coercion_rules.strip_skos_enum_contexts(context)
+    coercion_rules.strip_datatype_property_id_coercion(context, schema_view)
+    coercion_rules.strip_inlined_class_id_coercion(context, schema_view)
+    coercion_rules.fix_vocab_type_coercion(context, schema_view)
+    coercion_rules.fix_enum_vocab_type_coercion(context, schema_view)
+    coercion_rules.fix_object_property_id_coercion(context, schema_view)
 
 
 def _record_module_terms(
     schema_view: SchemaView, generator: ContextGenerator, prefix: str
 ) -> list[tuple[SlotDefinition, dict[str, Any], Any]]:
     """Run ``_module_terms`` and return each slot with its native entry before and after the inline rules."""
-    native_slot_context: Callable[[ContextGenerator, SlotDefinition], Any] = jsonld._native_slot_context
+    native_slot_context: Callable[[ContextGenerator, SlotDefinition], Any] = jsonld.native_slot_context
     recorded: list[tuple[SlotDefinition, dict[str, Any], Any]] = []
 
     def recording(gen: ContextGenerator, slot: SlotDefinition) -> Any:
@@ -59,7 +60,7 @@ def _record_module_terms(
         return entry
 
     with pytest.MonkeyPatch.context() as patch:
-        patch.setattr(jsonld, "_native_slot_context", recording)
+        patch.setattr(jsonld, "native_slot_context", recording)
         jsonld._module_terms(schema_view, generator, prefix)
     return recorded
 
