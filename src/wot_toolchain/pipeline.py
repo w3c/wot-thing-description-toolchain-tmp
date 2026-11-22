@@ -19,7 +19,7 @@ from .artifacts.jsonld_context.options import JsonLdContextOptions
 from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
 from .artifacts.jsonschema.options import JsonSchemaOptions
 from .artifacts.owl.generator import WotOwlGenerator
-from .artifacts.owl.options import OwlOptions
+from .artifacts.owl.options import OwlOptions, PermissibleValueKind
 from .artifacts.registry import Artifact, ArtifactRegistry
 from .artifacts.shacl.generator import WotShaclGenerator
 from .artifacts.shacl.options import ShaclOptions
@@ -189,7 +189,9 @@ def _run_gen_owl(schema_path: Path) -> Graph:
         warnings.simplefilter("ignore", DeprecationWarning)
         # as_graph(), not serialize() and re-parse: serialize() only adds canonical text that the post passes
         # discard; the final serializer orders the output (guarded by tests/test_owl_determinism.py).
-        return WotOwlGenerator.from_options(yaml_str, OwlOptions()).as_graph()
+        return WotOwlGenerator.from_options(
+            yaml_str, OwlOptions(permissible_values=PermissibleValueKind.INSTANCE)
+        ).as_graph()
 
 
 ARTIFACT_REGISTRY = ArtifactRegistry(

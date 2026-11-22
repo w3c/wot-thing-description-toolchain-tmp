@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
 
-from linkml_runtime.linkml_model.meta import EnumDefinition, SchemaDefinition
+from linkml_runtime.linkml_model.meta import SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import BNode, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import DCTERMS, OWL, RDF, RDFS, SKOS, VANN
@@ -13,7 +12,6 @@ from rdflib.plugin import register
 from rdflib.serializer import Serializer
 from rdflib.term import Node
 
-from ..model.names import is_non_ontological_enum
 from ..schema_utils import get_schema as _get_schema
 from . import resolve_prefix_namespace
 
@@ -27,8 +25,6 @@ register(
     "wot_toolchain.serializers.wot_turtle",
     "WotTurtleSerializer",
 )
-
-_Enums = dict[str, EnumDefinition]
 
 
 def postprocess_owl(
@@ -68,8 +64,6 @@ def postprocess_owl_graph(
     _fix_subproperty_literals(g, sv_merged)
     _fix_uri_annotation_literals(g)
     _clean_exact_match(g)
-    _clean_enum_artifacts(g)
-    _convert_enum_subclasses_to_individuals(g, sv_merged)
     _fix_aliased_labels(g)
     _strip_orphan_blank_nodes(g)
     _strip_empty_blank_node_restrictions(g)
@@ -140,27 +134,6 @@ def _fix_in_scheme(g: Graph, onto_iri: URIRef) -> None:
         g.add((s, SKOS.inScheme, onto_iri))
 
 
-def _clean_enum_artifacts(g: Graph) -> None:
-    """Remove gen-owl enum artifacts (double-# PVs, unionOf, NamedIndividual)."""
-    pv_subjects = {s for s in g.subjects() if isinstance(s, URIRef) and s.count("#") > 1}
-    for pv in pv_subjects:
-        for triple in list(g.triples((pv, None, None))):
-            g.remove(triple)
-
-    for triple in list(g.triples((None, LINKML.permissible_values, None))):
-        g.remove(triple)
-
-    for pred in (OWL.unionOf, OWL.oneOf):
-        for s, _, bn in list(g.triples((None, pred, None))):
-            if not isinstance(s, URIRef):
-                continue
-            g.remove((s, pred, bn))
-            _remove_rdf_list(g, bn)
-
-    for s, _, _ in list(g.triples((None, RDF.type, OWL.NamedIndividual))):
-        g.remove((s, RDF.type, OWL.NamedIndividual))
-
-
 def _remove_rdf_list(g: Graph, node: Node | None) -> None:
     """Walk and remove an RDF list starting at node."""
     while node and node != RDF.nil:
@@ -168,21 +141,6 @@ def _remove_rdf_list(g: Graph, node: Node | None) -> None:
         for t in list(g.triples((node, None, None))):
             g.remove(t)
         node = next_nodes[0] if next_nodes else None
-
-
-def _convert_enum_subclasses_to_individuals(g: Graph, sv: SchemaView) -> None:
-    """Convert PV subclasses to rdf:type individuals (upstream pattern)."""
-    schema = _get_schema(sv)
-    for edef in cast(_Enums, schema.enums).values():
-        if is_non_ontological_enum(edef):
-            continue
-        enum_iri = URIRef(sv.expand_curie(edef.enum_uri))
-        for s, _, _ in list(g.triples((None, RDFS.subClassOf, enum_iri))):
-            if not isinstance(s, URIRef):
-                continue
-            g.remove((s, RDFS.subClassOf, enum_iri))
-            g.remove((s, RDF.type, OWL.Class))
-            g.add((s, RDF.type, enum_iri))
 
 
 def _strip_orphan_blank_nodes(g: Graph) -> None:

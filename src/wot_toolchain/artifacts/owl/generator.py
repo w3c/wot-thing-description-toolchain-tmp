@@ -1,22 +1,28 @@
 """Upstream linkml OWL generator with the WoT toolchain's fixed arguments."""
 
+from dataclasses import dataclass
 from typing import Self
 
 from linkml.generators import owlgen
 from linkml.generators.owlgen import OwlSchemaGenerator
-from linkml_runtime.linkml_model.meta import SchemaDefinition
-from rdflib import OWL, URIRef
+from linkml_runtime.linkml_model.meta import EnumDefinition, PermissibleValue, SchemaDefinition
+from rdflib import OWL, RDF, RDFS, URIRef
 
 from wot_toolchain.artifacts.owl.options import OwlOptions, PermissibleValueKind
 
+# INSTANCE is emitted by WotOwlGenerator.add_enum, so upstream keeps its default for it.
 _PERMISSIBLE_VALUE_TYPES: dict[PermissibleValueKind, URIRef] = {
     PermissibleValueKind.CLASS: OWL.Class,
     PermissibleValueKind.INDIVIDUAL: OWL.NamedIndividual,
+    PermissibleValueKind.INSTANCE: OWL.Class,
 }
 
 
+@dataclass
 class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships no type information
     """OWL generator configured as the WoT toolchain runs it."""
+
+    permissible_values: PermissibleValueKind = PermissibleValueKind.CLASS
 
     @classmethod
     def from_options(cls, schema: SchemaDefinition | str, options: OwlOptions) -> Self:
@@ -40,4 +46,29 @@ class WotOwlGenerator(OwlSchemaGenerator):  # type: ignore[misc]  # linkml ships
             metadata_profiles=[owlgen.MetadataProfile(options.metadata_profile.value)],
             mergeimports=not options.only_root_schema,
             default_permissible_value_type=_PERMISSIBLE_VALUE_TYPES[options.permissible_values],
+            permissible_values=options.permissible_values,
         )
+
+    def add_enum(self, e: EnumDefinition) -> None:
+        """Emit ``e``; INSTANCE values are typed by the enum class only."""
+        if self.permissible_values is not PermissibleValueKind.INSTANCE:
+            super().add_enum(e)
+            return
+        # Adapted from upstream add_enum (owlgen.py:1157): no value declaration, covering axiom or
+        # linkml:permissible_values, which upstream always emits.
+        enum_uri = self._enum_uri(e.name)
+        self.graph.add((enum_uri, RDF.type, OWL.Class))
+        self.add_metadata(e, enum_uri)
+        for parent in [e.is_a, *sorted(e.mixins)]:
+            if parent:
+                self.graph.add((enum_uri, RDFS.subClassOf, self._enum_uri(parent)))
+        for pv in e.permissible_values.values():
+            if pv.meaning:
+                self._add_enum_instance(pv, enum_uri)
+
+    def _add_enum_instance(self, pv: PermissibleValue, enum_uri: URIRef) -> None:
+        """Emit ``pv`` as an instance of ``enum_uri``, named by its ``meaning``."""
+        pv_uri = URIRef(self.schemaview.expand_curie(pv.meaning))
+        self.add_metadata(pv, pv_uri)
+        self.graph.add((pv_uri, RDF.type, enum_uri))
+        self.graph.add((pv_uri, RDFS.label, self._literal(pv.text, pv)))

@@ -16,6 +16,8 @@ class PermissibleValueKind(StrEnum):
 
     CLASS = "class"
     INDIVIDUAL = "individual"
+    # Published TD ontology shape: values typed only by their enum, no owl:NamedIndividual, no owl:oneOf.
+    INSTANCE = "instance"
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,5 +28,5 @@ class OwlOptions:
     metadata_profile: MetadataProfile = MetadataProfile.LINKML
     # Module scoping is done by the preprocessor today; True stops merging imports and emits owl:imports instead.
     only_root_schema: bool = False
-    # Upstream default owl:Class; the post passes convert enum values to individuals afterwards.
+    # Upstream default owl:Class; the pipeline passes INSTANCE, which WotOwlGenerator emits itself.
     permissible_values: PermissibleValueKind = PermissibleValueKind.CLASS
