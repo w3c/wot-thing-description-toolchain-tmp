@@ -60,8 +60,6 @@ def postprocess_owl_graph(
 
     _strip_foreign_subjects(g, ns, onto_iri)
     _strip_linkml_ranges(g)
-    _strip_orphan_blank_nodes(g)
-    _strip_empty_blank_node_restrictions(g)
     _add_domain_includes(g, sv_merged)
     _add_lang_tags(g)
 
@@ -94,14 +92,6 @@ def _strip_foreign_subjects(g: Graph, local_ns: str, onto_iri: URIRef) -> None:
             g.remove(triple)
 
 
-def _strip_empty_blank_node_restrictions(g: Graph) -> None:
-    for s, p, o in list(g.triples((None, RDFS.subClassOf, None))):
-        if not isinstance(o, BNode):
-            continue
-        if not list(g.triples((o, None, None))):
-            g.remove((s, p, o))
-
-
 def _demote_to_datatype(g: Graph, props: set[Node]) -> None:
     """Demote ObjectProperty→DatatypeProperty for props that lost their only range."""
     for prop in props:
@@ -120,25 +110,6 @@ def _strip_linkml_ranges(g: Graph) -> None:
             linkml_ranged_props.add(s)
             g.remove((s, RDFS.range, o))
     _demote_to_datatype(g, linkml_ranged_props)
-
-
-def _remove_rdf_list(g: Graph, node: Node | None) -> None:
-    """Walk and remove an RDF list starting at node."""
-    while node and node != RDF.nil:
-        next_nodes = list(g.objects(node, RDF.rest))
-        for t in list(g.triples((node, None, None))):
-            g.remove(t)
-        node = next_nodes[0] if next_nodes else None
-
-
-def _strip_orphan_blank_nodes(g: Graph) -> None:
-    """Remove blank nodes unreferenced as object."""
-    all_objects = set(g.objects())
-    to_remove = [s for s in set(g.subjects()) if isinstance(s, BNode) and s not in all_objects]
-    for s in to_remove:
-        _remove_rdf_list(g, s)
-        for triple in list(g.triples((s, None, None))):
-            g.remove(triple)
 
 
 def _add_domain_includes(g: Graph, sv: SchemaView) -> None:
