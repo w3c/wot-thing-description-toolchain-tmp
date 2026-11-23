@@ -27,10 +27,10 @@ The algorithm reads only resolved LinkML model facts:
 - class inheritance and mixins;
 - induced slots of each class;
 - `range`, `inlined`, and `multivalued`; and
-- the explicit `jsonld_index` annotations where LinkML has no native
-  equivalent.
+- the explicit `jsonld_index` and `jsonld_container` annotations where LinkML
+  has no native equivalent.
 
-It uses `ContextGenerator(fix_multivalue_containers=True)` for native
+`WotContextGenerator` sets `fix_multivalue_containers=True` for native
 `@set` and `@index` container generation.
 
 ## Scoped Vocabulary Algorithm
@@ -51,7 +51,7 @@ For every class in that graph:
 This is intentionally a structural inference rule. It recognizes
 `PropertyAffordance` as a Data Schema through its `DataSchema` mixin, and it
 does not scope `linkml:Any`, because that generic class owns no vocabulary
-slots. No `jsonld_scoped_context` annotation is needed.
+slots.
 
 ## Bare `@id` Expansion
 
@@ -61,23 +61,18 @@ for slots and classes whose `slot_uri` or `class_uri` prefix matches the root
 expansion, but break when re-declared inside scoped contexts where `@vocab`
 points to a different namespace.
 
-The upstream W3C context uses full IRIs for all td-prefixed terms
-(e.g., `"@id": "https://www.w3.org/2019/wot/td#schemaDefinitions"`). The
-postprocessor's `_fix_root_bare_ids` step expands every bare `@id` in the root
-context using the root `@vocab` value, matching upstream behavior.
-
-A term ID is considered bare when it contains no colon, no slash, and does not
-start with `@`. The expansion concatenates root `@vocab` + bare name to produce
-the full IRI. This runs after `_apply_class_mappings` so all class and slot
-entries are present.
+When a root term is re-declared inside a scoped context, its bare `@id` is
+expanded with the root `@vocab` value. A term ID is considered bare when it
+contains no colon, no slash, and does not start with `@`. The root context
+keeps the bare names.
 
 ## Scoped Context Suppression
 
-The scoped vocabulary algorithm (below) auto-infers a nested `@context` from
+The scoped vocabulary algorithm (above) auto-infers a nested `@context` from
 the range class's vocabulary ownership. This works correctly for most slots but
 must be suppressed for definition containers like `schemaDefinitions`.
 
-The upstream W3C merge.js explicitly assigns scoped contexts to these slots:
+The upstream context `td-context-1.1.jsonld` assigns scoped contexts to these slots:
 
 | Slot | Scoped vocabulary |
 |------|-------------------|
@@ -96,9 +91,9 @@ applies the vocabulary mapping even though the TD author intended `href` as a
 plain JSON property name within a reusable schema.
 
 To suppress auto-inference, annotate the slot with `jsonld_context: none` in
-the LinkML schema. The `_context_scope` function returns `None` for this value,
+the LinkML schema. The `context_scope` function returns `None` for this value,
 and no `@context` is emitted. See
-[Custom Annotations — `jsonld_context`](wot-custom-annotations.md#jsonld_context)
+[Custom Annotations — `jsonld_context`](../reference/wot-custom-annotations.md#jsonld_context)
 for the annotation reference.
 
 ## Generated Context Contract
@@ -107,8 +102,9 @@ The generated context must provide the following behavior:
 
 - A root `id` expands as JSON-LD `@id` and root `@type` expands as RDF type.
 - TD affordance maps preserve their keys with `td:name`.
-- `securityDefinitions` and `schemaDefinitions` preserve their keys with
-  `td:hasInstanceConfiguration`.
+- `securityDefinitions` and `schemaDefinitions` are id maps
+  (`@container: @id`): each key becomes the IRI of the defined node, resolved
+  against the document base.
 - Nested Object Schema `properties` preserves keys with
   `jsonschema:propertyName`.
 - Objects reached through `properties`, `uriVariables`, Action/Event schema
@@ -118,12 +114,15 @@ The generated context must provide the following behavior:
 - Objects reached through `securityDefinitions` use the WoT Security
   vocabulary.
 - Objects reached through `forms` and `links` use the HCTL vocabulary.
-- `security` remains a string or array of strings. Its values are literals,
-  not IRIs and not objects requiring a scoped context.
+- `security` remains a string or array of strings in JSON. Each value is
+  coerced with `@type: @id` and resolves to the IRI of the scheme node that
+  `securityDefinitions` defines under that name. The term has no scoped
+  context. `schema` of an additional response refers to a `schemaDefinitions`
+  entry in the same way.
 
 The TD Data Schema member `type` is deliberately outside this contract. It
 must remain distinct from semantic JSON-LD `@type`; its RDF representation is
-tracked in [Upstream Compatibility Findings](../upstream-compatibility-findings.md).
+tracked in [JSON-LD context differences](../differences/jsonld-context.md#data-schema-type-is-a-property-not-type).
 
 ## Implicit `xsd:string` Type Coercion
 
@@ -180,23 +179,24 @@ Some slots exist in the LinkML schema solely for OWL ontology emission (e.g.
 `hasInteractionAffordance`). They are never instantiated in TD JSON instances
 and must not appear in the JSON-LD context.
 
-The postprocessor identifies these slots structurally: a slot is excluded when
+The context pass `remove_uninduced_slots` identifies these slots structurally: a slot is excluded when
 it is never induced by any class (via `SchemaView.class_induced_slots`) AND its
 key is not referenced as a `@index` term by any slot's `jsonld_index`
 annotation. This inference-based approach requires no extra annotations or
 hardcoded lists.
 
-For example, `hasInstanceConfiguration` is never class-induced but is retained
-because it serves as the `@index` term for `securityDefinitions` and
-`schemaDefinitions`. `hasInteractionAffordance` is neither class-induced nor
-an `@index` term, so it is excluded.
+For example, `propertyName` is never class-induced but is declared in the
+scoped Data Schema contexts because it serves as the `@index` term for the
+`properties` map of an Object Schema. `hasInteractionAffordance` and
+`hasInstanceConfiguration` are neither class-induced nor an `@index` term, so
+they are excluded.
 
 ## Enum Vocabulary Type Coercion
 
 When a slot's range is an enum whose permissible values carry `meaning`
-declarations (mapping string names to vocabulary IRIs), the postprocessor
-sets `@type: @vocab` on that slot's context entry. This activates the enum
-value aliases added by `_add_enum_value_aliases`, so bare string values
+declarations (mapping string names to vocabulary IRIs), the context pass
+`fix_enum_vocab_type_coercion` sets `@type: @vocab` on that slot's context entry. This activates the enum
+value aliases added by `add_enum_value_aliases`, so bare string values
 like `"readproperty"` expand to their vocabulary IRIs (e.g.
 `td:readProperty`) during JSON-LD processing.
 
@@ -211,7 +211,7 @@ Slots with `designates_type` are excluded because they map to JSON-LD
 
 **Two halves of one mechanism:**
 
-- `_add_enum_value_aliases` adds each permissible value's text as a context
+- `add_enum_value_aliases` adds each permissible value's text as a context
   alias pointing to its `meaning` IRI. This makes the vocabulary terms
   available to the JSON-LD processor.
 - `@type: @vocab` tells the processor to resolve bare string values through
@@ -219,24 +219,21 @@ Slots with `designates_type` are excluded because they map to JSON-LD
   never expand to IRIs.
 
 **Current slots affected:** `op` (range `OperationType`, 18 values with
-meanings mapping operation names to `td:` and `hctl:` IRIs).
-
-**Slots excluded:** `scheme` (range `SecuritySchemeList`,
-`designates_type=True` — maps to `@type`), `type` (range
-`DataSchemaType` — maps to `@type` via upstream convention).
+meanings mapping operation names to `td:` IRIs), `scheme` (range
+`SecuritySchemeList`) and `type` (range `DataSchemaType`). No slot in the
+current schemas uses `designates_type`.
 
 This rule is structural: it derives from `range`, `meaning`, and
 `designates_type` — no custom annotations are required.
 
 ## Annotation Reduction Status
 
-- `jsonld_scoped_context` was removed: vocabulary ownership is derived from the
-  schema graph.
 - `jsonld_index` remains: LinkML does not emit the required RDF predicate for
   a map key.
-- `json_key` was removed: the public security member now uses native
-  `alias: name`, while a structurally identified map key remains private.
-- No `jsonld_keyword` annotations remain. The fixed TD JSON-LD members
+- `jsonld_container` remains: LinkML emits neither language maps nor id maps.
+- The public security member uses native `alias: name`, while a structurally
+  identified map key remains private.
+- The fixed TD JSON-LD members
   `@context`, `@type`, and `id` are handled by the context composer; `id`
   maps to `@id` without becoming a required LinkML identifier.
 - LinkML names the JSON-LD keyword slots `atContext` and `atType`, with the
@@ -248,8 +245,9 @@ This rule is structural: it derives from `range`, `meaning`, and
   representation is JSON Schema output policy.
 - `jsonschema_oneof_dispatch` remains: the discriminator and unknown-scheme
   fallback are TD JSON Schema policy.
-- `jsonschema_form_variants` remains: operation-to-Form variant membership is
-  specification policy, not derivable from class inheritance alone.
+- `jsonschema_enum_subset_partition` and `jsonschema_form_subset` remain:
+  operation-to-Form variant membership is specification policy, not derivable
+  from class inheritance alone.
 
 Revisit a retained annotation only after a native LinkML metaslot or a new
 schema relationship can express the same meaning without reducing clarity.
@@ -350,8 +348,7 @@ a TD sets document-level `@language` (e.g. `"@language": "ar-EG"` in
 `@context`), the value becomes an `rdf:langString` literal tagged with that
 language. When no `@language` is in scope, the value is a plain `xsd:string`
 literal. This is correct behavior — the instance author controls whether their
-title is language-tagged. The LinkML schema declares `range: string`, which
-maps to `xsd:string` for JSON Schema validation purposes. JSON Schema validates
+title is language-tagged. JSON Schema validates
 the JSON surface form (always a plain string), while JSON-LD processing
 determines the RDF datatype at expansion time based on the active `@language`.
 These are independent concerns at different layers.
@@ -359,13 +356,6 @@ These are independent concerns at different layers.
 This deviation is tracked in `tests/test_jsonld_context_upstream_comparison.py`
 under `INTENTIONAL_DEVIATION` xfail markers on `test_title_has_language_tag`
 and `test_description_has_language_tag`.
-
-**TODO:** Clarify in the specification text that the TD instance controls
-whether `title` and `description` values are language-tagged — not the
-context or schema. When a TD sets `@language` in its `@context`, values
-become `rdf:langString` literals; otherwise they are plain `xsd:string`.
-This should be explicit so implementers understand the interaction between
-document-level `@language` and these default-language fields.
 
 ### `rdfs:range xsd:string` contradicts `rdf:langString` literals from `@language`
 
@@ -473,17 +463,9 @@ solution requires coordinated declarations:
 
 This is an upstream issue requiring coordinated fixes across the ontology,
 SHACL shapes, and context. Our generated artifacts follow the approach
-above: the OWL postprocessor emits `rdfs:range xsd:string` (matching
-current upstream) and should be updated when upstream resolves this; the
-SHACL shapes use `sh:nodeKind sh:Literal` without `sh:datatype` (accepts
+above: the generated OWL declares `rdfs:range rdfs:Literal` on `td:title`;
+the SHACL shapes use `sh:nodeKind sh:Literal` without `sh:datatype` (accepts
 both types); the JSON-LD context omits `@language` (see previous section).
-
-**TODO:** File upstream issue proposing: (1) change `rdfs:range xsd:string`
-to `rdfs:range rdfs:Literal` on `td:title` and `td:description` in the
-ontology, (2) unify SHACL shapes to use
-`sh:or ( [ sh:datatype xsd:string ] [ sh:datatype rdf:langString ] )`
-consistently, (3) reconsider `@language: en` in the context (see previous
-section).
 
 ## Accepted IRI Differences
 
@@ -495,7 +477,7 @@ upstream W3C contexts. These are deliberate modeling choices, not bugs.
 | Source | IRI |
 |--------|-----|
 | Generated context | `qudt:unit` (`http://qudt.org/schema/qudt/unit`) |
-| Upstream `json-schema-context-1.1.jsonld` | `schema:unitCode` |
+| Upstream `json-schema-context.jsonld` | `schema:unitCode` |
 
 The upstream context maps `unit` to `schema:unitCode`, which is a string
 code (e.g. `"CEL"`) from the UN/CEFACT recommendation. The LinkML schema
@@ -504,6 +486,5 @@ maps `unit` to `qudt:unit`, which points to a QUDT unit individual IRI
 analysis, conversion factors, and unit ontology membership — which aligns
 with the machine-readable design goals of the Thing Description.
 
-This difference is tracked in
-`tests/test_jsonld_context_upstream_comparison.py` under
-`ACCEPTED_IRI_DIFFERENCE` xfail markers.
+`test_unit_present` in `tests/test_jsonld_context_upstream_comparison.py`
+asserts the generated mapping.

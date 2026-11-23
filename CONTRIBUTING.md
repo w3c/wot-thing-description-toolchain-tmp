@@ -100,8 +100,8 @@ failure.
 
 - The LinkML schemas in `resources/schemas/` are the single source of truth.
   Fix modeling problems (types, cardinalities, enumerations, descriptions)
-  there, not in the postprocessors under `src/wot_toolchain/postprocessors/`.
-  Postprocessors only adjust generator output that LinkML cannot express; see
+  there, not in the code under `src/wot_toolchain/artifacts/`.
+  That code only adjusts generator output that LinkML cannot express; see
   [Postprocessor Conventions](docs/guidelines/postprocessor-conventions.md).
 - Schema changes must align with the
   [WoT Thing Description specification](https://www.w3.org/TR/wot-thing-description11/).
@@ -109,8 +109,23 @@ failure.
   corresponding Working Group issue or decision.
 - Read the guidelines in [docs/guidelines/](docs/guidelines/index.md) before
   editing a schema, in particular the
-  [LinkML Naming Conventions](docs/guidelines/linkml-naming-conventions.md) and
-  [WoT Custom Annotations](docs/guidelines/wot-custom-annotations.md).
+  [LinkML Naming Conventions](docs/reference/linkml-naming-conventions.md) and
+  [WoT Custom Annotations](docs/reference/wot-custom-annotations.md).
+
+## Documentation
+
+Every document under `docs/` starts with the same header: the title, then author and date, then a rule.
+
+```markdown
+# Title
+
+**Author:** Mahda Noura (mahda.noura@siemens.com)
+**Date:** DD.MM.YYYY
+
+---
+```
+
+The date is the day of the last change to the content.
 
 ## Pull requests
 

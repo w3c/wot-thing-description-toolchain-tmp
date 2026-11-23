@@ -56,7 +56,7 @@ wot-toolchain diff-report GENERATED REFERENCE
 ## Codebase Layout
 
 ```
-resources/schemas/          ← SOURCE OF TRUTH (edit here, not in gens/)
+resources/schemas/          ← SOURCE OF TRUTH
   thing_description.yaml    ← main TD schema; imports the others
   hypermedia.yaml           ← HCTL vocabulary
   wot_security.yaml         ← security vocabulary
@@ -73,12 +73,12 @@ src/wot_toolchain/
   diff_report.py            ← JSON structural diff used by diff-report
   schema_utils.py           ← SchemaView loading and annotation helpers
   generators/               ← spec (respec.py) and class-diagram (visualization.py) generators
-  preprocessors/            ← owl_preprocessor.py
-  postprocessors/           ← adjust raw LinkML output to meet W3C WoT TD requirements
-    jsonschema_postprocessor.py
-    jsonld_context_postprocessor.py
-    owl_postprocessor.py
-    shacl_postprocessor.py
+  artifacts/                ← adjust LinkML generator output to meet W3C WoT TD requirements
+    passes.py               ← Pass, PassKind, run_passes
+    jsonschema/ jsonld_context/ owl/ shacl/
+                            ← per artifact: generator.py (LinkML generator subclass), options.py, passes, postprocess.py
+  model/                    ← annotations.py, names.py, resolved.py
+  schemas/                  ← config.yaml (LinkML schema of the project config file)
   serializers/              ← wot_turtle.py (Turtle output)
   templates/                ← Jinja templates for the spec HTML
   specgen/                  ← HTML spec generation
@@ -112,7 +112,7 @@ pre-commit install
 `pre-commit install` activates the hooks in `.pre-commit-config.yaml`. On every commit:
 - **ruff** lints and auto-fixes Python files
 - **ruff-format** formats Python files
-- **linkml-lint** validates all four schema YAML files (only when any `resources/schemas/*.yaml` changed)
+- **linkml-lint** checks `thing_description.yaml`, `hypermedia.yaml`, `wot_security.yaml` and `jsonschema.yaml` (only when any `resources/schemas/*.yaml` changed)
 
 If `pre-commit` is not installed: `uv tool install pre-commit` or `pip install pre-commit`.
 
@@ -120,13 +120,11 @@ If `pre-commit` is not installed: `uv tool install pre-commit` or `pip install p
 
 ## The Postprocessor Pattern
 
-See [Postprocessor Conventions](docs/guidelines/postprocessor-conventions.md) for when and how to write postprocessors. See [Known LinkML Gaps](docs/known-linkml-gaps.md) for documented generator limitations. See [OWL Accepted Differences](docs/guidelines/owl-accepted-differences.md) for the authoritative list of known differences between generated and target OWL ontologies — check it before investigating or reporting any OWL gap.
-
-Never edit files under `resources/gens/` directly — they are overwritten on every run.
+See [Postprocessor Conventions](docs/guidelines/postprocessor-conventions.md) for when and how to write a workaround for a LinkML limitation. See [LinkML gaps](docs/linkml-gaps.md) for documented generator limitations. See [OWL differences](docs/differences/owl.md) for the authoritative list of known differences between generated and target OWL ontologies — check it before investigating or reporting any OWL gap.
 
 ## Custom LinkML Annotations
 
-See [WoT Custom Annotations](docs/guidelines/wot-custom-annotations.md) for the full annotation API, examples, and decision principles. See [LinkML Naming Conventions](docs/guidelines/linkml-naming-conventions.md) for schema structural rules, `inlined`/`identifier` patterns, and checklists.
+See [WoT Custom Annotations](docs/reference/wot-custom-annotations.md) for the full annotation API, examples, and decision principles. See [LinkML Naming Conventions](docs/reference/linkml-naming-conventions.md) for schema structural rules, `inlined`/`identifier` patterns, and checklists.
 
 ## Testing and Quality
 
@@ -152,7 +150,7 @@ uv run pytest tests/test_assertion_inventory.py -v
 
 ### Known Failures
 
-Expected failures are listed one per line in `tests/known_failures/` (`td_gate.txt`, `td_crosscheck.txt`, `jsonld_roundtrip.txt`, `spec_structure.txt`) and marked `xfail(strict=True)`: a listed case that starts passing fails the suite until its entry is removed, so the lists can only shrink. Reviewed divergences from upstream text and snippets are recorded in `tests/approved_divergences/`. Other failures are not accepted baselines; see Failure Policy below.
+Expected failures are listed one per line in `tests/known_failures/` (`td_gate.txt`, `td_crosscheck.txt`, `shacl_gate.txt`, `jsonld_roundtrip.txt`, `spec_structure.txt`) and marked `xfail(strict=True)`: a listed case that starts passing fails the suite until its entry is removed, so the lists can only shrink. Reviewed divergences from upstream text and snippets are recorded in `tests/approved_divergences/`. Other failures are not accepted baselines; see Failure Policy below.
 
 ### Generation Error Taxonomy
 
@@ -160,7 +158,8 @@ Expected failures are listed one per line in `tests/known_failures/` (`td_gate.t
 
 | Pattern | Action |
 |---|---|
-| `WARNING: Multiple owl types ...` (from `linkml.generators.owlgen`) | **Ignore** — known OWL gen behavior, not a bug |
+| `WARNING: SCHEMA: slots not defined in this schema or its imports are left out of NAME.svg: ...` | **Expected** for `hypermedia.yaml`, `wot_security.yaml` and `jsonschema.yaml`: the diagram of that vocabulary omits the listed slots. **Investigate** for any other schema. |
+| Any other `WARNING:` line | **Investigate** |
 | `ERROR: N spec snippet(s) in DIR are invalid:` followed by `FILE: PATH — MESSAGE [schema: ...]` or `FILE: invalid JSON` lines | **Fix** — snippet has invalid JSON or fails validation against the schemas in the config file's `generators.spec.snippet_validation_schemas`; the command exits non-zero |
 | Any other `ERROR:` line | **Fix** — generation failed; the command exits non-zero |
 
@@ -185,7 +184,7 @@ Two categories with different update policies:
 
 Snapshots, goldens and known-failure baselines (`tests/known_failures/`, `tests/approved_divergences/`) are never updated without explicit maintainer approval.
 
-**When a golden diff CI job fails:**
+**When `tests/test_golden_diff.py` fails:**
 1. Read the diff — is it expected from the schema change?
 2. If expected: report the diff and get maintainer approval; then run `uv run pytest tests/test_golden_diff.py --update-goldens`, commit the updated snapshot, explain in PR description.
 3. If unexpected: the change has a side-effect — investigate before updating.
@@ -217,14 +216,13 @@ When reviewing HTML changes, do not evaluate the entire document — scope the c
 
 ### CI Pipeline (GitHub Actions)
 
-`main.yaml` runs four jobs in sequence: `static-analysis` → `build` → [`test-gates` ∥ `golden-diff`].
+`main.yaml` runs three jobs in sequence: `static-analysis` → `build` → `tests`.
 
-| Job | What it checks |
+| Job | What it does |
 |---|---|
-| `static-analysis` | Ruff lint; LinkML schema lint (non-blocking) |
-| `build` | Graphviz install; full artifact generation with `-d`; package build; artifact upload (fails if no files are found) |
-| `test-gates` | TD instance gate; W3C cross-check; HTML structure tests; spec HTML vs upstream; assertion inventory vs upstream; default assignments |
-| `golden-diff` | Generated JSON Schema, JSON-LD context, OWL modules, SHACL shapes and the four generated spec sections vs committed snapshots |
+| `static-analysis` | Ruff lint; Ruff format check; mypy; LinkML schema lint (non-blocking) |
+| `build` | Graphviz install; `uv run wot-toolchain generate-wot-resources`; package build; upload of the generated resources |
+| `tests` | Graphviz, jsonld.js and ROBOT install; download of the generated resources; `uv run pytest` |
 
 ## Language Style
 
@@ -242,7 +240,6 @@ When reviewing HTML changes, do not evaluate the entire document — scope the c
 - Use `dataclasses` for data containers; `set` for membership testing; `dict.get()` / `defaultdict` for missing keys.
 - Use `enumerate()`, `zip()`, comprehensions. Never `range(len())`.
 - Type hints mandatory on all function signatures and class attributes (PEP 484).
-- Prefer `TypedDict` over plain `dict` or `Mapping` for structured data.
 - Implement `__repr__` and `__str__` where the class appears in logs or error output.
 
 **Naming:**
@@ -279,7 +276,6 @@ When reviewing HTML changes, do not evaluate the entire document — scope the c
 
 ## General Project Conventions
 
-- **Never edit `resources/gens/`** — generated on every run.
 - **Schema is authoritative.** If a generated artifact looks wrong, fix the schema or the postprocessor.
 - **Postprocessors patch generator gaps** — document the W3C requirement the fix satisfies.
 - **Reference files in `resources/upstream/`** are authoritative and require maintainer approval to update.
@@ -305,25 +301,15 @@ Files with high concurrent-edit risk. Check for in-progress PRs before touching.
 
 Everything in this section is **PLANNED and not yet implemented** unless stated otherwise.
 
-1. **Generators as modules (PLANNED).** Current state: the artifact generators are private `_gen_*` functions in `src/wot_toolchain/pipeline.py`, dispatched through its `_DISPATCH` dict; the generator names are validated against `KNOWN_GENERATORS` in `config.py`; `--only` filters the config file's `generators`; each generator writes to `<output_dir>/<name>/`. Planned: each generator becomes its own module under `src/wot_toolchain/generators/` with the contract `(project, sv, output_dir) -> None`, and one registry feeds both `--only` and the output directory mapping. This is a pure move: zero change in generated output.
+1. **Generators as modules (PLANNED).** Current state: the artifact generators are private `_gen_*` functions in `src/wot_toolchain/pipeline.py`, registered in its `ARTIFACT_REGISTRY`; the `Artifact` enum in `artifacts/registry.py` defines the generator names that `config.py` accepts; `--only` filters the config file's `generators`; each generator writes to `<output_dir>/<name>/`. Planned: each generator becomes its own module under `src/wot_toolchain/generators/` with the contract `(project, sv, output_dir) -> None`, and one registry feeds both `--only` and the output directory mapping. This is a pure move: zero change in generated output.
 2. **Consumer rollout (PLANNED), in this order:** this toolchain repository first; then a release tag; then a branch in `w3c/wot-thing-description` with the schemas under `linkml/`, its own config file and a preview workflow, opened as a side-by-side draft PR; then instance-based tests there.
 3. Snapshots, goldens and known-failure baselines change only with explicit maintainer approval (current rule; see Golden Files).
 
 Out of scope for now: automated ontology/SHACL consistency (the reference ontologies in `resources/upstream/ontology/` are used for reference only).
 
-## Available Claude Code Skills
+## Before running the pipeline
 
-| Skill | When to use |
-|---|---|
-| `/verify` | Full closed-loop check after any schema/postprocessor change: sync deps, generate, validate snippets, run tests |
-| `/generate` | Run full pipeline, surface only errors/warnings |
-| `/schema-diff` | Show what changed in LinkML schemas |
-| `/validate-snippets` | Check snippet validation errors only |
-| `/validate-consistency` | After schema change: detect cross-artifact drift |
-| `/check-linkml <feature>` | Check if LinkML supports a feature natively before writing a postprocessor |
-| `/review-pr <number>` | Review a PR against all project rules |
-
-**Before running any pipeline command**, ensure deps are current:
+Make sure the dependencies are current:
 ```bash
 uv sync
 ```

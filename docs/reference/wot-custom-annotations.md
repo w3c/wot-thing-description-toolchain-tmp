@@ -1,10 +1,5 @@
 # WoT Custom Annotations
 
-**Author:** Mahda Noura (mahda.noura@siemens.com)
-**Date:** 29.10.2026
-
----
-
 ## Why Custom Annotations Exist
 
 LinkML is a general-purpose schema language — it generates JSON Schema, OWL, SHACL, and JSON-LD from schema definitions. But the WoT Toolchain has requirements that LinkML generators do not cover natively:
@@ -17,7 +12,7 @@ LinkML is a general-purpose schema language — it generates JSON Schema, OWL, S
 
 Custom annotations are **workarounds, not features.** Each one exists because native LinkML cannot express a specific WoT requirement. When an upstream fix lands, the corresponding annotation should be retired.
 
-For the catalog of known LinkML limitations, see [Known LinkML Gaps](../known-linkml-gaps.md).
+For the catalog of known LinkML limitations, see [LinkML gaps](../linkml-gaps.md).
 
 ---
 
@@ -26,7 +21,7 @@ For the catalog of known LinkML limitations, see [Known LinkML Gaps](../known-li
 Before reaching for an annotation:
 
 1. **Can native LinkML express this?** Prefer `exactly_one_of`, `rules`, `minimum_value`, `multivalued`, etc. See [Native LinkML Features for JSON Schema](#native-linkml-features-for-json-schema) below.
-2. **Is the gap already documented?** Check [Known LinkML Gaps](../known-linkml-gaps.md) — a workaround may already exist.
+2. **Is the gap already documented?** Check [LinkML gaps](../linkml-gaps.md) — a workaround may already exist.
 3. **Which artifact does the concern affect?** Use `spec_*` for HTML output, `jsonschema_*` for JSON Schema output, and `jsonld_*` for the JSON-LD context. Never mix them.
 
 ---
@@ -49,7 +44,7 @@ Before reaching for a `jsonschema_*` annotation, verify that native LinkML const
 
 **Extensibility and maps:**
 
-- `extra_slots: allowed: true` — generates `additionalProperties: true`. Used on all schema classes to allow extension.
+- `extra_slots: allowed: true` — generates `additionalProperties: true`. Used on every vocabulary class except `Any` and `ThingModel`.
 - Multivalued inlined slots with identifier keys — generates the `additionalProperties` map pattern. Example: `securityDefinitions`, `properties`, `actions`, `events`.
 
 **Enumerations:**
@@ -118,15 +113,15 @@ through a vocabulary-specific lens.
 **What it does:** declares the RDF predicate represented by keys in an
 inlined dictionary-valued slot. LinkML generates `@container: "@index"`
 natively but does not currently generate this predicate.
-([Known LinkML Gaps, gap #3](../known-linkml-gaps.md#3-json-ld-index-predicates-are-not-generated-for-keyed-maps))
+([LinkML gaps, Index maps](../linkml-gaps.md#index-maps))
 
 Declared on a slot (top-level slot or `slot_usage`). The value is a CURIE.
 
 ```yaml
-securityDefinitions:
-  slot_uri: td:definesSecurityScheme
+properties:
+  slot_uri: td:hasPropertyAffordance
   annotations:
-    jsonld_index: td:hasInstanceConfiguration
+    jsonld_index: td:name
 ```
 
 Effect on the JSON-LD context:
@@ -137,18 +132,19 @@ Effect on the JSON-LD context:
   the scoped context contains a term resolving to the expanded CURIE.
 - The identifier slot of the range class (the map key) is remapped from `@id`
   to its `slot_uri`, or removed from the context when it has none.
-- `jsonld_index` has no effect on a slot that also declares `jsonld_container`.
+- `jsonld_index` has no effect on a slot that also declares
+  `jsonld_container: "@language"`.
 
-Currently used on: `properties`, `actions`, `events`, `securityDefinitions`,
-`schemaDefinitions`, `uriVariables` (TD module) and the `properties` slot usage
-of `ObjectSchema` in the JSON Schema module.
+Currently used on: `properties`, `actions`, `events`, `uriVariables` (TD
+module, all with `td:name`) and the `properties` slot usage of `ObjectSchema`
+in the JSON Schema module (`jsonschema:propertyName`).
 
 ### `jsonld_container`
 
 **What it does:** overrides the `@container` value of a slot's JSON-LD term
 definition. LinkML emits only `@index` or `@set` containers and cannot express
-language maps.
-([Known LinkML Gaps, gap #1](../known-linkml-gaps.md#1-no-container-language-support-in-json-ld-context-generator))
+language maps or id maps.
+([LinkML gaps, Language maps](../linkml-gaps.md#language-maps))
 
 Declared on a slot. The value is a JSON-LD container keyword string.
 
@@ -162,11 +158,26 @@ titles:
   range: MultiLanguage
 ```
 
-The postprocessor writes the value to the term's `@container` and generates
-neither an `@index` predicate nor a scoped context for the slot. For the value
-`"@language"` it also removes `@index` and `@type` from the term definition.
+The postprocessor writes the value to the term's `@container`.
 
-Currently used on: `titles`, `descriptions`.
+- For `"@language"` it removes `@index` and `@type` from the term definition
+  and generates neither an `@index` predicate nor a scoped context.
+  Currently used on: `titles`, `descriptions`.
+- For `"@id"` each key of the map becomes the IRI of the node it holds,
+  resolved against the document base. The slot is treated as a keyed map: it
+  receives a scoped context under the same rules as a `jsonld_index` slot, and
+  the identifier slot of the range class is remapped from `@id` to its
+  `slot_uri`, or removed from the context when it has none. A term that refers
+  to such a node by name (`security`, `schema`) is coerced with `@type: @id`
+  and resolves to the same IRI.
+  Currently used on: `securityDefinitions`, `schemaDefinitions`.
+
+```yaml
+securityDefinitions:
+  slot_uri: td:definesSecurityScheme
+  annotations:
+    jsonld_container: "@id"
+```
 
 The fixed TD JSON-LD members `@context`, `@type`, and `id` are handled by the
 context composer rather than custom schema annotations. `id` maps to `@id` and
@@ -191,7 +202,7 @@ These annotations control how classes and slots appear in the generated HTML spe
 
 - Add `spec_description` only when the spec text needs markup that `description` cannot hold.
 - Keep `description` in sync — it must contain the same text minus markup, because OWL and SHACL generators read `description`, not `spec_description`.
-- Never put `[[RFC####]]` or backtick markup in `description` — it renders as literal brackets in `rdfs:comment`.
+- Never put `[[RFC####]]` or backtick markup in `description` — it renders as literal brackets in the OWL `skos:definition`.
 
 ```yaml
 id:
@@ -210,7 +221,7 @@ id:
 
 ### `spec_default`
 
-**What it does:** marks a slot as having a normative default value in the W3C spec. The vocabulary table renders `with default` in the slot's assignment column instead of `mandatory` or `optional`, linked to the default-values section when the spec manifest defines its anchor.
+**What it does:** marks a slot as having a normative default value in the W3C spec. The vocabulary table renders `with default` in the slot's assignment column instead of `mandatory` or `optional`, linked to the default-values section when the config file defines its anchor.
 
 **What you need to do:**
 
@@ -262,7 +273,7 @@ Available block types:
 |------|---------|------------|
 | `note` | Informative note box | `text`, optional `title` |
 | `paragraph` | Prose with optional assertion segments | `segments[].id`, `segments[].text` |
-| `list` | Ordered/unordered list of assertions | `items[].id`, `items[].text` |
+| `list` | Unordered list of assertions | `items[].id`, `items[].text` |
 | `enum_table` | Table of enumeration values | `enum`, `columns` |
 | `markdown` | Raw markdown (no assertions) | `text` |
 
@@ -478,7 +489,7 @@ Currently not used in any schema.
 - Choose `mode`:
   - `one_of` — exhaustive list. The values **must** be complete.
   - `examples` — illustrative subset. Use when the full list is too long or open-ended. This is the default when `mode` is omitted.
-- The table renders the range followed by `(one of ...)` or `(e.g., ...)`. An annotation in `slot_usage` takes precedence over one in `attributes`, which takes precedence over one on the slot definition.
+- The table renders the range followed by `(one of ...)` or `(e.g., ...)`. An annotation in `attributes` takes precedence over one in `slot_usage`, which takes precedence over one on the slot definition.
 
 ```yaml
 # Exhaustive — all allowed values listed
@@ -511,9 +522,9 @@ BearerSecurityScheme:
 
 ## JSON Schema Annotations (`jsonschema_*`)
 
-These annotations control how the JSON Schema postprocessor (`src/wot_toolchain/postprocessors/jsonschema_postprocessor.py`) transforms raw LinkML generator output. They have **no effect** on HTML, OWL, or SHACL output.
+These annotations control how the JSON Schema postprocessor (`src/wot_toolchain/artifacts/jsonschema/postprocess.py`) transforms raw LinkML generator output. They have **no effect** on HTML, OWL, or SHACL output.
 
-The postprocessor reads these annotations via `_read_annotations()` and applies transforms in a fixed pipeline order. Adding an annotation to a class automatically activates the corresponding transform — no Python code changes needed.
+The postprocessor reads these annotations via `read_annotations()` and applies transforms in a fixed pipeline order. Adding an annotation to a class automatically activates the corresponding transform — no Python code changes needed.
 
 ---
 
@@ -521,7 +532,7 @@ The postprocessor reads these annotations via `_read_annotations()` and applies 
 
 **What it does:** merges all subclass-specific slots into the parent class definition and removes the individual subclass `$defs`. The result is a single flat JSON Schema definition containing every slot from the parent and all its children.
 
-**Why it exists:** the W3C TD spec defines `DataSchema` as one flat type where type-specific properties (`items`, `properties`, `minItems`, etc.) are all merged together. But LinkML's inheritance model generates separate `$defs` for `ArraySchema`, `ObjectSchema`, `NumberSchema`, etc. ([Known LinkML Gaps](../known-linkml-gaps.md))
+**Why it exists:** the W3C TD spec defines `DataSchema` as one flat type where type-specific properties (`items`, `properties`, `minItems`, etc.) are all merged together. But LinkML's inheritance model generates separate `$defs` for `ArraySchema`, `ObjectSchema`, `NumberSchema`, etc. ([LinkML gaps](../linkml-gaps.md))
 
 **What you need to do:**
 
@@ -557,7 +568,7 @@ Currently used on: `DataSchema`.
 
 **What it does:** replaces a class's definition with a `oneOf` of `$ref`s to its direct subclasses (`is_a`) that have a definition in `$defs`, sorted by reference. With `include_unknown: true`, a final object variant is appended that requires the discriminator slot and constrains it to a prefixed value (pattern `.+:.*`), so that unknown schemes do not overlap the known ones.
 
-**Why it exists:** the W3C TD specification uses the `scheme` field value (`"basic"`, `"oauth2"`, etc.) to select which `SecurityScheme` subclass applies, and admits additional schemes with a prefixed `scheme` value. LinkML has no native discriminated-union dispatch. ([Known LinkML Gaps, gap #7](../known-linkml-gaps.md#7-no-oneof-dispatch-on-a-discriminator-slot))
+**Why it exists:** the W3C TD specification uses the `scheme` field value (`"basic"`, `"oauth2"`, etc.) to select which `SecurityScheme` subclass applies, and admits additional schemes with a prefixed `scheme` value. LinkML has no native discriminated-union dispatch. ([LinkML gaps, Discriminated unions](../linkml-gaps.md#discriminated-unions))
 
 **What you need to do:**
 
@@ -605,7 +616,7 @@ Currently used on: `SecurityScheme`.
 - `<Class>_element_<subset>` — an `allOf` of the base and a constraint on the partitioned slot: one of the subset's values, or an array of them.
 - `<Class>` — a `oneOf` of `$ref`s to all subset variants.
 
-**Why it exists:** the W3C TD specification restricts the allowed `op` values of a `Form` by where it appears (Thing level, property, action, event). LinkML generates a single `Form` definition. ([Known LinkML Gaps, gap #8](../known-linkml-gaps.md#8-no-form-variants-per-affordance-type))
+**Why it exists:** the W3C TD specification restricts the allowed `op` values of a `Form` by where it appears (Thing level, property, action, event). LinkML generates a single `Form` definition. ([LinkML gaps, Form variants per affordance](../linkml-gaps.md#form-variants-per-affordance))
 
 **What you need to do:**
 
@@ -684,7 +695,7 @@ Currently not used in any schema; the example above is illustrative.
 |-----------|-------|--------|---------|
 | `jsonld_context` | slot | JSON-LD | Explicit scoped vocabulary prefix, or `none` |
 | `jsonld_index` | slot | JSON-LD | `@index` predicate for a keyed map |
-| `jsonld_container` | slot | JSON-LD | `@container` override (e.g. `@language`) |
+| `jsonld_container` | slot | JSON-LD | `@container` override (`@language`, `@id`) |
 | `spec_description` | class, slot | HTML | Spec text with markup (`[[RFC]]`, backticks) |
 | `spec_default` | slot | HTML | `with default` assignment in vocab table |
 | `spec_exclude` | class, slot | HTML | Hide class section or structural slot |

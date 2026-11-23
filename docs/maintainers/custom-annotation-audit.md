@@ -6,8 +6,8 @@ LinkML. When that is unavailable, a deterministic derivation is preferred over
 an annotation. An annotation remains only when it expresses artifact policy or
 a confirmed LinkML generator gap.
 
-The inventory covers all annotations outside the `spec_*` family in the four
-WoT schema modules.
+The inventory covers all annotations outside the `spec_*` family in the
+schema modules in `resources/schemas/`.
 
 ## Native LinkML
 
@@ -21,9 +21,7 @@ generator also natively emits list and keyed-map containers when invoked with
 
 ## Derived From the Schema Graph
 
-`jsonld_scoped_context` was removed in commit `6bc508d`.
-
-Scoped vocabulary selection is now inferred from the range class, its
+Scoped vocabulary selection is inferred from the range class, its
 ancestors and mixins, class URI ownership, and the containing slot URI. The
 algorithm and its expansion contract are documented in
 [JSON-LD Context Composition](jsonld-context-composition.md).
@@ -31,7 +29,7 @@ algorithm and its expansion contract are documented in
 There are no further annotations that can currently be removed by a proven
 structural rule.
 
-The literal JSON-LD keywords `@context` and `@type` are now handled as fixed
+The literal JSON-LD keywords `@context` and `@type` are handled as fixed
 protocol terms rather than schema annotations. The security parameter uses the
 native LinkML `alias: name`; its map-key identifier is identified from the
 declared keyed map and kept out of public JSON Schema and root-context terms.
@@ -44,19 +42,21 @@ Working Group as a structured RDF organization in generated OWL. LinkML has
 publisher. Keep this annotation unless LinkML adds a publisher model capable
 of representing the required organization name and URL.
 
-`skos:note` appears on `jsonschema:allOf`, `wotsec:in`, and
-`wotsec:oneOf`. These are vocabulary annotations, not generator controls.
-They record distinctions between terms with the same JSON spelling or a
-specification-status note. Keep them as RDF semantics.
-
 ## JSON-LD Generator Gaps
 
-`jsonld_index` occurs on seven inlined keyed maps. It supplies the RDF
+`jsonld_index` occurs on five inlined keyed maps. It supplies the RDF
 predicate represented by each JSON object key:
 
 - `td:name` for affordance and URI-variable maps;
-- `td:hasInstanceConfiguration` for security and Data Schema definition maps;
 - `jsonschema:propertyName` for nested Object Schema properties.
+
+`jsonld_container` occurs on four slots. It supplies a `@container` value
+that LinkML does not emit:
+
+- `"@language"` for `titles` and `descriptions`;
+- `"@id"` for `securityDefinitions` and `schemaDefinitions`, whose keys are
+  the names that `security` and `schema` refer to. Each key becomes the IRI of
+  the defined node.
 
 This predicate cannot be inferred from `identifier`: the identifier describes
 the key field of the value object, not the RDF predicate asserted for the map
@@ -65,8 +65,7 @@ extension for a schema element, rather than an RDF mapping for serialized map
 keys. Keep `jsonld_index` until LinkML supports an explicit keyed-map RDF
 predicate in its JSON-LD context generator.
 
-No `jsonld_keyword` annotations remain. The context composer handles the
-fixed TD JSON-LD members `@context`, `@type`, and optional `id`; `id` maps to
+The context composer handles the fixed TD JSON-LD members `@context`, `@type`, and optional `id`; `id` maps to
 `@id`. LinkML's native `identifier` would make the member required in generated
 JSON Schema, which rejects valid TDs.
 
@@ -94,11 +93,13 @@ values, and the prefixed unknown-scheme fallback is a separate TD rule. Keep
 this annotation. [LinkML type designators](https://linkml.io/linkml/schemas/type-designators.html)
 do not generate this JSON Schema union.
 
-`jsonschema_form_variants` on `Form` defines the TD operation sets for forms
-at root, Property, Action, and Event locations. The current graph represents
-these as one `Form` class, so the variant membership is not derivable from
-inheritance or cardinality. Keep the annotation. A future model with explicit
-Form subtypes and semantic operation-set relationships could replace it, but
+`jsonschema_enum_subset_partition` on `Form` partitions the `op` values of
+`OperationType` by subset, and `jsonschema_form_subset` on the `forms` slot
+usage at root, Property, Action, and Event locations selects the subset that
+applies there. The current graph represents these as one `Form` class, so the
+variant membership is not derivable from inheritance or cardinality. Keep the
+annotations. A future model with explicit
+Form subtypes and semantic operation-set relationships could replace them, but
 that would be a deliberate model redesign affecting every generated artifact.
 
 ## Specification Rendering Policy

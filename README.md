@@ -73,13 +73,13 @@ From these source models, the generation pipeline has two paths:
    - **OWL ontologies** (`owl/td.ttl`, `owl/tm.ttl`, `owl/hctl.ttl`, `owl/wotsec.ttl`, `owl/jsonschema.ttl`, experimental) — WoT vocabulary terms and relationships
    - **Visualizations** (`visualization/*.svg`, experimental) — class-hierarchy diagrams
 
-2. **Snippet rendering + ReSpec specification generation**, enabled by `-d`, takes the schema modules, `resources/index.template.html`, Jinja templates, and the TD/TM JSON snippets. It produces:
+2. **Snippet rendering + ReSpec specification generation**, which runs when `spec` is listed under `generators` in `wot-toolchain.yaml`, takes the schema modules, `resources/index.template.html`, Jinja templates, and the TD/TM JSON snippets. It produces:
    - **Generated ReSpec `index.html`** — vocabulary tables, assertions, and rendered TD/TM example snippets
    - **Assertion CSV inventory** (`assertions/`) — inventory of assertions in the TD specification
 
 ![WoT Toolchain generation flow](images/wot-toolchain.svg)
 
-Postprocessors are custom Python functions in [`src/wot_toolchain/postprocessors/`](src/wot_toolchain/postprocessors/). They modify a raw LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`Known LinkML Gaps`](docs/known-linkml-gaps.md) records each known limitation and workaround.
+The code in [`src/wot_toolchain/artifacts/`](src/wot_toolchain/artifacts/) subclasses the LinkML generators and runs passes on their output. It changes the LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`LinkML gaps`](docs/linkml-gaps.md) records each known limitation and workaround.
 
 ## Testing
 
@@ -109,11 +109,11 @@ See [tests/README.md](tests/README.md) for the complete test inventory and the u
 Useful commands:
 
 ```bash
-# Generate resource artifacts only
+# Run every generator listed in wot-toolchain.yaml
 uv run wot-toolchain generate-wot-resources
 
-# Generate resource artifacts and the ReSpec TD specification
-uv run wot-toolchain generate-wot-resources
+# Run one generator (repeat --only for more)
+uv run wot-toolchain generate-wot-resources --only jsonschema
 
 # Run the complete test suite
 uv run pytest tests/ -v
@@ -122,7 +122,7 @@ uv run pytest tests/ -v
 uv run ruff check .
 ```
 
-Before changing a schema or generator, read the [modeling guidelines](docs/guidelines/index.md) for naming conventions, custom annotations, postprocessor patterns, and snippet authoring. For documented LinkML limitations and workarounds, see [`Known LinkML Gaps`](docs/known-linkml-gaps.md). Files under `resources/gens/` are generated outputs and should not be edited manually. Each postprocessor should document the LinkML limitation it addresses.
+Before changing a schema or generator, read the [modeling guidelines](docs/guidelines/index.md) for naming conventions, custom annotations, postprocessor patterns, and snippet authoring. For documented LinkML limitations and workarounds, see [`LinkML gaps`](docs/linkml-gaps.md). Files under `resources/gens/` are generated outputs and should not be edited manually. Each postprocessor should document the LinkML limitation it addresses.
 
 ## Current Status
 

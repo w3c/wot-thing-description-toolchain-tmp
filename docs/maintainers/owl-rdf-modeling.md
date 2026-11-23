@@ -1,17 +1,12 @@
 # OWL/RDF Modeling Guide
 
-**Author:** Mahda Noura (mahda.noura@siemens.com)
-**Date:** 14.10.2026
-
----
-
-How to author LinkML schema YAML so the OWL generation pipeline (`preprocessor → gen-owl → postprocessor`) produces correct OWL ontologies. Cross-references: [LinkML Naming Conventions](linkml-naming-conventions.md), [Postprocessor Conventions](postprocessor-conventions.md), [Known LinkML Gaps](../known-linkml-gaps.md).
+How to author LinkML schema YAML so the OWL generation pipeline (`preprocess_for_gen_owl` → `WotOwlGenerator` → `postprocess_owl_graph`, under `src/wot_toolchain/artifacts/owl/`) produces correct OWL ontologies. Cross-references: [LinkML Naming Conventions](../reference/linkml-naming-conventions.md), [Postprocessor Conventions](../guidelines/postprocessor-conventions.md), [LinkML gaps](../linkml-gaps.md).
 
 ## 1. OWL Property Types and `implements`
 
-**Rule: every slot with a `slot_uri` that should appear in OWL output must declare `implements` with the correct OWL property type.**
+**Rule: declare `implements` with the correct OWL property type on a slot whose property type does not follow from its range.**
 
-Rationale: gen-owl infers property type from range (object range → `owl:ObjectProperty`, datatype range → `owl:DatatypeProperty`). This inference is often wrong for WoT because LinkML ranges and OWL ranges do not always align. The `implements` metaslot overrides the inference.
+Rationale: gen-owl infers property type from range (object range → `owl:ObjectProperty`, datatype range → `owl:DatatypeProperty`). LinkML ranges and OWL ranges do not always align. The `implements` metaslot overrides the inference.
 
 Valid values:
 - `owl:ObjectProperty` — range is another OWL class or resource
@@ -34,22 +29,24 @@ instance:
   range: string
 ```
 
-**Rule: do NOT use `implements` on slots referencing external vocabulary terms.**
+**Rule: a URI value that names no node of the Thing Description is a datatype property; a name that refers to a node the Thing Description defines is an object property ranging over the class of that node.**
 
-Rationale: external terms (e.g., `dcterms:created`, `dcterms:modified`) are defined in their own ontologies. Adding `implements` causes gen-owl to re-declare them inside this module's OWL output — polluting the ontology with foreign property declarations.
+Rationale: an object property without a range says nothing about its values, and an object property with an `xsd` range is wrong. Neither slot kind declares `implements`; the range decides.
 
 ```yaml
-# wrong — re-declares Dublin Core property in td.ttl
-created:
-  slot_uri: dcterms:created
-  implements:
-    - owl:AnnotationProperty
+# DatatypeProperty, rdfs:range xsd:anyURI — the value is an endpoint URI
+authorization:
+  slot_uri: wotsec:authorization
+  range: uri
 
-# correct — slot exists for JSON Schema output, OWL skips it
-created:
-  slot_uri: dcterms:created
-  range: datetime
+# ObjectProperty, rdfs:range wotsec:SecurityScheme — the value is the name
+# of an entry of securityDefinitions
+security:
+  slot_uri: td:hasSecurityConfiguration
+  range: SecurityScheme
 ```
+
+Generated: `hctl:hasAnchor`, `wotsec:proxy`, `wotsec:authorization`, `wotsec:token` and `wotsec:refresh` are `owl:DatatypeProperty` with `rdfs:range xsd:anyURI`. `td:hasSecurityConfiguration` is an `owl:ObjectProperty` with `rdfs:range wotsec:SecurityScheme`, and `hctl:hasAdditionalOutputSchema` one with `rdfs:range jsonschema:DataSchema`. See [JSON-LD Type Coercion Rules, Rule 2](jsonld-type-coercion-rules.md) for the JSON-LD and SHACL side.
 
 ## 2. The Three-Way Split: JSON Key, OWL IRI, JSON-LD Bridge
 
@@ -59,7 +56,7 @@ A single concept has three distinct identifiers:
 |--------|--------|---------|
 | JSON key | slot name (or `alias`) | `version` |
 | OWL property IRI | `slot_uri` | `td:versionInfo` |
-| Bridge | JSON-LD context entry | `"version": {"@id": "td:versionInfo"}` |
+| Bridge | JSON-LD context entry | `"version": {"@type": "@id", "@id": "versionInfo"}`, resolved against the `td` `@vocab` |
 
 **Rule: `slot_uri` determines OWL identity. Slot name determines JSON key. Never assume they match.**
 
@@ -68,16 +65,12 @@ Rationale: the upstream WoT specification uses short JSON keys (`forms`, `action
 ```yaml
 # slot name "forms" → JSON key "forms"
 # slot_uri td:hasForm → OWL property <https://www.w3.org/2019/wot/td#hasForm>
-# JSON-LD context: "forms": {"@id": "td:hasForm", "@container": "@set"}
+# JSON-LD context: "forms": {"@id": "hasForm", "@container": "@set"}
 forms:
   slot_uri: td:hasForm
-  implements:
-    - owl:ObjectProperty
   range: Form
   multivalued: true
 ```
-
-See [Known LinkML Gaps #10](../known-linkml-gaps.md#10-gen-owl-uses-slot-name-not-slot_uri-as-owl-property-iri) for why `gen-owl` cannot be used directly — it emits slot name as OWL IRI, ignoring `slot_uri`.
 
 ## 3. The `alias` Pattern
 
@@ -91,9 +84,7 @@ Rationale: LinkML slot names are globally unique. Without `alias`, two propertie
 # Top-level slot for Basic/Digest/Bearer — OWL property wotsec:in
 in:
   slot_uri: wotsec:in
-  implements:
-    - owl:DatatypeProperty
-  range: string
+  range: SecurityLocationType
 
 # Class attribute for APIKeySecurityScheme — OWL property wotsec:apikeyIn
 # alias maps it to same JSON key "in"
@@ -101,8 +92,6 @@ attributes:
   apikeyIn:
     alias: in
     slot_uri: wotsec:apikeyIn
-    implements:
-      - owl:DatatypeProperty
     range: SecurityLocationType
 ```
 
@@ -127,14 +116,14 @@ security_oneOf:
 
 **Rule: slots that need `rdfs:range` in OWL output must be top-level slots (under `slots:`), not class attributes.**
 
-Rationale: gen-owl emits `rdfs:range` only on top-level slot definitions. Class-level attributes produce `rdfs:subClassOf` restrictions but no global range declaration. The preprocessor's `_promote_attributes` transform handles this automatically — it lifts class attributes with `slot_uri` to top-level slots before gen-owl runs.
+Rationale: gen-owl emits `rdfs:range` only on top-level slot definitions. Class-level attributes produce `rdfs:subClassOf` restrictions but no global range declaration. `_promote_attributes` in `src/wot_toolchain/artifacts/owl/pre_passes.py` handles this automatically — it lifts class attributes with `slot_uri` to top-level slots before gen-owl runs.
 
 ```yaml
 # correct — top-level slot, gen-owl emits rdfs:range
 slots:
-  title:
-    slot_uri: td:title
-    range: string
+  version:
+    slot_uri: td:versionInfo
+    range: VersionInfo
 
 # also correct — class attribute with slot_uri
 # preprocessor promotes this to top-level before gen-owl runs
@@ -154,7 +143,7 @@ Examples: `atContext` (JSON-LD `@context`), `atType` (JSON-LD `@type`), identifi
 
 ## 5. Annotations as Workarounds for gen-owl Literal Bug
 
-Several RDF predicates expect `URIRef` objects, but gen-owl emits annotation values as `Literal` strings. The postprocessor converts these automatically.
+Several RDF predicates expect `URIRef` objects, but gen-owl emits annotation values as `Literal` strings.
 
 **Rule: use annotation syntax in schema YAML for these predicates. `WotOwlGenerator.add_metadata` (`src/wot_toolchain/artifacts/owl/generator.py`) emits these values as URIRefs instead of Literals.**
 
@@ -174,7 +163,7 @@ title:
     rdfs:subPropertyOf: dcterms:title
 ```
 
-The postprocessor converts `"dcterms:title"` from `Literal` CURIE to expanded `URIRef` via SchemaView prefix expansion, and URI-valued `rdfs:seeAlso` / `rdfs:subClassOf` strings to `URIRef`.
+The generator expands the CURIE `dcterms:title` to a `URIRef` via SchemaView prefix expansion, and emits URI-valued `rdfs:seeAlso` / `rdfs:subClassOf` strings as `URIRef`.
 
 **Note:** `rdfs:isDefinedBy` and `skos:inScheme` are NOT handled via annotations — see §5a below.
 
@@ -189,9 +178,7 @@ Both predicates are added automatically by the toolchain, not via schema annotat
 
 **Rule: do NOT add `rdfs:isDefinedBy` or `skos:inScheme` annotations in schema YAML. The toolchain handles them automatically.**
 
-Rationale: these are mechanical metadata — every term in a module is defined by that module's ontology. Repeating `rdfs:isDefinedBy: https://www.w3.org/2019/wot/td` on every class and slot adds noise without information. The postprocessor derives the value from the module namespace, keeping schema files focused on modeling semantics.
-
-See [Known LinkML Gaps #10](../known-linkml-gaps.md#10-gen-owl-uses-slot-name-not-slot_uri-as-owl-property-iri) for background on why the custom generator and postprocessor exist.
+Rationale: these are mechanical metadata — every term in a module is defined by that module's ontology. Repeating `rdfs:isDefinedBy: https://www.w3.org/2019/wot/td` on every class and slot adds noise without information. The generator uses the ontology IRI as the value, keeping schema files focused on modeling semantics.
 
 ## 6. Domain Declarations — Hybrid Approach
 
@@ -211,11 +198,11 @@ Multiple `rdfs:domain` triples create an OWL **intersection** — the subject mu
 | Case | Mechanism | Source |
 |------|-----------|--------|
 | Single-domain slot | `rdfs:domain` | `domain:` field in schema YAML → gen-owl emits natively |
-| Multi-domain slot | `schema:domainIncludes` | Postprocessor derives from class→slot membership |
+| Multi-domain slot | `schema:domainIncludes` | `_add_domain_includes` derives from class→slot membership |
 
 ### Single-Domain: Schema `domain:` Field
 
-LinkML `SlotDefinition.domain` accepts a single class name. gen-owl emits `rdfs:domain <class-uri>`. Works on top-level slots; class attributes survive because the preprocessor's `_promote_attributes` does `copy.deepcopy`.
+LinkML `SlotDefinition.domain` accepts a single class name. gen-owl emits `rdfs:domain <class-uri>`. Works on top-level slots; class attributes survive because `_promote_attributes` does `copy.deepcopy`.
 
 ```yaml
 # Top-level slot — domain: directly on the slot
@@ -234,8 +221,6 @@ classes:
       safe:
         slot_uri: td:isSafe
         domain: ActionAffordance
-        implements:
-          - owl:DatatypeProperty
         range: boolean
 ```
 
@@ -248,9 +233,9 @@ td:isSafe rdfs:domain td:ActionAffordance .
 
 **Rule: add `domain: ClassName` to every slot/attribute that belongs to exactly one class.**
 
-### Multi-Domain: Postprocessor `schema:domainIncludes`
+### Multi-Domain: `schema:domainIncludes`
 
-For properties used by 2+ classes, the postprocessor's `_add_domain_includes` function scans class→slot membership via SchemaView and emits `schema:domainIncludes` for each class. No hardcoded lookup tables.
+For properties used by 2+ classes, `_add_domain_includes` in `src/wot_toolchain/artifacts/owl/passes.py` scans class→slot membership via SchemaView and emits `schema:domainIncludes` for each class. No hardcoded lookup tables.
 
 ```turtle
 td:description schema:domainIncludes td:Thing ;
@@ -261,13 +246,13 @@ td:description schema:domainIncludes td:Thing ;
 
 The function handles `slot_usage` overrides (e.g., `ObjectSchema.properties` overrides `slot_uri` to `jsonschema:properties`) and class attributes.
 
-**Rule: do NOT add `domain:` to multi-domain slots. The postprocessor handles them automatically.**
+**Rule: do NOT add `domain:` to multi-domain slots. `_add_domain_includes` handles them automatically.**
 
 ### Rationale
 
 1. **Semantic correctness:** `rdfs:domain` is safe and informative for single-domain properties. Multi-domain properties use `schema:domainIncludes` to avoid intersection semantics.
 2. **Upstream alignment:** WoT upstream ontologies use `schema:domainIncludes` for multi-domain properties across td.ttl, hctl.ttl, jsonschema.ttl, wotsec.ttl.
-3. **LinkML limitation:** `SlotDefinition.domain` is `str | ClassDefinitionName | None` — single class only. No native way to express multi-domain (see [Known LinkML Gaps #11](../known-linkml-gaps.md#11-no-multi-domain-support-for-owl-properties)).
+3. **LinkML limitation:** `SlotDefinition.domain` is `str | ClassDefinitionName | None` — single class only. No native way to express multi-domain (see [LinkML gaps, Multiple domains](../linkml-gaps.md#multiple-domains)).
 4. **No hardcoded tables:** both mechanisms derive from schema structure — `domain:` field for single, class membership for multi.
 
 ## 7. Enum-to-OWL Patterns
@@ -280,15 +265,13 @@ Enums with `enum_uri` produce OWL named classes with named individuals.
 OperationType:
   enum_uri: td:OperationType
   annotations:
-    rdfs:isDefinedBy:
-      value: https://www.w3.org/2019/wot/td
     rdfs:subClassOf:
       value: http://schema.org/Enumeration
   permissible_values:
-    readProperty:
+    readproperty:
       meaning: td:readProperty
       description: Identifies the read operation on Property Affordances.
-    writeProperty:
+    writeproperty:
       meaning: td:writeProperty
       description: Identifies the write operation on Property Affordances.
 ```
@@ -300,29 +283,26 @@ td:OperationType a owl:Class ;
     rdfs:subClassOf schema:Enumeration .
 
 td:readProperty a td:OperationType ;
-    rdfs:label "readProperty" .
+    rdfs:label "readProperty"@en .
 ```
 
-The postprocessor handles two conversions:
-- `rdfs:subClassOf` on permissible values → `rdf:type` (upstream WoT convention: individuals are typed, not subclasses)
-- `rdfs:subClassOf` annotation on the enum itself → `URIRef` (Literal→URIRef conversion, same as §5)
+`WotOwlGenerator` does two things:
+- types each permissible value with a `meaning` as an instance of the enum class (`rdf:type`, not `rdfs:subClassOf`)
+- emits the `rdfs:subClassOf` annotation on the enum itself as a `URIRef` (same as §5)
 
 **Rule: enums without `enum_uri` are JSON Schema validation enums only — the preprocessor strips them before OWL generation.**
 
 ## 8. Accepted Differences from Upstream Ontology
 
-The generated OWL output intentionally differs from upstream WoT ontologies in specific, documented ways. See [OWL Fix Rules](../owl-fix-rules.md) for the full list.
+The generated OWL output intentionally differs from upstream WoT ontologies in specific, documented ways. See [OWL differences](../differences/owl.md) for the full list.
 
 Key accepted differences:
 
 | Difference | Rationale |
 |------------|-----------|
-| `rdfs:label` uses JSON key, not URI local name | JSON key is the developer-facing identifier |
 | `owl:Class` only (no `rdfs:Class` dual-typing) | Valid OWL; dual-typing is redundant |
-| No `@en` language tag on `rdfs:comment` | LinkML gen-owl behavior; acceptable |
 | `rdfs:domain` for single-domain (upstream uses `schema:domainIncludes`) | Stronger but semantically correct for single-domain; multi-domain uses `schema:domainIncludes` (§6) |
 | `rdfs:range` instead of `schema:rangeIncludes` | Valid OWL; stronger but correct |
-| `rdfs:isDefinedBy` on all local subjects | Postprocessor adds automatically (§5a); matches upstream coverage |
-| `skos:definition` alongside `rdfs:comment` | Both present, content identical |
+| `rdfs:isDefinedBy` on all local subjects | `WotOwlGenerator` adds automatically (§5a) |
 
 **Rule: do not "fix" accepted differences. If a diff appears during OWL generation review, check the accepted differences list before filing it as a bug.**

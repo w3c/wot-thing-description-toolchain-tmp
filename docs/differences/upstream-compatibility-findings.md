@@ -113,9 +113,10 @@ omits it.
 Note: unlike `securityDefinitions` which uses `"@index": "hasInstanceConfiguration"`
 to give index keys a semantic property, `schemaDefinitions` uses plain
 `@container: @index` — the JSON object keys are opaque string indices with no
-RDF property mapping. The toolchain schema previously had an incorrect
-`jsonld_index: td:hasInstanceConfiguration` annotation on the `schemaDefinitions`
-slot, copied from `securityDefinitions`. This has been corrected.
+RDF property mapping. The toolchain schema carries neither form: the
+`securityDefinitions` and `schemaDefinitions` slots both have the annotation
+`jsonld_container: "@id"`, and no slot has a `jsonld_index:
+td:hasInstanceConfiguration` annotation.
 
 ### Evidence
 
@@ -129,8 +130,14 @@ slot, copied from `securityDefinitions`. This has been corrected.
 The toolchain generates `td:schemaDefinitions` as an ObjectProperty from the
 LinkML source. This is correct — the term is spec-defined and context-mapped.
 The upstream ontology omission should not cause the toolchain to suppress
-generation. The JSON-LD context must use plain `@container: @index` without
-an `@index` key, matching the upstream context.
+generation. The generated JSON-LD context departs from the upstream context
+here: it declares `schemaDefinitions` with `@container: @id`, so each
+definition is a node named by its key. With the base `http://example.org/td`,
+`{"schemaDefinitions":{"s1":{"type":"string"}}}` gives
+`td:schemaDefinitions <http://example.org/s1>` under the generated context and
+a blank node under the upstream context; without a base the generated context
+gives no triple for the definition. See "A schema definition is a node named
+by its key" in the [JSON-LD context note](jsonld-context.md).
 
 ## Data Schema `type` RDF representation
 
@@ -208,12 +215,8 @@ document itself (like `owl:versionInfo`), invisible to OWL reasoners. But
 
 ### Toolchain decision
 
-This toolchain declares `td:hasVersionInfo` as an `owl:ObjectProperty` with
-`schema:rangeIncludes td:VersionInfo`. The rename from `versionInfo` to
-`hasVersionInfo` follows the established WoT naming convention for object
-properties (`hasForm`, `hasLink`, `hasInputSchema`, etc.) and avoids a
-case-only collision between `td:versionInfo` (property) and `td:VersionInfo`
-(class).
+This toolchain declares `td:versionInfo` as an `owl:ObjectProperty` with
+`rdfs:domain td:Thing` and `rdfs:range td:VersionInfo`.
 
 ## TD `VersionInfo` — phantom class in context
 
@@ -303,8 +306,8 @@ though `instance` and `model` are clearly string-valued.
 
 ### Toolchain decision
 
-This toolchain sets `schema:domainIncludes td:VersionInfo` (the class, not the
-property) and adds `schema:rangeIncludes schema:Text` to both properties.
+This toolchain sets `rdfs:domain td:VersionInfo` (the class, not the
+property) and `rdfs:range xsd:string` on both properties.
 
 ## TM ontology — design issues and scope reduction
 
@@ -348,7 +351,7 @@ The other td: properties could legitimately add soft
 consequences), but even this is unnecessary documentation — TM reusing TD
 properties is obvious from the spec and context.
 
-### Finding: tm:Version, tm:instance, tm:model belong in td:
+### Finding: tm:Version and tm:model belong in td:
 
 The upstream TM ontology defines `tm:Version` as a class and declares
 `tm:hasVersion` as an ObjectProperty linking ThingModel to Version.
@@ -384,13 +387,14 @@ which legitimately references `schema:contactPoint`.
 ### Finding: external annotation property boilerplate
 
 The upstream tm.ttl includes declarations for 10 external annotation properties
-(`dcterms:title`, `dcterms:description`, `rdfs:label`, `vann:preferredNamespacePrefix`,
+(`dc:title`, `dcterms:description`, `dcterms:license`, `vann:preferredNamespacePrefix`,
 etc.). No other WoT module ontology does this. These terms are defined by their
 respective vocabularies and do not need re-declaration.
 
 ### Toolchain decision
 
-The TM module (`tm.ttl`) in this toolchain contains only TM-specific terms:
+The TM module (`tm.ttl`) in this toolchain declares four terms in the `tm:`
+namespace:
 
 | Term | Type | Purpose |
 |------|------|---------|
@@ -398,17 +402,15 @@ The TM module (`tm.ttl`) in this toolchain contains only TM-specific terms:
 | `tm:optional` | DatatypeProperty | JSON Pointer refs to optional interaction affordances |
 | `tm:required` | DatatypeProperty | JSON Pointer refs to mandatory interaction affordances |
 | `tm:ref` | DatatypeProperty | Reference to external/local definition (URI + JSON Pointer) |
-| `tm:versionInfo` | AnnotationProperty | Ontology-level version metadata (like `owl:versionInfo`) |
 
 **Removed from TM, placed in TD:**
 - `tm:Version` → `td:VersionInfo` (class, shared by both TD and TM)
-- `tm:hasVersion` → `td:hasVersionInfo` (ObjectProperty, links Thing → VersionInfo)
-- `tm:instance` → `td:instance` (DatatypeProperty, already in upstream td.ttl)
+- `tm:hasVersion` → `td:versionInfo` (ObjectProperty, links Thing → VersionInfo)
 - `tm:model` → `td:model` (DatatypeProperty, already in upstream td.ttl)
 
 **Removed entirely (not generated):**
 - td: property re-declarations (redundant, one uses harmful hard `rdfs:domain`)
-- External annotation property boilerplate (no other WoT module does this)
+- `tm:versionInfo` (AnnotationProperty in the tm.ttl served at `https://www.w3.org/2019/wot/tm`)
 - `tm:ref rdfs:seeAlso schema:contactPoint` (copy-paste error)
 
 ## TD `uriVariables` — phantom IRI in security scoped context
@@ -473,10 +475,9 @@ ontology:
 "model":    { "@id": "td:model" }
 ```
 
-Without `@type: xsd:string`, `model` values expand to plain literals (no
-datatype IRI) instead of `xsd:string`-typed literals. This is asymmetric —
-two sibling properties of the same class, both string-valued, treated
-differently in RDF expansion.
+In expanded JSON-LD, `instance` values carry `@type: xsd:string` and `model`
+values carry no `@type`. In RDF both are the same `xsd:string` literal, so the
+asymmetry does not change the triples.
 
 ### Evidence
 
@@ -487,9 +488,10 @@ differently in RDF expansion.
 
 The toolchain should match upstream context behavior for compatibility. Both
 properties can be declared as string-ranged in the LinkML schema (and the OWL
-output includes `schema:rangeIncludes schema:Text` for both), but the
+output includes `rdfs:range xsd:string` for both), but the
 generated context should replicate the upstream asymmetry until the Working
-Group decides to fix it.
+Group decides to fix it. The generated context currently gives neither term an
+`@type`.
 
 ## TD `hasSecurityConfiguration` — self-contradictory type mapping across scopes
 
@@ -534,11 +536,15 @@ nesting depths.
 
 ### Effect on this toolchain
 
-The toolchain must replicate the upstream context behavior for TD compatibility
-(top-level `xsd:string`, forms-scoped `@id`). The OWL generator correctly
-emits ObjectProperty. This is a known upstream wart that the Working Group
-should resolve, but the toolchain cannot unilaterally change the context
-mapping.
+The generated context does not replicate the upstream asymmetry: `security`
+has `@type: @id` at the top level and in the forms and links scopes, so
+`"security":"basic_sc"` gives `td:hasSecurityConfiguration
+<http://example.org/basic_sc>` at every level with the base
+`http://example.org/td`, where the upstream context gives the literal
+`"basic_sc"` at the top level. The generated ontology declares
+`td:hasSecurityConfiguration` as an ObjectProperty with
+`rdfs:range wotsec:SecurityScheme`. See "Security references and combination
+members" in the [JSON-LD context note](jsonld-context.md).
 
 ## TD ontology minor upstream issues
 
@@ -563,11 +569,12 @@ The trailing `#` makes these technically different IRIs.
 
 ### OperationType comment copy-paste errors
 
-Four OperationType instances have incorrect `rdfs:comment` values copied from
+Five OperationType instances have `rdfs:comment` values copied from
 `readProperty`:
 
 | Instance | Comment says | Should say |
 |----------|-------------|------------|
+| `td:readMultipleProperties` | "read a property value" | read multiple property values |
 | `td:invokeAction` | "read a property value" | invoke an action |
 | `td:subscribeEvent` | "read a property value" | subscribe to event |
 | `td:unsubscribeEvent` | "read a property value" | unsubscribe from event |
@@ -594,11 +601,7 @@ audit. They are not upstream inconsistencies.
   `events`). Added as a base slot with `slot_uri: jsonschema:propertyName`.
 - `td:OperationType`, `td:hasInstanceConfiguration`, and
   `td:hasInteractionAffordance` are established TD 1.1 ontology terms. The
-  LinkML model needs explicit ontology mappings for them. In particular,
-  `OperationType` must retain its TD class and named operation values, and
-  `hasInteractionAffordance` must remain the parent of the property, action,
-  and event affordance predicates.
-
-These items should be addressed after the scoped JSON-LD context mapping is
-covered by tests. They must not be omitted merely because an existing
-generator does not currently emit them.
+  generated `td.ttl` declares all three: `td:OperationType` is a class with 18
+  named operation values, and `td:hasInteractionAffordance` is the parent of
+  `td:hasPropertyAffordance`, `td:hasActionAffordance` and
+  `td:hasEventAffordance`.

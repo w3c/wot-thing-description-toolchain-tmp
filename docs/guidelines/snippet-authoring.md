@@ -1,13 +1,9 @@
 # Snippet Authoring Guide
 
-**Author:** Mahda Noura (mahda.noura@siemens.com)
-**Date:** 29.10.2026
-
----
-
 Worked examples for authoring TD/TM JSON snippets rendered in the generated specification.
+Where snippets fit in a schema change is shown in the [authoring guide](../authoring-guide.md).
 
-For schema validation, see `resources/schemas/snippet_schema.yaml`.
+For the schema of `_snippets.yaml`, see `resources/schemas/snippet_schema.yaml`.
 
 ---
 
@@ -16,14 +12,14 @@ For schema validation, see `resources/schemas/snippet_schema.yaml`.
 **Rule: snippet file names use kebab-case matching the logical topic.**
 
 ```
-action-serialization.json     # good — topic is clear
+action-serialization.json     # good: topic is clear
 simple-td.json                # good
-myThing_example.json          # wrong — not kebab-case
+myThing_example.json          # wrong: not kebab-case
 ```
 
 **Rule: `id` in `_snippets.yaml` must be globally unique and use the pattern `{topic}-{qualifier}`.**
 
-Rationale: the `id` becomes the HTML element ID used for cross-referencing with `[[[#id]]]` in the spec. Collisions break ReSpec anchors. Before assigning an `id`, check that it does not conflict with an existing `id` already defined in `resources/index.template.html` — the template contains hand-authored section and element IDs that share the same HTML ID namespace.
+Rationale: the `id` becomes the HTML element ID used for cross-referencing with `[[[#id]]]` in the spec. Neither generation nor the tests detect a collision; the generated page then contains two elements with the same ID. Before assigning an `id`, check that it does not conflict with an existing `id` already defined in `resources/index.template.html`. The template contains hand-authored section and element IDs that share the same HTML ID namespace.
 
 ```yaml
 action-serialization:
@@ -38,33 +34,31 @@ Each snippet is registered in `_snippets.yaml`. The following fields are availab
 
 | Field | Required | Default | Description |
 |-------|----------|---------|-------------|
-| `id` | for `aside` layout | — | HTML element ID for cross-referencing with `[[[#id]]]` |
-| `title` | no | — | Example title displayed in the spec |
+| `id` | for `aside` layout | none | HTML element ID for cross-referencing with `[[[#id]]]` |
+| `title` | no | none | Example title displayed in the spec |
 | `layout` | no | `aside` | `aside` (wrapped in `<aside class="example">`) or `pre` (`<pre class="example json">`) |
 | `validate` | no | `true` | Whether to validate against TD/TM JSON Schema |
 | `schema` | no | top-level `default_schema` | Snippet kind to validate against: a key of `generators.spec.snippet_validation_schemas` in `wot-toolchain.yaml` (`tm` for Thing Model snippets) |
-| `default_schema` | when a validated snippet has no `schema` | — | **Top-level key** of `_snippets.yaml`, not a snippet field: the snippet kind for every snippet without its own `schema` (`td`) |
-| `hide_paths` | no | — | Dot-notation paths to hide (replaced with `// ...`) |
-| `show_paths` | no | — | Dot-notation paths to show (everything else becomes `// ...`) |
-
-`hide_paths` and `show_paths` are mutually exclusive.
+| `default_schema` | when a validated snippet has no `schema` | none | **Top-level key** of `_snippets.yaml`, not a snippet field: the snippet kind for every snippet without its own `schema` (`td`) |
+| `hide_paths` | no | none | Dot-notation paths to hide (replaced with `// ...`) |
+| `show_paths` | no | none | Dot-notation paths to show (everything else becomes `// ...`) |
 
 ### Path Notation
 
 Paths use dot-separated keys to target nested JSON properties:
 
-- Top-level: `securityDefinitions`, `@context`, `id`
+- Top-level: `securityDefinitions`, `id`, `'@context'` (quote keys that start with `@`)
 - Nested: `properties.temperature.forms`, `properties.lampState.type`
 - Wildcard: `properties.*.forms` (matches any property name)
 
 **Collapse vs hide:**
 
-- `properties.*.forms` — entire `"forms"` key hidden (removed from output)
-- `properties.*.forms.*` — `"forms": [// ...]` (key visible, contents collapsed)
+- `properties.*.forms`: entire `"forms"` key replaced by a `// ...` line
+- `properties.*.forms.*`: `"forms": [// ...]` (key visible, contents collapsed)
 
 ### Schema Validation
 
-The snippet schema is defined in `resources/schemas/snippet_schema.yaml`. Validate with:
+Validate `_snippets.yaml` against its schema with:
 
 ```bash
 uv run pytest tests/test_snippet_schema.py -v
@@ -76,7 +70,7 @@ uv run pytest tests/test_snippet_schema.py -v
 
 A minimal snippet with default settings.
 
-**Step 1 — Create the JSON file** (`resources/snippets/simple-td.json`):
+**Step 1: Create the JSON file** (`resources/snippets/simple-td.json`):
 
 ```json
 {
@@ -96,7 +90,7 @@ A minimal snippet with default settings.
 }
 ```
 
-**Step 2 — Register in `_snippets.yaml`**:
+**Step 2: Register in `_snippets.yaml`**:
 
 ```yaml
 snippets:
@@ -107,13 +101,13 @@ snippets:
 
 With no `hide_paths`, `show_paths`, or `layout` override, the snippet renders in full inside an `<aside class="example">` block with the given title.
 
-**Step 3 — Add the template directive** in `resources/index.template.html`:
+**Step 3: Add the template directive** in `resources/index.template.html`:
 
 ```
 %snippet('simple-td')%
 ```
 
-**Rendered output:** a titled example block containing the full syntax-highlighted JSON.
+**Rendered output:** a titled example block containing the full JSON.
 
 ---
 
@@ -149,25 +143,29 @@ snippets:
             "input": {
                 "type": "object",
                 "properties": {
-                    "from": { "type": "integer", "minimum": 0, "maximum": 100 },
-                    "to": { "type": "integer", "minimum": 0, "maximum": 100 },
+                    "from": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100
+                    },
+                    "to": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100
+                    },
                     "duration": { "type": "number" }
                 },
-                "required": ["to", "duration"]
+                "required": [
+                    "to",
+                    "duration"
+                ]
             },
             "output": { "type": "string" },
-            "forms": [
-                // ...
-            ]
+            "forms": [// ...]
         }
     }
 }
 ```
-
-**Path notation:**
-- `@context` — top-level key (quote `@` keys)
-- `actions.*.forms.*` — wildcard matches any key at that level. Hides all `forms` entries inside all actions.
-- `properties.*.forms.*` — same pattern for property forms
 
 ---
 
@@ -187,15 +185,15 @@ snippets:
     - properties.lampState.properties
 ```
 
-**Effect:** only `properties.lampState.type` and `properties.lampState.properties` are shown in full. Everything else (context, security, forms, other properties) is replaced with `// ...`.
+**Effect:** only `properties.lampState.type` and `properties.lampState.properties` are shown in full. Everything else (context, security, forms) is replaced with `// ...`.
 
-**Rule: `hide_paths` and `show_paths` are mutually exclusive.** Setting both causes undefined behavior.
+**Rule: `hide_paths` and `show_paths` are mutually exclusive.** If both are set, generation applies `hide_paths`, ignores `show_paths`, and `tests/test_snippet_schema.py` fails.
 
 ---
 
 ## 6. Worked Example: Snippet Group (Toggle)
 
-Groups combine two related snippets into a single rendered block with a toggle. The `with-default` layout shows a compact version by default with a toggle to reveal the expanded version.
+Groups combine two related snippets into a single rendered block with a toggle. The `with-default` layout shows the expanded version when the page loads, with a checkbox labelled `toggle_label`; clearing it shows the compact version.
 
 **Metadata:**
 
@@ -211,7 +209,7 @@ groups:
 
 Both `coap-binding-compact` and `coap-binding-expanded` must exist as entries in the `snippets:` section (they can have `validate: false` if they are partial examples).
 
-**Template directive** — same syntax as individual snippets:
+**Template directive**: same syntax as individual snippets:
 
 ```
 %snippet('coap-binding')%
@@ -245,13 +243,13 @@ Renders as a tabbed interface with one tab per snippet. `selected: true` marks t
 
 **Rule: set `validate: false` only for partial, non-TD/TM, or placeholder-containing snippets.**
 
-Rationale: by default, all snippets are validated against the generated TD/TM JSON Schema. Partial examples (e.g., protocol binding fragments, context expansion examples) fail validation because they are not complete TDs.
+Rationale: by default, every snippet registered in `_snippets.yaml` is validated during `uv run wot-toolchain generate-wot-resources` against the JSON Schema that `generators.spec.snippet_validation_schemas` in `wot-toolchain.yaml` lists for its kind (`td` or `tm`, chosen by `schema` or `default_schema`). These are the static files under `resources/upstream/schemas/`, not the JSON Schema generated from the LinkML model. A violation fails generation. Partial examples (e.g., protocol binding fragments, context expansion examples) fail validation because they are not complete TDs. With `validate: false` the snippet is not validated at all and is still rendered.
 
 ```yaml
 snippets:
-  coap-binding-compact:
+  context-expansion-compact:
     validate: false
-  coap-binding-expanded:
+  context-expansion-expanded:
     validate: false
 ```
 
@@ -259,24 +257,13 @@ snippets:
 
 ## 8. Common Patterns
 
-**Hiding security boilerplate:** most snippets hide `@context`, `id`, `title`, `securityDefinitions`, and `security` to focus on the relevant affordance structure. Copy this standard set:
-
-```yaml
-hide_paths:
-- '@context'
-- id
-- title
-- securityDefinitions
-- security
-```
-
-**Layout `pre` vs `aside` (default):** use `layout: pre` for full TD/TM examples that should render as a standalone `<pre>` block rather than inside an `<aside class="example">` wrapper. Typically used for complete Thing Model or Thing Description examples referenced by `[[[#id]]]`.
+**Layout `pre` vs `aside` (default):** use `layout: pre` for full TD/TM examples that should render as a standalone `<pre>` block rather than inside an `<aside class="example">` wrapper.
 
 ---
 
 ## 9. Pitfalls
 
-- **Forgetting to register in `_snippets.yaml`** — a `%snippet('name')%` placeholder for an unregistered snippet fails generation with `GenerationError: Snippet 'name' not found in _snippets.yaml`. A JSON file that is neither registered nor referenced is silently ignored and never validated.
-- **Mismatched snippet name** — the key in `_snippets.yaml` must match the filename without `.json`. `simple-td.json` → key is `simple-td`.
-- **Non-existent `hide_paths` entry** — a path that does not match anything in the JSON is silently ignored. Verify after generation.
-- **Stale group references** — if a group references a snippet key that does not exist, generation fails with a `GenerationError` naming the missing key.
+- **Forgetting to register in `_snippets.yaml`**: a `%snippet('name')%` placeholder for an unregistered snippet fails generation with `ERROR: Snippet 'name' not found in _snippets.yaml`. A JSON file that is neither registered nor referenced is silently ignored and never validated.
+- **Mismatched snippet name**: the key in `_snippets.yaml` must match the filename without `.json`. `simple-td.json` → key is `simple-td`.
+- **Non-existent `hide_paths` entry**: a path that does not match anything in the JSON is silently ignored. Verify after generation.
+- **Stale group references**: if a group references a snippet key that does not exist, generation fails with `ERROR: Snippet 'name' not found in _snippets.yaml`, or with a `FileNotFoundError` traceback for `name.json` if that file does not exist either.

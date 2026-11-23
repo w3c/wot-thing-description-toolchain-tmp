@@ -1,13 +1,8 @@
 # LinkML Cheatsheet
 
-**Author:** Mahda Noura (mahda.noura@siemens.com)
-**Date:** 29.10.2026
-
----
-
-Quick reference for LinkML features used in WoT schemas. 
+Quick reference for LinkML features used in WoT schemas.
 For detailed LinkML documentation, see [LinkML docs](https://linkml.io/linkml/).
-For detailed WoT LinkML conventions, see [docs/guidelines/](guidelines/index.md).
+For detailed WoT LinkML conventions, see [docs/guidelines/](../guidelines/index.md).
 
 ---
 
@@ -24,7 +19,7 @@ For detailed WoT LinkML conventions, see [docs/guidelines/](guidelines/index.md)
 | `prefixes` / `default_prefix` | Namespace declarations | RDF/OWL only — no JSON Schema effect |
 | `default_range` | Fallback `range` when none set | avoid relying on this — always set `range` explicitly |
 
-Use `attributes` when a slot belongs to exactly one class. Use `slots` when shared. See [naming conventions §9](guidelines/linkml-naming-conventions.md#9-slot-definitions-top-level-vs-class-level).
+Use `attributes` when a slot belongs to exactly one class. Use `slots` when shared. See [naming conventions §9](linkml-naming-conventions.md#9-slot-definitions-top-level-vs-class-level).
 
 ---
 
@@ -34,9 +29,8 @@ Use `attributes` when a slot belongs to exactly one class. Use `slots` when shar
 |---|---|---|
 | `is_a` | Single inheritance | parent properties merged into subclass |
 | `mixins` | Inject slots from mixin class(es) | mixin properties merged in |
-| `mixin: true` | Mark class as mixin (not standalone) | no `$defs` entry emitted |
-| `abstract: true` | Base class only — cannot appear as instance in data | class may or may not appear in `$defs` depending on postprocessors (e.g., `InteractionAffordance` is removed by `jsonschema_flatten_subclasses`) |
-| `tree_root: true` | Entry point for JSON Schema validation | becomes root schema object — only `Thing` has this |
+| `abstract: true` | Base class only — cannot appear as instance in data | no effect by itself; the postprocessor removes definitions that nothing references (e.g., `InteractionAffordance`) |
+| `tree_root: true` | Entry point for JSON Schema validation | becomes root schema object — `Thing` is the only vocabulary class with this |
 | `slot_usage` | Override slot constraints per-class | overrides property constraints in that class's `$defs` entry |
 | `extra_slots: allowed: true` | Allow unknown properties | `additionalProperties: true` |
 | `class_uri` | RDF class IRI (e.g., `td:Thing`) | no JSON Schema effect — required for OWL/SHACL |
@@ -79,7 +73,7 @@ The combination of `inlined`, `multivalued`, and `identifier` determines the JSO
 Example: `properties` slot → dict because `PropertyAffordance` has `name` with `identifier: true`.
 Example: `forms` slot → array because `Form` has no identifier slot.
 
-Full details with generated JSON Schema output: [naming conventions §10](guidelines/linkml-naming-conventions.md#10-inlined-true--embedding-vs-map-vs-array).
+Full details with generated JSON Schema output: [naming conventions §10](linkml-naming-conventions.md#10-inlined-true--embedding-vs-map-vs-array).
 
 ---
 
@@ -117,7 +111,7 @@ rules:
 | `description` on a value | Appears in generated HTML enum tables |
 | `comments` on a value | Internal metadata; extractable via `comment:<prefix>` in `enum_table` content blocks |
 
-Permissible value keys must match the W3C spec exactly (typically lowercase). See [naming conventions §3](guidelines/linkml-naming-conventions.md#3-enum-naming).
+Permissible value keys must match the W3C spec exactly (typically lowercase). See [naming conventions §3](linkml-naming-conventions.md#3-enum-naming).
 
 ---
 
@@ -125,13 +119,13 @@ Permissible value keys must match the W3C spec exactly (typically lowercase). Se
 
 | Keyword | Where it matters |
 |---|---|
-| `description` | Spec tables, OWL `rdfs:comment`, SHACL — plain text only |
+| `description` | Spec tables, OWL `skos:definition`, SHACL — plain text only |
 | `spec_description` | Spec tables only — supports `[[RFC####]]`, backticks, term links |
 | `comments` | Internal notes (e.g., cardinality reminders) |
 | `todos` | Unresolved questions — greppable |
 | `see_also` | Related IRIs — discoverability for maintainers |
 | `deprecated` | Marks obsolete terms |
 
-`description` and `spec_description` must stay in sync (same meaning, different markup). See [naming conventions §7](guidelines/linkml-naming-conventions.md#7-description-and-spec_description-sync).
+`description` and `spec_description` must stay in sync (same meaning, different markup). See [naming conventions §7](linkml-naming-conventions.md#7-description-and-spec_description-sync).
 
-For the full annotation API (`spec_content`, `spec_subsections`, `jsonschema_*`, etc.), see [custom annotations](guidelines/wot-custom-annotations.md).
+For the full annotation API (`spec_content`, `spec_subsections`, `jsonschema_*`, etc.), see [custom annotations](wot-custom-annotations.md).
