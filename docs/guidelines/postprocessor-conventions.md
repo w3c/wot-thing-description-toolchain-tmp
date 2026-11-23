@@ -1,171 +1,141 @@
 # Postprocessor Conventions
 
-**Author:** Mahda Noura (mahda.noura@siemens.com)
-**Date:** 29.10.2026
+Conventions for the code in [`src/wot_toolchain/artifacts/`](../../src/wot_toolchain/artifacts/) that adjusts the output of the LinkML generators until it meets the WoT Thing Description requirements.
 
----
+[LinkML gaps](../linkml-gaps.md) lists the LinkML limitations that this code works around.
 
-Conventions for writing and maintaining postprocessors — the Python functions in [`src/wot_toolchain/postprocessors/`](../../src/wot_toolchain/postprocessors/) that transform raw LinkML generator output into spec-compliant artifacts.
+## 1. When to write a workaround
 
-For the catalog of known LinkML limitations that motivate postprocessors, see [Known LinkML Gaps](../known-linkml-gaps.md).
+**Rule: use a native LinkML feature when one exists.**
 
----
+A workaround is code this project must maintain and must remove when LinkML closes the gap.
 
-## 1. When to Write a Postprocessor
+1. LinkML can express the requirement (`exactly_one_of`, `rules`, `minimum_value`, `inlined`, ...): use the native feature.
+2. [LinkML gaps](../linkml-gaps.md) already describes the gap and its workaround: extend that workaround.
+3. Otherwise: write a new workaround and describe the gap in [LinkML gaps](../linkml-gaps.md).
 
-**Rule: exhaust native LinkML features first.**
+Before you conclude that LinkML cannot express a requirement, run the generator on a small schema and inspect its output.
 
-Rationale: a postprocessor is maintenance burden. Native LinkML features are upstream-maintained, tested, and documented. A postprocessor is a workaround that must be removed when the upstream gap is closed.
+## 2. Where a workaround lives
 
-Decision sequence:
+**Rule: a workaround has one home. Choose the first that applies.**
 
-1. Can LinkML express this natively? (`exactly_one_of`, `rules`, `minimum_value`, `inlined`, etc.) → Use native feature.
-2. Is the gap already in [Known LinkML Gaps](../known-linkml-gaps.md) with an existing workaround? → Use the existing postprocessor path.
-3. Neither? → Write a new postprocessor function **and** add the gap to `KNOWN_LINKML_GAPS.md`.
+1. **Schema.** The fact is modeling (a type, a cardinality, an enumeration, a description). Fix it in `resources/schemas/`.
+2. **Generator subclass.** The LinkML generator emits the wrong thing and offers a method to override. Fix it where the output is emitted.
+3. **Pass.** The generated artifact needs a transformation that the generator cannot produce. See [§4](#4-passes).
+4. **Serializer.** Ordering and formatting only.
 
-**Rule: never write a postprocessor for something LinkML supports natively.**
+## 3. File organization
 
-If you suspect LinkML cannot express a requirement, verify by testing with the generator first. Assumptions about generator limitations are frequently wrong.
+One package per artifact:
 
----
+| Package | Artifact |
+|---------|----------|
+| `artifacts/jsonschema/` | JSON Schema |
+| `artifacts/jsonld_context/` | JSON-LD context |
+| `artifacts/owl/` | OWL ontologies |
+| `artifacts/shacl/` | SHACL shapes |
 
-## 2. File Organization
+Each package has the same parts:
 
-**Rule: one postprocessor module per artifact type.**
+| Part | Content |
+|------|---------|
+| `generator.py` | Subclass of the LinkML generator: `WotJsonSchemaGenerator`, `WotContextGenerator`, `WotOwlGenerator`, `WotShaclGenerator` |
+| `options.py` | Typed options of that subclass |
+| Pass tuple | The ordered passes of the artifact (table below) |
+| `postprocess.py` | Entry point that runs the passes |
 
-| Module | Artifact |
-|--------|----------|
-| `jsonschema_postprocessor.py` | JSON Schema |
-| `jsonld_context_postprocessor.py` | JSON-LD Context |
-| `shacl_postprocessor.py` | SHACL Shapes |
+| Artifact | Pass tuple | Entry point |
+|----------|------------|-------------|
+| JSON Schema | `JSONSCHEMA_PASSES` in `jsonschema/postprocess.py` | `post_process_jsonschema` |
+| JSON-LD context | `PRE_SCOPING_PASSES`, `POST_SCOPING_PASSES` in `jsonld_context/passes.py` | `post_process_jsonld_context` |
+| OWL | `OWL_PRE_PASSES` in `owl/pre_passes.py` (before generation) | `preprocess_for_gen_owl` |
+| OWL | `OWL_PASSES` in `owl/passes.py` (after generation) | `postprocess_owl` |
+| SHACL | `SHACL_PASSES` in `shacl/passes.py` | `post_process_shacl` |
 
-**Rule: add new transform functions to the existing module. Do not create new files.**
+## 4. Passes
 
-Rationale: the generation pipeline calls one entry point per artifact. Splitting logic across files creates import complexity with no benefit.
-
-**Rule: each module has one public entry point at the bottom.**
-
-```python
-def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
-    schema = copy.deepcopy(raw_schema)
-    config = _read_annotations(schema_view)
-    _flatten_subclasses(schema, schema_view, config)
-    _build_oneof_dispatch(schema, schema_view, config)
-    # ... each transform in sequence ...
-    return schema
-```
-
-New transforms are added as private functions and called from the entry point in the correct order.
-
----
-
-## 3. Naming Conventions
-
-**Rule: private transform functions use `_verb_noun` naming.**
-
-The function name describes what the transform does, not the bug it fixes or the spec requirement it satisfies.
+[`artifacts/passes.py`](../../src/wot_toolchain/artifacts/passes.py) defines the contract:
 
 ```python
-_flatten_subclasses()          # good — describes the transformation
-_build_oneof_dispatch()        # good
-_fix_issue_47()                # wrong — names the ticket, not the action
-_workaround_linkml_bug()       # wrong — too vague
+class PassKind(StrEnum):
+    UPSTREAM_BUG = auto()
+    UPSTREAM_GAP = auto()
+    WOT_SHAPING = auto()
+    COSMETIC = auto()
+
+
+@dataclass(frozen=True, slots=True)
+class Pass:
+    name: str
+    kind: PassKind
+    reason: str
+    apply: Callable[..., None]
 ```
 
-**Rule: dataclass configs for annotation-driven transforms use `PascalCase` + `Config` suffix.**
+| Kind | Use it when |
+|------|-------------|
+| `UPSTREAM_BUG` | The LinkML generator emits incorrect output. |
+| `UPSTREAM_GAP` | LinkML has no way to express the requirement. |
+| `WOT_SHAPING` | The output is correct LinkML output but the TD specification requires a different form. |
+| `COSMETIC` | The change removes or tidies content without changing what the artifact means. |
+
+- A pass changes the artifact in place and returns nothing.
+- `reason` states why the pass is needed. A blank `name` or `reason` raises `ValueError`.
+- `run_passes(passes, *args)` applies the passes in tuple order and passes `*args` to each one.
+
+**Rule: add a pass to the tuple of its artifact, at the position where its input is ready.**
+
+**Rule: when a pass depends on the position of another pass, pin the order in a test.** The tests `tests/test_artifacts_<artifact>_passes.py` assert the order of each tuple.
+
+**Failure policy:**
+
+- A pass that cannot do its job raises a `WotToolchainError` subclass (`GenerationError`, `SchemaError`) with a message that names the problem. `run_passes` re-raises it unchanged.
+- `run_passes` wraps any other exception in a `GenerationError` that names the pass.
+- A pass that finds nothing to change returns without error.
+
+## 5. Naming
+
+**Rule: name a pass and its function after the transformation, in `verb_noun` form.**
 
 ```python
-@dataclass
-class OneOfDispatchConfig:
-    class_name: str
-    discriminator: str
-    include_unknown: bool
-
-@dataclass
-class FormVariantsConfig:
-    class_name: str
-    op_slot: str
-    variants: dict[str, list[str]]
+flatten_subclasses       # good: describes the transformation
+build_oneof_dispatch     # good
+fix_issue_47             # wrong: names the ticket
+workaround_linkml_bug    # wrong: says nothing about the transformation
 ```
 
----
+## 6. Annotation-driven passes
 
-## 4. Annotation-Driven Pattern
+**Rule: read class and slot names from schema annotations or from `SchemaView`. Do not write them into a pass.**
 
-**Rule: prefer reading transform configuration from schema annotations over hardcoding class names.**
+A pass with a class name written into it breaks when the class is renamed and cannot serve a second class.
 
-Rationale: annotation-driven transforms decouple postprocessor logic from specific schema content. Adding a new `jsonschema_flatten_subclasses` annotation to a class automatically triggers flattening without changing Python code.
+The JSON Schema passes are configured by five schema annotations: `jsonschema_flatten_subclasses`, `jsonschema_oneof_dispatch`, `jsonschema_enum_subset_partition`, `jsonschema_form_subset` and `jsonschema_exclude`. `read_annotations` in [`artifacts/jsonschema/annotations.py`](../../src/wot_toolchain/artifacts/jsonschema/annotations.py) reads them into a `TransformConfig`, which every JSON Schema pass receives. [WoT custom annotations](../reference/wot-custom-annotations.md) describes each annotation.
 
-```python
-def _read_annotations(sv: SchemaView) -> TransformConfig:
-    flatten_parents = []
-    for cls in sv.all_classes():
-        val = _get_annotation_value(cls, "jsonschema_flatten_subclasses")
-        if val:
-            flatten_parents.append(cls.name)
-    # ... read other annotations ...
-    return TransformConfig(flatten_subclass_parents=flatten_parents, ...)
-```
+## 7. Documentation
 
-**Anti-pattern:** hardcoding class names in the transform function.
+**Rule: the `reason` of a pass states the TD requirement it serves or the LinkML limitation that forces it.**
 
-```python
-# Wrong — breaks if the class is renamed or a second class needs flattening
-def _flatten_subclasses(schema):
-    ds = schema["$defs"]["DataSchema"]  # hardcoded
-    ...
-```
+**Rule: describe every LinkML limitation in [LinkML gaps](../linkml-gaps.md),** with the symptom and the workaround, in the section of the affected artifact.
 
----
+## 8. Testing
 
-## 5. Documentation Requirements
+**Rule: a change to a generator subclass or a pass is checked against the golden files.**
 
-**Rule: every postprocessor function must document (a) the W3C requirement it satisfies and (b) the LinkML gap that forces the workaround.**
-
-Rationale: when the upstream gap is closed, maintainers need to know which postprocessor functions can be removed and which spec requirements they served.
-
-A one-line comment before the function is sufficient:
-
-```python
-# W3C TD spec requires flat DataSchema; LinkML generates separate subclass $defs (gap #3).
-def _flatten_subclasses(schema: dict, sv: SchemaView, config: TransformConfig) -> None:
-    ...
-```
-
-**Rule: add a `TODO: remove when LinkML #NNNN is merged` comment when an upstream fix is expected.**
-
-**Rule: add the gap to [Known LinkML Gaps](../known-linkml-gaps.md) with symptom, affected artifact, workaround, and issue link.**
-
----
-
-## 6. Testing
-
-**Rule: postprocessor output is validated through golden file comparison.**
-
-The test suite (`tests/test_golden_diff.py`) compares full generated output — including postprocessor transforms — against snapshots. After modifying a postprocessor:
+`tests/test_golden_diff.py` compares the generated artifacts in `resources/gens/` with the snapshots in `tests/snapshots/`.
 
 1. Regenerate: `uv run wot-toolchain generate-wot-resources`
-2. Review the diff in `resources/gens/`
-3. Update goldens: `uv run pytest tests/test_golden_diff.py --update-goldens`
-4. Run full suite: `uv run pytest tests/ -v`
+2. Run the suite: `uv run pytest`
+3. If a golden test fails, review the difference. Update the snapshots only when the new output is the intended output: `uv run pytest tests/test_golden_diff.py --update-goldens`
 
-**Rule: the entry point function must be pure — `deepcopy` the input, return a new dict.**
+**Rule: a workaround for a defect in LinkML gets a canary test.** A canary in `tests/test_upstream_canaries.py` asserts the defective LinkML behaviour. It fails when LinkML changes that behaviour, which is the signal to remove the workaround. Name the canary in the [LinkML gaps](../linkml-gaps.md) entry.
 
-Rationale: the pipeline may use the raw schema for other generators. Mutating the input causes cross-artifact contamination.
+**Rule: `post_process_jsonschema` does not modify its input.** It copies the raw schema and returns the copy.
 
-```python
-def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
-    schema = copy.deepcopy(raw_schema)  # always copy
-    ...
-    return schema
-```
+## 9. Anti-patterns
 
----
-
-## 7. Anti-Patterns
-
-- **Hardcoded class or slot names** — use annotations or `SchemaView` queries instead.
-- **Editing `resources/gens/` directly** — postprocessors run in the pipeline, not as manual patches.
-- **Postprocessor for a native LinkML feature** — if `exactly_one_of`, `rules`, or `minimum_value` can express it, use the native construct.
-- **No `KNOWN_LINKML_GAPS.md` entry** — every postprocessor must trace back to a documented gap. Undocumented workarounds accumulate silently and never get removed.
-- **Mutating the input schema** — always `deepcopy` first.
+- **A class or slot name written into a pass.** Use annotations or `SchemaView` queries.
+- **A pass for something LinkML expresses natively.**
+- **A modeling fix in a pass.** Fix the schema.
+- **A workaround without an entry in [LinkML gaps](../linkml-gaps.md).**

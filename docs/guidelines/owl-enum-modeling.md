@@ -1,11 +1,6 @@
 # OWL Enum Modeling
 
-**Author:** Mahda Noura (mahda.noura@siemens.com)
-**Date:** 22.11.2026
-
----
-
-How LinkML enums appear in the generated OWL ontologies (`resources/gens/owl/*.ttl`). Cross-references: [OWL/RDF Modeling](owl-rdf-modeling.md) §7, [OWL Accepted Differences](owl-accepted-differences.md).
+How LinkML enums appear in the generated OWL ontologies (`resources/gens/owl/*.ttl`). Cross-references: [OWL/RDF Modeling](../maintainers/owl-rdf-modeling.md) §7, [OWL differences](../differences/owl.md).
 
 ## 1. Published Shape
 
@@ -16,7 +11,7 @@ How LinkML enums appear in the generated OWL ontologies (`resources/gens/owl/*.t
 | Permissible value with `meaning` | IRI = `meaning`; `a <Enum>`, `rdfs:label` (the value text), `skos:definition`, `rdfs:isDefinedBy <ontology>` (own namespace only) |
 | Permissible value without `meaning` | nothing |
 
-`rdfs:subClassOf schema:Enumeration` is not added by code. It comes from the schema annotation on `OperationType` (`resources/schemas/hypermedia.yaml:124-126`), which `WotOwlGenerator.add_metadata` emits as an IRI. Only `td:OperationType` carries it today.
+`rdfs:subClassOf schema:Enumeration` is not added by code. It comes from the schema annotation on `OperationType` (`resources/schemas/hypermedia.yaml`), which `WotOwlGenerator.add_metadata` emits as an IRI. Only `td:OperationType` carries it today.
 
 Emitted by `WotOwlGenerator.add_enum` and `_add_enum_instance` in `src/wot_toolchain/artifacts/owl/generator.py`.
 
@@ -33,12 +28,12 @@ Emitted by `WotOwlGenerator.add_enum` and `_add_enum_instance` in `src/wot_toolc
 
 Consequence: the OWL enum class has no closure axiom, so the ontology does not state that the listed values are the only members. The closed value set is enforced by the validation artifacts instead:
 
-- SHACL: `sh:in ( td:readProperty ... )` on `hctl:hasOperationType` (`resources/gens/shacl/shapes.shacl.ttl:71-75`)
-- JSON Schema: `"enum": [ "readproperty", ... ]` in the array branch of `op` (`resources/gens/jsonschema/jsonschema.json:1410-1428`)
+- SHACL: `sh:in ( td:readProperty ... )` on `hctl:hasOperationType` (`resources/gens/shacl/shapes.shacl.ttl`)
+- JSON Schema: `"enum": [ "readproperty", ... ]` in the array branch of `op` (`resources/gens/jsonschema/jsonschema.json`)
 
 ## 4. Option
 
-Selected by `OwlOptions(permissible_values=PermissibleValueKind.INSTANCE)` (`src/wot_toolchain/artifacts/owl/options.py:14-20`), set by the pipeline at `src/wot_toolchain/pipeline.py:193`. The other kinds (`CLASS`, `INDIVIDUAL`) fall through to upstream `add_enum`.
+Selected by `OwlOptions(permissible_values=PermissibleValueKind.INSTANCE)` (`src/wot_toolchain/artifacts/owl/options.py`), set by the pipeline in `src/wot_toolchain/pipeline.py`. The other kinds (`CLASS`, `INDIVIDUAL`) fall through to upstream `add_enum`.
 
 ## 5. Example (`resources/gens/owl/td.ttl`, abridged)
 

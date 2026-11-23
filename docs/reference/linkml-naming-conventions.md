@@ -1,13 +1,8 @@
 # LinkML Naming Conventions
 
-**Author:** Mahda Noura (mahda.noura@siemens.com)
-**Date:** 29.10.2026
-
----
-
 Naming and structural conventions for the WoT LinkML schemas under `resources/schemas/`.
 
-For the complete annotation API, see [WoT Custom Annotations](wot-custom-annotations.md). For postprocessor conventions, see [Postprocessor Conventions](postprocessor-conventions.md).
+For the complete annotation API, see [WoT Custom Annotations](wot-custom-annotations.md). For postprocessor conventions, see [Postprocessor Conventions](../guidelines/postprocessor-conventions.md).
 
 ---
 
@@ -24,7 +19,7 @@ InteractionAffordance:  # correct — matches td:InteractionAffordance
 
 **Rule: every class that has a published WoT ontology counterpart must carry `class_uri`.**
 
-Rationale: without `class_uri`, OWL and SHACL generators produce blank-node classes not linked to the WoT ontology.
+Rationale: without `class_uri`, the OWL and SHACL generators derive the class IRI from the schema's `default_prefix` and the class name, which need not be the published WoT term.
 
 ```yaml
 Thing:
@@ -35,9 +30,9 @@ Thing:
     and interfaces are described by a WoT Thing Description.
 ```
 
-**Rule: only `Thing` carries `tree_root: true`.**
+**Rule: among the vocabulary schemas, only `Thing` carries `tree_root: true`.**
 
-Rationale: `tree_root` determines the JSON Schema entry point and the first HTML vocabulary table. Multiple tree roots cause ambiguous validator behavior.
+Rationale: `tree_root` determines the JSON Schema entry point. Multiple tree roots cause ambiguous validator behavior.
 
 ---
 
@@ -45,7 +40,7 @@ Rationale: `tree_root` determines the JSON Schema entry point and the first HTML
 
 **Rule: use camelCase for slot names, matching the TD JSON property name directly.**
 
-Rationale: slot names in this project use camelCase (e.g., `securityDefinitions`, `schemaDefinitions`, `uriVariables`) to match the W3C TD representation. This differs from the general LinkML convention of snake_case but is aligned with TD 1.1. terms.
+Rationale: slot names in this project use camelCase (e.g., `securityDefinitions`, `schemaDefinitions`, `uriVariables`) to match the W3C TD representation. This differs from the general LinkML convention of snake_case but is aligned with TD 1.1 terms.
 
 ```yaml
 slots:
@@ -204,7 +199,7 @@ id:
 
 **Rule: `[[RFC####]]` and backtick markup belong only in `spec_description`, never in `description`.**
 
-Rationale: `description` is plain text. Markup in `description` renders as literal brackets in OWL `rdfs:comment` values.
+Rationale: `description` is plain text. Markup in `description` renders as literal brackets in OWL `skos:definition` values.
 
 ---
 
@@ -212,12 +207,13 @@ Rationale: `description` is plain text. Markup in `description` renders as liter
 
 **Rule: use `see_also` to link a slot or class to its W3C spec section URL or a related ontology term.**
 
-Rationale: `see_also` provides discoverability without affecting generated output. Maintainers can trace schema terms back to the spec.
+Rationale: `see_also` lets maintainers trace schema terms back to the spec. The OWL generator emits it as `rdfs:seeAlso`.
 
 ```yaml
-supportContact:
+support:
   slot_uri: td:supportContact
-  see_also: schema:contactPoint
+  see_also:
+    - schema:contactPoint
 ```
 
 ---
@@ -271,7 +267,7 @@ This works because the slot has `inlined: true` and `multivalued: true`, and the
 {
   "description": "Set of form hypermedia controls that describe how an operation can be performed. ...",
   "items": {
-    "$ref": "#/$defs/Form"
+    "$ref": "#/$defs/Form_element_root_ops"
   },
   "type": "array"
 }
@@ -283,7 +279,7 @@ Slots without `inlined: true` emit references or scalar values. Generated JSON S
 
 ```json
 {
-  "description": "Set of security definition names, chosen from those defined in securityDefinitions. ...",
+  "description": "A security configuration is a security scheme applied to a (set of) affordance(s).",
   "oneOf": [
     {
       "type": "string"
@@ -319,7 +315,9 @@ Since the identifier slot is a structural artifact of JSON serialization (the ma
 
 | Class | Identifier slot | Effect | Parent slots that become maps |
 |-------|----------------|--------|-------------------------------|
-| `InteractionAffordance` | `name` | Affordance name = JSON map key | `properties`, `actions`, `events`, `uriVariables` |
+| `InteractionAffordance` | `name` | Affordance name = JSON map key | `properties`, `actions`, `events` |
+| `DataSchema` | `name` | Schema name = JSON map key | `uriVariables`, `schemaDefinitions` |
+| `SecurityScheme` | `security_scheme_key` | Security definition name = JSON map key | `securityDefinitions` |
 | `MultiLanguage` | `language_tag` | Language tag = JSON map key | `titles`, `descriptions` |
 
 ---
@@ -332,7 +330,7 @@ Since the identifier slot is a structural artifact of JSON serialization (the ma
 4. Add `spec_description` if HTML version needs markup or RFC refs.
 5. Add all slots with explicit `range`, `required` list, and `slot_uri` where applicable.
 6. If the class appears as a range on another slot, verify the other slot has `inlined: true` if instances are embedded.
-7. Run `/verify`.
+7. Regenerate and run the tests: `uv run wot-toolchain generate-wot-resources`, then `uv run pytest`.
 
 ---
 
@@ -345,7 +343,7 @@ Since the identifier slot is a structural artifact of JSON serialization (the ma
 5. Set `inlined: true` if the range is a class and instances are embedded.
 6. Add to the class `required:` list if normative.
 7. Write both `description` and `spec_description` (if different).
-8. Run `/verify`.
+8. Regenerate and run the tests: `uv run wot-toolchain generate-wot-resources`, then `uv run pytest`.
 
 ---
 
