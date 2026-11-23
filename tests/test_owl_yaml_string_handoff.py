@@ -14,12 +14,12 @@ from wot_toolchain.artifacts.owl.options import OwlOptions
 from wot_toolchain.artifacts.owl.preprocess import preprocess_for_gen_owl
 from wot_toolchain.config import GEN_OWL_OPTIONS, load_project
 
-MANIFEST = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
+CONFIG = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
 
 
 def _schema_path(prefix: str) -> Path:
-    """Return the schema path of the module with ``prefix`` in the repository manifest."""
-    return next(module.schema for module in load_project(MANIFEST).modules if module.prefix == prefix)
+    """Return the schema path of the vocabulary with ``prefix`` in the repository config file."""
+    return next(vocabulary.schema for vocabulary in load_project(CONFIG).vocabularies if vocabulary.prefix == prefix)
 
 
 def _serialize(schema: str) -> str:

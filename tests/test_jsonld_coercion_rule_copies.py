@@ -15,7 +15,7 @@ from wot_toolchain.artifacts.jsonld_context import module_context as jsonld
 from wot_toolchain.config import load_project
 from wot_toolchain.schema_utils import load_schema_view
 
-MANIFEST = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
+CONFIG = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
 
 type Coercion = tuple[Any, bool]
 type InlineAndChain = tuple[Coercion, Coercion]
@@ -85,14 +85,14 @@ def _compare_module(schema_view: SchemaView, generator: ContextGenerator, prefix
 
 @pytest.fixture(scope="module")
 def module_prefixes() -> set[str]:
-    project = load_project(MANIFEST)
-    return {module.prefix for module in project.modules if module.context is not None}
+    project = load_project(CONFIG)
+    return {vocabulary.prefix for vocabulary in project.vocabularies if vocabulary.context is not None}
 
 
 @pytest.fixture(scope="module")
 def coercions(module_prefixes: set[str]) -> dict[tuple[str, str], InlineAndChain]:
-    project = load_project(MANIFEST)
-    schema_view = load_schema_view(project.main_schema, merge_imports=True)
+    project = load_project(CONFIG)
+    schema_view = load_schema_view(project.root_schema, merge_imports=True)
     generator = ContextGenerator(schema_view.schema, mergeimports=True, fix_multivalue_containers=True)
     scopes = {
         scope for slot in jsonld._context_slots(schema_view) if (scope := jsonld._context_scope(schema_view, slot))

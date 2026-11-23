@@ -17,7 +17,7 @@ Stable ID convention (table rows)
 ──────────────────────────────────
   <vocab_id_prefix>-vocab-<slot-name>--<ClassName>
 
-``vocab_id_prefix`` is the manifest key ``spec.vocab_id_prefix``; it is the same for every section.
+``vocab_id_prefix`` is the config key ``spec.vocab_id_prefix``; it is the same for every section.
 
 Special LinkML escape names are normalized to the historical TD anchors:
   @context  →  at-context
@@ -90,7 +90,7 @@ def make_slot_assertion_id(vocab_id_prefix: str, class_name: str, slot_name: str
     and extract_all_table_assertions() (building the CSV).
 
     Args:
-        vocab_id_prefix: The manifest's ``spec.vocab_id_prefix``.
+        vocab_id_prefix: The config file's ``spec.vocab_id_prefix``.
         class_name: Name of the class whose table holds the row.
         slot_name: Serialized name of the slot, i.e. its alias or else its name.
 
@@ -154,7 +154,7 @@ def extract_all_table_assertions(
     prefix_map:
         Maps schema file stem → short ID prefix (e.g. "thing_description" → "td").
     vocab_id_prefix:
-        The manifest's ``spec.vocab_id_prefix``, shared by the IDs of all sections.
+        The config file's ``spec.vocab_id_prefix``, shared by the IDs of all sections.
 
     Raises:
         SchemaError: A section schema is not a file or is not valid YAML.

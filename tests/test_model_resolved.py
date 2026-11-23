@@ -11,13 +11,13 @@ from wot_toolchain.model import resolved as resolved_module
 from wot_toolchain.model.resolved import ResolvedProject
 from wot_toolchain.schema_utils import load_schema_view
 
-REPO_MANIFEST = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
+REPO_CONFIG = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
 
 
 @pytest.fixture(scope="module")
 def project() -> Project:
     """The repository project."""
-    return load_project(REPO_MANIFEST)
+    return load_project(REPO_CONFIG)
 
 
 def _names(sv: SchemaView) -> dict[str, set[str]]:
@@ -38,8 +38,8 @@ def _forbid_loading(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_merged_view_equals_todays_merged_load(project: Project) -> None:
-    merged = ResolvedProject(project.main_schema).merged
-    today = load_schema_view(project.main_schema, merge_imports=True)
+    merged = ResolvedProject(project.root_schema).merged
+    today = load_schema_view(project.root_schema, merge_imports=True)
 
     assert _names(merged) == _names(today)
     for slot, cls in [("title", "Thing"), ("href", "Form"), ("security", "Thing"), ("type", "DataSchema")]:
@@ -47,29 +47,29 @@ def test_merged_view_equals_todays_merged_load(project: Project) -> None:
 
 
 def test_module_view_equals_todays_unmerged_load(project: Project) -> None:
-    resolved = ResolvedProject(project.main_schema)
+    resolved = ResolvedProject(project.root_schema)
 
-    for module in project.modules:
-        today = load_schema_view(module.schema, merge_imports=False)
-        view = resolved.module(module.schema)
-        assert _names(view) == _names(today), module.schema.name
-        assert set(view.schema.classes or {}) == set(today.schema.classes or {}), module.schema.name
+    for vocabulary in project.vocabularies:
+        today = load_schema_view(vocabulary.schema, merge_imports=False)
+        view = resolved.module(vocabulary.schema)
+        assert _names(view) == _names(today), vocabulary.schema.name
+        assert set(view.schema.classes or {}) == set(today.schema.classes or {}), vocabulary.schema.name
 
 
 def test_views_are_loaded_once(project: Project, monkeypatch: pytest.MonkeyPatch) -> None:
-    resolved = ResolvedProject(project.main_schema)
+    resolved = ResolvedProject(project.root_schema)
     merged = resolved.merged
-    module = resolved.module(project.modules[1].schema)
+    module = resolved.module(project.vocabularies[1].schema)
     _forbid_loading(monkeypatch)
 
     assert resolved.merged is merged
-    assert resolved.module(project.modules[1].schema) is module
+    assert resolved.module(project.vocabularies[1].schema) is module
 
 
-def test_merged_and_module_view_of_the_main_schema_differ(project: Project) -> None:
-    resolved = ResolvedProject(project.main_schema)
+def test_merged_and_module_view_of_the_root_schema_differ(project: Project) -> None:
+    resolved = ResolvedProject(project.root_schema)
 
-    assert resolved.module(project.main_schema) is not resolved.merged
+    assert resolved.module(project.root_schema) is not resolved.merged
 
 
 def test_spec_sections_take_their_classes_from_resolved_project(
@@ -77,8 +77,8 @@ def test_spec_sections_take_their_classes_from_resolved_project(
 ) -> None:
     assert project.spec is not None
     sections = project.spec.sections
-    expected = respec._classes_per_section(sections, project.spec.first_class, ResolvedProject(project.main_schema))
-    resolved = ResolvedProject(project.main_schema)
+    expected = respec._classes_per_section(sections, project.spec.first_class, ResolvedProject(project.root_schema))
+    resolved = ResolvedProject(project.root_schema)
     for section in sections:
         resolved.module(section.schema)
     _forbid_loading(monkeypatch)

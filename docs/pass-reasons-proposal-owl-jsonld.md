@@ -72,7 +72,7 @@ How they were gathered: by reading the code, `git log -S`, and the upstream link
 | `_strip_datatype_property_id_coercion` :253 | UPSTREAM-BUG | Upstream adds `@type: @id` for every class range (including `Any`), even on `owl:DatatypeProperty` slots (`enum`, `const`, `default`). | e98c2a84; jsonldcontextgen.py:393-394 | high |
 | `_strip_inlined_class_id_coercion` :272 | UPSTREAM-BUG | Upstream ignores `inlined` and coerces inlined objects (`response`, `additionalResponses`) to `@id`. | 2e19ba5a; known-linkml-gaps.md #3f | high |
 | `_remove_linkml_internals` :300 | COSMETIC | Removes the `linkml` prefix and the `Any` → `linkml:Any` term. | d84e11c4 | medium-high |
-| `_remove_non_root_terms` :313 | WOT-SHAPING | Keeps only td-prefixed terms and the manifest's `extra_root_terms` at the root, matching the W3C context layout. | f2571209, 0da55192, 011fc17e; wot-toolchain.yaml:19-23 | medium |
+| `_remove_non_root_terms` :313 | WOT-SHAPING | Keeps only td-prefixed terms and the config file's `generators.jsonldcontext.extra_root_terms` at the root, matching the W3C context layout. | f2571209, 0da55192, 011fc17e; wot-toolchain.yaml:42-46 | medium |
 | `context["@version"] = 1.1` :821 | UNCLEAR | Scoped contexts and `@index` need it. Question: is this our choice (WOT-SHAPING), or should upstream emit it when it uses JSON-LD 1.1 features (UPSTREAM-GAP)? | introducing commit not traced | low |
 
 ## JSON-LD per-module inline rules (`_module_terms` :512-601)

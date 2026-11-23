@@ -33,26 +33,26 @@ Requirements:
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
 uv sync --locked
-uv run wot-toolchain generate-wot-resources -d
+uv run wot-toolchain generate-wot-resources
 uv run pytest tests/ -v
 ```
 
-`wot-toolchain` is the Python command-line interface installed from this checkout by `uv sync`. `generate-wot-resources` generates the resource artifacts; `-d` additionally generates the ReSpec TD specification and its assertion CSV inventory. `--only GENERATOR` runs a subset of the manifest's generators and `--output-dir DIR` redirects the resource artifacts. Run `uv run wot-toolchain generate-wot-resources --help` for all options.
+`wot-toolchain` is the Python command-line interface installed from this checkout by `uv sync`. `generate-wot-resources` runs every generator listed under `generators` in the config file; the `spec` generator builds the ReSpec TD specification and its assertion CSV inventory. `--only GENERATOR` runs a subset of the config file's generators and `--output-dir DIR` redirects the resource artifacts. Run `uv run wot-toolchain generate-wot-resources --help` for all options.
 
 `wot-toolchain diff-report GENERATED REFERENCE` prints a Markdown report of the JSON paths added, removed or changed in a generated JSON Schema or JSON-LD context relative to a reference file; it exits 0 whether or not they differ, so its output can be appended to `$GITHUB_STEP_SUMMARY`.
 
-What is generated, from which schemas and into which files is described by the project manifest [`wot-toolchain.yaml`](wot-toolchain.yaml); select another manifest with `-c`.
+What is generated, from which schemas and into which files is described by the project config file [`wot-toolchain.yaml`](wot-toolchain.yaml); select another config file with `-c`.
 
 ### Use from another repository
 
-The toolchain contains no schemas of its own. A repository that owns LinkML schemas and a manifest installs a tagged release and runs it against that manifest:
+The toolchain contains no schemas of its own. A repository that owns LinkML schemas and a config file installs a tagged release and runs it against that config file:
 
 ```bash
 uv tool install git+https://github.com/w3c/wot-thing-description-toolchain-tmp@<tag>
-wot-toolchain generate-wot-resources -d -c path/to/wot-toolchain.yaml
+wot-toolchain generate-wot-resources -c path/to/wot-toolchain.yaml
 ```
 
-The toolchain is not published on PyPI. Bikeshed, used by `-d`, is installed with the toolchain. The visualization generator needs Graphviz `dot` on `PATH`.
+The toolchain is not published on PyPI. Bikeshed, used by the `spec` generator, is installed with the toolchain. The visualization generator needs Graphviz `dot` on `PATH`.
 
 Generated files are written under `resources/gens/`. Do not edit them directly.
 
@@ -113,7 +113,7 @@ Useful commands:
 uv run wot-toolchain generate-wot-resources
 
 # Generate resource artifacts and the ReSpec TD specification
-uv run wot-toolchain generate-wot-resources -d
+uv run wot-toolchain generate-wot-resources
 
 # Run the complete test suite
 uv run pytest tests/ -v

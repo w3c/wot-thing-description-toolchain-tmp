@@ -24,7 +24,7 @@ def td_project() -> Project:
 
 @pytest.fixture(scope="module")
 def td_schema_view(td_project: Project) -> SchemaView:
-    return load_schema_view(td_project.main_schema, merge_imports=True)
+    return load_schema_view(td_project.root_schema, merge_imports=True)
 
 
 def _inline_kwargs_generator(schema: object, top_class: str | None) -> JsonSchemaGenerator:
@@ -56,9 +56,9 @@ def test_options_are_frozen_with_exactly_three_fields() -> None:
 
 def test_from_options_matches_todays_inline_constructor_state(td_project: Project, td_schema_view: SchemaView) -> None:
     wot = WotJsonSchemaGenerator.from_options(
-        copy.deepcopy(td_schema_view.schema), JsonSchemaOptions(top_class=td_project.top_class)
+        copy.deepcopy(td_schema_view.schema), JsonSchemaOptions(top_class=td_project.jsonschema.top_class)
     )
-    upstream = _inline_kwargs_generator(copy.deepcopy(td_schema_view.schema), td_project.top_class)
+    upstream = _inline_kwargs_generator(copy.deepcopy(td_schema_view.schema), td_project.jsonschema.top_class)
     assert _state(wot) == _state(upstream)
 
 
@@ -71,11 +71,11 @@ def test_options_map_to_upstream_arguments(td_schema_view: SchemaView) -> None:
 
 def test_td_output_equals_inline_kwargs_output(td_project: Project, td_schema_view: SchemaView) -> None:
     upstream = json.loads(
-        _inline_kwargs_generator(copy.deepcopy(td_schema_view.schema), td_project.top_class).serialize()
+        _inline_kwargs_generator(copy.deepcopy(td_schema_view.schema), td_project.jsonschema.top_class).serialize()
     )
     wot = json.loads(
         WotJsonSchemaGenerator.from_options(
-            copy.deepcopy(td_schema_view.schema), JsonSchemaOptions(top_class=td_project.top_class)
+            copy.deepcopy(td_schema_view.schema), JsonSchemaOptions(top_class=td_project.jsonschema.top_class)
         ).serialize()
     )
     assert wot == upstream

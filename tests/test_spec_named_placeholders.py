@@ -25,7 +25,7 @@ def test_sections_are_filled_by_id_regardless_of_fragment_order(tmp_path: Path) 
     assert out.read_text(encoding="utf-8") == "<a>A</a><b>B</b>"
 
 
-def test_marker_without_manifest_section_raises_naming_id_and_template(tmp_path: Path) -> None:
+def test_marker_without_config_section_raises_naming_id_and_template(tmp_path: Path) -> None:
     template = write_template(tmp_path, "%section('sec-a')%%section('sec-stray')%")
 
     with pytest.raises(GenerationError, match=r"sec-stray") as error:
@@ -34,7 +34,7 @@ def test_marker_without_manifest_section_raises_naming_id_and_template(tmp_path:
     assert str(template) in str(error.value)
 
 
-def test_manifest_section_without_marker_raises_naming_id_and_template(tmp_path: Path) -> None:
+def test_config_section_without_marker_raises_naming_id_and_template(tmp_path: Path) -> None:
     template = write_template(tmp_path, "%section('sec-a')%")
 
     with pytest.raises(GenerationError, match=r"sec-unused") as error:

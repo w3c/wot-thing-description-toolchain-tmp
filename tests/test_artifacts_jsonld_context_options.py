@@ -36,7 +36,7 @@ TODAYS_SLOT_TERMS: dict[str, Any] = {
 @pytest.fixture(scope="module")
 def td_schema_view() -> SchemaView:
     project = load_project(REPO_ROOT / "wot-toolchain.yaml")
-    return load_schema_view(project.main_schema, merge_imports=True)
+    return load_schema_view(project.root_schema, merge_imports=True)
 
 
 def _inline_kwargs_generator(schema_view: SchemaView) -> ContextGenerator:

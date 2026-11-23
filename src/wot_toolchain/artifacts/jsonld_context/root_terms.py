@@ -77,7 +77,7 @@ def remove_linkml_internals(context: dict[str, Any]) -> None:
 
 
 def remove_non_root_terms(context: dict[str, Any], schema_view: SchemaView, extra_root_terms: Collection[str]) -> None:
-    """Remove terms outside the main schema's default prefix from the root context.
+    """Remove terms outside the root schema's default prefix from the root context.
 
     The LinkML context generator and enum-alias step emit all slots, class
     names, and enum value aliases at root level.  Only terms of the main
@@ -87,7 +87,7 @@ def remove_non_root_terms(context: dict[str, Any], schema_view: SchemaView, extr
 
     Args:
         context: Root ``@context`` dict, modified in place.
-        schema_view: SchemaView of the main schema.
+        schema_view: SchemaView of the root schema.
         extra_root_terms: Terms outside the default prefix that stay in the root context.
 
     Raises:
@@ -99,8 +99,8 @@ def remove_non_root_terms(context: dict[str, Any], schema_view: SchemaView, extr
     if missing:
         raise SchemaError(
             f"Extra root term(s) {', '.join(map(repr, missing))} are not in the JSON-LD context generated from "
-            f"schema {get_schema(schema_view).name!r}. Remove them from 'jsonld.extra_root_terms' in the manifest "
-            "or define them in the schema."
+            f"schema {get_schema(schema_view).name!r}. Remove them from "
+            "'generators.jsonldcontext.extra_root_terms' in the config file or define them in the schema."
         )
     root_prefix = default_prefix(schema_view)
     root_slots: set[str] = set()

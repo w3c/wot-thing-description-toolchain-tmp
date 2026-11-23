@@ -1,26 +1,19 @@
-"""Project configuration: the project manifest loader and the gen-owl options.
-
-A project manifest (``wot-toolchain.yaml``) declares which LinkML schemas make up a vocabulary, which
-generators run, where artifacts are written and, optionally, how the specification is assembled.
-``load_project`` validates the manifest completely and returns an immutable ``Project`` whose paths are
-absolute and resolved relative to the manifest file's directory, never to the current working directory.
-Every problem is reported as a ``ManifestError`` naming the manifest, the offending key and the fix.
-
-``GEN_OWL_OPTIONS`` are the options the pipeline passes to LinkML's OWL generator.
-"""
+"""The config file loader and the gen-owl options."""
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
+from importlib.resources import files
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Literal
 
 import yaml
+from linkml.validator import validate
 
 from .artifacts.registry import artifact_names
-from .errors import ManifestError
+from .errors import ConfigError
 
 GEN_OWL_OPTIONS = {
     "metaclasses": False,
@@ -32,37 +25,39 @@ GEN_OWL_OPTIONS = {
     "skip_abstract_class_as_unionof_subclasses": True,
 }
 
-JSON_SCHEMA_FILES: Mapping[str, str] = MappingProxyType({"jsonschema": "jsonschema.json"})
+CONFIG_SCHEMA = files("wot_toolchain") / "schemas" / "config.yaml"
+"""The LinkML schema that a config file conforms to."""
+
 """File name of the JSON Schema that a generator writes into its output subdirectory, per generator."""
 
 
 @dataclass(frozen=True)
-class Module:
+class Vocabulary:
     """One LinkML schema of the vocabulary and the artifact file names generated from it.
 
     Attributes:
-        schema: Absolute path of the module's LinkML schema.
-        prefix: Unique short name of the module.
-        ontology: File name of the generated ontology, or ``None`` if the module gets none.
-        context: File name of the generated JSON-LD context, or ``None`` if the module gets none.
-        diagram: File name of the generated class diagram, or ``None`` if the module gets none.
+        schema: Absolute path of the vocabulary's LinkML schema.
+        prefix: Unique short name of the vocabulary.
+        ontology: File names of the generated ontology, one per serialization; empty if the vocabulary gets none.
+        context: File name of the generated JSON-LD context, or ``None`` if the vocabulary gets none.
+        diagram: File name of the generated class diagram, or ``None`` if the vocabulary gets none.
     """
 
     schema: Path
     prefix: str
-    ontology: str | None
+    ontology: tuple[str, ...]
     context: str | None
     diagram: str | None
 
 
 @dataclass(frozen=True)
 class SpecSection:
-    """A specification section filled with the vocabulary tables of one module.
+    """A specification section filled with the vocabulary tables of one vocabulary.
 
     Attributes:
         id: HTML id of the section in the specification template.
-        schema: Absolute path of the module schema rendered into the section.
-        prefix: Prefix of that module.
+        schema: Absolute path of the vocabulary schema rendered into the section.
+        prefix: Prefix of that vocabulary.
     """
 
     id: str
@@ -78,7 +73,7 @@ class SpecConfig:
         template: Absolute path of the HTML specification template.
         output: Absolute path of the rendered specification.
         vocab_id_prefix: Leading part of every vocabulary-table assertion ID, ``<vocab_id_prefix>-vocab-...``,
-            shared by all sections regardless of the module that defines the class.
+            shared by all sections regardless of the vocabulary that defines the class.
         first_class: Class whose table is rendered first, or ``None`` to keep schema order.
         sections: Sections to fill, each into the template's ``%section('<id>')%`` marker.
         snippets: Directory holding the example snippets.
@@ -87,8 +82,7 @@ class SpecConfig:
         assertions_csv: Absolute path of the extracted assertions CSV, or ``None`` if none is written.
         snippet_validation_schemas: Static JSON Schema file per snippet kind, read-only.
         generated_snippet_validation_schemas: Snippet kinds validated against the JSON Schema generated in the
-            same run, mapped to the generator that writes it, read-only. Written ``kind: {generated: GENERATOR}``
-            under ``snippet_validation_schemas`` in the manifest.
+            same run, mapped to the generator that writes it, read-only.
         range_labels: Text shown in the vocabulary tables' type column for a LinkML range, keyed by range name,
             read-only; ranges without an entry are shown under their own name.
         default_values_anchor: Fragment id of the section the "with default" assignment links to, or ``None`` to
@@ -113,346 +107,207 @@ class SpecConfig:
 
 
 @dataclass(frozen=True)
-class Project:
-    """A fully validated project manifest.
+class JsonSchemaSettings:
+    """The ``generators.jsonschema`` settings.
 
     Attributes:
-        manifest_path: Absolute path of the manifest file.
-        main_schema: Absolute path of the schema that imports all modules.
-        output_dir: Absolute path of the directory that receives generated artifacts.
-        generators: Names of the generators to run, in manifest order.
-        top_class: Root class of the generated JSON Schema, or ``None`` for the generator default.
-        modules: Vocabulary modules, in manifest order.
-        spec: Specification build settings, or ``None`` if the project builds no specification.
-        extra_root_terms: Terms outside the main schema's default prefix that stay in the root of the merged
-            JSON-LD context, in manifest order. Written under ``jsonld`` in the manifest.
+        top_class: Class that the root of the JSON Schema describes.
+        id: Value of the ``$id`` keyword.
+        description: Value of the ``description`` keyword at the root of the JSON Schema.
+        dialect: JSON Schema dialect, a permissible value of ``JsonSchemaDialect`` in the config schema.
+        output: File name of the JSON Schema.
     """
 
-    manifest_path: Path
-    main_schema: Path
+    top_class: str
+    id: str
+    description: str
+    dialect: str
+    output: str
+
+
+@dataclass(frozen=True)
+class Project:
+    """A validated config file.
+
+    Attributes:
+        config_path: Absolute path of the config file.
+        root_schema: Absolute path of the schema that imports all vocabularies.
+        output_dir: Absolute path of the directory that receives generated artifacts.
+        generators: Names of the generators to run, in the order in which they run.
+        jsonschema: JSON Schema settings, or ``None`` if the config file has no ``generators.jsonschema``.
+        vocabularies: Vocabularies, in config file order.
+        spec: Specification build settings, or ``None`` if the project builds no specification.
+        extra_root_terms: Terms outside the root schema's default prefix that stay in the root of the merged
+            JSON-LD context, in config file order.
+    """
+
+    config_path: Path
+    root_schema: Path
     output_dir: Path
     generators: tuple[str, ...]
-    top_class: str | None
-    modules: tuple[Module, ...]
+    jsonschema: JsonSchemaSettings | None
+    vocabularies: tuple[Vocabulary, ...]
     spec: SpecConfig | None
     extra_root_terms: tuple[str, ...] = ()
 
 
-@dataclass(frozen=True)
-class _Keys:
-    required: tuple[str, ...]
-    optional: tuple[str, ...] = ()
-
-    @property
-    def allowed(self) -> tuple[str, ...]:
-        return self.required + self.optional
-
-
-_PROJECT_KEYS = _Keys(("main_schema", "output_dir", "generators", "modules"), ("jsonschema", "jsonld", "spec"))
-_JSONSCHEMA_KEYS = _Keys((), ("top_class",))
-_JSONLD_KEYS = _Keys((), ("extra_root_terms",))
-_MODULE_KEYS = _Keys(("schema", "prefix"), ("ontology", "context", "diagram"))
-_SPEC_KEYS = _Keys(
-    ("template", "output", "vocab_id_prefix", "sections", "snippets", "glossary"),
-    (
-        "first_class",
-        "extra_asserts",
-        "assertions_csv",
-        "snippet_validation_schemas",
-        "range_labels",
-        "default_values_anchor",
-    ),
-)
-_SECTION_KEYS = _Keys(("id", "schema"))
-_GENERATED_SCHEMA_KEYS = _Keys(("generated",))
-
 _PathKind = Literal["file", "directory"]
 
+SPEC_GENERATOR = "spec"
+_GENERATORS_WITH_REQUIRED_SETTINGS = ("jsonschema", SPEC_GENERATOR)
 
-def load_project(manifest_path: Path) -> Project:
-    """Load and validate a project manifest.
+
+def load_project(config_path: Path) -> Project:
+    """Load a config file.
 
     Args:
-        manifest_path: Path of the manifest file; relative paths inside it are resolved against its directory.
+        config_path: Path of the config file; relative paths inside it are resolved against its directory.
 
     Returns:
-        The validated project with absolute, resolved paths.
+        The project with absolute, resolved paths.
 
     Raises:
-        ManifestError: The manifest is missing, unreadable, not valid YAML or describes an invalid project.
+        ConfigError: The config file is missing, unreadable, not valid YAML, does not conform to the config
+            schema or describes an invalid project.
     """
-    manifest_path = manifest_path.resolve()
-    document = _read_yaml(manifest_path)
-    root = _Node.root(manifest_path, document, _PROJECT_KEYS)
-    main_schema = root.input_path("main_schema", "file")
-    output_dir = root.output_path("output_dir")
-    generators = _parse_generators(root)
-    top_class = _parse_top_class(root)
-    modules = _parse_modules(root)
+    source = _Source(config_path.resolve())
+    document = source.read()
+    generators = document["generators"]
+    for name in _GENERATORS_WITH_REQUIRED_SETTINGS:
+        if name in generators and generators[name] is None:
+            raise source.error(f"/generators/{name}", "settings are required")
+    vocabularies = _vocabularies(source, document["vocabularies"])
     return Project(
-        manifest_path=manifest_path,
-        main_schema=main_schema,
-        output_dir=output_dir,
-        generators=generators,
-        top_class=top_class,
-        modules=modules,
-        spec=_parse_spec(root, modules),
-        extra_root_terms=_parse_extra_root_terms(root),
+        config_path=source.config_path,
+        root_schema=source.input(document["root_schema"], "/root_schema", "file"),
+        output_dir=source.output(document["output_dir"]),
+        generators=tuple(name for name in (*artifact_names(), SPEC_GENERATOR) if name in generators),
+        jsonschema=JsonSchemaSettings(**generators["jsonschema"]) if "jsonschema" in generators else None,
+        vocabularies=vocabularies,
+        spec=_spec(source, generators["spec"], vocabularies) if "spec" in generators else None,
+        extra_root_terms=tuple((generators.get("jsonldcontext") or {}).get("extra_root_terms") or ()),
     )
 
 
-def _read_yaml(manifest_path: Path) -> object:
-    try:
-        text = manifest_path.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        raise ManifestError(
-            f"{manifest_path}: manifest file not found. Create it or pass the path of an existing manifest."
-        ) from None
-    except OSError as exc:
-        raise ManifestError(f"{manifest_path}: manifest file could not be read: {exc.strerror}.") from exc
-    try:
-        return yaml.safe_load(text)
-    except yaml.YAMLError as exc:
-        raise ManifestError(f"{manifest_path}: manifest is not valid YAML. Fix the syntax error: {exc}") from exc
+@dataclass(frozen=True)
+class _Source:
+    """A config file: reads it and resolves the paths written in it."""
+
+    config_path: Path
+
+    def error(self, location: str, problem: str) -> ConfigError:
+        return ConfigError(f"{self.config_path}: {problem} in {location}")
+
+    def read(self) -> dict[str, Any]:
+        document = self._read_yaml()
+        messages = [result.message for result in validate(document, str(CONFIG_SCHEMA), "Config").results]
+        if messages:
+            raise ConfigError("\n".join(f"{self.config_path}: {message}" for message in messages))
+        return document
+
+    def _read_yaml(self) -> Any:
+        try:
+            text = self.config_path.read_text(encoding="utf-8")
+        except FileNotFoundError:
+            raise ConfigError(f"{self.config_path}: config file not found.") from None
+        except OSError as exc:
+            raise ConfigError(f"{self.config_path}: config file could not be read: {exc.strerror}.") from exc
+        try:
+            return yaml.safe_load(text)
+        except yaml.YAMLError as exc:
+            raise ConfigError(f"{self.config_path}: config file is not valid YAML: {exc}") from exc
+
+    def output(self, value: str) -> Path:
+        return (self.config_path.parent / value).resolve()
+
+    def input(self, value: str, location: str, kind: _PathKind) -> Path:
+        path = self.output(value)
+        if not path.exists():
+            raise self.error(location, f"{path} does not exist")
+        if (kind == "file" and not path.is_file()) or (kind == "directory" and not path.is_dir()):
+            raise self.error(location, f"{path} is not a {kind}")
+        return path
 
 
-def _parse_generators(root: _Node) -> tuple[str, ...]:
-    generators: list[str] = []
-    for key_path, value in root.list_items("generators"):
-        name = root.as_string(value, key_path)
-        if name not in artifact_names():
-            raise root.error(key_path, f"unknown generator {name!r}", f"Use one of: {', '.join(artifact_names())}.")
-        if name in generators:
-            raise root.error(key_path, f"duplicate generator {name!r}", "List each generator once.")
-        generators.append(name)
-    return tuple(generators)
-
-
-def _parse_top_class(root: _Node) -> str | None:
-    jsonschema = root.optional_mapping("jsonschema", _JSONSCHEMA_KEYS)
-    return None if jsonschema is None else jsonschema.optional_string("top_class")
-
-
-def _parse_extra_root_terms(root: _Node) -> tuple[str, ...]:
-    jsonld = root.optional_mapping("jsonld", _JSONLD_KEYS)
-    if jsonld is None or "extra_root_terms" not in jsonld.values:
-        return ()
-    terms: list[str] = []
-    for key_path, value in jsonld.list_items("extra_root_terms"):
-        term = jsonld.as_string(value, key_path)
-        if term in terms:
-            raise jsonld.error(key_path, f"duplicate extra root term {term!r}", "List each term once.")
-        terms.append(term)
-    return tuple(terms)
-
-
-def _parse_modules(root: _Node) -> tuple[Module, ...]:
-    modules: list[Module] = []
-    for node in root.mappings("modules", _MODULE_KEYS):
-        module = Module(
-            schema=node.input_path("schema", "file"),
-            prefix=node.string("prefix"),
-            ontology=node.optional_file_name("ontology"),
-            context=node.optional_file_name("context"),
-            diagram=node.optional_file_name("diagram"),
+def _vocabularies(source: _Source, entries: list[dict[str, Any]]) -> tuple[Vocabulary, ...]:
+    vocabularies: list[Vocabulary] = []
+    for index, entry in enumerate(entries):
+        location = f"/vocabularies/{index}"
+        vocabulary = Vocabulary(
+            schema=source.input(entry["schema"], f"{location}/schema", "file"),
+            prefix=entry["prefix"],
+            ontology=tuple(entry.get("ontology") or ()),
+            context=entry.get("context"),
+            diagram=entry.get("diagram"),
         )
-        if any(other.prefix == module.prefix for other in modules):
-            raise node.error(
-                node.child("prefix"), f"duplicate module prefix {module.prefix!r}", "Give every module a unique prefix."
+        if any(other.prefix == vocabulary.prefix for other in vocabularies):
+            raise source.error(
+                f"{location}/prefix", f"prefix {vocabulary.prefix!r} is used by more than one vocabulary"
             )
-        if any(other.schema == module.schema for other in modules):
-            raise node.error(node.child("schema"), f"duplicate module schema {module.schema}", "List each schema once.")
-        modules.append(module)
-    return tuple(modules)
+        if any(other.schema == vocabulary.schema for other in vocabularies):
+            raise source.error(f"{location}/schema", f"{vocabulary.schema} is the schema of more than one vocabulary")
+        vocabularies.append(vocabulary)
+    return tuple(vocabularies)
 
 
-def _parse_spec(root: _Node, modules: tuple[Module, ...]) -> SpecConfig | None:
-    spec = root.optional_mapping("spec", _SPEC_KEYS)
-    if spec is None:
-        return None
-    module_prefixes = {module.schema: module.prefix for module in modules}
-    static_schemas, generated_schemas = _parse_validation_schemas(spec)
+def _spec(source: _Source, spec: dict[str, Any], vocabularies: tuple[Vocabulary, ...]) -> SpecConfig:
+    location = "/generators/spec"
+    static_schemas, generated_schemas = _snippet_validation_schemas(source, spec.get("snippet_validation_schemas"))
     return SpecConfig(
-        template=spec.input_path("template", "file"),
-        output=spec.output_path("output"),
-        vocab_id_prefix=spec.string("vocab_id_prefix"),
-        first_class=spec.optional_string("first_class"),
-        sections=tuple(_parse_section(node, module_prefixes) for node in spec.mappings("sections", _SECTION_KEYS)),
-        snippets=spec.input_path("snippets", "directory"),
-        glossary=spec.input_path("glossary", "file"),
-        extra_asserts=spec.optional_input_path("extra_asserts", "file"),
-        assertions_csv=spec.optional_output_path("assertions_csv"),
+        template=source.input(spec["template"], f"{location}/template", "file"),
+        output=source.output(spec["output"]),
+        vocab_id_prefix=spec["vocab_id_prefix"],
+        first_class=spec.get("first_class"),
+        sections=_sections(source, spec["sections"], vocabularies),
+        snippets=source.input(spec["snippets"], f"{location}/snippets", "directory"),
+        glossary=source.input(spec["glossary"], f"{location}/glossary", "file"),
+        extra_asserts=_optional(spec, "extra_asserts", lambda v: source.input(v, f"{location}/extra_asserts", "file")),
+        assertions_csv=_optional(spec, "assertions_csv", source.output),
         snippet_validation_schemas=static_schemas,
         generated_snippet_validation_schemas=generated_schemas,
-        range_labels=_parse_range_labels(spec),
-        default_values_anchor=spec.optional_string("default_values_anchor"),
+        range_labels=_range_labels(spec.get("range_labels")),
+        default_values_anchor=spec.get("default_values_anchor"),
     )
 
 
-def _parse_section(node: _Node, module_prefixes: Mapping[Path, str]) -> SpecSection:
-    schema = node.input_path("schema", "file")
-    if schema not in module_prefixes:
-        raise node.error(
-            node.child("schema"),
-            f"{schema} is not the schema of any module",
-            "Use the schema path of one of the entries under 'modules'.",
-        )
-    return SpecSection(id=node.string("id"), schema=schema, prefix=module_prefixes[schema])
+def _optional(mapping: Mapping[str, Any], key: str, convert: Callable[[str], Path]) -> Path | None:
+    value = mapping.get(key)
+    return None if value is None else convert(value)
 
 
-def _parse_validation_schemas(spec: _Node) -> tuple[Mapping[str, Path], Mapping[str, str]]:
-    key = "snippet_validation_schemas"
+def _sections(
+    source: _Source, entries: list[dict[str, str]], vocabularies: tuple[Vocabulary, ...]
+) -> tuple[SpecSection, ...]:
+    prefixes = {vocabulary.schema: vocabulary.prefix for vocabulary in vocabularies}
+    sections: list[SpecSection] = []
+    for index, entry in enumerate(entries):
+        location = f"/generators/spec/sections/{index}/schema"
+        schema = source.input(entry["schema"], location, "file")
+        if schema not in prefixes:
+            raise source.error(location, f"{schema} is not the schema of a vocabulary")
+        sections.append(SpecSection(id=entry["id"], schema=schema, prefix=prefixes[schema]))
+    return tuple(sections)
+
+
+def _snippet_validation_schemas(
+    source: _Source, entries: Mapping[str, Any] | None
+) -> tuple[Mapping[str, Path], Mapping[str, str]]:
     static: dict[str, Path] = {}
     generated: dict[str, str] = {}
-    if key in spec.values:
-        key_path = spec.child(key)
-        for kind, entry in spec.as_mapping(spec.values[key], key_path).items():
-            entry_path = f"{key_path}.{spec.as_string(kind, key_path)}"
-            if isinstance(entry, dict):
-                generated[kind] = _parse_generated_schema(spec, entry, entry_path)
-            else:
-                static[kind] = spec.resolve_input(entry, entry_path, "file")
+    for kind, entry in (entries or {}).items():
+        location = f"/generators/spec/snippet_validation_schemas/{kind}"
+        path, generator = (entry or {}).get("path"), (entry or {}).get("generated")
+        if (path is None) == (generator is None):
+            raise source.error(location, "exactly one of 'path' and 'generated' is required")
+        if path is None:
+            generated[kind] = generator
+        else:
+            static[kind] = source.input(path, f"{location}/path", "file")
     return MappingProxyType(static), MappingProxyType(generated)
 
 
-def _parse_range_labels(spec: _Node) -> Mapping[str, str]:
-    key = "range_labels"
-    if key not in spec.values:
-        return MappingProxyType({})
-    key_path = spec.child(key)
-    labels: dict[str, str] = {}
-    for range_name, label in spec.as_mapping(spec.values[key], key_path).items():
-        range_name = spec.as_string(range_name, key_path)
-        labels[range_name] = spec.as_string(label, f"{key_path}.{range_name}")
-    return MappingProxyType(labels)
-
-
-def _parse_generated_schema(spec: _Node, entry: object, entry_path: str) -> str:
-    node = spec.checked(entry, entry_path, _GENERATED_SCHEMA_KEYS)
-    generator = node.string("generated")
-    if generator not in JSON_SCHEMA_FILES:
-        raise node.error(
-            node.child("generated"),
-            f"generator {generator!r} does not generate a JSON Schema",
-            f"Use one of: {', '.join(JSON_SCHEMA_FILES)}.",
-        )
-    return generator
-
-
-@dataclass(frozen=True)
-class _Node:
-    """A manifest mapping whose keys are already checked, plus its location for precise error messages."""
-
-    manifest_path: Path
-    path: str
-    values: Mapping[Any, Any]
-
-    @classmethod
-    def root(cls, manifest_path: Path, document: object, keys: _Keys) -> _Node:
-        return cls(manifest_path, "", {}).checked(document, "", keys)
-
-    def child(self, key: str | int) -> str:
-        if isinstance(key, int):
-            return f"{self.path}[{key}]"
-        return f"{self.path}.{key}" if self.path else key
-
-    def error(self, key_path: str, problem: str, fix: str) -> ManifestError:
-        return ManifestError(f"{self.manifest_path}: {key_path or 'top level'}: {problem}. {fix}")
-
-    def type_error(self, key_path: str, expected: str, value: object) -> ManifestError:
-        return self.error(key_path, f"must be {expected}, got {_describe(value)}", f"Change the value to {expected}.")
-
-    def checked(self, value: object, key_path: str, keys: _Keys) -> _Node:
-        mapping = self.as_mapping(value, key_path)
-        node = _Node(self.manifest_path, key_path, mapping)
-        for key in mapping:
-            if key not in keys.allowed:
-                raise self.error(
-                    node.child(str(key)), f"unknown key {key!r}", f"Allowed keys here: {', '.join(keys.allowed)}."
-                )
-        for key in keys.required:
-            if key not in mapping:
-                raise self.error(node.child(key), "missing required key", "Add it.")
-        return node
-
-    def as_mapping(self, value: object, key_path: str) -> Mapping[Any, Any]:
-        if not isinstance(value, dict):
-            raise self.type_error(key_path, "a mapping", value)
-        return value
-
-    def as_string(self, value: object, key_path: str) -> str:
-        if not isinstance(value, str) or not value:
-            raise self.type_error(key_path, "a non-empty string", value)
-        return value
-
-    def string(self, key: str) -> str:
-        return self.as_string(self.values[key], self.child(key))
-
-    def optional_string(self, key: str) -> str | None:
-        return self.string(key) if key in self.values else None
-
-    def optional_file_name(self, key: str) -> str | None:
-        name = self.optional_string(key)
-        if name is not None and (Path(name).name != name or name == ".."):
-            raise self.error(
-                self.child(key),
-                f"must be a plain file name without directories, got {name!r}",
-                "Remove the directory part; the file is written below 'output_dir'.",
-            )
-        return name
-
-    def list_items(self, key: str) -> list[tuple[str, object]]:
-        key_path = self.child(key)
-        value = self.values[key]
-        if not isinstance(value, list):
-            raise self.type_error(key_path, "a list", value)
-        if not value:
-            raise self.error(key_path, "must not be empty", "List at least one entry.")
-        return [(f"{key_path}[{index}]", item) for index, item in enumerate(value)]
-
-    def mappings(self, key: str, keys: _Keys) -> tuple[_Node, ...]:
-        return tuple(self.checked(item, key_path, keys) for key_path, item in self.list_items(key))
-
-    def optional_mapping(self, key: str, keys: _Keys) -> _Node | None:
-        return self.checked(self.values[key], self.child(key), keys) if key in self.values else None
-
-    def resolve_input(self, value: object, key_path: str, kind: _PathKind) -> Path:
-        path = self.manifest_path.parent / self.as_string(value, key_path)
-        path = path.resolve()
-        if not path.exists():
-            raise self.error(
-                key_path, f"{path} does not exist", f"Fix the path; it is relative to {self.manifest_path.parent}."
-            )
-        if (kind == "file" and not path.is_file()) or (kind == "directory" and not path.is_dir()):
-            raise self.error(key_path, f"{path} is not a {kind}", f"Point it at an existing {kind}.")
-        return path
-
-    def input_path(self, key: str, kind: _PathKind) -> Path:
-        return self.resolve_input(self.values[key], self.child(key), kind)
-
-    def optional_input_path(self, key: str, kind: _PathKind) -> Path | None:
-        return self.input_path(key, kind) if key in self.values else None
-
-    def output_path(self, key: str) -> Path:
-        return (self.manifest_path.parent / self.string(key)).resolve()
-
-    def optional_output_path(self, key: str) -> Path | None:
-        return self.output_path(key) if key in self.values else None
-
-
-_YAML_TYPE_NAMES: tuple[tuple[type, str], ...] = (
-    (bool, "a boolean"),
-    (int, "a number"),
-    (float, "a number"),
-    (str, "a string"),
-    (list, "a list"),
-    (dict, "a mapping"),
-)
-
-
-def _describe(value: object) -> str:
-    if value is None:
-        return "null"
-    if value == "":
-        return "an empty string"
-    return next((name for kind, name in _YAML_TYPE_NAMES if isinstance(value, kind)), type(value).__name__)
+def _range_labels(entries: Mapping[str, Any] | None) -> Mapping[str, str]:
+    """Return the label of each range; a label is written as ``range: label`` or ``range: {label: label}``."""
+    return MappingProxyType(
+        {name: entry if isinstance(entry, str) else entry["label"] for name, entry in (entries or {}).items()}
+    )

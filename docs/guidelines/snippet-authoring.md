@@ -42,7 +42,7 @@ Each snippet is registered in `_snippets.yaml`. The following fields are availab
 | `title` | no | — | Example title displayed in the spec |
 | `layout` | no | `aside` | `aside` (wrapped in `<aside class="example">`) or `pre` (`<pre class="example json">`) |
 | `validate` | no | `true` | Whether to validate against TD/TM JSON Schema |
-| `schema` | no | top-level `default_schema` | Snippet kind to validate against: a key of `spec.snippet_validation_schemas` in `wot-toolchain.yaml` (`tm` for Thing Model snippets) |
+| `schema` | no | top-level `default_schema` | Snippet kind to validate against: a key of `generators.spec.snippet_validation_schemas` in `wot-toolchain.yaml` (`tm` for Thing Model snippets) |
 | `default_schema` | when a validated snippet has no `schema` | — | **Top-level key** of `_snippets.yaml`, not a snippet field: the snippet kind for every snippet without its own `schema` (`td`) |
 | `hide_paths` | no | — | Dot-notation paths to hide (replaced with `// ...`) |
 | `show_paths` | no | — | Dot-notation paths to show (everything else becomes `// ...`) |

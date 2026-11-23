@@ -27,7 +27,7 @@ CLI_BIN = Path(sys.executable).parent / "wot-toolchain"
 
 @pytest.fixture
 def project(tmp_path: Path) -> Path:
-    """A private copy of the project manifest and the input resources, without generated output."""
+    """A private copy of the project config file and the input resources, without generated output."""
     shutil.copy2(REPO_ROOT / "wot-toolchain.yaml", tmp_path / "wot-toolchain.yaml")
     shutil.copytree(REPO_ROOT / "resources", tmp_path / "resources", ignore=shutil.ignore_patterns("gens"))
     return tmp_path
@@ -35,7 +35,7 @@ def project(tmp_path: Path) -> Path:
 
 def _generate(project: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [str(CLI_BIN), "generate-wot-resources", "-d"],
+        [str(CLI_BIN), "generate-wot-resources"],
         cwd=project,
         capture_output=True,
         text=True,
@@ -117,6 +117,6 @@ def test_quiet_is_a_flag() -> None:
     try:
         result = CliRunner().invoke(main, ["-q", "generate-wot-resources", "--help"])
         assert result.exit_code == 0, result.output
-        assert "--generate_docs" in result.output
+        assert "--only" in result.output
     finally:
         root.setLevel(previous)

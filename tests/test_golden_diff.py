@@ -25,7 +25,7 @@ def regenerate_artifacts():
     venv_bin = Path(sys.executable).parent
     cli_bin = venv_bin / "wot-toolchain"
     subprocess.run(
-        [str(cli_bin), "generate-wot-resources", "-d"],
+        [str(cli_bin), "generate-wot-resources"],
         cwd=REPO_ROOT,
         check=True,
         capture_output=True,

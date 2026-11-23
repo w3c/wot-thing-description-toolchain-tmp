@@ -21,7 +21,7 @@ Requirements:
 - Python 3.14 or later
 - [uv](https://docs.astral.sh/uv/)
 - [Graphviz](https://graphviz.org/) (the `dot` program) for the diagram
-  generator. When the manifest enables the `visualization` generator,
+  generator. When the config file enables the `visualization` generator,
   generation stops with an error before writing any output if `dot` is not on
   `PATH`; `--only` can exclude that generator.
 - [Node.js](https://nodejs.org/) with the `jsonld` package installed in
@@ -46,19 +46,19 @@ pre-commit install
 ## Running the generator
 
 ```bash
-uv run wot-toolchain generate-wot-resources -d
+uv run wot-toolchain generate-wot-resources
 ```
 
-The command reads the project manifest `wot-toolchain.yaml` and writes the
-artifacts to `resources/gens/`. Options:
+The command reads the project config file `wot-toolchain.yaml` and runs every
+generator listed under `generators`, including `spec` (the specification HTML
+and assertion CSV). The artifacts are written to `resources/gens/`. Options:
 
 | Option | Meaning |
 |---|---|
-| `-c`, `--config FILE` | Project manifest (default: `wot-toolchain.yaml`) |
-| `-i`, `--input_schema FILE` | LinkML schema to use instead of the manifest's `main_schema` |
-| `-d`, `--generate_docs` | Also generate the specification HTML and assertion CSV files |
-| `--output-dir DIRECTORY` | Write the artifacts to this directory instead of the manifest's `output_dir` |
-| `--only GENERATOR` | Run only this generator of the manifest's `generators`; repeat for several |
+| `-c`, `--config FILE` | Project config file (default: `wot-toolchain.yaml`) |
+| `-i`, `--input_schema FILE` | LinkML schema to use instead of the config file's `root_schema` |
+| `--output-dir DIRECTORY` | Write the artifacts to this directory instead of the config file's `output_dir` |
+| `--only GENERATOR` | Run only this generator of the config file's `generators`; repeat for several |
 
 Global options `-v`/`--verbose` and `-q`/`--quiet` go before the command name.
 Run `uv run wot-toolchain --help` for details. The command exits with a
@@ -71,7 +71,7 @@ Do not edit files under `resources/gens/`; they are overwritten on every run.
 Integration tests read the generated artifacts, so run the generator first:
 
 ```bash
-uv run wot-toolchain generate-wot-resources -d
+uv run wot-toolchain generate-wot-resources
 uv run pytest
 uv run ruff check .
 ```

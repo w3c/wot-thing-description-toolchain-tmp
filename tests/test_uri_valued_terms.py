@@ -11,7 +11,7 @@ from wot_toolchain import pipeline
 from wot_toolchain.config import load_project
 from wot_toolchain.schema_utils import load_schema_view
 
-MANIFEST = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
+CONFIG = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
 BASE = "https://td.example.com/td.jsonld"
 HCTL = Namespace("https://www.w3.org/2019/wot/hypermedia#")
 WOTSEC = Namespace("https://www.w3.org/2019/wot/security#")
@@ -43,8 +43,8 @@ URI_VALUED = (
 
 
 def _project_and_view() -> tuple[Any, Any]:
-    project = load_project(MANIFEST)
-    return project, load_schema_view(project.main_schema, merge_imports=True)
+    project = load_project(CONFIG)
+    return project, load_schema_view(project.root_schema, merge_imports=True)
 
 
 @pytest.fixture(scope="module")

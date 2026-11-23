@@ -12,7 +12,7 @@ from wot_toolchain.artifacts.owl.options import OwlOptions
 from wot_toolchain.config import load_project
 from wot_toolchain.schema_utils import load_schema_view
 
-MANIFEST = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
+CONFIG = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
 MODULES = ("hctl", "jsonschema", "td", "tm", "wotsec")
 
 EX = Namespace("https://example.org/s#")
@@ -74,8 +74,8 @@ def example(tmp_path_factory: pytest.TempPathFactory) -> Graph:
 @pytest.fixture(scope="module")
 def generated(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Graph]:
     output_dir = tmp_path_factory.mktemp("owl")
-    project = load_project(MANIFEST)
-    pipeline._gen_owl(project, load_schema_view(project.main_schema, merge_imports=True), output_dir)
+    project = load_project(CONFIG)
+    pipeline._gen_owl(project, load_schema_view(project.root_schema, merge_imports=True), output_dir)
     return {path.stem: Graph().parse(path, format="turtle") for path in output_dir.glob("*.ttl")}
 
 

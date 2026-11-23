@@ -16,42 +16,36 @@ from .diff_report import markdown_report
 from .errors import WotToolchainError
 from .pipeline import run_pipeline
 
-DEFAULT_MANIFEST = Path("wot-toolchain.yaml")
+DEFAULT_CONFIG = Path("wot-toolchain.yaml")
 
 config_option = click.option(
     "-c",
     "--config",
     type=click.Path(dir_okay=False, path_type=Path),
-    default=DEFAULT_MANIFEST,
+    default=DEFAULT_CONFIG,
     show_default=True,
-    help="Path to the project manifest, relative to the current directory.",
+    help="Path to the project config file, relative to the current directory.",
 )
 input_option = click.option(
     "-i",
     "--input_schema",
     type=click.Path(exists=True, dir_okay=False, path_type=Path),
     default=None,
-    help="LinkML schema to use instead of the manifest's main_schema.",
-)
-docs_option = click.option(
-    "-d",
-    "--generate_docs",
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help="Also generate the specification described by the manifest's spec section.",
+    help="LinkML schema to use instead of the config file's root_schema.",
 )
 output_dir_option = click.option(
     "--output-dir",
     type=click.Path(file_okay=False, path_type=Path),
     default=None,
-    help="Directory for generated artifacts instead of the manifest's output_dir, relative to the current directory.",
+    help=(
+        "Directory for generated artifacts instead of the config file's output_dir, relative to the current directory."
+    ),
 )
 only_option = click.option(
     "--only",
     multiple=True,
     metavar="GENERATOR",
-    help="Run only this generator of the manifest's generators; repeat for several.",
+    help="Run only this generator of the config file's generators; repeat for several.",
 )
 
 
@@ -82,34 +76,32 @@ def main(verbose: int, quiet: bool) -> None:
 @main.command()
 @config_option
 @input_option
-@docs_option
 @output_dir_option
 @only_option
 def generate_wot_resources(
-    config: Path, input_schema: Path | None, generate_docs: bool, output_dir: Path | None, only: tuple[str, ...]
+    config: Path, input_schema: Path | None, output_dir: Path | None, only: tuple[str, ...]
 ) -> None:
-    """Generate the artifacts and, optionally, the specification of the project described by a manifest.
+    """Run the generators of the project described by a config file.
 
     \u000c
     Args:
-        config: Project manifest.
-        input_schema: Optional replacement for the manifest's main schema.
-        generate_docs: Also generate the specification.
-        output_dir: Optional replacement for the manifest's output directory.
-        only: Generators to run instead of all the manifest's generators.
+        config: Project config file.
+        input_schema: Optional replacement for the config file's root schema.
+        output_dir: Optional replacement for the config file's output directory.
+        only: Generators to run instead of all the config file's generators.
 
     Raises:
-        click.UsageError: ``only`` names a generator the manifest does not list.
+        click.UsageError: ``only`` names a generator the config file does not list.
     """
     with _exit_on_toolchain_error():
         project = load_project(config.resolve())
         if input_schema is not None:
-            project = dataclasses.replace(project, main_schema=input_schema.resolve())
+            project = dataclasses.replace(project, root_schema=input_schema.resolve())
         if output_dir is not None:
             project = dataclasses.replace(project, output_dir=output_dir.resolve())
         if only:
             project = _select_generators(project, only)
-        run_pipeline(project, generate_docs=generate_docs)
+        run_pipeline(project)
 
 
 @main.command()
@@ -142,7 +134,7 @@ def _select_generators(project: Project, only: tuple[str, ...]) -> Project:
     unlisted = [name for name in only if name not in project.generators]
     if unlisted:
         raise click.UsageError(
-            f"--only: not a generator listed in {project.manifest_path}: {', '.join(map(repr, unlisted))}. "
+            f"--only: not a generator listed in {project.config_path}: {', '.join(map(repr, unlisted))}. "
             f"Use one of: {', '.join(project.generators)}."
         )
     return dataclasses.replace(project, generators=tuple(name for name in project.generators if name in only))

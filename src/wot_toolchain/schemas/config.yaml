@@ -1,0 +1,196 @@
+id: https://w3c.github.io/wot-thing-description-toolchain/config
+name: wot_toolchain_config
+title: wot-toolchain config
+description: Schema of the config file that a repository passes to wot-toolchain.
+prefixes:
+  linkml: https://w3id.org/linkml/
+  config: https://w3c.github.io/wot-thing-description-toolchain/config/
+default_prefix: config
+default_range: string
+imports:
+  - linkml:types
+
+classes:
+  Config:
+    tree_root: true
+    description: The LinkML schemas of one vocabulary and the generators to run on them.
+    attributes:
+      root_schema:
+        description: >-
+          Path of the LinkML schema that the generators read together with the schemas it imports.
+        required: true
+      output_dir:
+        description: Directory that receives the generated artifacts.
+        required: true
+      vocabularies:
+        description: The vocabularies that the generators process.
+        range: Vocabulary
+        multivalued: true
+        inlined_as_list: true
+        required: true
+        minimum_cardinality: 1
+      generators:
+        description: The generators to run. A generator runs if its key is present.
+        range: Generators
+        required: true
+
+  Vocabulary:
+    description: One LinkML schema and the names of the files generated from it.
+    attributes:
+      schema:
+        description: Path of the LinkML schema.
+        required: true
+      prefix:
+        description: Prefix of the vocabulary, unique among the vocabularies.
+        required: true
+      ontology:
+        description: >-
+          File names of the ontology generated from this schema, one per serialization.
+          The file extension selects the serialization.
+        multivalued: true
+        pattern: '^(?!\.\.?$)[^/\\]+$'
+      context:
+        description: File name of the JSON-LD context generated from this schema.
+        pattern: '^(?!\.\.?$)[^/\\]+$'
+      diagram:
+        description: File name of the class diagram generated from this schema.
+        pattern: '^(?!\.\.?$)[^/\\]+$'
+
+  Generators:
+    description: Settings of each generator.
+    attributes:
+      jsonschema:
+        range: JsonSchemaSettings
+      jsonldcontext:
+        range: JsonLdContextSettings
+      shacl:
+        range: ShaclSettings
+      owl:
+        range: OwlSettings
+      linkml:
+        range: LinkmlSettings
+      visualization:
+        range: VisualizationSettings
+      spec:
+        range: SpecSettings
+
+  JsonSchemaSettings:
+    attributes:
+      top_class:
+        description: Class that the root of the JSON Schema describes.
+        required: true
+      id:
+        description: Value of the "$id" keyword.
+        range: uri
+        required: true
+      description:
+        description: Value of the "description" keyword at the root of the JSON Schema.
+        required: true
+      dialect:
+        description: JSON Schema dialect of the generated JSON Schema.
+        range: JsonSchemaDialect
+        required: true
+      output:
+        description: File name of the generated JSON Schema.
+        required: true
+        pattern: '^(?!\.\.?$)[^/\\]+$'
+
+  JsonLdContextSettings:
+    attributes:
+      extra_root_terms:
+        description: >-
+          Terms outside the default prefix of the root schema that are defined at the root of the merged
+          JSON-LD context.
+        multivalued: true
+
+  ShaclSettings: {}
+
+  OwlSettings: {}
+
+  LinkmlSettings: {}
+
+  VisualizationSettings: {}
+
+  SpecSettings:
+    attributes:
+      template:
+        description: Path of the HTML template of the specification.
+        required: true
+      output:
+        description: Path of the generated specification.
+        required: true
+      vocab_id_prefix:
+        description: Leading part of the assertion ID of every vocabulary table row.
+        required: true
+      sections:
+        description: Sections of the template that receive the tables of one vocabulary each.
+        range: SpecSection
+        multivalued: true
+        inlined_as_list: true
+        required: true
+        minimum_cardinality: 1
+      snippets:
+        description: Directory of the example snippets.
+        required: true
+      glossary:
+        description: Path of the glossary used for cross-references.
+        required: true
+      first_class:
+        description: Class whose vocabulary table is rendered first.
+      extra_asserts:
+        description: Path of an HTML file with assertions that the specification text does not state.
+      assertions_csv:
+        description: Path of the generated CSV file of assertions.
+      default_values_anchor:
+        description: Fragment identifier of the template section that the "with default" assignment links to.
+      range_labels:
+        description: Text shown in the type column of the vocabulary tables for a LinkML range.
+        range: RangeLabel
+        multivalued: true
+        inlined: true
+      snippet_validation_schemas:
+        description: The JSON Schema that validates the snippets of one kind.
+        range: SnippetValidationSchema
+        multivalued: true
+        inlined: true
+
+  SpecSection:
+    attributes:
+      id:
+        description: HTML id of the section in the template.
+        required: true
+      schema:
+        description: Path of the vocabulary schema whose tables fill the section.
+        required: true
+
+  RangeLabel:
+    attributes:
+      range:
+        description: Name of the LinkML range.
+        key: true
+      label:
+        description: Text shown for the range.
+        required: true
+
+  SnippetValidationSchema:
+    attributes:
+      kind:
+        description: Kind of snippet.
+        key: true
+      path:
+        description: Path of a JSON Schema file.
+      generated:
+        description: Generator whose JSON Schema validates the snippets.
+        range: JsonSchemaGenerator
+
+enums:
+  JsonSchemaDialect:
+    permissible_values:
+      draft-07:
+        meaning: http://json-schema.org/draft-07/schema#
+      2019-09:
+        meaning: https://json-schema.org/draft/2019-09/schema
+  JsonSchemaGenerator:
+    description: The generators that write a JSON Schema.
+    permissible_values:
+      jsonschema:

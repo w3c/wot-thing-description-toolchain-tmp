@@ -8,7 +8,7 @@ import pytest
 from linkml_runtime.utils.schemaview import SchemaView
 
 from wot_toolchain import pipeline
-from wot_toolchain.config import Project
+from wot_toolchain.config import JsonSchemaSettings, Project
 from wot_toolchain.errors import GenerationError
 
 # The dangling ``is_a`` loads fine but makes JsonSchemaGenerator raise ValueError.
@@ -35,12 +35,18 @@ def _project(tmp_path: Path) -> Project:
     schema = tmp_path / "probe.yaml"
     schema.write_text(REJECTED_SCHEMA, encoding="utf-8")
     return Project(
-        manifest_path=tmp_path / "wot-toolchain.yaml",
-        main_schema=schema,
+        config_path=tmp_path / "wot-toolchain.yaml",
+        root_schema=schema,
         output_dir=tmp_path / "out",
         generators=("jsonschema",),
-        top_class=None,
-        modules=(),
+        jsonschema=JsonSchemaSettings(
+            top_class="A",
+            id="https://example.org/probe",
+            description="A probe.",
+            dialect="2019-09",
+            output="jsonschema.json",
+        ),
+        vocabularies=(),
         spec=None,
     )
 
@@ -54,7 +60,7 @@ def test_generator_value_error_raises_generation_error_naming_schema(tmp_path: P
 
 def test_generator_failure_restores_designates_type(tmp_path: Path) -> None:
     project = _project(tmp_path)
-    sv = SchemaView(str(project.main_schema))
+    sv = SchemaView(str(project.root_schema))
     output_dir = tmp_path / "out"
     output_dir.mkdir()
     with pytest.raises(GenerationError):

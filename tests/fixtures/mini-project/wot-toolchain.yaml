@@ -1,15 +1,17 @@
 # A minimal project that is not the Thing Description: it proves the toolchain needs no TD knowledge.
-main_schema: schemas/sensor.yaml
+root_schema: schemas/sensor.yaml
 output_dir: gens
 
-generators:
-  - jsonschema
-  - jsonldcontext
-
-jsonschema:
-  top_class: Sensor
-
-modules:
+vocabularies:
   - schema: schemas/sensor.yaml
     prefix: sen
     context: sensor-context.jsonld
+
+generators:
+  jsonschema:
+    top_class: Sensor
+    id: https://example.org/sensor
+    description: A tiny vocabulary unrelated to the Thing Description, used to test the toolchain.
+    dialect: "2019-09"
+    output: jsonschema.json
+  jsonldcontext:

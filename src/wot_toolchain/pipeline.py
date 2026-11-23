@@ -1,4 +1,4 @@
-"""Artifact generation pipeline driven by a project manifest."""
+"""Artifact generation pipeline driven by a project config file."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from .artifacts.jsonld_context.generator import WotContextGenerator
 from .artifacts.jsonld_context.module_context import build_module_context
 from .artifacts.jsonld_context.options import JsonLdContextOptions
 from .artifacts.jsonld_context.postprocess import post_process_jsonld_context
+from .artifacts.jsonschema.dialect import apply_settings
 from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
 from .artifacts.jsonschema.options import JsonSchemaOptions
 from .artifacts.jsonschema.postprocess import post_process_jsonschema
@@ -29,50 +30,45 @@ from .artifacts.registry import Artifact, ArtifactRegistry
 from .artifacts.shacl.generator import WotShaclGenerator
 from .artifacts.shacl.options import ShaclOptions
 from .artifacts.shacl.postprocess import post_process_shacl
-from .config import JSON_SCHEMA_FILES, Project, SpecConfig
-from .errors import GenerationError, ManifestError
+from .config import SPEC_GENERATOR, Project, SpecConfig
+from .errors import ConfigError, GenerationError
 from .generators.respec import generate_respec_spec
 from .generators.visualization import generate_visualizations, require_dot
 from .model.resolved import ResolvedProject
 from .specgen.bikeshed_processor import require_bikeshed
 
 
-def run_pipeline(project: Project, *, generate_docs: bool = False) -> None:
-    """Generate the artifacts of a project and, optionally, its specification.
+def run_pipeline(project: Project) -> None:
+    """Run the generators listed in ``project.generators``.
 
-    Every artifact generator listed in ``project.generators`` writes into its own
-    subdirectory of ``project.output_dir``.
+    Every artifact generator writes into its own subdirectory of ``project.output_dir``. The ``spec`` generator
+    runs last and writes to the paths that ``project.spec`` names.
 
     Args:
-        project: The validated project manifest.
-        generate_docs: Also build the specification described by ``project.spec``.
+        project: The validated project config file.
 
     Raises:
-        ManifestError: ``generate_docs`` is requested but the manifest has no ``spec`` section, or a snippet
-            validation schema refers to the output of a generator that is not part of this run.
+        ConfigError: A snippet validation schema refers to the output of a generator that is not part of this run.
         ExternalToolError: An external program needed by this run is missing; nothing has been generated.
         WotToolchainError: A schema could not be loaded or an artifact could not be generated.
     """
-    spec = project.spec if generate_docs else None
-    if generate_docs and spec is None:
-        raise ManifestError(
-            f"{project.manifest_path}: spec: generating the specification was requested but the manifest "
-            "has no 'spec' section. Add one or do not request the specification."
-        )
-    if spec is not None:
-        spec = _with_generated_validation_schemas(project, spec)
-    _require_external_tools(project, generate_docs=generate_docs)
-    resolved = ResolvedProject(project.main_schema)
+    spec = None
+    if SPEC_GENERATOR in project.generators:
+        spec = _with_generated_validation_schemas(project, project.spec)
+    _require_external_tools(project)
+    resolved = ResolvedProject(project.root_schema)
     resolved.validate()
     schema_view = resolved.merged
 
     for name in project.generators:
+        if name == SPEC_GENERATOR:
+            continue
         output_dir = _generator_dir(project, name)
         output_dir.mkdir(parents=True, exist_ok=True)
         ARTIFACT_REGISTRY.generator(name)(project, schema_view, output_dir)
 
     if spec is not None:
-        generate_respec_spec(spec, project.main_schema, resolved)
+        generate_respec_spec(spec, project.root_schema, resolved)
 
 
 def _generator_dir(project: Project, generator: str) -> Path:
@@ -80,16 +76,16 @@ def _generator_dir(project: Project, generator: str) -> Path:
 
 
 def _with_generated_validation_schemas(project: Project, spec: SpecConfig) -> SpecConfig:
-    # Resolved here, not when loading the manifest, because --output-dir and --only change the run afterwards.
+    # Resolved here, not when loading the config file, because --output-dir and --only change the run afterwards.
     schemas = dict(spec.snippet_validation_schemas)
     for kind, generator in spec.generated_snippet_validation_schemas.items():
         if generator not in project.generators:
-            raise ManifestError(
-                f"{project.manifest_path}: spec.snippet_validation_schemas.{kind}: refers to the JSON Schema "
+            raise ConfigError(
+                f"{project.config_path}: generators.spec.snippet_validation_schemas.{kind}: refers to the JSON Schema "
                 f"generated by {generator!r}, but that generator is not part of this run. Add it to 'generators' "
                 "(and to --only if used) or point the entry at a static schema file."
             )
-        schemas[kind] = _generator_dir(project, generator) / JSON_SCHEMA_FILES[generator]
+        schemas[kind] = _generator_dir(project, generator) / project.jsonschema.output
     return dataclasses.replace(
         spec,
         snippet_validation_schemas=MappingProxyType(schemas),
@@ -97,22 +93,26 @@ def _with_generated_validation_schemas(project: Project, spec: SpecConfig) -> Sp
     )
 
 
-def _require_external_tools(project: Project, *, generate_docs: bool) -> None:
+def _require_external_tools(project: Project) -> None:
     # Checked up front so a missing program does not leave a partially generated output directory.
-    if generate_docs:
+    if SPEC_GENERATOR in project.generators:
         require_bikeshed()
-    if "visualization" in project.generators and any(module.diagram is not None for module in project.modules):
+    if "visualization" in project.generators and any(
+        vocabulary.diagram is not None for vocabulary in project.vocabularies
+    ):
         require_dot()
 
 
 def _gen_jsonschema(project: Project, sv: SchemaView, output_dir: Path) -> None:
+    settings = project.jsonschema
     try:
-        gen = WotJsonSchemaGenerator.from_options(sv.schema, JsonSchemaOptions(top_class=project.top_class))
+        gen = WotJsonSchemaGenerator.from_options(sv.schema, JsonSchemaOptions(top_class=settings.top_class))
         raw = json.loads(gen.serialize())
     except ValueError as exc:
-        raise GenerationError(f"Could not generate the JSON Schema from {project.main_schema}: {exc}") from exc
+        raise GenerationError(f"Could not generate the JSON Schema from {project.root_schema}: {exc}") from exc
     processed = post_process_jsonschema(raw, sv)
-    with (output_dir / JSON_SCHEMA_FILES["jsonschema"]).open("w", encoding="utf-8") as f:
+    apply_settings(processed, id=settings.id, description=settings.description, dialect=settings.dialect)
+    with (output_dir / settings.output).open("w", encoding="utf-8") as f:
         json.dump(processed, f, indent=2, ensure_ascii=False)
 
 
@@ -124,25 +124,29 @@ def _gen_shacl(project: Project, sv: SchemaView, output_dir: Path) -> None:
 
 def _gen_owl(project: Project, sv: SchemaView, output_dir: Path) -> None:
     (output_dir / "ontology.owl.ttl").unlink(missing_ok=True)
-    for module in project.modules:
-        if module.ontology is None:
-            continue
-        graph = _run_gen_owl(module.schema)
-        postprocess_owl_graph(
-            graph, module.schema.name, module.ontology, module.schema.parent, output_dir, sv_merged=sv
-        )
+    for vocabulary in project.vocabularies:
+        for file_name in vocabulary.ontology:
+            if Path(file_name).suffix != ".ttl":
+                raise GenerationError(
+                    f"Could not generate the ontology {file_name} from {vocabulary.schema}: "
+                    "only the Turtle serialization (.ttl) is supported."
+                )
+            graph = _run_gen_owl(vocabulary.schema)
+            postprocess_owl_graph(
+                graph, vocabulary.schema.name, file_name, vocabulary.schema.parent, output_dir, sv_merged=sv
+            )
 
 
 def _gen_jsonldcontext(project: Project, sv: SchemaView, output_dir: Path) -> None:
     # build_module_context reuses the generator's internal state per slot, so the
     # merged context gets its own generator to stay independent of module order.
     module_gen = _context_generator(sv)
-    for module in project.modules:
-        if module.context is None:
+    for vocabulary in project.vocabularies:
+        if vocabulary.context is None:
             continue
-        module_ctx = build_module_context(sv, module_gen, module.prefix)
+        module_ctx = build_module_context(sv, module_gen, vocabulary.prefix)
         doc = json.dumps({"@context": module_ctx}, indent=2)
-        (output_dir / module.context).write_text(doc)
+        (output_dir / vocabulary.context).write_text(doc)
     merged = post_process_jsonld_context(
         sv, _context_generator(sv).serialize(), extra_root_terms=project.extra_root_terms
     )
@@ -154,17 +158,17 @@ def _context_generator(sv: SchemaView) -> WotContextGenerator:
 
 
 def _gen_linkml(project: Project, sv: SchemaView, output_dir: Path) -> None:
-    # The generator echoes source_file; keep it relative to the manifest so the
+    # The generator echoes source_file; keep it relative to the config file so the
     # artifact does not depend on the machine it was generated on.
     schema = copy.copy(sv.schema)
-    schema.source_file = Path(os.path.relpath(project.main_schema, project.manifest_path.parent)).as_posix()
+    schema.source_file = Path(os.path.relpath(project.root_schema, project.config_path.parent)).as_posix()
     gen = LinkmlGenerator(schema, mergeimports=True, format="yaml")
     (output_dir / "linkml.yaml").write_text(gen.serialize())
 
 
 def _gen_visualization(project: Project, sv: SchemaView, output_dir: Path) -> None:
     range_labels = project.spec.range_labels if project.spec is not None else MappingProxyType({})
-    generate_visualizations(project.modules, output_dir, range_labels)
+    generate_visualizations(project.vocabularies, output_dir, range_labels)
 
 
 def _run_gen_owl(schema_path: Path) -> Graph:

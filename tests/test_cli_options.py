@@ -19,9 +19,9 @@ from wot_toolchain import cli
 from wot_toolchain.config import Project
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-REPO_MANIFEST = REPO_ROOT / "wot-toolchain.yaml"
+REPO_CONFIG = REPO_ROOT / "wot-toolchain.yaml"
 CLI_BIN = Path(sys.executable).parent / "wot-toolchain"
-MANIFEST_GENERATORS = "jsonschema, shacl, jsonldcontext, owl, linkml, visualization"
+CONFIG_GENERATORS = "jsonschema, shacl, jsonldcontext, owl, linkml, visualization, spec"
 
 
 @pytest.fixture(autouse=True)
@@ -37,8 +37,8 @@ def recorded_runs(monkeypatch: pytest.MonkeyPatch) -> list[dict[str, Any]]:
     """Replace the pipeline with a recorder so option handling is observed without generating anything."""
     runs: list[dict[str, Any]] = []
 
-    def record(project: Project, *, generate_docs: bool = False) -> None:
-        runs.append({"project": project, "generate_docs": generate_docs})
+    def record(project: Project) -> None:
+        runs.append({"project": project})
 
     monkeypatch.setattr(cli, "run_pipeline", record)
     return runs
@@ -46,29 +46,29 @@ def recorded_runs(monkeypatch: pytest.MonkeyPatch) -> list[dict[str, Any]]:
 
 @pytest.fixture
 def project(tmp_path: Path) -> Path:
-    """A private copy of the project manifest and the input resources, without generated output."""
+    """A private copy of the project config file and the input resources, without generated output."""
     root = tmp_path / "project"
     root.mkdir()
-    shutil.copy2(REPO_MANIFEST, root / "wot-toolchain.yaml")
+    shutil.copy2(REPO_CONFIG, root / "wot-toolchain.yaml")
     shutil.copytree(REPO_ROOT / "resources", root / "resources", ignore=shutil.ignore_patterns("gens"))
     return root
 
 
-def _specless_manifest(tmp_path: Path, *, generators: list[str] | None = None, diagrams: bool = True) -> Path:
-    """A manifest without a spec section that reuses the repository schemas through absolute paths."""
-    document = yaml.safe_load(REPO_MANIFEST.read_text(encoding="utf-8"))
-    del document["spec"]
-    document["main_schema"] = str(REPO_ROOT / document["main_schema"])
-    document["output_dir"] = str(tmp_path / "manifest-out")
+def _specless_config(tmp_path: Path, *, generators: list[str] | None = None, diagrams: bool = True) -> Path:
+    """A config file without a spec section that reuses the repository schemas through absolute paths."""
+    document = yaml.safe_load(REPO_CONFIG.read_text(encoding="utf-8"))
+    del document["generators"]["spec"]
+    document["root_schema"] = str(REPO_ROOT / document["root_schema"])
+    document["output_dir"] = str(tmp_path / "config-out")
     if generators is not None:
-        document["generators"] = generators
-    for module in document["modules"]:
-        module["schema"] = str(REPO_ROOT / module["schema"])
+        document["generators"] = {name: document["generators"][name] for name in generators}
+    for vocabulary in document["vocabularies"]:
+        vocabulary["schema"] = str(REPO_ROOT / vocabulary["schema"])
         if not diagrams:
-            module.pop("diagram", None)
-    manifest = tmp_path / "specless.yaml"
-    manifest.write_text(yaml.safe_dump(document), encoding="utf-8")
-    return manifest
+            vocabulary.pop("diagram", None)
+    config = tmp_path / "specless.yaml"
+    config.write_text(yaml.safe_dump(document), encoding="utf-8")
+    return config
 
 
 def _invoke(*args: str | Path) -> Result:
@@ -79,36 +79,40 @@ def test_output_dir_is_resolved_against_the_working_directory(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, recorded_runs: list[dict[str, Any]]
 ) -> None:
     monkeypatch.chdir(tmp_path)
-    result = _invoke("-c", REPO_MANIFEST, "--output-dir", "out")
+    result = _invoke("-c", REPO_CONFIG, "--output-dir", "out")
     assert result.exit_code == 0, result.output
     assert recorded_runs[0]["project"].output_dir == tmp_path.resolve() / "out"
 
 
-def test_only_runs_the_named_generators_in_manifest_order(recorded_runs: list[dict[str, Any]]) -> None:
-    result = _invoke("-c", REPO_MANIFEST, "--only", "linkml", "--only", "jsonschema")
+def test_only_runs_the_named_generators_in_config_order(recorded_runs: list[dict[str, Any]]) -> None:
+    result = _invoke("-c", REPO_CONFIG, "--only", "linkml", "--only", "jsonschema")
     assert result.exit_code == 0, result.output
     assert recorded_runs[0]["project"].generators == ("jsonschema", "linkml")
 
 
-def test_only_leaves_spec_generation_to_the_docs_flag(recorded_runs: list[dict[str, Any]]) -> None:
-    result = _invoke("-c", REPO_MANIFEST, "--only", "linkml", "-d")
+def test_only_selects_the_spec_like_any_generator(recorded_runs: list[dict[str, Any]]) -> None:
+    result = _invoke("-c", REPO_CONFIG, "--only", "spec", "--only", "linkml")
     assert result.exit_code == 0, result.output
-    assert recorded_runs[0]["generate_docs"] is True
+    assert recorded_runs[0]["project"].generators == ("linkml", "spec")
 
 
-def test_only_rejects_an_unknown_generator_naming_the_choices(recorded_runs: list[dict[str, Any]]) -> None:
-    result = _invoke("-c", REPO_MANIFEST, "--only", "nope")
+def test_generate_docs_option_no_longer_exists(recorded_runs: list[dict[str, Any]]) -> None:
+    result = _invoke("-c", REPO_CONFIG, "-d")
     assert result.exit_code == 2, result.output
-    assert "'nope'" in result.output
-    assert MANIFEST_GENERATORS in result.output
     assert recorded_runs == []
 
 
-def test_only_rejects_a_generator_the_manifest_does_not_list(
-    tmp_path: Path, recorded_runs: list[dict[str, Any]]
-) -> None:
-    manifest = _specless_manifest(tmp_path, generators=["jsonschema", "linkml"])
-    result = _invoke("-c", manifest, "--only", "visualization")
+def test_only_rejects_an_unknown_generator_naming_the_choices(recorded_runs: list[dict[str, Any]]) -> None:
+    result = _invoke("-c", REPO_CONFIG, "--only", "nope")
+    assert result.exit_code == 2, result.output
+    assert "'nope'" in result.output
+    assert CONFIG_GENERATORS in result.output
+    assert recorded_runs == []
+
+
+def test_only_rejects_a_generator_the_config_does_not_list(tmp_path: Path, recorded_runs: list[dict[str, Any]]) -> None:
+    config = _specless_config(tmp_path, generators=["jsonschema", "linkml"])
+    result = _invoke("-c", config, "--only", "visualization")
     assert result.exit_code == 2, result.output
     assert "'visualization'" in result.output
     assert "jsonschema, linkml" in result.output
@@ -121,7 +125,7 @@ def test_missing_bikeshed_fails_before_any_generation(
     # A None entry in sys.modules is how Python marks a module as not importable.
     monkeypatch.setitem(sys.modules, "bikeshed", None)
     out = tmp_path / "out"
-    result = _invoke("-c", REPO_MANIFEST, "-d", "--only", "linkml", "--output-dir", out)
+    result = _invoke("-c", REPO_CONFIG, "--only", "spec", "--only", "linkml", "--output-dir", out)
     assert result.exit_code == 1, result.output
     assert "bikeshed" in caplog.text
     assert "specification" in caplog.text
@@ -133,7 +137,7 @@ def test_missing_dot_fails_before_any_generation(
 ) -> None:
     monkeypatch.setenv("PATH", str(tmp_path / "empty-bin"))
     out = tmp_path / "out"
-    result = _invoke("-c", REPO_MANIFEST, "--only", "linkml", "--only", "visualization", "--output-dir", out)
+    result = _invoke("-c", REPO_CONFIG, "--only", "linkml", "--only", "visualization", "--output-dir", out)
     assert result.exit_code == 1, result.output
     assert "'dot'" in caplog.text
     assert "diagram" in caplog.text
@@ -141,9 +145,9 @@ def test_missing_dot_fails_before_any_generation(
 
 
 def test_dot_is_not_required_when_no_module_declares_a_diagram(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    manifest = _specless_manifest(tmp_path, diagrams=False)
+    config = _specless_config(tmp_path, diagrams=False)
     monkeypatch.setenv("PATH", str(tmp_path / "empty-bin"))
-    result = _invoke("-c", manifest, "--only", "visualization", "--output-dir", tmp_path / "out")
+    result = _invoke("-c", config, "--only", "visualization", "--output-dir", tmp_path / "out")
     assert result.exit_code == 0, result.output
 
 

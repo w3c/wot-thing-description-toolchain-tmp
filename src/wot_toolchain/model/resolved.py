@@ -11,20 +11,20 @@ from wot_toolchain.schema_utils import load_schema_view
 
 @dataclass(frozen=True, slots=True)
 class ResolvedProject:
-    """The merged view of the main schema and the unmerged view of each module, loaded on first use."""
+    """The merged view of the root schema and the unmerged view of each module, loaded on first use."""
 
-    main_schema: Path
+    root_schema: Path
     # Mutable only to cache: each (file, merge_imports) pair is loaded once and then shared.
     _views: dict[tuple[Path, bool], SchemaView] = field(default_factory=dict, init=False, repr=False, compare=False)
 
     @property
     def merged(self) -> SchemaView:
-        """Return the main schema with all imports merged.
+        """Return the root schema with all imports merged.
 
         Raises:
             SchemaError: If the schema file is missing or is not valid YAML.
         """
-        return self._view(self.main_schema, merge_imports=True)
+        return self._view(self.root_schema, merge_imports=True)
 
     def validate(self) -> None:
         """Check the annotations of the merged view that the passes read.

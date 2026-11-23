@@ -12,7 +12,7 @@ from pathlib import Path
 from linkml_runtime.linkml_model.meta import ClassDefinition, SlotDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
-from ..config import Module
+from ..config import Vocabulary
 from ..errors import ExternalToolError
 from ..schema_utils import load_schema_view
 
@@ -311,20 +311,24 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: set[str], rang
     return "\n".join(lines)
 
 
-def generate_visualizations(modules: Iterable[Module], output_dir: Path, range_labels: Mapping[str, str]) -> None:
-    """Render the class diagram of every module that declares one.
+def generate_visualizations(
+    vocabularies: Iterable[Vocabulary], output_dir: Path, range_labels: Mapping[str, str]
+) -> None:
+    """Render the class diagram of every vocabulary that declares one.
 
     Args:
-        modules: Vocabulary modules; each one whose ``diagram`` is set gets an SVG of that name.
+        vocabularies: Vocabularies; each one whose ``diagram`` is set gets an SVG of that name.
         output_dir: Directory that receives the diagrams.
         range_labels: Text shown for a slot range, keyed by range name; ranges without an entry are shown under
             their own name.
 
     Raises:
         ExternalToolError: Graphviz ``dot`` is missing or fails to render a diagram.
-        SchemaError: A module schema cannot be loaded.
+        SchemaError: A vocabulary schema cannot be loaded.
     """
-    diagrams = [(module.schema, module.diagram) for module in modules if module.diagram is not None]
+    diagrams = [
+        (vocabulary.schema, vocabulary.diagram) for vocabulary in vocabularies if vocabulary.diagram is not None
+    ]
     if not diagrams:
         return
     require_dot()

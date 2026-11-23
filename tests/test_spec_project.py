@@ -1,4 +1,4 @@
-"""The specification generator takes every project-specific setting from the manifest's ``spec`` section."""
+"""The specification generator takes every project-specific setting from the config file's ``spec`` section."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from wot_toolchain.generators.respec import generate_respec_spec
 from wot_toolchain.specgen.respec import process_snippet_placeholders
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-REPO_MANIFEST = REPO_ROOT / "wot-toolchain.yaml"
+REPO_CONFIG = REPO_ROOT / "wot-toolchain.yaml"
 
 _CLASS_HEADING_RE = re.compile(r'<h3 id="[^"]*"><code>([A-Za-z]+)</code></h3>')
 
@@ -25,7 +25,7 @@ _CLASS_HEADING_RE = re.compile(r'<h3 id="[^"]*"><code>([A-Za-z]+)</code></h3>')
 @pytest.fixture
 def repo_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Project:
     """The repository project with spec outputs below ``tmp_path``, run from an unrelated working directory."""
-    project = load_project(REPO_MANIFEST)
+    project = load_project(REPO_CONFIG)
     assert project.spec is not None
     spec = dataclasses.replace(project.spec, output=tmp_path / "index.html", assertions_csv=None)
     elsewhere = tmp_path / "elsewhere"
@@ -34,8 +34,8 @@ def repo_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Project:
     return dataclasses.replace(project, spec=spec)
 
 
-def _rendered_classes(spec: SpecConfig, main_schema: Path) -> list[str]:
-    generate_respec_spec(spec, main_schema)
+def _rendered_classes(spec: SpecConfig, root_schema: Path) -> list[str]:
+    generate_respec_spec(spec, root_schema)
     return _CLASS_HEADING_RE.findall(spec.output.read_text(encoding="utf-8"))
 
 
@@ -45,28 +45,28 @@ def _spec(project: Project) -> SpecConfig:
 
 
 def test_spec_does_not_depend_on_the_working_directory(repo_project: Project) -> None:
-    classes = _rendered_classes(_spec(repo_project), repo_project.main_schema)
+    classes = _rendered_classes(_spec(repo_project), repo_project.root_schema)
 
     assert classes[0] == "Thing"
     assert not list(Path.cwd().iterdir())
 
 
-def test_first_class_comes_from_the_manifest(repo_project: Project) -> None:
+def test_first_class_comes_from_the_config(repo_project: Project) -> None:
     spec = dataclasses.replace(_spec(repo_project), first_class="VersionInfo")
 
-    classes = _rendered_classes(spec, repo_project.main_schema)
+    classes = _rendered_classes(spec, repo_project.root_schema)
 
     assert classes[0] == "VersionInfo"
     assert "Thing" in classes
 
 
-def test_sections_come_from_the_manifest(repo_project: Project, tmp_path: Path) -> None:
+def test_sections_come_from_the_config(repo_project: Project, tmp_path: Path) -> None:
     security = next(s for s in _spec(repo_project).sections if s.id == "sec-security-vocabulary-definition")
     template = tmp_path / "security.template.html"
     template.write_text(f"<section id='{security.id}'>%section('{security.id}')%</section>\n", encoding="utf-8")
     spec = dataclasses.replace(_spec(repo_project), template=template, sections=(security,), first_class=None)
 
-    classes = _rendered_classes(spec, repo_project.main_schema)
+    classes = _rendered_classes(spec, repo_project.root_schema)
 
     assert "SecurityScheme" in classes
     assert "Thing" not in classes
@@ -90,7 +90,7 @@ def test_snippet_manifest_edits_are_seen_by_the_next_generation(repo_project: Pr
     assert 'title="Edited title"' in second
 
 
-def test_snippet_validation_schemas_come_from_the_manifest(repo_project: Project, tmp_path: Path) -> None:
+def test_snippet_validation_schemas_come_from_the_config(repo_project: Project, tmp_path: Path) -> None:
     reject_all = tmp_path / "reject-all.json"
     reject_all.write_text(json.dumps({"not": {}}), encoding="utf-8")
     spec = dataclasses.replace(
@@ -98,13 +98,13 @@ def test_snippet_validation_schemas_come_from_the_manifest(repo_project: Project
     )
 
     with pytest.raises(GenerationError, match="snippet"):
-        generate_respec_spec(spec, repo_project.main_schema)
+        generate_respec_spec(spec, repo_project.root_schema)
 
 
 def test_unknown_first_class_is_rejected(repo_project: Project) -> None:
     spec = dataclasses.replace(_spec(repo_project), first_class="NoSuchClass")
 
     with pytest.raises(GenerationError, match="NoSuchClass"):
-        generate_respec_spec(spec, repo_project.main_schema)
+        generate_respec_spec(spec, repo_project.root_schema)
 
     assert not spec.output.exists()

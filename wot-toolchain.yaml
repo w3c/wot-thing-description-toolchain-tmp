@@ -1,87 +1,89 @@
-# Project manifest for wot-toolchain: the LinkML schemas of the WoT Thing Description vocabulary,
-# the generators to run, and how the specification is assembled.
-# All paths are relative to the directory of this file.
+# wot-toolchain config of the WoT Thing Description.
+# Paths are relative to the directory of this file.
+# This config will be moved in a seperate PR to the wot td repository.
 
-main_schema: resources/schemas/thing_description.yaml
+root_schema: resources/schemas/thing_description.yaml
 output_dir: resources/gens
 
-generators:
-  - jsonschema
-  - shacl
-  - jsonldcontext
-  - owl
-  - linkml
-  - visualization
-
-jsonschema:
-  top_class: Thing
-
-# The merged JSON-LD context keeps only terms of the main schema's default prefix (td) at its root; terms of
-# other vocabularies live in scoped contexts. These terms are outside td but the upstream TD context places
-# them at its root: schema (hctl:hasAdditionalOutputSchema), created and modified (dcterms).
-jsonld:
-  extra_root_terms: [schema, created, modified]
-
-# ontology, context and diagram are output file names, written to <output_dir>/owl, jsonldcontext and visualization.
-modules:
+vocabularies:
   - schema: resources/schemas/thing_description.yaml
     prefix: td
-    ontology: td.ttl
+    ontology: [td.ttl]
     context: td-context.jsonld
     diagram: td.svg
   - schema: resources/schemas/hypermedia.yaml
     prefix: hctl
-    ontology: hctl.ttl
+    ontology: [hctl.ttl]
     context: hypermedia-context.jsonld
     diagram: hctl.svg
   - schema: resources/schemas/wot_security.yaml
     prefix: wotsec
-    ontology: wotsec.ttl
+    ontology: [wotsec.ttl]
     context: wot-security-context.jsonld
     diagram: wotsec.svg
   - schema: resources/schemas/jsonschema.yaml
     prefix: jsonschema
-    ontology: jsonschema.ttl
+    ontology: [jsonschema.ttl]
     context: json-schema-context.jsonld
     diagram: jsonschema.svg
   - schema: resources/schemas/thing_model.yaml
     prefix: tm
-    ontology: tm.ttl
+    ontology: [tm.ttl]
 
-spec:
-  template: resources/index.template.html
-  output: resources/gens/index.html
-  # Every vocabulary table row gets the assertion ID td-vocab-<term>--<Class>, also in the sections of the
-  # jsonschema, wotsec and hctl modules: the published TD specification and its test suite use these IDs.
-  vocab_id_prefix: td
-  # The type column of the vocabulary tables names these LinkML ranges as the published TD specification does.
-  range_labels:
-    Any: any type
-    linkml:Any: any type
-    langString: rdf:langString
-    uri: anyURI
-    uriorcurie: anyURI
-    datetime: dateTime
-    NonNegativeInteger: unsignedInt
-    decimal: double
-  # The "with default" assignment in the vocabulary tables links to this section of the TD specification template.
-  default_values_anchor: sec-default-values
-  first_class: Thing
-  sections:
-    - id: sec-core-vocabulary-definition
-      schema: resources/schemas/thing_description.yaml
-    - id: sec-data-schema-vocabulary-definition
-      schema: resources/schemas/jsonschema.yaml
-    - id: sec-security-vocabulary-definition
-      schema: resources/schemas/wot_security.yaml
-    - id: sec-hypermedia-vocabulary-definition
-      schema: resources/schemas/hypermedia.yaml
-  snippets: resources/snippets
-  glossary: resources/xref/glossary.yaml
-  # Copied from w3c/wot-thing-description testing/inputs/. Holds the assertions that the spec text
-  # does not state as a separate sentence but the test suite still needs, same as in the upstream toolchain.
-  extra_asserts: resources/upstream/extra-asserts.html
-  assertions_csv: resources/gens/assertions/assertions.csv
-  snippet_validation_schemas:
-    td: resources/upstream/schemas/td-next-json-schema-validation.json
-    tm: resources/upstream/schemas/tm-json-schema-validation.json
+generators:
+  jsonschema:
+    top_class: Thing
+    id: https://www.w3.org/2019/wot/td
+    description: >-
+      JSON Schema for validating TD instances against the TD information model.
+      TD instances can be with or without terms that have default values
+    dialect: "2019-09"
+    output: jsonschema.json
+  # The merged JSON-LD context keeps only terms of the root schema's default prefix (td) at its root; terms of
+  # other vocabularies live in scoped contexts. These terms are outside td but the upstream TD context places
+  # them at its root: schema (hctl:hasAdditionalOutputSchema), created and modified (dcterms).
+  jsonldcontext:
+    extra_root_terms: [schema, created, modified]
+  shacl:
+  owl:
+  linkml:
+  visualization:
+  spec:
+    template: resources/index.template.html
+    output: resources/gens/index.html
+    # Every vocabulary table row gets the assertion ID td-vocab-<term>--<Class>, also in the sections of the
+    # jsonschema, wotsec and hctl modules: the published TD specification and its test suite use these IDs.
+    vocab_id_prefix: td
+    # The type column of the vocabulary tables names these LinkML ranges as the published TD specification does.
+    range_labels:
+      Any: any type
+      linkml:Any: any type
+      langString: rdf:langString
+      uri: anyURI
+      uriorcurie: anyURI
+      datetime: dateTime
+      NonNegativeInteger: unsignedInt
+      decimal: double
+    # The "with default" assignment in the vocabulary tables links to this section of the TD specification template.
+    default_values_anchor: sec-default-values
+    first_class: Thing
+    sections:
+      - id: sec-core-vocabulary-definition
+        schema: resources/schemas/thing_description.yaml
+      - id: sec-data-schema-vocabulary-definition
+        schema: resources/schemas/jsonschema.yaml
+      - id: sec-security-vocabulary-definition
+        schema: resources/schemas/wot_security.yaml
+      - id: sec-hypermedia-vocabulary-definition
+        schema: resources/schemas/hypermedia.yaml
+    snippets: resources/snippets
+    glossary: resources/xref/glossary.yaml
+    # Copied from w3c/wot-thing-description testing/inputs/. Holds the assertions that the spec text
+    # does not state as a separate sentence but the test suite still needs, same as in the upstream toolchain.
+    extra_asserts: resources/upstream/extra-asserts.html
+    assertions_csv: resources/gens/assertions/assertions.csv
+    snippet_validation_schemas:
+      td:
+        path: resources/upstream/schemas/td-next-json-schema-validation.json
+      tm:
+        path: resources/upstream/schemas/tm-json-schema-validation.json

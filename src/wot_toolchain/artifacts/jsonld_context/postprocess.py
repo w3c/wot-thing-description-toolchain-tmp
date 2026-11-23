@@ -24,7 +24,7 @@ def post_process_jsonld_context(
     RDF predicate represented by a keyed map, or scoped vocabulary contexts.
 
     Args:
-        schema_view: SchemaView of the main schema.
+        schema_view: SchemaView of the root schema.
         serialized_schema: JSON-LD context serialized by LinkML's ``ContextGenerator``.
         extra_root_terms: Terms outside the schema's default prefix that stay in the root context.
 

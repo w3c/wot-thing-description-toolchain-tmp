@@ -244,7 +244,7 @@ def _load_schema(schema_path: Path) -> Draft7Validator:
 
 
 def _schema_kind(manifest: Mapping[str, Any], name: str, manifest_path: Path) -> str:
-    """Return the ``spec.snippet_validation_schemas`` key the snippet manifest assigns to snippet ``name``."""
+    """Return the ``generators.spec.snippet_validation_schemas`` key that the snippet manifest assigns to ``name``."""
     meta = manifest["snippets"][name]
     if "schema" in meta:
         kind, key = meta["schema"], f"snippets.{name}.schema"
@@ -254,10 +254,12 @@ def _schema_kind(manifest: Mapping[str, Any], name: str, manifest_path: Path) ->
         raise GenerationError(
             f"{manifest_path}: snippets.{name}: no 'schema' and no top-level 'default_schema'; "
             f"add 'schema: <kind>' to the snippet or 'default_schema: <kind>' to the manifest, "
-            f"where <kind> is a key of spec.snippet_validation_schemas"
+            f"where <kind> is a key of generators.spec.snippet_validation_schemas"
         )
     if not isinstance(kind, str):
-        raise GenerationError(f"{manifest_path}: {key}: must be a key of spec.snippet_validation_schemas, got {kind!r}")
+        raise GenerationError(
+            f"{manifest_path}: {key}: must be a key of generators.spec.snippet_validation_schemas, got {kind!r}"
+        )
     return kind
 
 
@@ -272,7 +274,7 @@ def _collect_schema_errors(
     if validator is None:
         raise GenerationError(
             f"{filename} needs a {kind!r} validation schema (from {_SNIPPET_MANIFEST}); "
-            f"add it to spec.snippet_validation_schemas in the project manifest"
+            f"add it to generators.spec.snippet_validation_schemas in the config file"
         )
     for error in validator.iter_errors(instance):
         path = ".".join(str(p) for p in error.absolute_path) or "(root)"
@@ -285,7 +287,7 @@ def validate_all_snippets(snippets_dir: Path, schemas: Mapping[str, Path]) -> li
 
     Args:
         snippets_dir: Directory holding the snippet JSON files and the manifest.
-        schemas: JSON Schema per snippet kind, from ``spec.snippet_validation_schemas``. The snippet manifest
+        schemas: JSON Schema per snippet kind, from ``generators.spec.snippet_validation_schemas``. The snippet manifest
             picks the kind per snippet: its ``schema`` key, else the manifest's top-level ``default_schema``.
 
     Returns:

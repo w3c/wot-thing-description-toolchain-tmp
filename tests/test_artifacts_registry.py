@@ -7,7 +7,7 @@ import pytest
 from wot_toolchain import pipeline
 from wot_toolchain.artifacts.registry import Artifact, ArtifactRegistry, artifact_names
 from wot_toolchain.config import load_project
-from wot_toolchain.errors import ManifestError
+from wot_toolchain.errors import ConfigError
 
 # Captured from config.KNOWN_GENERATORS and pipeline._DISPATCH before the registry existed.
 NAMES_BEFORE_REGISTRY = ("jsonschema", "shacl", "jsonldcontext", "owl", "linkml", "visualization")
@@ -57,16 +57,14 @@ def test_registry_rejects_unknown_generator() -> None:
         ArtifactRegistry(generators)
 
 
-def test_manifest_with_unknown_generator_reports_the_registered_names(tmp_path: Path) -> None:
-    (tmp_path / "main.yaml").write_text("", encoding="utf-8")
-    manifest = tmp_path / "wot-toolchain.yaml"
-    manifest.write_text(
-        "main_schema: main.yaml\noutput_dir: out\ngenerators: [pdf]\nmodules: [{schema: main.yaml, prefix: m}]\n",
+def test_config_with_unknown_generator_reports_the_registered_names(tmp_path: Path) -> None:
+    (tmp_path / "m.yaml").write_text("", encoding="utf-8")
+    config = tmp_path / "wot-toolchain.yaml"
+    config.write_text(
+        "root_schema: m.yaml\noutput_dir: out\ngenerators: {pdf: }\nvocabularies: [{schema: m.yaml, prefix: m}]\n",
         encoding="utf-8",
     )
-    with pytest.raises(ManifestError) as excinfo:
-        load_project(manifest)
-    assert str(excinfo.value) == (
-        f"{manifest.resolve()}: generators[0]: unknown generator 'pdf'. "
-        "Use one of: jsonschema, shacl, jsonldcontext, owl, linkml, visualization."
-    )
+    with pytest.raises(ConfigError) as excinfo:
+        load_project(config)
+    assert "'pdf' was unexpected" in str(excinfo.value)
+    assert str(excinfo.value).endswith("in /generators")

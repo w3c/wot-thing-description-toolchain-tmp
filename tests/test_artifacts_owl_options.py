@@ -13,7 +13,7 @@ from wot_toolchain.artifacts.owl.options import MetadataProfile, OwlOptions, Per
 from wot_toolchain.artifacts.owl.preprocess import preprocess_for_gen_owl
 from wot_toolchain.config import load_project
 
-MANIFEST = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
+CONFIG = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
 
 TODAYS_FLAGS = {
     "metaclasses": False,
@@ -32,7 +32,7 @@ def hctl_yaml() -> str:
 
 
 def _preprocessed_yaml(prefix: str) -> str:
-    schema = next(module.schema for module in load_project(MANIFEST).modules if module.prefix == prefix)
+    schema = next(vocabulary.schema for vocabulary in load_project(CONFIG).vocabularies if vocabulary.prefix == prefix)
     return preprocess_for_gen_owl(str(schema))
 
 

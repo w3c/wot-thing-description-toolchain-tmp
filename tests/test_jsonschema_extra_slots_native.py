@@ -17,7 +17,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 def td_schema_view() -> SchemaView:
     """The TD schema view, loaded as the pipeline loads it."""
     project = load_project(REPO_ROOT / "wot-toolchain.yaml")
-    return load_schema_view(project.main_schema, merge_imports=True)
+    return load_schema_view(project.root_schema, merge_imports=True)
 
 
 @pytest.fixture(scope="module")
@@ -27,7 +27,7 @@ def raw_td_jsonschema(td_schema_view: SchemaView) -> dict:
     gen = JsonSchemaGenerator(
         td_schema_view.schema,
         mergeimports=True,
-        top_class=project.top_class,
+        top_class=project.jsonschema.top_class,
         not_closed=True,
         include_null=False,
         preserve_names=True,

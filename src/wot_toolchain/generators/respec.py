@@ -432,16 +432,16 @@ def render_explicit_assertion_annotation(
     return "\n".join(rendered)
 
 
-def generate_respec_spec(spec: SpecConfig, main_schema: Path, resolved: ResolvedProject | None = None) -> None:
-    """Render the specification described by the manifest's ``spec`` section.
+def generate_respec_spec(spec: SpecConfig, root_schema: Path, resolved: ResolvedProject | None = None) -> None:
+    """Render the specification described by the config file's ``spec`` section.
 
     Renders one table per class of every section's module, resolves glossary links with Bikeshed,
     validates and expands the example snippets, injects everything into the HTML template and,
     if configured, extracts the assertion inventory.
 
     Args:
-        spec: The specification settings of the project manifest.
-        main_schema: Schema that imports all modules; class definitions are read from it.
+        spec: The specification settings of the project config file.
+        root_schema: Schema that imports all modules; class definitions are read from it.
         resolved: Views already loaded in this run; section schemas are loaded here when omitted.
 
     Raises:
@@ -451,9 +451,9 @@ def generate_respec_spec(spec: SpecConfig, main_schema: Path, resolved: Resolved
         ExternalToolError: Bikeshed is missing or fails.
     """
     # Own merged load: the pipeline's merged view has been mutated by the artifact generators (from_schema rewritten).
-    sv = load_schema_view(main_schema, merge_imports=True)
+    sv = load_schema_view(root_schema, merge_imports=True)
     if resolved is None:
-        resolved = ResolvedProject(main_schema)
+        resolved = ResolvedProject(root_schema)
     section_tpl = build_jinja_env().get_template("class_section.jinja2")
     type_hrefs = load_type_hrefs(spec.glossary)
     fragments = [
@@ -507,7 +507,7 @@ def _classes_per_section(
         if not any(first_class in names for names in classes):
             raise GenerationError(
                 f"spec.first_class {first_class!r} is not a class of any spec section. "
-                "Name a class of one of the section schemas or remove first_class from the manifest."
+                "Name a class of one of the section schemas or remove first_class from the config file."
             )
         classes = [_move_to_front(names, first_class) for names in classes]
     return classes

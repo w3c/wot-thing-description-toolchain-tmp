@@ -6,7 +6,7 @@ Integration tests read generated artifacts. Generate them before running the
 full suite:
 
 ```bash
-uv run wot-toolchain generate-wot-resources -d
+uv run wot-toolchain generate-wot-resources
 uv run pytest tests/ -v
 ```
 
@@ -41,9 +41,9 @@ their own fixtures and do not require generated output.
   and need Node.js with the `jsonld` package in `node_modules/`.
 - `test_owl_structure.py` and `test_shacl_postprocessor.py` check the
   experimental OWL and SHACL outputs.
-- `test_manifest.py`, `test_pipeline_project.py`, `test_spec_project.py`,
+- `test_config.py`, `test_pipeline_project.py`, `test_spec_project.py`,
   `test_visualization_project.py`, `test_cli_options.py`, and
-  `test_cli_exit_codes.py` check manifest loading, CLI options, and error
+  `test_cli_exit_codes.py` check config file loading, CLI options, and error
   exits. `test_second_project.py` runs the toolchain on a LinkML project other
   than the Thing Description.
 - `test_packaged_templates.py`, `test_declared_dependencies.py`,

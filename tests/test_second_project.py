@@ -1,6 +1,6 @@
 """A LinkML project that is not the Thing Description generates correct artifacts with the same toolchain.
 
-The fixture in ``tests/fixtures/mini-project`` has its own manifest, top class and prefix. Every TD name
+The fixture in ``tests/fixtures/mini-project`` has its own config file, top class and prefix. Every TD name
 the Python code relied on would show up here as a missing or wrong artifact.
 """
 

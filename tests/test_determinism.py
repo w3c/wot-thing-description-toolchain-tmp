@@ -23,7 +23,7 @@ RELEASE_GENERATORS = ("jsonschema", "jsonldcontext")
 
 @pytest.fixture
 def project_root(tmp_path: Path) -> Path:
-    """A private copy of the project manifest and the input resources, without generated output."""
+    """A private copy of the project config file and the input resources, without generated output."""
     shutil.copy2(REPO_ROOT / "wot-toolchain.yaml", tmp_path / "wot-toolchain.yaml")
     shutil.copytree(REPO_ROOT / "resources", tmp_path / "resources", ignore=shutil.ignore_patterns("gens"))
     return tmp_path
@@ -44,7 +44,7 @@ def _release_paths(project: Project) -> list[Path]:
 def _generate_release_artifacts(project_root: Path, project: Project) -> dict[str, bytes]:
     """Run the CLI with ``-d`` once, then collect and remove its release artifacts, keyed by relative path."""
     result = subprocess.run(
-        [str(CLI_BIN), "generate-wot-resources", "-d"],
+        [str(CLI_BIN), "generate-wot-resources"],
         cwd=project_root,
         capture_output=True,
         text=True,

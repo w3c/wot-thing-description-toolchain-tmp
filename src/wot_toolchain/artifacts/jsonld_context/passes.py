@@ -124,7 +124,7 @@ POST_SCOPING_PASSES: tuple[Pass, ...] = (
     Pass(
         name="remove_non_root_terms",
         kind=PassKind.WOT_SHAPING,
-        reason="Keeps only td-prefixed terms and the manifest's extra_root_terms at the root, matching the W3C "
+        reason="Keeps only td-prefixed terms and the config file's extra_root_terms at the root, matching the W3C "
         "context layout.",
         apply=remove_non_root_terms,
     ),

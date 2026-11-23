@@ -11,8 +11,8 @@ class WotToolchainError(Exception):
     """Base class for all errors raised deliberately by wot_toolchain."""
 
 
-class ManifestError(WotToolchainError):
-    """The project manifest is missing, unreadable or describes an invalid project."""
+class ConfigError(WotToolchainError):
+    """The project config file is missing, unreadable or describes an invalid project."""
 
 
 class SchemaError(WotToolchainError):

@@ -9,7 +9,7 @@ from wot_toolchain import pipeline
 from wot_toolchain.config import load_project
 from wot_toolchain.schema_utils import load_schema_view
 
-MANIFEST = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
+CONFIG = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
 
 _GENERATE_IN_CHILD = """
 import sys
@@ -18,7 +18,7 @@ from wot_toolchain import pipeline
 from wot_toolchain.config import load_project
 from wot_toolchain.schema_utils import load_schema_view
 project = load_project(Path(sys.argv[1]))
-pipeline._gen_owl(project, load_schema_view(project.main_schema, merge_imports=True), Path(sys.argv[2]))
+pipeline._gen_owl(project, load_schema_view(project.root_schema, merge_imports=True), Path(sys.argv[2]))
 """
 
 
@@ -29,9 +29,9 @@ def _read_outputs(output_dir: Path) -> dict[str, str]:
 
 def _generate_in_process(output_dir: Path) -> dict[str, str]:
     """Run the pipeline's OWL route with a fresh schema view and fresh generators."""
-    project = load_project(MANIFEST)
+    project = load_project(CONFIG)
     output_dir.mkdir()
-    pipeline._gen_owl(project, load_schema_view(project.main_schema, merge_imports=True), output_dir)
+    pipeline._gen_owl(project, load_schema_view(project.root_schema, merge_imports=True), output_dir)
     return _read_outputs(output_dir)
 
 
@@ -40,7 +40,7 @@ def _generate_in_subprocess(output_dir: Path, hash_seed: str) -> dict[str, str]:
     output_dir.mkdir()
     env = {**os.environ, "PYTHONHASHSEED": hash_seed}
     result = subprocess.run(
-        [sys.executable, "-c", _GENERATE_IN_CHILD, str(MANIFEST), str(output_dir)],
+        [sys.executable, "-c", _GENERATE_IN_CHILD, str(CONFIG), str(output_dir)],
         env=env,
         capture_output=True,
         text=True,
@@ -56,8 +56,8 @@ def _differing(first: dict[str, str], second: dict[str, str]) -> list[str]:
 
 
 def _expected_files() -> set[str]:
-    """Return the ontology file names the manifest asks for."""
-    return {module.ontology for module in load_project(MANIFEST).modules if module.ontology is not None}
+    """Return the ontology file names the config file asks for."""
+    return {file_name for vocabulary in load_project(CONFIG).vocabularies for file_name in vocabulary.ontology}
 
 
 def test_owl_route_is_identical_twice_in_one_process(tmp_path: Path) -> None:

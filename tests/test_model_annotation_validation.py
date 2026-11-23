@@ -10,8 +10,8 @@ from wot_toolchain.errors import SchemaError
 from wot_toolchain.model.resolved import ResolvedProject
 
 TESTS = Path(__file__).resolve().parent
-REPO_MANIFEST = TESTS.parent / "wot-toolchain.yaml"
-SECOND_PROJECT_MANIFEST = TESTS / "fixtures" / "mini-project" / "wot-toolchain.yaml"
+REPO_CONFIG = TESTS.parent / "wot-toolchain.yaml"
+SECOND_PROJECT_CONFIG = TESTS / "fixtures" / "mini-project" / "wot-toolchain.yaml"
 
 
 def _schema(
@@ -124,6 +124,6 @@ def test_reading_the_merged_view_does_not_validate(tmp_path: Path) -> None:
     assert "Box" in resolved.merged.all_classes()
 
 
-@pytest.mark.parametrize("manifest", [REPO_MANIFEST, SECOND_PROJECT_MANIFEST], ids=["td", "second-project"])
-def test_current_projects_validate_clean(manifest: Path) -> None:
-    ResolvedProject(load_project(manifest).main_schema).validate()
+@pytest.mark.parametrize("config", [REPO_CONFIG, SECOND_PROJECT_CONFIG], ids=["td", "second-project"])
+def test_current_projects_validate_clean(config: Path) -> None:
+    ResolvedProject(load_project(config).root_schema).validate()

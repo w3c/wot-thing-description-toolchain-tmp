@@ -27,7 +27,7 @@ class Generation:
 
     project: Path
     working_dir: Path
-    manifest: dict[str, Any]
+    config: dict[str, Any]
     output_dir: Path
     result: subprocess.CompletedProcess[str]
 
@@ -52,7 +52,7 @@ def installed_venv(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 @pytest.fixture(scope="session")
 def generation(installed_venv: Path, tmp_path_factory: pytest.TempPathFactory) -> Generation:
-    """The installed CLI run with all manifest generators and the specification, from an unrelated directory."""
+    """The installed CLI run with all config file generators and the specification, from an unrelated directory."""
     project = tmp_path_factory.mktemp("project")
     shutil.copy2(REPO_ROOT / "wot-toolchain.yaml", project / "wot-toolchain.yaml")
     shutil.copytree(REPO_ROOT / "resources", project / "resources", ignore=shutil.ignore_patterns("gens"))
@@ -67,7 +67,6 @@ def generation(installed_venv: Path, tmp_path_factory: pytest.TempPathFactory) -
             str(project / "wot-toolchain.yaml"),
             "--output-dir",
             str(output_dir),
-            "-d",
         ],
         cwd=elsewhere,
         env={**os.environ, "PATH": _path_without_the_environment()},
@@ -75,8 +74,8 @@ def generation(installed_venv: Path, tmp_path_factory: pytest.TempPathFactory) -
         text=True,
         check=False,
     )
-    manifest = yaml.safe_load((project / "wot-toolchain.yaml").read_text(encoding="utf-8"))
-    return Generation(project=project, working_dir=elsewhere, manifest=manifest, output_dir=output_dir, result=result)
+    config = yaml.safe_load((project / "wot-toolchain.yaml").read_text(encoding="utf-8"))
+    return Generation(project=project, working_dir=elsewhere, config=config, output_dir=output_dir, result=result)
 
 
 def _path_without_the_environment() -> str:
@@ -113,7 +112,7 @@ def test_merged_json_ld_context_is_generated(generation: Generation) -> None:
 
 
 def test_every_module_json_ld_context_is_generated(generation: Generation) -> None:
-    contexts = [module["context"] for module in generation.manifest["modules"] if "context" in module]
+    contexts = [vocabulary["context"] for vocabulary in generation.config["vocabularies"] if "context" in vocabulary]
     assert contexts
     for name in contexts:
         path = generation.output_dir / "jsonldcontext" / name
@@ -122,7 +121,7 @@ def test_every_module_json_ld_context_is_generated(generation: Generation) -> No
 
 
 def test_every_module_ontology_is_generated(generation: Generation) -> None:
-    ontologies = [module["ontology"] for module in generation.manifest["modules"] if "ontology" in module]
+    ontologies = [name for vocabulary in generation.config["vocabularies"] for name in vocabulary.get("ontology", ())]
     assert ontologies
     for name in ontologies:
         _assert_non_empty_file(generation.output_dir / "owl" / name)
@@ -133,22 +132,22 @@ def test_shacl_shapes_are_generated(generation: Generation) -> None:
 
 
 def test_every_module_diagram_is_generated(generation: Generation) -> None:
-    diagrams = [module["diagram"] for module in generation.manifest["modules"] if "diagram" in module]
+    diagrams = [vocabulary["diagram"] for vocabulary in generation.config["vocabularies"] if "diagram" in vocabulary]
     assert diagrams
     for name in diagrams:
         _assert_non_empty_file(generation.output_dir / "visualization" / name)
 
 
 def test_specification_html_is_generated(generation: Generation) -> None:
-    # The spec paths come from the manifest and are resolved against its directory, not against --output-dir.
-    path = generation.project / generation.manifest["spec"]["output"]
+    # The spec paths come from the config file and are resolved against its directory, not against --output-dir.
+    path = generation.project / generation.config["generators"]["spec"]["output"]
     _assert_non_empty_file(path)
     # An assertion id that only exists in thing_description.yaml proves the schema content reached the spec.
     assert 'id="td-context-ns-thing-mandatory"' in path.read_text(encoding="utf-8")
 
 
 def test_assertions_csv_is_generated(generation: Generation) -> None:
-    path = generation.project / generation.manifest["spec"]["assertions_csv"]
+    path = generation.project / generation.config["generators"]["spec"]["assertions_csv"]
     _assert_non_empty_file(path)
     rows = path.read_text(encoding="utf-8").splitlines()
     assert rows[0] == '"ID","Status","Assertion"'

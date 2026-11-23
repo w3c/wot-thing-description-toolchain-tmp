@@ -78,7 +78,7 @@ def test_unconfigured_schema_kind_is_rejected(tmp_path: Path) -> None:
     message = str(excinfo.value)
     assert "nameless.json" in message
     assert "'absent'" in message
-    assert "spec.snippet_validation_schemas" in message
+    assert "generators.spec.snippet_validation_schemas" in message
 
 
 def test_non_string_schema_kind_is_rejected(tmp_path: Path) -> None:

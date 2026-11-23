@@ -13,7 +13,7 @@ from wot_toolchain import pipeline
 from wot_toolchain.config import load_project
 from wot_toolchain.schema_utils import load_schema_view
 
-MANIFEST = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
+CONFIG = Path(__file__).resolve().parent.parent / "wot-toolchain.yaml"
 WOTSEC = Namespace("https://www.w3.org/2019/wot/security#")
 COMBO_SHAPE = WOTSEC.ComboSecuritySchemeShape
 TERMS = ("oneOf", "allOf")
@@ -22,8 +22,8 @@ TERMS = ("oneOf", "allOf")
 @pytest.fixture(scope="module")
 def json_schema(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Any]:
     output_dir = tmp_path_factory.mktemp("jsonschema")
-    project = load_project(MANIFEST)
-    pipeline._gen_jsonschema(project, load_schema_view(project.main_schema, merge_imports=True), output_dir)
+    project = load_project(CONFIG)
+    pipeline._gen_jsonschema(project, load_schema_view(project.root_schema, merge_imports=True), output_dir)
     schema: dict[str, Any] = json.loads((output_dir / "jsonschema.json").read_text(encoding="utf-8"))
     return schema
 
@@ -31,8 +31,8 @@ def json_schema(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Any]:
 @pytest.fixture(scope="module")
 def shapes(tmp_path_factory: pytest.TempPathFactory) -> Graph:
     output_dir = tmp_path_factory.mktemp("shacl")
-    project = load_project(MANIFEST)
-    pipeline._gen_shacl(project, load_schema_view(project.main_schema, merge_imports=True), output_dir)
+    project = load_project(CONFIG)
+    pipeline._gen_shacl(project, load_schema_view(project.root_schema, merge_imports=True), output_dir)
     return Graph().parse(output_dir / "shapes.shacl.ttl", format="turtle")
 
 

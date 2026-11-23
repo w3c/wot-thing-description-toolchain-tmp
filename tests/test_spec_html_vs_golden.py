@@ -39,9 +39,7 @@ def golden_tree():
 @pytest.fixture(scope="module")
 def generated_tree():
     if not GENERATED_PATH.exists():
-        pytest.skip(
-            f"Generated HTML not found at {GENERATED_PATH}; run `wot-toolchain generate-wot-resources -d` first."
-        )
+        pytest.skip(f"Generated HTML not found at {GENERATED_PATH}; run `wot-toolchain generate-wot-resources` first.")
     return parse_html(GENERATED_PATH)
 
 
