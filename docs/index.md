@@ -1,8 +1,5 @@
 # WoT Toolchain
 
-**Author:** Abrorkhon Inomkhujaev
-**Date:** 24.11.2026
-
 ---
 
 The WoT Toolchain generates Web of Things (WoT) resources from LinkML schema modules: the JSON Schema, the JSON-LD context, SHACL shapes, OWL ontologies, class-hierarchy diagrams, and the ReSpec Thing Description specification with its assertion inventory. These pages are for contributors who author the schemas or maintain the toolchain.
@@ -25,14 +22,14 @@ The project config file `wot-toolchain.yaml` lists the generators to run, the sc
 
 ## Where to start
 
-| If you want to | Read |
-|----------------|------|
-| Change the td-next vocabulary | [Authoring td-next with LinkML](authoring-guide.md) |
-| Follow the schema and code conventions | [Guidelines](guidelines/index.md) |
-| Look up an annotation or naming rule | [WoT Custom Annotations](reference/wot-custom-annotations.md), [LinkML Naming Conventions](reference/linkml-naming-conventions.md), [LinkML Cheatsheet](reference/linkml-cheatsheet.md) |
-| Understand how an artifact is composed | [Maintainers](maintainers/jsonld-context-composition.md) |
-| Check how the output differs from TD 1.1 | [Differences](differences/README.md) |
-| See what LinkML cannot express yet | [LinkML gaps](linkml-gaps.md), [Upstream issues](upstream-issues/README.md) |
+| If you want to                           | Read                                                                                                                                                                                    |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Change the td-next vocabulary            | [Authoring td-next with LinkML](authoring-guide.md)                                                                                                                                     |
+| Follow the schema and code conventions   | [Guidelines](guidelines/index.md)                                                                                                                                                       |
+| Look up an annotation or naming rule     | [WoT Custom Annotations](reference/wot-custom-annotations.md), [LinkML Naming Conventions](reference/linkml-naming-conventions.md), [LinkML Cheatsheet](reference/linkml-cheatsheet.md) |
+| Understand how an artifact is composed   | [Maintainers](maintainers/jsonld-context-composition.md)                                                                                                                                |
+| Check how the output differs from TD 1.1 | [Differences](differences/README.md)                                                                                                                                                    |
+| See what LinkML cannot express yet       | [LinkML gaps](linkml-gaps.md), [Upstream issues](upstream-issues/README.md)                                                                                                             |
 
 ## Generated artifacts
 
