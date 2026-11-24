@@ -16,59 +16,13 @@ the repository license.
 
 ## Development setup
 
-Requirements:
-
-- Python 3.14 or later
-- [uv](https://docs.astral.sh/uv/)
-- [Graphviz](https://graphviz.org/) (the `dot` program) for the diagram
-  generator. When the config file enables the `visualization` generator,
-  generation stops with an error before writing any output if `dot` is not on
-  `PATH`; `--only` can exclude that generator.
-- [Node.js](https://nodejs.org/) with the `jsonld` package installed in
-  `node_modules/`, only for the JSON-LD round-trip tests.
-
-`bikeshed`, used to build the specification HTML, is a Python dependency and
-is installed by uv.
-
-Install the locked environment:
-
-```bash
-uv sync --locked
-```
-
-Optionally install the pre-commit hooks (`ruff`, `ruff-format`, and
-`linkml-lint` on the schema files):
-
-```bash
-pre-commit install
-```
-
-## Running the generator
-
-```bash
-uv run wot-toolchain generate-wot-resources
-```
-
-The command reads the project config file `wot-toolchain.yaml` and runs every
-generator listed under `generators`, including `spec` (the specification HTML
-and assertion CSV). The artifacts are written to `resources/gens/`. Options:
-
-| Option | Meaning |
-|---|---|
-| `-c`, `--config FILE` | Project config file (default: `wot-toolchain.yaml`) |
-| `-i`, `--input_schema FILE` | LinkML schema to use instead of the config file's `root_schema` |
-| `--output-dir DIRECTORY` | Write the artifacts to this directory instead of the config file's `output_dir` |
-| `--only GENERATOR` | Run only this generator of the config file's `generators`; repeat for several |
-
-Global options `-v`/`--verbose` and `-q`/`--quiet` go before the command name.
-Run `uv run wot-toolchain --help` for details. The command exits with a
-non-zero status if generation fails.
-
-Do not edit files under `resources/gens/`; they are overwritten on every run.
+Install the toolchain, its test prerequisites, the pre-commit hooks and the
+reference files in `resources/upstream/` as described in
+[Install](docs/getting-started/install.md). The commands and their options are
+in the [CLI reference](docs/reference/cli.md). Do not edit files under
+`resources/gens/`; they are overwritten on every run.
 
 ## Tests and lint
-
-Integration tests read the generated artifacts, so run the generator first:
 
 ```bash
 uv run wot-toolchain generate-wot-resources
@@ -76,25 +30,10 @@ uv run pytest
 uv run ruff check .
 ```
 
-See [tests/README.md](tests/README.md) for what each test module covers.
-Failures are investigated, not skipped. Expected failures are listed in
-`tests/known_failures/` and marked as strict expected failures, so an entry
-must be removed once its test passes.
-
-### Snapshots
-
-`tests/snapshots/` holds committed copies of the generated output. They are
-updated only deliberately, after a schema or generator change whose effect on
-the artifacts you have reviewed:
-
-```bash
-uv run pytest tests/test_golden_diff.py --update-goldens
-```
-
-Commit the updated snapshots together with the change that caused them and
-explain the diff in the pull request so reviewers can check it. Do not edit
-snapshot files by hand, and do not update them to silence an unexplained
-failure.
+Failures are investigated, not skipped. The expected-failure lists, the
+snapshots in `tests/snapshots/` and when they may be updated are described in
+[Testing](docs/internals/testing.md). Before opening a pull request, go through
+[Checking a change](docs/authoring/checking-a-change.md).
 
 ## Modeling changes
 
