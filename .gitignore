@@ -49,3 +49,7 @@ package-lock.json
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# Docs site output and build cache (uv run --group docs zensical build)
+site/
+.cache/

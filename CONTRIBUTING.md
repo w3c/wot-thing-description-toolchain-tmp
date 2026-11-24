@@ -127,6 +127,17 @@ Every document under `docs/` starts with the same header: the title, then author
 
 The date is the day of the last change to the content.
 
+The documents are published as a website built with [Zensical](https://zensical.org/).
+Add a new document to `nav` in `zensical.toml`; a document missing from `nav` is still
+built but does not appear in the navigation. Preview the site locally with:
+
+```bash
+uv run --group docs zensical serve
+```
+
+`uv run --group docs zensical build --strict` runs in CI and fails on links to missing
+documents or anchors.
+
 ## Pull requests
 
 - Keep each pull request focused on one issue and reference it

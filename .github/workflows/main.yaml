@@ -38,6 +38,9 @@ jobs:
         # Remove it once the schemas lint clean.
         run: uv run linkml-lint resources/schemas/ || true
 
+      - name: Docs build
+        run: uv run --group docs zensical build --strict
+
   build:
     name: Build resources and package
     needs: static-analysis

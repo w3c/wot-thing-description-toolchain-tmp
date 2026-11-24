@@ -1,0 +1,103 @@
+# Docs site for the toolchain, built from docs/ with Zensical (https://zensical.org).
+# Preview: uv run --group docs zensical serve
+# Build:   uv run --group docs zensical build --strict   (writes site/)
+
+[project]
+site_name = "WoT Toolchain"
+site_description = "LinkML-based generation of Web of Things artifacts"
+site_url = "https://w3c.github.io/wot-thing-description-toolchain-tmp/"
+repo_url = "https://github.com/w3c/wot-thing-description-toolchain-tmp"
+repo_name = "w3c/wot-thing-description-toolchain-tmp"
+edit_uri = "edit/main/docs/"
+docs_dir = "docs"
+site_dir = "site"
+
+# Broken links and anchors between documents fail the build.
+strict = true
+
+nav = [
+  { "Home" = "index.md" },
+  { "Authoring guide" = "authoring-guide.md" },
+  { "Guidelines" = [
+    "guidelines/index.md",
+    "guidelines/postprocessor-conventions.md",
+    "guidelines/snippet-authoring.md",
+    "guidelines/owl-enum-modeling.md",
+  ] },
+  { "Reference" = [
+    "reference/linkml-naming-conventions.md",
+    "reference/wot-custom-annotations.md",
+    "reference/linkml-cheatsheet.md",
+  ] },
+  { "Maintainers" = [
+    "maintainers/custom-annotation-audit.md",
+    "maintainers/jsonld-context-composition.md",
+    "maintainers/jsonld-type-coercion-rules.md",
+    "maintainers/owl-rdf-modeling.md",
+  ] },
+  { "Differences" = [
+    "differences/README.md",
+    { "JSON Schema" = "differences/json-schema.md" },
+    { "JSON-LD context" = "differences/jsonld-context.md" },
+    { "OWL" = "differences/owl.md" },
+    { "SHACL" = "differences/shacl.md" },
+    { "Upstream compatibility findings" = "differences/upstream-compatibility-findings.md" },
+  ] },
+  { "LinkML gaps" = "linkml-gaps.md" },
+  { "Upstream issues" = [
+    "upstream-issues/README.md",
+    { "01 JSON Schema designates_type enum crash" = "upstream-issues/01-jsonschema-designates-type-enum-crash.md" },
+    { "02 rdfs:Literal emitted as datatype" = "upstream-issues/02-rdfs-literal-type-emitted-as-datatype.md" },
+    { "03 SKOS scoped context on enum slots" = "upstream-issues/03-context-enum-skos-scoped-context.md" },
+    { "04 Any range coerced to @id" = "upstream-issues/04-context-any-range-coerced-to-id.md" },
+    { "05 Inlined class coerced to @id" = "upstream-issues/05-context-inlined-class-coerced-to-id.md" },
+    { "06 OWL IRI annotations as literals" = "upstream-issues/06-owl-annotation-iri-values-as-literals.md" },
+    { "07 SHACL exactly_one_of dropped" = "upstream-issues/07-shacl-exactly-one-of-dropped.md" },
+  ] },
+  { "Proposals" = [
+    { "JSON Schema and SHACL pass reasons" = "pass-reasons-proposal-jsonschema-shacl.md" },
+    { "OWL and JSON-LD context pass reasons" = "pass-reasons-proposal-owl-jsonld.md" },
+  ] },
+]
+
+[project.validation]
+invalid_links = true
+invalid_link_anchors = true
+
+[project.theme]
+features = [
+  "navigation.sections",
+  "navigation.indexes",
+  "navigation.top",
+  "navigation.footer",
+  "search.highlight",
+  "content.code.copy",
+  "content.action.edit",
+  "toc.follow",
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "indigo"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "indigo"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to light mode"
+
+[project.markdown_extensions]
+tables = {}
+attr_list = {}
+admonition = {}
+toc.permalink = true
+# GitHub-style lowercase heading anchors, so #links work both on GitHub and on this site.
+toc.slugify.object = "pymdownx.slugs.slugify"
+toc.slugify.kwds.case = "lower"
+pymdownx.highlight.anchor_linenums = true
+pymdownx.inlinehilite = {}
+pymdownx.superfences = {}

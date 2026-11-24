@@ -1,6 +1,6 @@
 # Postprocessor Conventions
 
-Conventions for the code in [`src/wot_toolchain/artifacts/`](../../src/wot_toolchain/artifacts/) that adjusts the output of the LinkML generators until it meets the WoT Thing Description requirements.
+Conventions for the code in [`src/wot_toolchain/artifacts/`](https://github.com/w3c/wot-thing-description-toolchain-tmp/tree/main/src/wot_toolchain/artifacts) that adjusts the output of the LinkML generators until it meets the WoT Thing Description requirements.
 
 [LinkML gaps](../linkml-gaps.md) lists the LinkML limitations that this code works around.
 
@@ -55,7 +55,7 @@ Each package has the same parts:
 
 ## 4. Passes
 
-[`artifacts/passes.py`](../../src/wot_toolchain/artifacts/passes.py) defines the contract:
+[`artifacts/passes.py`](https://github.com/w3c/wot-thing-description-toolchain-tmp/blob/main/src/wot_toolchain/artifacts/passes.py) defines the contract:
 
 ```python
 class PassKind(StrEnum):
@@ -111,7 +111,7 @@ workaround_linkml_bug    # wrong: says nothing about the transformation
 
 A pass with a class name written into it breaks when the class is renamed and cannot serve a second class.
 
-The JSON Schema passes are configured by five schema annotations: `jsonschema_flatten_subclasses`, `jsonschema_oneof_dispatch`, `jsonschema_enum_subset_partition`, `jsonschema_form_subset` and `jsonschema_exclude`. `read_annotations` in [`artifacts/jsonschema/annotations.py`](../../src/wot_toolchain/artifacts/jsonschema/annotations.py) reads them into a `TransformConfig`, which every JSON Schema pass receives. [WoT custom annotations](../reference/wot-custom-annotations.md) describes each annotation.
+The JSON Schema passes are configured by five schema annotations: `jsonschema_flatten_subclasses`, `jsonschema_oneof_dispatch`, `jsonschema_enum_subset_partition`, `jsonschema_form_subset` and `jsonschema_exclude`. `read_annotations` in [`artifacts/jsonschema/annotations.py`](https://github.com/w3c/wot-thing-description-toolchain-tmp/blob/main/src/wot_toolchain/artifacts/jsonschema/annotations.py) reads them into a `TransformConfig`, which every JSON Schema pass receives. [WoT custom annotations](../reference/wot-custom-annotations.md) describes each annotation.
 
 ## 7. Documentation
 
