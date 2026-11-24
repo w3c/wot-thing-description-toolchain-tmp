@@ -28,6 +28,9 @@ htmlcov/
 # Generated output (written by wot-toolchain generate-wot-resources)
 resources/gens/
 
+# Generated docs page (written by scripts/gen_config_docs.py)
+docs/reference/config-file.md
+
 # Local reference ontologies used for OWL comparison
 resources/upstream/
 

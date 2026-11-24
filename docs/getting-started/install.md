@@ -40,7 +40,7 @@ uv run pytest tests/
 
 Each run prints `WARNING` lines about slots left out of the `hctl`, `wotsec` and `jsonschema` diagrams. They appear on an unchanged checkout too. An `ERROR` line means the run failed, and the command exits with status 1.
 
-The outputs land under `resources/gens`: `index.html`, `assertions/assertions.csv`, `jsonschema/jsonschema.json`, `jsonldcontext/*.jsonld`, `owl/*.ttl`, `shacl/shapes.shacl.ttl`, `visualization/*.svg` and the merged schema `linkml/linkml.yaml`. Do not edit them. Run `uv run wot-toolchain generate-wot-resources --help` for all options.
+The outputs land under `resources/gens`: `index.html`, `assertions/assertions.csv`, `jsonschema/jsonschema.json`, `jsonldcontext/*.jsonld`, `owl/*.ttl`, `shacl/shapes.shacl.ttl`, `visualization/*.svg` and the merged schema `linkml/linkml.yaml`. Do not edit them. The options of every command are in the [CLI reference](../reference/cli.md).
 
 ## Install a release in another repository
 
@@ -51,10 +51,13 @@ uv tool install git+https://github.com/w3c/wot-thing-description-toolchain-tmp@<
 wot-toolchain generate-wot-resources -c path/to/wot-toolchain.yaml
 ```
 
+[Use from another repository](using-from-another-repo.md) walks through a minimal project.
+
 ## Preview these pages
 
 ```bash
+uv run --group docs python scripts/gen_config_docs.py
 uv run --group docs zensical serve
 ```
 
-This serves the site at <http://127.0.0.1:8000/> and rebuilds on every change under `docs/`.
+The first command generates the [config file reference](../reference/config-file.md). The second serves the site at <http://127.0.0.1:8000/> and rebuilds on every change under `docs/`.

@@ -1,4 +1,5 @@
 # Docs site for the toolchain, built from docs/ with Zensical (https://zensical.org).
+# Generate the config file reference first: uv run --group docs python scripts/gen_config_docs.py
 # Preview: uv run --group docs zensical serve
 # Build:   uv run --group docs zensical build --strict   (writes site/)
 
@@ -20,6 +21,7 @@ nav = [
   { "Getting started" = [
     "getting-started/install.md",
     "getting-started/first-change.md",
+    "getting-started/using-from-another-repo.md",
   ] },
   { "Authoring" = [
     "authoring/schema-changes.md",
@@ -27,12 +29,16 @@ nav = [
     "authoring/checking-a-change.md",
   ] },
   { "Reference" = [
+    "reference/cli.md",
+    "reference/config-file.md",
     "reference/annotations.md",
     "reference/annotations-spec.md",
     "reference/naming-conventions.md",
     "reference/linkml-cheatsheet.md",
+    "reference/glossary.md",
   ] },
   { "Internals" = [
+    "internals/architecture.md",
     "internals/postprocessors.md",
     "internals/jsonld-context.md",
     "internals/owl.md",
@@ -83,6 +89,7 @@ toggle.name = "Switch to light mode"
 
 [project.markdown_extensions]
 tables = {}
+def_list = {}
 attr_list = {}
 admonition = {}
 toc.permalink = true

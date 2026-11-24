@@ -118,11 +118,15 @@ Add a new document to `nav` in `zensical.toml`; a document missing from `nav` is
 built but does not appear in the navigation. Preview the site locally with:
 
 ```bash
+uv run --group docs python scripts/gen_config_docs.py
 uv run --group docs zensical serve
 ```
 
-`uv run --group docs zensical build --strict` runs in CI and fails on links to missing
-documents or anchors.
+The first command generates `docs/reference/config-file.md` from the LinkML schema of the
+config file, `src/wot_toolchain/schemas/config.yaml`. The page is not tracked: change the
+schema's descriptions, or the template in `scripts/templates/config-docs/`, instead.
+`uv run --group docs zensical build --strict` runs in CI after the same script and fails on
+links to missing documents or anchors.
 
 ## Pull requests
 

@@ -41,6 +41,9 @@ jobs:
         continue-on-error: true
         run: uv run wot-toolchain generate-wot-resources
 
+      - name: Generate config file reference
+        run: uv run python scripts/gen_config_docs.py
+
       - name: Build docs site
         run: uv run zensical build --strict
 

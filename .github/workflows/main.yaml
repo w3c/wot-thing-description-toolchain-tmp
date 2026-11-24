@@ -38,6 +38,9 @@ jobs:
         # Remove it once the schemas lint clean.
         run: uv run linkml-lint resources/schemas/ || true
 
+      - name: Generate config file reference
+        run: uv run --group docs python scripts/gen_config_docs.py
+
       - name: Docs build
         run: uv run --group docs zensical build --strict
 
