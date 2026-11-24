@@ -24,7 +24,7 @@ generator also natively emits list and keyed-map containers when invoked with
 Scoped vocabulary selection is inferred from the range class, its
 ancestors and mixins, class URI ownership, and the containing slot URI. The
 algorithm and its expansion contract are documented in
-[JSON-LD Context Composition](jsonld-context-composition.md).
+[JSON-LD context](../internals/jsonld-context.md).
 
 There are no further annotations that can currently be removed by a proven
 structural rule.

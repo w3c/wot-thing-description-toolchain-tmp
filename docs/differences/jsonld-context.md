@@ -53,6 +53,8 @@ Generated. `unit` maps to `qudt:unit` (`http://qudt.org/schema/qudt/unit`) with 
 Effect. `"unit":"qudt:DEG_C"` gives `schema:unitCode <qudt:DEG_C>` under the published context and `qudt:unit <http://qudt.org/schema/qudt/DEG_C>` under the generated one.
 An absolute IRI value such as the om-2 `degree_Celsius` IRI is kept under both, with the two different predicates.
 
+Cause. `slot_uri: qudt:unit` on `unit` in `resources/schemas/jsonschema.yaml`. A QUDT unit IRI carries dimensions and conversion factors, where `schema:unitCode` takes a UN/CEFACT code such as `CEL`.
+
 Status. Undecided.
 
 ### `license` is not a term
@@ -375,6 +377,7 @@ The TD 1.1 specification `resources/upstream/html/index.html` states that the de
 Generated. `title` and `description` have no language mapping; with `"@language":"de"`, `"title":"Lampe"` gives `td:title "Lampe"@de`.
 
 Effect. With `"@language":"de"`, `"title":"Lampe"` gives `td:title "Lampe"@en`; the test corpus shows German and Arabic titles and a German description tagged `@en`.
+A term-level language mapping overrides the document default (JSON-LD 1.1), so the TD 1.1 test instance `tests/data/11-multilanguage/string-direction-td-valid.jsonld`, which sets `"@language": "ar-EG"`, gets an Arabic `title` tagged `@en`. After expansion and compaction its `title` and `description` come back as `td:title` and `td:description`, because the compactor cannot pick a term whose language mapping differs from the value's.
 
 Status. Published defect.
 

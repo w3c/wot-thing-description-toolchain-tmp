@@ -29,8 +29,7 @@ nav = [
   ] },
   { "Maintainers" = [
     "maintainers/custom-annotation-audit.md",
-    "maintainers/jsonld-context-composition.md",
-    "maintainers/jsonld-type-coercion-rules.md",
+    "internals/jsonld-context.md",
     "internals/owl.md",
   ] },
   { "Differences" = [

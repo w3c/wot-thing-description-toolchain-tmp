@@ -46,7 +46,7 @@ security:
   range: SecurityScheme
 ```
 
-Generated: `hctl:hasAnchor`, `wotsec:proxy`, `wotsec:authorization`, `wotsec:token` and `wotsec:refresh` are `owl:DatatypeProperty` with `rdfs:range xsd:anyURI`. `td:hasSecurityConfiguration` is an `owl:ObjectProperty` with `rdfs:range wotsec:SecurityScheme`, and `hctl:hasAdditionalOutputSchema` one with `rdfs:range jsonschema:DataSchema`. See [JSON-LD Type Coercion Rules, Rule 2](../maintainers/jsonld-type-coercion-rules.md) for the JSON-LD and SHACL side.
+Generated: `hctl:hasAnchor`, `wotsec:proxy`, `wotsec:authorization`, `wotsec:token` and `wotsec:refresh` are `owl:DatatypeProperty` with `rdfs:range xsd:anyURI`. `td:hasSecurityConfiguration` is an `owl:ObjectProperty` with `rdfs:range wotsec:SecurityScheme`, and `hctl:hasAdditionalOutputSchema` one with `rdfs:range jsonschema:DataSchema`. See [JSON-LD context, Rule 2](jsonld-context.md#rule-2-a-uri-value-is-a-literal-a-name-reference-is-a-node) for the JSON-LD and SHACL side.
 
 ## 2. The Three-Way Split: JSON Key, OWL IRI, JSON-LD Bridge
 
