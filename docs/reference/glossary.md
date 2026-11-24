@@ -14,6 +14,12 @@ Words these pages use with a meaning of their own.
 **Snapshot** (also **golden**)
 : A committed copy of the toolchain's current output in `tests/snapshots/`. `tests/test_golden_diff.py` fails when the output changes. A snapshot records what this toolchain produces, not what is correct; see [Testing](../internals/testing.md).
 
+**Config file**
+: The YAML file of a project, by default `wot-toolchain.yaml`, that names its schemas, generators and output paths. See [Config file](config-file.md).
+
+**Config schema**
+: `src/wot_toolchain/schemas/config.yaml`, the LinkML schema of the config file format. The toolchain validates every config file against it, and the config file reference is generated from it. It is not one of the vocabulary schemas in `resources/schemas/`.
+
 **Pass**
 : One named transformation applied to a generated artifact, with a `PassKind` and a written reason. See [Postprocessors](../internals/postprocessors.md).
 

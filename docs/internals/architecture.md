@@ -25,7 +25,7 @@ resources/schemas/*.yaml ──► model/resolved.py ──► merged SchemaView
 
 ## 1. Load the project
 
-`cli.py` parses the options and calls `config.load_project`, which validates the config file against `schemas/config.yaml` and returns a `Project` with absolute paths. `--input_schema`, `--output-dir` and `--only` replace fields of that `Project`. The keys are described in the [config file reference](../reference/config-file.md).
+`cli.py` parses the options and calls `config.load_project`. It validates the project's config file (`wot-toolchain.yaml`) against the config schema `schemas/config.yaml`, a LinkML schema shipped with the package that defines the config format, and returns a `Project` with absolute paths. `--input_schema`, `--output-dir` and `--only` replace fields of that `Project`. The keys are described in the [config file reference](../reference/config-file.md).
 
 ## 2. Resolve the schemas
 
