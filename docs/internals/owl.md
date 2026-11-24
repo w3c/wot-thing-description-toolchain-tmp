@@ -1,6 +1,6 @@
-# OWL/RDF Modeling Guide
+# OWL ontologies
 
-How to author LinkML schema YAML so the OWL generation pipeline (`preprocess_for_gen_owl` → `WotOwlGenerator` → `postprocess_owl_graph`, under `src/wot_toolchain/artifacts/owl/`) produces correct OWL ontologies. Cross-references: [LinkML Naming Conventions](../reference/linkml-naming-conventions.md), [Postprocessor Conventions](../guidelines/postprocessor-conventions.md), [LinkML gaps](../linkml-gaps.md).
+How to author LinkML schema YAML so the OWL generation pipeline (`preprocess_for_gen_owl` → `WotOwlGenerator` → `postprocess_owl_graph`, under `src/wot_toolchain/artifacts/owl/`) produces correct OWL ontologies. Cross-references: [LinkML Naming Conventions](../reference/linkml-naming-conventions.md), [Postprocessor Conventions](../guidelines/postprocessor-conventions.md), [LinkML gaps](../linkml-gaps.md). How the generated ontologies differ from the published TD 1.1 ontologies is recorded only in [OWL differences](../differences/owl.md).
 
 ## 1. OWL Property Types and `implements`
 
@@ -46,7 +46,7 @@ security:
   range: SecurityScheme
 ```
 
-Generated: `hctl:hasAnchor`, `wotsec:proxy`, `wotsec:authorization`, `wotsec:token` and `wotsec:refresh` are `owl:DatatypeProperty` with `rdfs:range xsd:anyURI`. `td:hasSecurityConfiguration` is an `owl:ObjectProperty` with `rdfs:range wotsec:SecurityScheme`, and `hctl:hasAdditionalOutputSchema` one with `rdfs:range jsonschema:DataSchema`. See [JSON-LD Type Coercion Rules, Rule 2](jsonld-type-coercion-rules.md) for the JSON-LD and SHACL side.
+Generated: `hctl:hasAnchor`, `wotsec:proxy`, `wotsec:authorization`, `wotsec:token` and `wotsec:refresh` are `owl:DatatypeProperty` with `rdfs:range xsd:anyURI`. `td:hasSecurityConfiguration` is an `owl:ObjectProperty` with `rdfs:range wotsec:SecurityScheme`, and `hctl:hasAdditionalOutputSchema` one with `rdfs:range jsonschema:DataSchema`. See [JSON-LD Type Coercion Rules, Rule 2](../maintainers/jsonld-type-coercion-rules.md) for the JSON-LD and SHACL side.
 
 ## 2. The Three-Way Split: JSON Key, OWL IRI, JSON-LD Bridge
 
@@ -257,7 +257,7 @@ The function handles `slot_usage` overrides (e.g., `ObjectSchema.properties` ove
 
 ## 7. Enum-to-OWL Patterns
 
-Enums with `enum_uri` produce OWL named classes with named individuals.
+Enums with `enum_uri` produce OWL classes whose permissible values are typed instances of the class.
 
 **Rule: set `enum_uri` on enums that represent OWL classes. Set `meaning` on permissible values for individual IRIs.**
 
@@ -276,33 +276,60 @@ OperationType:
       description: Identifies the write operation on Property Affordances.
 ```
 
-This produces:
-
-```turtle
-td:OperationType a owl:Class ;
-    rdfs:subClassOf schema:Enumeration .
-
-td:readProperty a td:OperationType ;
-    rdfs:label "readProperty"@en .
-```
-
-`WotOwlGenerator` does two things:
-- types each permissible value with a `meaning` as an instance of the enum class (`rdf:type`, not `rdfs:subClassOf`)
-- emits the `rdfs:subClassOf` annotation on the enum itself as a `URIRef` (same as §5)
-
 **Rule: enums without `enum_uri` are JSON Schema validation enums only — the preprocessor strips them before OWL generation.**
 
-## 8. Accepted Differences from Upstream Ontology
+### 7.1 Generated shape
 
-The generated OWL output intentionally differs from upstream WoT ontologies in specific, documented ways. See [OWL differences](../differences/owl.md) for the full list.
+| Element | Emitted triples |
+|---------|-----------------|
+| Enum | `a owl:Class`, `rdfs:label`, `skos:definition`, `rdfs:isDefinedBy <ontology>`, `skos:inScheme <ontology>` |
+| Enum with `rdfs:subClassOf` annotation | additionally `rdfs:subClassOf <IRI>`, e.g. `schema:Enumeration` |
+| Permissible value with `meaning` | IRI = `meaning`; `a <Enum>`, `rdfs:label` (the value text), `skos:definition`, `rdfs:isDefinedBy <ontology>` (own namespace only) |
+| Permissible value without `meaning` | nothing |
 
-Key accepted differences:
+`rdfs:subClassOf schema:Enumeration` is not added by code. It comes from the schema annotation on `OperationType` (`resources/schemas/hypermedia.yaml`), which `WotOwlGenerator.add_metadata` emits as an IRI. Only `td:OperationType` carries it today.
 
-| Difference | Rationale |
-|------------|-----------|
-| `owl:Class` only (no `rdfs:Class` dual-typing) | Valid OWL; dual-typing is redundant |
-| `rdfs:domain` for single-domain (upstream uses `schema:domainIncludes`) | Stronger but semantically correct for single-domain; multi-domain uses `schema:domainIncludes` (§6) |
-| `rdfs:range` instead of `schema:rangeIncludes` | Valid OWL; stronger but correct |
-| `rdfs:isDefinedBy` on all local subjects | `WotOwlGenerator` adds automatically (§5a) |
+Emitted by `WotOwlGenerator.add_enum` and `_add_enum_instance` in `src/wot_toolchain/artifacts/owl/generator.py`.
 
-**Rule: do not "fix" accepted differences. If a diff appears during OWL generation review, check the accepted differences list before filing it as a bug.**
+### 7.2 Not emitted
+
+- `owl:NamedIndividual` declaration on values
+- `owl:oneOf` covering axiom on the enum class
+- `skos:Concept` typing
+- `linkml:permissible_values`
+
+### 7.3 Decision
+
+**Rule: an enum is an open class whose values are typed instances, following the schema.org enumeration pattern, not the closed `owl:oneOf` enumeration of OWL textbooks.**
+
+Consequence: the OWL enum class has no closure axiom, so the ontology does not state that the listed values are the only members. The closed value set is enforced by the validation artifacts instead:
+
+- SHACL: `sh:in ( td:readProperty ... )` on `hctl:hasOperationType` (`resources/gens/shacl/shapes.shacl.ttl`)
+- JSON Schema: `"enum": [ "readproperty", ... ]` in the array branch of `op` (`resources/gens/jsonschema/jsonschema.json`)
+
+### 7.4 Option
+
+Selected by `OwlOptions(permissible_values=PermissibleValueKind.INSTANCE)` (`src/wot_toolchain/artifacts/owl/options.py`), set by the pipeline in `src/wot_toolchain/pipeline.py`. The other kinds (`CLASS`, `INDIVIDUAL`) fall through to upstream `add_enum`.
+
+### 7.5 Example (`resources/gens/owl/td.ttl`, abridged)
+
+```turtle
+td:OperationType
+    rdf:type owl:Class ;
+    rdfs:label "OperationType"@en ;
+    rdfs:subClassOf schema:Enumeration ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/td> ;
+    skos:inScheme <https://www.w3.org/2019/wot/td> ;
+.
+
+td:readProperty
+    rdf:type td:OperationType ;
+    rdfs:label "readProperty"@en ;
+    skos:definition "Identifies the read operation on Property Affordances to retrieve the corresponding data."@en ;
+    rdfs:isDefinedBy <https://www.w3.org/2019/wot/td> ;
+.
+```
+
+## 8. Differences from the published ontologies
+
+The generated ontologies differ from the published TD 1.1 ontologies, for example in `owl:Class`-only typing, `rdfs:domain` and `rdfs:range` instead of single-class includes, and `rdfs:isDefinedBy` values. Every difference, with its status, is recorded in [OWL differences](../differences/owl.md); check there before treating an OWL diff as a bug.

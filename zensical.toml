@@ -21,7 +21,6 @@ nav = [
   { "Guidelines" = [
     "guidelines/postprocessor-conventions.md",
     "guidelines/snippet-authoring.md",
-    "guidelines/owl-enum-modeling.md",
   ] },
   { "Reference" = [
     "reference/linkml-naming-conventions.md",
@@ -32,7 +31,7 @@ nav = [
     "maintainers/custom-annotation-audit.md",
     "maintainers/jsonld-context-composition.md",
     "maintainers/jsonld-type-coercion-rules.md",
-    "maintainers/owl-rdf-modeling.md",
+    "internals/owl.md",
   ] },
   { "Differences" = [
     "differences/README.md",
