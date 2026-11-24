@@ -124,7 +124,7 @@ See [Postprocessor Conventions](docs/guidelines/postprocessor-conventions.md) fo
 
 ## Custom LinkML Annotations
 
-See [WoT Custom Annotations](docs/reference/wot-custom-annotations.md) for the full annotation API, examples, and decision principles. See [LinkML Naming Conventions](docs/reference/linkml-naming-conventions.md) for schema structural rules, `inlined`/`identifier` patterns, and checklists.
+See [WoT Custom Annotations](docs/reference/annotations.md) for the full annotation API, examples, and decision principles. See [LinkML Naming Conventions](docs/reference/linkml-naming-conventions.md) for schema structural rules, `inlined`/`identifier` patterns, and checklists.
 
 ## Testing and Quality
 

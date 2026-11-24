@@ -109,7 +109,7 @@ failure.
   corresponding Working Group issue or decision.
 - Before editing a schema, read the
   [LinkML Naming Conventions](docs/reference/linkml-naming-conventions.md) and
-  [WoT Custom Annotations](docs/reference/wot-custom-annotations.md).
+  [WoT Custom Annotations](docs/reference/annotations.md).
 
 ## Documentation
 

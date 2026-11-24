@@ -96,7 +96,7 @@ plain JSON property name within a reusable schema.
 To suppress auto-inference, annotate the slot with `jsonld_context: none` in
 the LinkML schema. The `context_scope` function returns `None` for this value,
 and no `@context` is emitted. See
-[Custom Annotations — `jsonld_context`](../reference/wot-custom-annotations.md#jsonld_context)
+[Custom Annotations — `jsonld_context`](../reference/annotations.md#jsonld_context)
 for the annotation reference.
 
 ## Generated Context Contract

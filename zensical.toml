@@ -24,11 +24,11 @@ nav = [
   ] },
   { "Reference" = [
     "reference/linkml-naming-conventions.md",
-    "reference/wot-custom-annotations.md",
+    "reference/annotations.md",
+    "reference/annotations-spec.md",
     "reference/linkml-cheatsheet.md",
   ] },
   { "Maintainers" = [
-    "maintainers/custom-annotation-audit.md",
     "internals/jsonld-context.md",
     "internals/owl.md",
   ] },

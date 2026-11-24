@@ -289,7 +289,7 @@ Read the listed paths. If every change is one you intended, rewrite the snapshot
 
 ## Where to look next
 
-The `spec_*` annotations that drive the specification tables: [wot-custom-annotations.md](reference/wot-custom-annotations.md).
+The `spec_*` annotations that drive the specification tables: [annotations.md](reference/annotations.md).
 
 Where LinkML generators fall short of what the TD needs, and what the toolchain does about it: [linkml-gaps.md](linkml-gaps.md).
 

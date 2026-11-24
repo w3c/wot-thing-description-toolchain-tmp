@@ -111,7 +111,7 @@ workaround_linkml_bug    # wrong: says nothing about the transformation
 
 A pass with a class name written into it breaks when the class is renamed and cannot serve a second class.
 
-The JSON Schema passes are configured by five schema annotations: `jsonschema_flatten_subclasses`, `jsonschema_oneof_dispatch`, `jsonschema_enum_subset_partition`, `jsonschema_form_subset` and `jsonschema_exclude`. `read_annotations` in [`artifacts/jsonschema/annotations.py`](https://github.com/w3c/wot-thing-description-toolchain-tmp/blob/main/src/wot_toolchain/artifacts/jsonschema/annotations.py) reads them into a `TransformConfig`, which every JSON Schema pass receives. [WoT custom annotations](../reference/wot-custom-annotations.md) describes each annotation.
+The JSON Schema passes are configured by five schema annotations: `jsonschema_flatten_subclasses`, `jsonschema_oneof_dispatch`, `jsonschema_enum_subset_partition`, `jsonschema_form_subset` and `jsonschema_exclude`. `read_annotations` in [`artifacts/jsonschema/annotations.py`](https://github.com/w3c/wot-thing-description-toolchain-tmp/blob/main/src/wot_toolchain/artifacts/jsonschema/annotations.py) reads them into a `TransformConfig`, which every JSON Schema pass receives. [WoT custom annotations](../reference/annotations.md) describes each annotation.
 
 ## 7. Documentation
 

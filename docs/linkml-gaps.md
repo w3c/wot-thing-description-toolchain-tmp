@@ -253,14 +253,10 @@ The same object before the passes, and the YAML serialization of the object afte
 The tool passes the YAML serialization.
 Workaround.
 
-## Differences from the published artifacts
-
-The differences between the generated and the published artifacts, and the defects of the published artifacts, are recorded per artifact in [`differences/`](differences/README.md).
-There is one file each for the [JSON-LD context](differences/jsonld-context.md), the [JSON Schema](differences/json-schema.md), the [SHACL shapes](differences/shacl.md) and the [OWL ontologies](differences/owl.md).
-
 ## LinkML modelling gaps
 
 Several workarounds above are driven by schema annotations, because the LinkML metamodel cannot state the requirement.
+What each annotation is for, and what would let it go, is listed in [WoT custom annotations](reference/annotations.md#when-an-annotation-can-go).
 The semantics that LinkML can express are written with native metaslots: `implements: [owl:ObjectProperty]` or `[owl:DatatypeProperty]`, `identifier`, `inlined`, `designates_type` and `meaning` on permissible values.
 
 ### JSON-LD containers and indexes

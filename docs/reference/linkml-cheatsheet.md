@@ -128,4 +128,4 @@ Permissible value keys must match the W3C spec exactly (typically lowercase). Se
 
 `description` and `spec_description` must stay in sync (same meaning, different markup). See [naming conventions §7](linkml-naming-conventions.md#7-description-and-spec_description-sync).
 
-For the full annotation API (`spec_content`, `spec_subsections`, `jsonschema_*`, etc.), see [custom annotations](wot-custom-annotations.md).
+For the full annotation API (`spec_content`, `spec_subsections`, `jsonschema_*`, etc.), see [custom annotations](annotations.md).
