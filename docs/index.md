@@ -22,12 +22,12 @@ The project config file `wot-toolchain.yaml` lists the generators to run, the sc
 
 | If you want to                           | Read                                                                                                                                                                                    |
 | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Change the td-next vocabulary            | [Authoring td-next with LinkML](authoring-guide.md)                                                                                                                                     |
-| Follow the schema and code conventions   | [Postprocessor conventions](guidelines/postprocessor-conventions.md), [Snippet authoring](guidelines/snippet-authoring.md)                                                                                                                                                       |
-| Look up an annotation or naming rule     | [WoT Custom Annotations](reference/annotations.md), [LinkML Naming Conventions](reference/linkml-naming-conventions.md), [LinkML Cheatsheet](reference/linkml-cheatsheet.md) |
+| Change the td-next vocabulary            | [Authoring td-next with LinkML](getting-started/first-change.md)                                                                                                                                     |
+| Follow the schema and code conventions   | [Postprocessor conventions](internals/postprocessors.md), [Snippet authoring](authoring/snippets.md)                                                                                                                                                       |
+| Look up an annotation or naming rule     | [WoT Custom Annotations](reference/annotations.md), [LinkML Naming Conventions](reference/naming-conventions.md), [LinkML Cheatsheet](reference/linkml-cheatsheet.md) |
 | Understand how an artifact is composed   | [JSON-LD context](internals/jsonld-context.md), [OWL](internals/owl.md)                                                                                                                                |
-| Check how the output differs from TD 1.1 | [Differences](differences/README.md)                                                                                                                                                    |
-| See what LinkML cannot express yet       | [LinkML gaps](linkml-gaps.md), [Upstream issues](upstream-issues/README.md)                                                                                                             |
+| Check how the output differs from TD 1.1 | [Differences](status/differences/index.md)                                                                                                                                                    |
+| See what LinkML cannot express yet       | [LinkML gaps](status/linkml-gaps.md), [Upstream issues](status/linkml-issue-drafts.md)                                                                                                             |
 
 ## Generated artifacts
 

@@ -4,7 +4,7 @@ This note compares the generated JSON-LD context `resources/gens/jsonldcontext/c
 It lists every difference that changes how a TD is interpreted, and the defects of the published context that explain why the generated context departs from it.
 To reproduce an entry, put either context in place of the TD 1.1 context URL in the fragment's `@context`, convert the fragment to RDF with a JSON-LD 1.1 processor whose document loader refuses remote loads, and compare the N-Quads.
 
-The status words Undecided and Published defect are defined in the [README](README.md) of this directory.
+The status words Undecided and Published defect are defined in the [README](index.md) of this directory.
 
 ## Method
 

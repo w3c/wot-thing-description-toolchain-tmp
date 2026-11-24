@@ -2,7 +2,7 @@
 
 This note compares the generated schema `resources/gens/jsonschema/jsonschema.json` (JSON Schema 2019-09) with the published W3C TD 1.1 validation schema `resources/upstream/schemas/td11-json-schema-validation.json` (draft-07), and lists defects of the published schema.
 
-The status words Undecided and Published defect are defined in the [README](README.md) of this directory.
+The status words Undecided and Published defect are defined in the [README](index.md) of this directory.
 
 ## Method
 

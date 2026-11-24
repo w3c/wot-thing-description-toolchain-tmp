@@ -7,7 +7,7 @@ OWL output is of experimental quality in this project.
 The generated ontologies are `resources/gens/owl/{td,hctl,wotsec,jsonschema,tm}.ttl`.
 The published ontologies are the files with the same names in `resources/upstream/ontology/`, except `td.ttl` and `tm.ttl`, for which the files served by W3C are used; see Method.
 
-Each entry in Part 1 has the status Undecided and each entry in Part 2 the status Published defect, both defined in the [README](README.md) of this directory.
+Each entry in Part 1 has the status Undecided and each entry in Part 2 the status Published defect, both defined in the [README](index.md) of this directory.
 Entries are ordered term presence, property type, class hierarchy, domain and range, restrictions and individuals, annotations, ontology header; within a group, modules follow the order td, hctl, wotsec, jsonschema, tm.
 
 ## Method

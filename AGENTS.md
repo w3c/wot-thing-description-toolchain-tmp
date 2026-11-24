@@ -63,7 +63,7 @@ resources/schemas/          ← SOURCE OF TRUTH
   jsonschema.yaml           ← JSON Schema vocabulary
   thing_model.yaml          ← Thing Model vocabulary
   snippet_schema.yaml       ← schema of resources/snippets/_snippets.yaml
-  README.md                 ← points to docs/guidelines/ (read before touching schemas)
+  README.md                 ← points to the docs pages to read before touching schemas
 
 src/wot_toolchain/
   cli.py                    ← entry point: wot-toolchain generate-wot-resources | diff-report (see CLI above)
@@ -120,11 +120,11 @@ If `pre-commit` is not installed: `uv tool install pre-commit` or `pip install p
 
 ## The Postprocessor Pattern
 
-See [Postprocessor Conventions](docs/guidelines/postprocessor-conventions.md) for when and how to write a workaround for a LinkML limitation. See [LinkML gaps](docs/linkml-gaps.md) for documented generator limitations. See [OWL differences](docs/differences/owl.md) for the authoritative list of known differences between generated and target OWL ontologies — check it before investigating or reporting any OWL gap.
+See [Postprocessor Conventions](docs/internals/postprocessors.md) for when and how to write a workaround for a LinkML limitation. See [LinkML gaps](docs/status/linkml-gaps.md) for documented generator limitations. See [OWL differences](docs/status/differences/owl.md) for the authoritative list of known differences between generated and target OWL ontologies — check it before investigating or reporting any OWL gap.
 
 ## Custom LinkML Annotations
 
-See [WoT Custom Annotations](docs/reference/annotations.md) for the full annotation API, examples, and decision principles. See [LinkML Naming Conventions](docs/reference/linkml-naming-conventions.md) for schema structural rules, `inlined`/`identifier` patterns, and checklists.
+See [WoT Custom Annotations](docs/reference/annotations.md) for the full annotation API, examples, and decision principles. See [LinkML Naming Conventions](docs/reference/naming-conventions.md) for schema structural rules, `inlined`/`identifier` patterns, and checklists.
 
 ## Testing and Quality
 
@@ -272,7 +272,7 @@ When reviewing HTML changes, do not evaluate the entire document — scope the c
 - Metadata (id, title, hide_paths, show_paths) lives in `_snippets.yaml`, not in the JSON file.
 - Snippet `id` must be unique across all snippets and not conflict with IDs in `index.template.html`.
 - Set `validate: false` only for non-TD/TM snippets (e.g., partial examples).
-- See [Snippet Authoring Guide](docs/guidelines/snippet-authoring.md) for worked examples.
+- See [Snippet Authoring Guide](docs/authoring/snippets.md) for worked examples.
 
 ## General Project Conventions
 

@@ -102,13 +102,13 @@ failure.
   Fix modeling problems (types, cardinalities, enumerations, descriptions)
   there, not in the code under `src/wot_toolchain/artifacts/`.
   That code only adjusts generator output that LinkML cannot express; see
-  [Postprocessor Conventions](docs/guidelines/postprocessor-conventions.md).
+  [Postprocessor Conventions](docs/internals/postprocessors.md).
 - Schema changes must align with the
   [WoT Thing Description specification](https://www.w3.org/TR/wot-thing-description11/).
   A change that departs from the specification needs a reference to the
   corresponding Working Group issue or decision.
 - Before editing a schema, read the
-  [LinkML Naming Conventions](docs/reference/linkml-naming-conventions.md) and
+  [LinkML Naming Conventions](docs/reference/naming-conventions.md) and
   [WoT Custom Annotations](docs/reference/annotations.md).
 
 ## Documentation

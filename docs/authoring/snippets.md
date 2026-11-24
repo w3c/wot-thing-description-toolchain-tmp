@@ -1,7 +1,7 @@
 # Snippet Authoring Guide
 
 Worked examples for authoring TD/TM JSON snippets rendered in the generated specification.
-Where snippets fit in a schema change is shown in the [authoring guide](../authoring-guide.md).
+Where snippets fit in a schema change is shown in the [authoring guide](../getting-started/first-change.md).
 
 For the schema of `_snippets.yaml`, see `resources/schemas/snippet_schema.yaml`.
 

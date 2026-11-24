@@ -1,76 +1,8 @@
-# Authoring td-next with LinkML
+# Schema changes
 
-This guide is for people who know the Thing Description and want to change the td-next vocabulary. You edit LinkML schema files in YAML, and the toolchain generates every published artifact from them. You do not need to know LinkML before you start.
-
-## What the toolchain produces
-
-From the schemas, one command writes a JSON Schema for TD instances, JSON-LD contexts, the specification HTML with its vocabulary tables, an assertion CSV, OWL ontologies, SHACL shapes, and class diagrams.
-
-The README names the JSON Schema, the JSON-LD context, and the specification HTML with its assertion inventory as the release targets, and calls the OWL, SHACL and visualization outputs experimental.
-
-## Install and run
-
-From a checkout of the repository:
-
-```sh
-uv sync --locked
-uv run wot-toolchain generate-wot-resources
-```
-
-Each run prints `WARNING` lines about slots left out of the `hctl`, `wotsec` and `jsonschema` diagrams. They appear on an unchanged checkout too. An `ERROR` line means the run failed, and the command exits with status 1.
-
-The outputs land under `resources/gens`: `index.html`, `assertions/assertions.csv`, `jsonschema/jsonschema.json`, `jsonldcontext/*.jsonld`, `owl/*.ttl`, `shacl/shapes.shacl.ttl`, `visualization/*.svg` and the merged schema `linkml/linkml.yaml`.
-
-## How the pieces fit
-
-The vocabulary lives in `resources/schemas/*.yaml`. `thing_description.yaml` is the root schema and imports `hypermedia`, `wot_security` and `jsonschema`.
-
-`wot-toolchain.yaml` at the repository root is the config file. Its `vocabularies` list says which schema gets its own ontology, context and diagram file. Its `generators.spec.sections` list says which schema fills which section of the specification template `resources/index.template.html`.
-
-JSON examples for the specification live in `resources/snippets`. Each one is registered in `resources/snippets/_snippets.yaml` and placed in the template with a `%snippet('name')%` marker.
-
-## Worked example: an optional property
-
-Suppose you want `version` to carry the firmware version of the device. The range of `version` is the class `VersionInfo`, so you add a `firmware` slot to that class. In `thing_description.yaml`, find `VersionInfo` and add this under its `attributes:`, after `model`:
-
-```yaml
-      firmware:
-        description: >-
-          Provides the version of the firmware running on the device that the Thing represents.
-        slot_uri: td:firmware
-        domain: VersionInfo
-        range: string
-        annotations:
-          spec_description: >-
-            Provides the version of the firmware running on the device that the Thing represents
-            (e.g., `2.1.0`).
-```
-
-Regenerate. In `jsonschema.json`, `$defs.VersionInfo.properties` gains `firmware` with the `description` and `"type": "string"`. In `jsonldcontext/td-context.jsonld` it becomes `"firmware": {"@id": "firmware"}`.
-
-In `index.html`, the `VersionInfo` table gains a row:
-
-```html
-     </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-firmware--VersionInfo">
-      <td><code>firmware</code>
-      </td><td>Provides the version of the firmware running on the device that the Thing represents (e.g., <code>2.1.0</code>).
-      </td><td>optional
-      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
-```
-
-The row id is the assertion id, built as `td-vocab-<term>--<Class>`. `assertions/assertions.csv` gets a row with the same id and the cell texts, ending in `optional string`. In `owl/td.ttl`, `td:firmware` is an `owl:DatatypeProperty` with `rdfs:domain td:VersionInfo` and `rdfs:range xsd:string`.
-
-Each key has a visible effect:
-
-- `description` becomes the JSON Schema `description` and the OWL `skos:definition`.
-- `annotations: spec_description` is the text of the specification table cell and the CSV row. Backticks become `<code>` in HTML.
-- `slot_uri` puts `td:firmware` into OWL and the module context. Without it, `firmware` is missing from `owl/td.ttl` and `td-context.jsonld`. JSON Schema, the merged `context.jsonld` and SHACL still contain it.
-- `domain` produces the `rdfs:domain` line in OWL.
-- `range` sets the type in JSON Schema, the table and OWL.
+Each section starts from the [worked example](../getting-started/first-change.md#worked-example-an-optional-property), which adds an optional `firmware` slot to `VersionInfo` in `resources/schemas/thing_description.yaml`.
 
 ## Variations
-
-Each variation below starts from the worked example.
 
 ### Required
 
@@ -116,6 +48,8 @@ Mark `firmwareVersion` with `identifier: true` and several things change at once
 - The context maps `"firmwareVersion": "@id"`. In JSON-LD, `{"firmwareVersion": "2.1.0"}` then names the node with the IRI `2.1.0`, resolved against the base. No `td:firmwareVersion` triple is produced.
 
 Add `inlined: true` to the slot and the `$ref` comes back. The context keeps `"@type": "@id"` and SHACL keeps `sh:IRI`.
+
+The rules behind these shapes are in [naming conventions §10](../reference/naming-conventions.md#10-inlined-true--embedding-vs-map-vs-array) and [§11](../reference/naming-conventions.md#11-identifier-true--map-keys-in-linkml).
 
 ### One of several shapes
 
@@ -258,39 +192,6 @@ version-firmware.json: version — 'instance' is a required property [schema: pr
 
 The validator is the static schema under `resources/upstream/schemas/` named in `generators.spec.snippet_validation_schemas`, not the generated `jsonschema.json`. A snippet with `"firmware": 42` passes generation even though the generated schema rejects it. A marker for an unregistered snippet fails with `ERROR: Snippet 'missing-snippet' not found in _snippets.yaml`.
 
-For layouts, groups and path options, see [snippet-authoring.md](guidelines/snippet-authoring.md).
+For layouts, groups and path options, see [Snippets](snippets.md).
 
-## Checking a change
-
-Regenerate, then compare an output with its snapshot in `tests/snapshots`:
-
-```sh
-uv run wot-toolchain generate-wot-resources
-uv run wot-toolchain diff-report resources/gens/jsonschema/jsonschema.json tests/snapshots/jsonschema.json
-```
-
-`diff-report` prints a Markdown table of added, removed and changed paths, then lists the paths. After the worked example and the new class, `/$defs/Firmware` and `/$defs/VersionInfo/properties/firmware` are listed as added. The command exits 0 even when it finds differences.
-
-Run the tests with `uv run pytest tests/`. Some tests have prerequisites. `tests/test_owl_profile.py` reads `resources/gens/owl`, so generate first. `tests/test_jsonld_roundtrip.py` and `tests/test_jsonld_context_upstream_comparison.py` use the Node.js `jsonld` package and fail with `Cannot find module` when it is missing. The repository has no `package.json`. `npm install --no-save jsonld` at the repository root installs the package.
-
-`tests/test_golden_diff.py` compares the generated outputs with the snapshots and reports each difference:
-
-```
-E       Failed: Generated jsonschema.json differs from the golden snapshot:
-E       11 changes, 5 patterns
-...
-E           1  added    $.$defs.*   e.g. $.$defs.Firmware
-E           1  added    $.$defs.*.properties.*   e.g. $.$defs.VersionInfo.properties.firmware
-...
-E       if the change is intended, update with --update-goldens.
-```
-
-Read the listed paths. If every change is one you intended, rewrite the snapshots with `uv run pytest tests/test_golden_diff.py --update-goldens` and commit them with the schema change. That run reports each test as skipped with `Golden updated: ...`. The next run passes.
-
-## Where to look next
-
-The `spec_*` annotations that drive the specification tables: [annotations.md](reference/annotations.md).
-
-Where LinkML generators fall short of what the TD needs, and what the toolchain does about it: [linkml-gaps.md](linkml-gaps.md).
-
-How each generated artifact differs from the one published with TD 1.1, and the defects found in the published artifacts: [differences/](differences/README.md).
+When the change is written, check it as described in [Checking a change](checking-a-change.md).

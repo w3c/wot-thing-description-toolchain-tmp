@@ -2,7 +2,7 @@
 
 Quick reference for LinkML features used in WoT schemas.
 For detailed LinkML documentation, see [LinkML docs](https://linkml.io/linkml/).
-For detailed WoT LinkML conventions, see the [naming conventions](linkml-naming-conventions.md).
+For detailed WoT LinkML conventions, see the [naming conventions](naming-conventions.md).
 
 ---
 
@@ -19,7 +19,7 @@ For detailed WoT LinkML conventions, see the [naming conventions](linkml-naming-
 | `prefixes` / `default_prefix` | Namespace declarations | RDF/OWL only — no JSON Schema effect |
 | `default_range` | Fallback `range` when none set | avoid relying on this — always set `range` explicitly |
 
-Use `attributes` when a slot belongs to exactly one class. Use `slots` when shared. See [naming conventions §9](linkml-naming-conventions.md#9-slot-definitions-top-level-vs-class-level).
+Use `attributes` when a slot belongs to exactly one class. Use `slots` when shared. See [naming conventions §9](naming-conventions.md#9-slot-definitions-top-level-vs-class-level).
 
 ---
 
@@ -73,7 +73,7 @@ The combination of `inlined`, `multivalued`, and `identifier` determines the JSO
 Example: `properties` slot → dict because `PropertyAffordance` has `name` with `identifier: true`.
 Example: `forms` slot → array because `Form` has no identifier slot.
 
-Full details with generated JSON Schema output: [naming conventions §10](linkml-naming-conventions.md#10-inlined-true--embedding-vs-map-vs-array).
+Full details with generated JSON Schema output: [naming conventions §10](naming-conventions.md#10-inlined-true--embedding-vs-map-vs-array).
 
 ---
 
@@ -111,7 +111,7 @@ rules:
 | `description` on a value | Appears in generated HTML enum tables |
 | `comments` on a value | Internal metadata; extractable via `comment:<prefix>` in `enum_table` content blocks |
 
-Permissible value keys must match the W3C spec exactly (typically lowercase). See [naming conventions §3](linkml-naming-conventions.md#3-enum-naming).
+Permissible value keys must match the W3C spec exactly (typically lowercase). See [naming conventions §3](naming-conventions.md#3-enum-naming).
 
 ---
 
@@ -126,6 +126,6 @@ Permissible value keys must match the W3C spec exactly (typically lowercase). Se
 | `see_also` | Related IRIs — discoverability for maintainers |
 | `deprecated` | Marks obsolete terms |
 
-`description` and `spec_description` must stay in sync (same meaning, different markup). See [naming conventions §7](linkml-naming-conventions.md#7-description-and-spec_description-sync).
+`description` and `spec_description` must stay in sync (same meaning, different markup). See [naming conventions §7](naming-conventions.md#7-description-and-spec_description-sync).
 
 For the full annotation API (`spec_content`, `spec_subsections`, `jsonschema_*`, etc.), see [custom annotations](annotations.md).

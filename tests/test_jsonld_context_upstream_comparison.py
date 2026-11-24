@@ -111,7 +111,7 @@ class TestTdModule:
 
     @pytest.mark.xfail(
         reason="INTENTIONAL_DEVIATION: upstream @language: en breaks multilanguage TDs — "
-        "see docs/differences/jsonld-context.md#forced-english-language"
+        "see docs/status/differences/jsonld-context.md#forced-english-language"
     )
     def test_title_has_language_tag(self, td_upstream, td_generated):
         """title carries @language: "en" upstream but we omit it intentionally.
@@ -129,7 +129,7 @@ class TestTdModule:
 
     @pytest.mark.xfail(
         reason="INTENTIONAL_DEVIATION: upstream @language: en breaks multilanguage TDs — "
-        "see docs/differences/jsonld-context.md#forced-english-language"
+        "see docs/status/differences/jsonld-context.md#forced-english-language"
     )
     def test_description_has_language_tag(self, td_upstream, td_generated):
         """description carries @language: "en" upstream but we omit it intentionally.

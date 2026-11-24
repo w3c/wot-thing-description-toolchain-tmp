@@ -1,6 +1,6 @@
 # OWL ontologies
 
-How to author LinkML schema YAML so the OWL generation pipeline (`preprocess_for_gen_owl` → `WotOwlGenerator` → `postprocess_owl_graph`, under `src/wot_toolchain/artifacts/owl/`) produces correct OWL ontologies. Cross-references: [LinkML Naming Conventions](../reference/linkml-naming-conventions.md), [Postprocessor Conventions](../guidelines/postprocessor-conventions.md), [LinkML gaps](../linkml-gaps.md). How the generated ontologies differ from the published TD 1.1 ontologies is recorded only in [OWL differences](../differences/owl.md).
+How to author LinkML schema YAML so the OWL generation pipeline (`preprocess_for_gen_owl` → `WotOwlGenerator` → `postprocess_owl_graph`, under `src/wot_toolchain/artifacts/owl/`) produces correct OWL ontologies. Cross-references: [LinkML Naming Conventions](../reference/naming-conventions.md), [Postprocessor Conventions](postprocessors.md), [LinkML gaps](../status/linkml-gaps.md). How the generated ontologies differ from the published TD 1.1 ontologies is recorded only in [OWL differences](../status/differences/owl.md).
 
 ## 1. OWL Property Types and `implements`
 
@@ -252,7 +252,7 @@ The function handles `slot_usage` overrides (e.g., `ObjectSchema.properties` ove
 
 1. **Semantic correctness:** `rdfs:domain` is safe and informative for single-domain properties. Multi-domain properties use `schema:domainIncludes` to avoid intersection semantics.
 2. **Upstream alignment:** WoT upstream ontologies use `schema:domainIncludes` for multi-domain properties across td.ttl, hctl.ttl, jsonschema.ttl, wotsec.ttl.
-3. **LinkML limitation:** `SlotDefinition.domain` is `str | ClassDefinitionName | None` — single class only. No native way to express multi-domain (see [LinkML gaps, Multiple domains](../linkml-gaps.md#multiple-domains)).
+3. **LinkML limitation:** `SlotDefinition.domain` is `str | ClassDefinitionName | None` — single class only. No native way to express multi-domain (see [LinkML gaps, Multiple domains](../status/linkml-gaps.md#multiple-domains)).
 4. **No hardcoded tables:** both mechanisms derive from schema structure — `domain:` field for single, class membership for multi.
 
 ## 7. Enum-to-OWL Patterns
@@ -332,4 +332,4 @@ td:readProperty
 
 ## 8. Differences from the published ontologies
 
-The generated ontologies differ from the published TD 1.1 ontologies, for example in `owl:Class`-only typing, `rdfs:domain` and `rdfs:range` instead of single-class includes, and `rdfs:isDefinedBy` values. Every difference, with its status, is recorded in [OWL differences](../differences/owl.md); check there before treating an OWL diff as a bug.
+The generated ontologies differ from the published TD 1.1 ontologies, for example in `owl:Class`-only typing, `rdfs:domain` and `rdfs:range` instead of single-class includes, and `rdfs:isDefinedBy` values. Every difference, with its status, is recorded in [OWL differences](../status/differences/owl.md); check there before treating an OWL diff as a bug.

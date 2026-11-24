@@ -2,7 +2,7 @@
 
 Naming and structural conventions for the WoT LinkML schemas under `resources/schemas/`.
 
-For the complete annotation API, see [WoT Custom Annotations](annotations.md). For postprocessor conventions, see [Postprocessor Conventions](../guidelines/postprocessor-conventions.md).
+For the complete annotation API, see [WoT Custom Annotations](annotations.md). For postprocessor conventions, see [Postprocessor Conventions](../internals/postprocessors.md).
 
 ---
 

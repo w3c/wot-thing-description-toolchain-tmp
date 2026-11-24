@@ -17,38 +17,37 @@ strict = true
 
 nav = [
   { "Home" = "index.md" },
-  { "Authoring guide" = "authoring-guide.md" },
-  { "Guidelines" = [
-    "guidelines/postprocessor-conventions.md",
-    "guidelines/snippet-authoring.md",
+  { "Getting started" = [
+    "getting-started/install.md",
+    "getting-started/first-change.md",
+  ] },
+  { "Authoring" = [
+    "authoring/schema-changes.md",
+    "authoring/snippets.md",
+    "authoring/checking-a-change.md",
   ] },
   { "Reference" = [
-    "reference/linkml-naming-conventions.md",
     "reference/annotations.md",
     "reference/annotations-spec.md",
+    "reference/naming-conventions.md",
     "reference/linkml-cheatsheet.md",
   ] },
-  { "Maintainers" = [
+  { "Internals" = [
+    "internals/postprocessors.md",
     "internals/jsonld-context.md",
     "internals/owl.md",
+    "internals/testing.md",
   ] },
-  { "Differences" = [
-    "differences/README.md",
-    { "JSON Schema" = "differences/json-schema.md" },
-    { "JSON-LD context" = "differences/jsonld-context.md" },
-    { "OWL" = "differences/owl.md" },
-    { "SHACL" = "differences/shacl.md" },
-  ] },
-  { "LinkML gaps" = "linkml-gaps.md" },
-  { "Upstream issues" = [
-    "upstream-issues/README.md",
-    { "01 JSON Schema designates_type enum crash" = "upstream-issues/01-jsonschema-designates-type-enum-crash.md" },
-    { "02 rdfs:Literal emitted as datatype" = "upstream-issues/02-rdfs-literal-type-emitted-as-datatype.md" },
-    { "03 SKOS scoped context on enum slots" = "upstream-issues/03-context-enum-skos-scoped-context.md" },
-    { "04 Any range coerced to @id" = "upstream-issues/04-context-any-range-coerced-to-id.md" },
-    { "05 Inlined class coerced to @id" = "upstream-issues/05-context-inlined-class-coerced-to-id.md" },
-    { "06 OWL IRI annotations as literals" = "upstream-issues/06-owl-annotation-iri-values-as-literals.md" },
-    { "07 SHACL exactly_one_of dropped" = "upstream-issues/07-shacl-exactly-one-of-dropped.md" },
+  { "Status" = [
+    "status/linkml-gaps.md",
+    { "Differences from TD 1.1" = [
+      "status/differences/index.md",
+      { "JSON Schema" = "status/differences/json-schema.md" },
+      { "JSON-LD context" = "status/differences/jsonld-context.md" },
+      { "OWL" = "status/differences/owl.md" },
+      { "SHACL" = "status/differences/shacl.md" },
+    ] },
+    "status/linkml-issue-drafts.md",
   ] },
 ]
 

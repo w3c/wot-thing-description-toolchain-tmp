@@ -79,7 +79,7 @@ From these source models, the generation pipeline has two paths:
 
 ![WoT Toolchain generation flow](images/wot-toolchain.svg)
 
-The code in [`src/wot_toolchain/artifacts/`](src/wot_toolchain/artifacts/) subclasses the LinkML generators and runs passes on their output. It changes the LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`LinkML gaps`](docs/linkml-gaps.md) records each known limitation and workaround.
+The code in [`src/wot_toolchain/artifacts/`](src/wot_toolchain/artifacts/) subclasses the LinkML generators and runs passes on their output. It changes the LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`LinkML gaps`](docs/status/linkml-gaps.md) records each known limitation and workaround.
 
 ## Testing
 
@@ -122,7 +122,7 @@ uv run pytest tests/ -v
 uv run ruff check .
 ```
 
-Before changing a schema or generator, read the [documentation](docs/index.md) for naming conventions, custom annotations, postprocessor patterns, and snippet authoring. For documented LinkML limitations and workarounds, see [`LinkML gaps`](docs/linkml-gaps.md). Files under `resources/gens/` are generated outputs and should not be edited manually. Each postprocessor should document the LinkML limitation it addresses.
+Before changing a schema or generator, read the [documentation](docs/index.md) for naming conventions, custom annotations, postprocessor patterns, and snippet authoring. For documented LinkML limitations and workarounds, see [`LinkML gaps`](docs/status/linkml-gaps.md). Files under `resources/gens/` are generated outputs and should not be edited manually. Each postprocessor should document the LinkML limitation it addresses.
 
 ## Current Status
 

@@ -20,4 +20,4 @@ Two status words occur here. Undecided has the same meaning as at the top of [Li
 
 All comparisons are made on the output of `wot-toolchain generate-wot-resources` against the files in `resources/upstream/`.
 
-How to change the schemas and regenerate the artifacts is described in the [authoring guide](../authoring-guide.md).
+How to change the schemas and regenerate the artifacts is described in the [authoring guide](../../getting-started/first-change.md).
