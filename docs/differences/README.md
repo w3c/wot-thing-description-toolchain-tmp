@@ -8,9 +8,6 @@ It exists so that a reader can trace why generated output differs from the publi
 - [shacl.md](shacl.md): the SHACL shapes, against `resources/upstream/validation/td-validation.ttl`, with data converted through `resources/upstream/context/td-context-1.1.jsonld`.
 - [owl.md](owl.md): the OWL ontologies, against `td.ttl`, `hctl.ttl`, `wotsec.ttl`, `jsonschema.ttl` and `tm.ttl` in `resources/upstream/ontology/`.
 
-[upstream-compatibility-findings.md](upstream-compatibility-findings.md) is the earlier record of defects found in the published artifacts, with the evidence links and the decisions requested from the Working Group.
-It does not follow the layout below. Its modelling judgments and its accounts of Working Group discussions were not re-checked.
-
 Each file has a short introduction, then `## Method`, which names the published reference file or files, then `## Part 1: ...`, where the generated artifact differs from the published one, and `## Part 2: ...`, defects in the published artifact, including inconsistencies between published companion artifacts such as the context and the shapes.
 
 Each entry is written in fixed paragraphs, in this order: Published, Generated, Effect, Cause and Status.

@@ -55,6 +55,6 @@ the datatypes are disjoint). **Actual:** only the slot's base range `xsd:string`
 **Suspected cause:** `linkml/generators/shaclgen.py:314-324` builds `sh:or` from `any_of`; the file contains no
 `exactly_one_of` handling at all (`grep -c exactly_one_of shaclgen.py` returns 0).
 
-**Workaround in this repo:** `post_process_shacl` (with helper `_langstring_unions`) in
-`src/wot_toolchain/postprocessors/shacl_postprocessor.py`; its comment cites linkml discussion #2199
+**Workaround in this repo:** the pass `rewrite_langstring_union_to_sh_or` in
+`src/wot_toolchain/artifacts/shacl/passes.py`; its comment cites linkml discussion #2199
 (not checked).

@@ -56,5 +56,5 @@ ValueError: No such type: "Kind"
 
 ## Workaround in this repo
 
-`_gen_jsonschema` in `src/wot_toolchain/pipeline.py` temporarily sets `designates_type = False` on every
-slot before calling the generator and restores it afterwards.
+`before_generate_class_slot` in `src/wot_toolchain/artifacts/jsonschema/generator.py` hands the upstream
+generator a copy of each type designator slot with `designates_type = False`.

@@ -54,7 +54,7 @@ generator does not check `inlined` or whether the range class has an identifier.
 
 ## Workaround in this repo
 
-`_strip_inlined_class_id_coercion` in
-`src/wot_toolchain/postprocessors/jsonld_context_postprocessor.py` removes `@type: @id` when
+`strip_inlined_class_id_coercion` in
+`src/wot_toolchain/artifacts/jsonld_context/coercions.py` removes `@type: @id` when
 `SchemaView.is_inlined(slot)` is true, the range class has no identifier slot, and the slot does not
 implement `owl:ObjectProperty`.

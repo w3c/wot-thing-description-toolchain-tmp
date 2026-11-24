@@ -348,6 +348,8 @@ The published shapes constrain `wotsec:in` on the API key scheme as well, so the
 Generated. The generated context also gives `wotsec:in "header"` for an API key scheme, while the generated shapes constrain `wotsec:apikeyIn`; see "API key `in` path" in Part 1 of the [SHACL note](shacl.md).
 
 Effect. `{"securityDefinitions":{"k":{"scheme":"apikey","in":"header","name":"x"}}}` gives `rdf:type wotsec:APIKeySecurityScheme` and `wotsec:in "header"`.
+A context scoped at `securityDefinitions` cannot pick `wotsec:apikeyIn` only when `scheme` is `apikey`, because JSON-LD does not select a context by a member value.
+The Working Group has to decide which predicate is canonical: `wotsec:in` for every scheme, `wotsec:apikeyIn` for API key schemes with a context design that can select it, or an explicit RDF relation between the two.
 
 Status. Published defect.
 

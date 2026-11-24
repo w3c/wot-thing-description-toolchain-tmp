@@ -53,5 +53,5 @@ prefix at lines 408-412. No generator option gates this.
 
 ## Workaround in this repo
 
-`_strip_skos_enum_contexts` in `src/wot_toolchain/postprocessors/jsonld_context_postprocessor.py`
+`strip_skos_enum_contexts` in `src/wot_toolchain/artifacts/jsonld_context/coercions.py`
 deletes any scoped `@context` that contains the keys `text`, `description`, `meaning`.

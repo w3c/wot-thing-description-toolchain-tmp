@@ -107,25 +107,11 @@ failure.
   [WoT Thing Description specification](https://www.w3.org/TR/wot-thing-description11/).
   A change that departs from the specification needs a reference to the
   corresponding Working Group issue or decision.
-- Read the guidelines in [docs/guidelines/](docs/guidelines/index.md) before
-  editing a schema, in particular the
+- Before editing a schema, read the
   [LinkML Naming Conventions](docs/reference/linkml-naming-conventions.md) and
   [WoT Custom Annotations](docs/reference/wot-custom-annotations.md).
 
 ## Documentation
-
-Every document under `docs/` starts with the same header: the title, then author and date, then a rule.
-
-```markdown
-# Title
-
-**Author:** Mahda Noura (mahda.noura@siemens.com)
-**Date:** DD.MM.YYYY
-
----
-```
-
-The date is the day of the last change to the content.
 
 The documents are published as a website built with [Zensical](https://zensical.org/).
 Add a new document to `nav` in `zensical.toml`; a document missing from `nav` is still

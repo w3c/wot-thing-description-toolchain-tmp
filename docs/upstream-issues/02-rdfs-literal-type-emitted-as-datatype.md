@@ -55,5 +55,5 @@ expect them to violate the shape; I did not run a SHACL engine to confirm.
 
 ## Workaround in this repo
 
-- `_remove_literal_type_coercion` in `src/wot_toolchain/postprocessors/jsonld_context_postprocessor.py`
-- `_remove_literal_datatype` in `src/wot_toolchain/postprocessors/shacl_postprocessor.py`
+- `remove_literal_type_coercion` in `src/wot_toolchain/artifacts/jsonld_context/coercions.py`
+- `_remove_literal_datatype` in `src/wot_toolchain/artifacts/shacl/passes.py`

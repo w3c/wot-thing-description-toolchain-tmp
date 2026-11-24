@@ -19,7 +19,6 @@ nav = [
   { "Home" = "index.md" },
   { "Authoring guide" = "authoring-guide.md" },
   { "Guidelines" = [
-    "guidelines/index.md",
     "guidelines/postprocessor-conventions.md",
     "guidelines/snippet-authoring.md",
     "guidelines/owl-enum-modeling.md",
@@ -41,7 +40,6 @@ nav = [
     { "JSON-LD context" = "differences/jsonld-context.md" },
     { "OWL" = "differences/owl.md" },
     { "SHACL" = "differences/shacl.md" },
-    { "Upstream compatibility findings" = "differences/upstream-compatibility-findings.md" },
   ] },
   { "LinkML gaps" = "linkml-gaps.md" },
   { "Upstream issues" = [
@@ -53,10 +51,6 @@ nav = [
     { "05 Inlined class coerced to @id" = "upstream-issues/05-context-inlined-class-coerced-to-id.md" },
     { "06 OWL IRI annotations as literals" = "upstream-issues/06-owl-annotation-iri-values-as-literals.md" },
     { "07 SHACL exactly_one_of dropped" = "upstream-issues/07-shacl-exactly-one-of-dropped.md" },
-  ] },
-  { "Proposals" = [
-    { "JSON Schema and SHACL pass reasons" = "pass-reasons-proposal-jsonschema-shacl.md" },
-    { "OWL and JSON-LD context pass reasons" = "pass-reasons-proposal-owl-jsonld.md" },
   ] },
 ]
 

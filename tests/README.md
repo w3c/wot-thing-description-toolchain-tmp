@@ -10,8 +10,8 @@ uv run wot-toolchain generate-wot-resources
 uv run pytest tests/ -v
 ```
 
-The `-d` option generates the specification HTML and assertion CSV files used
-by the specification checks. Unit tests for the HTML rendering helpers use
+`generate-wot-resources` also writes the specification HTML and assertion CSV
+files used by the specification checks; `--only spec` runs that generator alone. Unit tests for the HTML rendering helpers use
 their own fixtures and do not require generated output.
 
 ## Coverage

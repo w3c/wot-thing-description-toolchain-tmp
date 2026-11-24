@@ -1,10 +1,5 @@
 # LinkML gaps
 
-**Author:** Mahda Noura (mahda.noura@siemens.com)
-**Date:** 22.11.2026
-
----
-
 This note records where the upstream LinkML generators (linkml 1.12) do not produce what the WoT Thing Description needs and what wot-toolchain does about it.
 Differences between the generated artifacts and the published W3C artifacts are recorded in [`differences/`](differences/README.md).
 It is meant for WoT WG members who review the generated artifacts and for LinkML maintainers who want to know which gaps are worth closing upstream.

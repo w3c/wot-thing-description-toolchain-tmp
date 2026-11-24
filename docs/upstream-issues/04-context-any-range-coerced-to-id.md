@@ -54,6 +54,6 @@ is not consulted.
 
 ## Workaround in this repo
 
-`_strip_datatype_property_id_coercion` in
-`src/wot_toolchain/postprocessors/jsonld_context_postprocessor.py` removes `@type: @id` from slots whose
+`strip_datatype_property_id_coercion` in
+`src/wot_toolchain/artifacts/jsonld_context/coercions.py` removes `@type: @id` from slots whose
 `implements` contains `owl:DatatypeProperty`.
