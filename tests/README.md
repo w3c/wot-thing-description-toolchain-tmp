@@ -3,8 +3,8 @@
 ## Run the suite
 
 The tests in `conformance/` and `goldens/` read the files in `resources/gens/`
-(except `goldens/test_approved_divergences.py`). Generate them before running
-the full suite:
+(except `goldens/test_approved_divergences.py`) and fail when a file is
+missing. Generate the files before running the full suite:
 
 ```bash
 uv run wot-toolchain generate-wot-resources
@@ -41,7 +41,7 @@ The specification HTML is built when `spec` is listed under `generators` in
 - `unit/spec/test_spec_content_rendering.py` checks the HTML rendered from
   spec content annotations.
 - `unit/spec/test_default_assignments.py` checks which table rows of the
-  LinkML schemas are marked "with default". Run it from the repository root.
+  LinkML schemas are marked "with default".
 - `goldens/test_assertion_inventory.py` compares assertion counts,
   identifiers, and statuses with the upstream inventory, then checks each
   approved wording correction exactly.

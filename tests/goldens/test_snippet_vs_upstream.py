@@ -173,14 +173,14 @@ def _tab_contents(group: HtmlElement) -> list[str]:
 @pytest.fixture(scope="module")
 def upstream_tree():
     if not UPSTREAM_PATH.exists():
-        pytest.skip(f"Upstream HTML not found at {UPSTREAM_PATH}")
+        pytest.fail(f"Upstream HTML not found at {UPSTREAM_PATH}")
     return parse_html(UPSTREAM_PATH)
 
 
 @pytest.fixture(scope="module")
 def generated_tree():
     if not GENERATED_PATH.exists():
-        pytest.skip(f"Generated HTML not found at {GENERATED_PATH}; run generation first")
+        pytest.fail(f"Generated HTML not found at {GENERATED_PATH}; run `wot-toolchain generate-wot-resources` first.")
     return parse_html(GENERATED_PATH)
 
 

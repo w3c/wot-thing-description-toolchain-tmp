@@ -45,7 +45,7 @@ ADDITIONAL_EXPECTED_RESPONSE_ASSERTION_IDS = [
 @pytest.fixture(scope="module")
 def generated_html() -> str:
     if not GENERATED_HTML_PATH.exists():
-        pytest.skip(f"Generated HTML not found at {GENERATED_HTML_PATH}")
+        pytest.fail(f"Generated HTML not found at {GENERATED_HTML_PATH}; run `wot-toolchain generate-wot-resources` first.")
     return GENERATED_HTML_PATH.read_text(encoding="utf-8")
 
 

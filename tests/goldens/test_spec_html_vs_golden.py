@@ -30,14 +30,14 @@ DIVERGENCES_PATH = TESTS_DIR.parent / "resources" / "approved_divergences" / "ht
 @pytest.fixture(scope="module")
 def golden_tree():
     if not GOLDEN_PATH.exists():
-        pytest.skip(f"Golden HTML not found at {GOLDEN_PATH}")
+        pytest.fail(f"Golden HTML not found at {GOLDEN_PATH}")
     return parse_html(GOLDEN_PATH)
 
 
 @pytest.fixture(scope="module")
 def generated_tree():
     if not GENERATED_PATH.exists():
-        pytest.skip(f"Generated HTML not found at {GENERATED_PATH}; run `wot-toolchain generate-wot-resources` first.")
+        pytest.fail(f"Generated HTML not found at {GENERATED_PATH}; run `wot-toolchain generate-wot-resources` first.")
     return parse_html(GENERATED_PATH)
 
 

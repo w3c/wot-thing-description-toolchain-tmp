@@ -19,7 +19,7 @@ DATA_DIR = TESTS_DIR / "resources" / "td"
 @pytest.fixture(scope="session")
 def validator():
     if not SCHEMA_PATH.exists():
-        pytest.skip(f"Generated schema not found at {SCHEMA_PATH}; run `wot-toolchain generate-wot-resources` first.")
+        pytest.fail(f"Generated schema not found at {SCHEMA_PATH}; run `wot-toolchain generate-wot-resources` first.")
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     cls = validators.validator_for(schema)
     cls.check_schema(schema)

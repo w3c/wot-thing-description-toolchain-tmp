@@ -73,7 +73,7 @@ def _json_change_summary(golden: str, current: str) -> list[str]:
 @pytest.mark.parametrize("name, gen_path, normalize", ARTIFACTS, ids=[n for n, _, _ in ARTIFACTS])
 def test_golden_matches_generated(request, name: str, gen_path: Path, normalize):
     if not gen_path.exists():
-        pytest.skip(f"Generated artifact not found: {gen_path}")
+        pytest.fail(f"Generated artifact not found: {gen_path}; run `wot-toolchain generate-wot-resources` first.")
     current = normalize(gen_path)
     golden_path = GOLDENS_DIR / name
 

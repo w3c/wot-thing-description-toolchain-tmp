@@ -41,7 +41,7 @@ def _samples():
 @pytest.fixture(scope="session")
 def generated_validator():
     if not SCHEMA_PATH.exists():
-        pytest.skip("Generated schema not found; run `wot-toolchain generate-wot-resources` first.")
+        pytest.fail("Generated schema not found; run `wot-toolchain generate-wot-resources` first.")
     return _make_validator(SCHEMA_PATH)
 
 
