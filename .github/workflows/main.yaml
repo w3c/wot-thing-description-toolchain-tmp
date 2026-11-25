@@ -13,9 +13,10 @@ jobs:
   static-analysis:
     name: Static analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
@@ -23,6 +24,9 @@ jobs:
 
       - name: Ruff check
         run: uv run ruff check .
+
+      - name: Mypy
+        run: uv run mypy
 
       - name: LinkML schema lint (non-blocking)
         # the schemas still have known lint issues, so this does not fail the build yet
@@ -32,9 +36,10 @@ jobs:
     name: Build resources & package
     needs: static-analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
@@ -72,14 +77,14 @@ jobs:
         run: uv build
 
       - name: Upload generated resources
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: WoT TD artifacts
           path: resources/gens/
           if-no-files-found: error
 
       - name: Upload Python package
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: python-package
           path: dist/
@@ -87,7 +92,7 @@ jobs:
 
       - name: Upload GitHub Pages artifact
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: resources/gens/
 
@@ -95,16 +100,17 @@ jobs:
     name: Tests
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
         run: uv sync --locked
 
       - name: Download generated resources
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: WoT TD artifacts
           path: resources/gens/
@@ -117,6 +123,7 @@ jobs:
     needs: tests
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       pages: write
       id-token: write
@@ -129,4 +136,4 @@ jobs:
     steps:
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
