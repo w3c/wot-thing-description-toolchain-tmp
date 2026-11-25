@@ -36,7 +36,6 @@ If you suspect LinkML cannot express a requirement, verify by testing with the g
 | Module | Artifact |
 |--------|----------|
 | `artifacts/jsonschema/postprocess.py` | JSON Schema |
-| `artifacts/jsonld_context/postprocess.py` | JSON-LD Context |
 | `artifacts/shacl/postprocess.py` | SHACL Shapes |
 
 **Rule: add new transform functions to the existing module. Do not create new files.**

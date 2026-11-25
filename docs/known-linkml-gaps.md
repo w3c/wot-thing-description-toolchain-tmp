@@ -8,34 +8,36 @@ Each entry: **what the gap is**, **which artifact(s) affected**, **current worka
 
 ## JSON-LD Context Generator
 
+`context.jsonld` is the unmodified output of the LinkML generator; the toolchain has no JSON-LD context postprocessor.
+
 ### 1. `@container: @language` not set for `langString` slots
 **Symptom:** Slots with `range: langString` or `exactly_one_of` branches with `langString` range are emitted without `@container: @language`, making multilingual values serialize incorrectly.
 **Artifact:** `context.jsonld`
-**Workaround:** `artifacts/jsonld_context/postprocess.py` → `process_langstring_conditions()`
+**Workaround:** none
 **LinkML issue:** unknown
 
 ### 2. `@container: @set` not set for multivalued slots
 **Symptom:** Multivalued slots missing `@container: @set` in the context, causing JSON-LD framing to treat arrays as singletons.
 **Artifact:** `context.jsonld`
-**Workaround:** `artifacts/jsonld_context/postprocess.py` → `process_multivalued_slots()`
+**Workaround:** none
 **LinkML issue:** unknown — run `/check-linkml multivalued @set container`
 
 ### 3. `@container: @index` + `@type: @id` not set for inlined dict-keyed slots
 **Symptom:** Slots that are `inlined: true`, `multivalued: true`, and not `inlined_as_list` (i.e., keyed dicts like `securityDefinitions`) are not emitted with `@container: @index` and `@type: @id`.
 **Artifact:** `context.jsonld`
-**Workaround:** `artifacts/jsonld_context/postprocess.py` → `process_inlined_slot()`
+**Workaround:** none
 **LinkML issue:** unknown — run `/check-linkml inlined dict index container`
 
 ### 4. `@type` not set for default-range slots
 **Symptom:** Slots whose range equals the schema `default_range` do not get `@type` set in the context entry.
 **Artifact:** `context.jsonld`
-**Workaround:** `artifacts/jsonld_context/postprocess.py` (default range block)
+**Workaround:** none
 **LinkML issue:** unknown — run `/check-linkml default_range @type context`
 
 ### 5. `@type` handling for `exactly_one_of` with mixed ranges
 **Symptom:** Slots with `exactly_one_of` branches with different ranges emit no `@type`; with a single uniform range, the XSD type must be constructed manually.
 **Artifact:** `context.jsonld`
-**Workaround:** `artifacts/jsonld_context/postprocess.py` → `process_exactly_one_of()`
+**Workaround:** none
 **LinkML issue:** unknown — run `/check-linkml exactly_one_of range context type`
 
 ---

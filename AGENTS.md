@@ -33,7 +33,6 @@ src/wot_toolchain/
   generators/               ← respec.py (specification HTML), visualization.py (diagrams)
   artifacts/                ← adjust raw LinkML output to meet W3C WoT TD requirements
     jsonschema/postprocess.py
-    jsonld_context/postprocess.py
     shacl/postprocess.py
   specgen/                  ← HTML spec generation
     respec.py / bikeshed_processor.py
