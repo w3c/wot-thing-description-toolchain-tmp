@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
       - name: Ruff check
         run: uv run ruff check .
@@ -38,7 +38,7 @@ jobs:
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
       - name: Install Graphviz (needed for generating diagrams)
         run: sudo apt-get update -qq && sudo apt-get install -y -qq graphviz
@@ -101,7 +101,7 @@ jobs:
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
       - name: Download generated resources
         uses: actions/download-artifact@v8
@@ -137,7 +137,7 @@ jobs:
       - name: Set up Python
         run: uv python install 3.14
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --locked
 
       - name: Download generated resources
         uses: actions/download-artifact@v8
@@ -165,4 +165,4 @@ jobs:
     steps:
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
