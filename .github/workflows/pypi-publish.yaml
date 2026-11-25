@@ -45,13 +45,13 @@ jobs:
         run: uv sync --locked
 
       - name: Generate WoT resources
-        run: uv run wotis generate-wot-resources
+        run: uv run wot-toolchain generate-wot-resources
 
       - name: Bundle generated resources
         run: |
           set -euo pipefail
           test -s resources/gens/jsonschema/jsonschema.json
-          zip -r wotis-generated-resources.zip resources/gens
+          zip -r wot-toolchain-generated-resources.zip resources/gens
 
       - name: Upload release assets
         env:
@@ -60,7 +60,7 @@ jobs:
         run: |
           set -euo pipefail
           gh release upload "$TAG" \
-            wotis-generated-resources.zip \
+            wot-toolchain-generated-resources.zip \
             resources/gens/jsonschema/jsonschema.json \
             resources/gens/jsonldcontext/context.jsonld \
             --clobber

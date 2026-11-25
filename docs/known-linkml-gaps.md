@@ -1,6 +1,6 @@
 # Known LinkML Generator Gaps
 
-Before writing a new postprocessor, run `/check-linkml <feature>` — a gap here may be fixed in a newer LinkML version.
+Before writing a new postprocessor, check the current LinkML release — a gap here may be fixed in a newer version.
 
 Each entry: **what the gap is**, **which artifact(s) affected**, **current workaround**, **LinkML issue if known**.
 
@@ -12,7 +12,7 @@ Each entry: **what the gap is**, **which artifact(s) affected**, **current worka
 **Symptom:** Slots with `range: langString` or `exactly_one_of` branches with `langString` range are emitted without `@container: @language`, making multilingual values serialize incorrectly.
 **Artifact:** `context.jsonld`
 **Workaround:** `jsonld_context_postprocessor.py` → `process_langstring_conditions()`
-**LinkML issue:** unknown — run `/check-linkml langString @language container`
+**LinkML issue:** unknown
 
 ### 2. `@container: @set` not set for multivalued slots
 **Symptom:** Multivalued slots missing `@container: @set` in the context, causing JSON-LD framing to treat arrays as singletons.
@@ -43,7 +43,7 @@ Each entry: **what the gap is**, **which artifact(s) affected**, **current worka
 ## JSON Schema Generator
 
 ### 6. JSON Schema generator cannot express all W3C TD structural patterns
-The JSON Schema postprocessor (`src/wotis/postprocessors/jsonschema_postprocessor.py`) contains active transforms that compensate for generator gaps — including subclass flattening, oneOf dispatch, form variants, type normalization, identifier slot removal, ref resolution, and metadata cleanup. Gaps #9, #10, and #11 below document specific transforms; additional undocumented transforms (`_normalize_types`, `_simplify_exclusive_minimum`, `_remove_identifier_slots`, `_remove_excluded_defs`, `_resolve_refs`, `_clean_metadata`) handle structural adjustments the generator cannot produce natively.
+The JSON Schema postprocessor (`src/wot_toolchain/postprocessors/jsonschema_postprocessor.py`) contains active transforms that compensate for generator gaps — including subclass flattening, oneOf dispatch, form variants, type normalization, identifier slot removal, ref resolution, and metadata cleanup. Gaps #9, #10, and #11 below document specific transforms; additional undocumented transforms (`_normalize_types`, `_simplify_exclusive_minimum`, `_remove_identifier_slots`, `_remove_excluded_defs`, `_resolve_refs`, `_clean_metadata`) handle structural adjustments the generator cannot produce natively.
 
 ### 7. No oneOf dispatch on a discriminator slot
 **Symptom:** W3C `securityScheme` is a oneOf over the known schemes plus `additionalSecurityScheme` with a prefixed `scheme`; the generator does not use `designates_type` for this.

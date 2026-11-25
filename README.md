@@ -38,19 +38,19 @@ uv run pre-commit install
 
 ### Generating Artifacts
 
-`wotis` is the Python command-line interface one can use.
+`wot-toolchain` is the Python command-line interface one can use.
 
 To generate the WoT resources run
 
 ```bash
-uv run wotis generate-wot-resources -d
+uv run wot-toolchain generate-wot-resources -d
 ```
 
 Options:
  - `generate-wot-resources` generates the resource artifacts
  - `-d` additionally generates the ReSpec TD specification and its assertion CSV inventory
 
-Run `uv run wotis --help` to view all the available command and options.
+Run `uv run wot-toolchain --help` to view all the available command and options.
 
 Generated files are written under `resources/gens/`. Do not edit them directly.
 
@@ -80,7 +80,7 @@ From these source models, the generation pipeline has two paths:
 
 ![WoT Toolchain generation flow](images/wot-toolchain.svg)
 
-Postprocessors are custom Python functions in [`src/wotis/postprocessors/`](src/wotis/postprocessors/). They modify a raw LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`Known LinkML Gaps`](docs/known-linkml-gaps.md) records each known limitation and workaround.
+Postprocessors are custom Python functions in [`src/wot_toolchain/postprocessors/`](src/wot_toolchain/postprocessors/). They modify a raw LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`Known LinkML Gaps`](docs/known-linkml-gaps.md) records each known limitation and workaround.
 
 ## Testing
 
@@ -110,10 +110,10 @@ Useful commands:
 
 ```bash
 # Generate resource artifacts only
-uv run wotis generate-wot-resources
+uv run wot-toolchain generate-wot-resources
 
 # Generate resource artifacts and the ReSpec TD specification
-uv run wotis generate-wot-resources -d
+uv run wot-toolchain generate-wot-resources -d
 
 # Run the complete test suite
 uv run pytest tests/ -v

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from linkml_runtime.utils.schemaview import SchemaView
 
-from src.wotis.specgen.tables import collect_slot_rows
+from wot_toolchain.specgen.tables import collect_slot_rows
 
 
 def _plain_markdown(text: str) -> str:

@@ -5,7 +5,7 @@ from rdflib.collection import Collection
 from rdflib.namespace import RDF as RDF_NAMESPACE
 from rdflib.namespace import SH, XSD
 
-from src.wotis.postprocessors.shacl_postprocessor import post_process_shacl
+from wot_toolchain.postprocessors.shacl_postprocessor import post_process_shacl
 from linkml.generators.shaclgen import ShaclGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 

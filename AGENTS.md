@@ -1,8 +1,8 @@
-# WOTIS — Agent & Contributor Guide
+# wot-toolchain — Agent & Contributor Guide
 
 ## Project Overview
 
-**WoT Integrated Schemas (WOTIS)** replaces the [W3C WoT Thing Description toolchain](https://github.com/w3c/wot-thing-description/). The old toolchain is partially automated: SPARQL Template Language (STTL) queries over SHACL shape descriptions populate `%`-placeholders in `resources/index.template.html` to generate the vocabulary tables in the spec. What is written entirely by hand — and drifts — is: the JSON-LD context, the ontologies (td, hctl, tm, wotsec), the SHACL shapes, the JSON Schema, and the TypeScript types derived from the JSON Schema. Inconsistencies between these hand-authored artifacts (e.g., a field typed `string` in one file and `integer` in another) are the core problem this toolchain solves.
+**wot-toolchain** replaces the [W3C WoT Thing Description toolchain](https://github.com/w3c/wot-thing-description/). The old toolchain is partially automated: SPARQL Template Language (STTL) queries over SHACL shape descriptions populate `%`-placeholders in `resources/index.template.html` to generate the vocabulary tables in the spec. What is written entirely by hand — and drifts — is: the JSON-LD context, the ontologies (td, hctl, tm, wotsec), the SHACL shapes, the JSON Schema, and the TypeScript types derived from the JSON Schema. Inconsistencies between these hand-authored artifacts (e.g., a field typed `string` in one file and `integer` in another) are the core problem this toolchain solves.
 
 This toolchain uses **one LinkML schema as the single source of truth** and generates all official W3C artifacts from it. Consistency is structural and semantic.
 
@@ -27,8 +27,8 @@ resources/schemas/          ← SOURCE OF TRUTH (edit here, not in gens/)
   jsonschema.yaml           ← JSON Schema vocabulary
   README.md                 ← points to docs/guidelines/ (read before touching schemas)
 
-src/wotis/
-  cli.py                    ← entry point: wotis generate-wot-resources [-d]
+src/wot_toolchain/
+  cli.py                    ← entry point: wot-toolchain generate-wot-resources [-d]
   generators/               ← LinkML → raw artifacts
   postprocessors/           ← adjust raw LinkML output to meet W3C WoT TD requirements
     json_schema_postprocessor.py
@@ -84,7 +84,7 @@ See [WoT Custom Annotations](docs/guidelines/wot-custom-annotations.md) for the 
 
 ```bash
 # Full pipeline — verify it exits cleanly
-uv run wotis generate-wot-resources -d 2>&1 | grep -E "ERROR|WARNING"
+uv run wot-toolchain generate-wot-resources -d 2>&1 | grep -E "ERROR|WARNING"
 
 # All tests (on main branch)
 uv run pytest tests/ -v
@@ -112,7 +112,7 @@ These failures exist in CI on `main`. A PR that does not touch the Form class or
 
 ### Generation Error Taxonomy
 
-`uv run wotis generate-wot-resources -d` output signals:
+`uv run wot-toolchain generate-wot-resources -d` output signals:
 
 | Pattern | Action |
 |---|---|
@@ -149,9 +149,9 @@ Two categories with different update policies:
 
 A change is complete when all of these hold:
 
-1. `uv run wotis generate-wot-resources -d` exits without ERROR.
+1. `uv run wot-toolchain generate-wot-resources -d` exits without ERROR.
 2. `uv run pytest tests/ -v` passes (xfail acceptable, no new unexpected failures).
-3. Snippets in `resources/snippets/` validate against the generated JSON Schema — run `/validate-snippets`. Every `.json` linked to a changed class or slot must pass; `validate: false` is only acceptable for non-TD/TM examples.
+3. Snippets in `resources/snippets/` validate against the generated JSON Schema. Every `.json` linked to a changed class or slot must pass; `validate: false` is only acceptable for non-TD/TM examples.
 4. HTML output is correct — see below.
 
 #### HTML Correctness
@@ -266,18 +266,6 @@ Files with high concurrent-edit risk. Check for in-progress PRs before touching.
 4. Assertion CSVs — assertions match anchors in `index.html`.
 
 Out of scope for now: automated ontology/SHACL consistency (manual_goldens exist as reference only).
-
-## Available Claude Code Skills
-
-| Skill | When to use |
-|---|---|
-| `/verify` | Full closed-loop check after any schema/postprocessor change: sync deps, generate, validate snippets, run tests |
-| `/generate` | Run full pipeline, surface only errors/warnings |
-| `/schema-diff` | Show what changed in LinkML schemas |
-| `/validate-snippets` | Check snippet validation errors only |
-| `/validate-consistency` | After schema change: detect cross-artifact drift |
-| `/check-linkml <feature>` | Check if LinkML supports a feature natively before writing a postprocessor |
-| `/review-pr <number>` | Review a PR against all project rules |
 
 **Before running any pipeline command**, ensure deps are current:
 ```bash

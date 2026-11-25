@@ -5,8 +5,8 @@ import yaml
 
 from pathlib import Path
 
-from src.wotis import YAML_SCHEMA_PATH, ASSERTION_PATH, EXTRA_ASSERTS_PATH
-from src.wotis.generators import run_pipeline
+from wot_toolchain import YAML_SCHEMA_PATH, ASSERTION_PATH, EXTRA_ASSERTS_PATH
+from wot_toolchain.generators import run_pipeline
 
 
 input_option = click.option('-i', '--input_schema',
@@ -39,7 +39,7 @@ extra_asserts_option = click.option('--extra-asserts',
 @click.option("-v", "--verbose", count=True)
 @click.option("-q", "--quiet")
 def main(verbose: int, quiet: bool):
-    """CLI for WOTIS (Web of Things Integrated Schemas) toolchain.
+    """Toolchain generating W3C Web of Things specification resources from LinkML schemas.
 
     :param verbose: Verbosity while running.
     :param quiet: Boolean to be quiet or verbose.

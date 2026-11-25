@@ -24,7 +24,7 @@ Die On: nothing
 </pre>
 """
 
-SECTION_MARKER_ATTR = "data-wotis-section"
+SECTION_MARKER_ATTR = "data-wot-toolchain-section"
 
 
 def build_anchors_block(glossary_path: Path) -> str:
