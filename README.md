@@ -78,7 +78,7 @@ From these source models, the generation pipeline has two paths:
 
 ![WoT Toolchain generation flow](images/wot-toolchain.svg)
 
-Postprocessors are custom Python functions in [`src/wot_toolchain/postprocessors/`](src/wot_toolchain/postprocessors/). They modify a raw LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`Known LinkML Gaps`](docs/known-linkml-gaps.md) records each known limitation and workaround.
+Postprocessors are custom Python functions in [`src/wot_toolchain/artifacts/`](src/wot_toolchain/artifacts/). They modify a raw LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`Known LinkML Gaps`](docs/known-linkml-gaps.md) records each known limitation and workaround.
 
 ## Testing
 
