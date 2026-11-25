@@ -104,7 +104,9 @@ classes:
         description: Path of the glossary used for cross-references.
         required: true
       extra_asserts:
-        description: Path of an HTML file with assertions that the specification text does not state.
+        description: >-
+          Path of an HTML file listing assertions that are tested but are not in the specification.
+          They are added to the assertion inventory CSV.
       assertions_csv:
         description: Path of the generated CSV file of assertions.
 

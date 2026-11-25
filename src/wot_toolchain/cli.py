@@ -33,8 +33,8 @@ assertions_csv_option = click.option('--assertions-csv',
 extra_asserts_option = click.option('--extra-asserts',
                                     type=click.Path(path_type=Path, dir_okay=False),
                                     default=None,
-                                    help="HTML file with test assertions that the specification text does not state. "
-                                         "They are added to the assertion inventory. Replaces "
+                                    help="HTML file listing assertions that are tested but are not in the specification. "
+                                         "They are added to the assertion inventory CSV. Replaces "
                                          "generators.spec.extra_asserts of the config. "
                                          "Ignored when the config does not list spec.")
 

@@ -40,7 +40,6 @@ generators:
         schema: resources/schemas/hypermedia.yaml
     snippets: resources/snippets
     glossary: resources/xref/glossary.yaml
-    # Copied from w3c/wot-thing-description testing/inputs/. Holds the assertions that the spec text
-    # does not state as a separate sentence but the test suite still needs, same as in the upstream toolchain.
+    # Assertions that are tested but are not in the specification. They are added to assertions_csv.
     extra_asserts: resources/upstream/extra-asserts.html
     assertions_csv: resources/gens/assertions/assertions.csv
