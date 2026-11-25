@@ -91,8 +91,8 @@ jobs:
         with:
           path: resources/gens/
 
-  test-gates:
-    name: Test gates
+  tests:
+    name: Tests
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -109,48 +109,12 @@ jobs:
           name: WoT TD artifacts
           path: resources/gens/
 
-      - name: TD instance gate
-        run: uv run pytest tests/conformance/test_td_instance_gate.py -v
-
-      - name: Cross-check against W3C schemas
-        run: uv run pytest tests/conformance/test_td_crosscheck.py -v
-
-      - name: Spec HTML structure tests
-        run: uv run pytest tests/unit/spec/test_spec_content_rendering.py tests/goldens/test_golden_form_structure.py -v
-
-      - name: Spec HTML vs upstream golden
-        run: uv run pytest tests/goldens/test_spec_html_vs_golden.py -v
-
-      - name: Assertion inventory vs upstream
-        run: uv run pytest tests/goldens/test_assertion_inventory.py -v
-
-      - name: Default assignments
-        run: uv run pytest tests/unit/spec/test_default_assignments.py -v
-
-  golden-diff:
-    name: Golden diff
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
-      - name: Set up Python
-        run: uv python install 3.14
-      - name: Install dependencies
-        run: uv sync --locked
-
-      - name: Download generated resources
-        uses: actions/download-artifact@v8
-        with:
-          name: WoT TD artifacts
-          path: resources/gens/
-
-      - name: Golden diff
-        run: uv run pytest tests/goldens/test_golden_diff.py -v
+      - name: Run the tests
+        run: uv run pytest
 
   deploy-pages:
     name: Deploy to GitHub Pages
-    needs: [test-gates, golden-diff]
+    needs: tests
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
