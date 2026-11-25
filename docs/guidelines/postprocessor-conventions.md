@@ -5,7 +5,7 @@
 
 ---
 
-Conventions for writing and maintaining postprocessors — the Python functions in [`src/wotis/postprocessors/`](../../src/wotis/postprocessors/) that transform raw LinkML generator output into spec-compliant artifacts.
+Conventions for writing and maintaining postprocessors — the Python functions in [`src/wot_toolchain/postprocessors/`](../../src/wot_toolchain/postprocessors/) that transform raw LinkML generator output into spec-compliant artifacts.
 
 For the catalog of known LinkML limitations that motivate postprocessors, see [Known LinkML Gaps](../known-linkml-gaps.md).
 
@@ -144,7 +144,7 @@ def _flatten_subclasses(schema: dict, sv: SchemaView, config: TransformConfig) -
 
 The test suite (`tests/test_golden_diff.py`) compares full generated output — including postprocessor transforms — against snapshots. After modifying a postprocessor:
 
-1. Regenerate: `uv run wotis generate-wot-resources`
+1. Regenerate: `uv run wot-toolchain generate-wot-resources`
 2. Review the diff in `resources/gens/`
 3. Update goldens: `uv run pytest tests/test_golden_diff.py --update-goldens`
 4. Run full suite: `uv run pytest tests/ -v`

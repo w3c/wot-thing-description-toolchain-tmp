@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from src.wotis.generators.respec import (
+from wot_toolchain.generators.respec import (
     render_spec_content_annotation,
     render_subsections,
 )

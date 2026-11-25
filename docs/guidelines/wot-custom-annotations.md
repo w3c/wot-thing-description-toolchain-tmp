@@ -58,7 +58,7 @@ Before reaching for a `jsonschema_*` annotation, verify that native LinkML const
 
 ## Spec Rendering Annotations (`spec_*`)
 
-These annotations control how classes and slots appear in the generated HTML specification (`index.html`). They have **no effect** on JSON Schema, JSON-LD, SHACL, or OWL output. They are consumed by the ReSpec generator (`src/wotis/generators/respec.py`) and the vocabulary table builder (`src/wotis/specgen/tables.py`).
+These annotations control how classes and slots appear in the generated HTML specification (`index.html`). They have **no effect** on JSON Schema, JSON-LD, SHACL, or OWL output. They are consumed by the ReSpec generator (`src/wot_toolchain/generators/respec.py`) and the vocabulary table builder (`src/wot_toolchain/specgen/tables.py`).
 
 ---
 
@@ -386,7 +386,7 @@ BearerSecurityScheme:
 
 ## JSON Schema Annotations (`jsonschema_*`)
 
-These annotations control how the JSON Schema postprocessor (`src/wotis/postprocessors/jsonschema_postprocessor.py`) transforms raw LinkML generator output. They have **no effect** on HTML, OWL, or SHACL output.
+These annotations control how the JSON Schema postprocessor (`src/wot_toolchain/postprocessors/jsonschema_postprocessor.py`) transforms raw LinkML generator output. They have **no effect** on HTML, OWL, or SHACL output.
 
 The postprocessor reads these annotations via `_read_annotations()` and applies transforms in a fixed pipeline order. Adding an annotation to a class automatically activates the corresponding transform — no Python code changes needed.
 

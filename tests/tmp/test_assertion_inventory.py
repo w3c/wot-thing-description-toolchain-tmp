@@ -31,7 +31,7 @@ def approved_assertion_divergences() -> dict[str, str]:
 
 def test_assertion_ids_vs_upstream() -> None:
     if not OUR_CSV.exists():
-        pytest.skip(f"Assertion CSV not found at {OUR_CSV}; run `wotis generate-wot-resources -d` first.")
+        pytest.skip(f"Assertion CSV not found at {OUR_CSV}; run `wot-toolchain generate-wot-resources -d` first.")
 
     ours = assertion_rows(OUR_CSV)
     upstream = assertion_rows(UPSTREAM_CSV)

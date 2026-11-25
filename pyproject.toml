@@ -1,7 +1,7 @@
 [project]
-name = "wotis"
+name = "wot-toolchain"
 version = "0.1.0"
-description = "The CLI tool for Web of Things Integrated Schemas (WOTIS)"
+description = "Toolchain generating W3C Web of Things specification resources from LinkML schemas"
 authors = [
     { name = "Mahda Noura", email = "mahda.noura@siemens.com" }
 ]
@@ -27,14 +27,17 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build]
-only-include = ["src/wotis"]
+only-include = ["src/wot_toolchain"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wot_toolchain"]
 
 [tool.hatch.metadata]
 root = "src"
 allow-direct-references = true
 
 [project.scripts]
-wotis = "src.wotis.cli:main"
+wot-toolchain = "wot_toolchain.cli:main"
 
 [dependency-groups]
 dev = [
