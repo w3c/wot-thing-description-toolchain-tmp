@@ -10,7 +10,7 @@ def _strip_outer_p(html: str) -> str:
     match = re.fullmatch(r"\s*<p>(?P<body>.*)</p>\s*", html or "", flags=re.DOTALL)
     return match.group("body") if match else (html or "")
 
-def _normalize_range_name(rng: str) -> str:
+def _normalize_range_name(rng: str | None) -> str:
     """
     Map LinkML range names to the textual form expected in the TD spec.
 
@@ -159,7 +159,7 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
             alt_rng_raw = getattr(alt, "range", None)
             if not alt_rng_raw:
                 alt_rng_raw = raw_rng
-            if alt_rng_raw in all_enums:
+            if alt_rng_raw is not None and alt_rng_raw in all_enums:
                 enum_def = all_enums[alt_rng_raw]
                 is_uri = enum_def.enum_uri in ["linkml:uri", "anyURI"] or alt_rng_raw.lower() == "uri"
                 rng = "anyURI" if is_uri else "string"
@@ -184,7 +184,7 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
         )
     # ENUM LOGIC
     all_enums = sv.all_enums()
-    if raw_rng in all_enums:
+    if raw_rng is not None and raw_rng in all_enums:
         enum_def = all_enums[raw_rng]
         is_uri_enum = (enum_def.enum_uri in ["linkml:uri", "anyURI"] or raw_rng.lower() == "uri")
         enum_base = _link("anyURI", sv) if is_uri_enum else _link("string", sv)
@@ -221,7 +221,7 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
     class_def = sv.get_class(class_name)
     if not class_def:
         return []
-    rows: List[Dict[str, str]] = []
+    rows: List[Dict[str, Any]] = []
     slot_names: List[str] = class_def.slots or []
     # Get attribute names
     attribute_names: List[str] = list(class_def.attributes.keys()) if class_def.attributes else []

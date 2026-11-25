@@ -6,7 +6,7 @@ Integration tests read generated artifacts. Generate them before running the
 full suite:
 
 ```bash
-uv run wot-toolchain generate-wot-resources -d
+uv run wot-toolchain generate-wot-resources
 uv run pytest tests/ -v
 ```
 

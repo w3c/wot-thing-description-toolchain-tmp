@@ -1,0 +1,46 @@
+# wot-toolchain config of the WoT Thing Description.
+# Paths are relative to the directory of this file.
+
+root_schema: resources/schemas/thing_description.yaml
+output_dir: resources/gens
+
+vocabularies:
+  - schema: resources/schemas/thing_description.yaml
+    prefix: td
+    diagram: td.svg
+  - schema: resources/schemas/hypermedia.yaml
+    prefix: hctl
+    diagram: hctl.svg
+  - schema: resources/schemas/wot_security.yaml
+    prefix: wotsec
+    diagram: wotsec.svg
+  - schema: resources/schemas/jsonschema.yaml
+    prefix: jsonschema
+    diagram: jsonschema.svg
+
+generators:
+  jsonschema:
+    top_class: Thing
+  jsonldcontext:
+  shacl:
+  owl:
+  linkml:
+  visualization:
+  spec:
+    template: resources/index.template.html
+    output: resources/gens/index.html
+    sections:
+      - id: sec-core-vocabulary-definition
+        schema: resources/schemas/thing_description.yaml
+      - id: sec-data-schema-vocabulary-definition
+        schema: resources/schemas/jsonschema.yaml
+      - id: sec-security-vocabulary-definition
+        schema: resources/schemas/wot_security.yaml
+      - id: sec-hypermedia-vocabulary-definition
+        schema: resources/schemas/hypermedia.yaml
+    snippets: resources/snippets
+    glossary: resources/xref/glossary.yaml
+    # Copied from w3c/wot-thing-description testing/inputs/. Holds the assertions that the spec text
+    # does not state as a separate sentence but the test suite still needs, same as in the upstream toolchain.
+    extra_asserts: resources/upstream/extra-asserts.html
+    assertions_csv: resources/gens/assertions/assertions.csv

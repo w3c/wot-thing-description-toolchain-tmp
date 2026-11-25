@@ -1,0 +1,118 @@
+id: https://w3c.github.io/wot-thing-description-toolchain/config
+name: wot_toolchain_config
+title: wot-toolchain config
+description: Schema of the config file that a repository passes to wot-toolchain.
+prefixes:
+  linkml: https://w3id.org/linkml/
+  config: https://w3c.github.io/wot-thing-description-toolchain/config/
+default_prefix: config
+default_range: string
+imports:
+  - linkml:types
+
+classes:
+  Config:
+    tree_root: true
+    description: The LinkML schemas of one vocabulary and the generators to run on them.
+    attributes:
+      root_schema:
+        description: >-
+          Path of the LinkML schema that the generators read together with the schemas it imports.
+        required: true
+      output_dir:
+        description: Directory that receives the generated artifacts.
+        required: true
+      vocabularies:
+        description: The vocabularies that the generators process.
+        range: Vocabulary
+        multivalued: true
+        inlined_as_list: true
+        required: true
+        minimum_cardinality: 1
+      generators:
+        description: The generators to run. A generator runs if its key is present.
+        range: Generators
+        required: true
+
+  Vocabulary:
+    description: One LinkML schema and the names of the files generated from it.
+    attributes:
+      schema:
+        description: Path of the LinkML schema.
+        required: true
+      prefix:
+        description: Prefix of the vocabulary, unique among the vocabularies.
+        required: true
+      diagram:
+        description: File name of the class diagram generated from this schema.
+        pattern: '^(?!\.\.?$)[^/\\]+$'
+
+  Generators:
+    description: Settings of each generator.
+    attributes:
+      jsonschema:
+        range: JsonSchemaSettings
+      jsonldcontext:
+        range: JsonLdContextSettings
+      shacl:
+        range: ShaclSettings
+      owl:
+        range: OwlSettings
+      linkml:
+        range: LinkmlSettings
+      visualization:
+        range: VisualizationSettings
+      spec:
+        description: Settings of the specification, which is built after the other generators.
+        range: SpecSettings
+
+  JsonSchemaSettings:
+    attributes:
+      top_class:
+        description: Class that the root of the JSON Schema describes.
+        required: true
+
+  JsonLdContextSettings: {}
+
+  ShaclSettings: {}
+
+  OwlSettings: {}
+
+  LinkmlSettings: {}
+
+  VisualizationSettings: {}
+
+  SpecSettings:
+    attributes:
+      template:
+        description: Path of the HTML template of the specification.
+        required: true
+      output:
+        description: Path of the generated specification.
+        required: true
+      sections:
+        description: Sections of the template that receive the tables of one vocabulary each.
+        range: SpecSection
+        multivalued: true
+        inlined_as_list: true
+        required: true
+        minimum_cardinality: 1
+      snippets:
+        description: Directory of the example snippets.
+        required: true
+      glossary:
+        description: Path of the glossary used for cross-references.
+        required: true
+      extra_asserts:
+        description: Path of an HTML file with assertions that the specification text does not state.
+      assertions_csv:
+        description: Path of the generated CSV file of assertions.
+
+  SpecSection:
+    attributes:
+      id:
+        description: HTML id of the section in the template.
+        required: true
+      schema:
+        description: Path of the vocabulary schema whose tables fill the section.
+        required: true

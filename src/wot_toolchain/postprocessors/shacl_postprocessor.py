@@ -5,6 +5,7 @@ from __future__ import annotations
 from rdflib import BNode, Graph, URIRef
 from rdflib.collection import Collection
 from rdflib.namespace import SH
+from rdflib.term import Node
 
 from linkml_runtime.utils.schemaview import SchemaView
 
@@ -52,7 +53,7 @@ def post_process_shacl(raw_shacl: str, schema_view: SchemaView) -> str:
                 graph.remove((property_shape, SH.datatype, None))
                 graph.remove((property_shape, SH["or"], None))
 
-                branches = []
+                branches: list[Node] = []
                 for datatype in datatypes:
                     branch = BNode()
                     graph.add((branch, SH.datatype, datatype))

@@ -162,7 +162,7 @@ def _build_oneof_dispatch(schema: dict, sv: SchemaView, config: TransformConfig)
             if sub_def.is_a == cls_name and sub_name in defs:
                 subclass_refs.append({"$ref": f"#/$defs/{sub_name}"})
 
-        one_of_list = sorted(subclass_refs, key=lambda x: x["$ref"])
+        one_of_list: list[dict[str, Any]] = sorted(subclass_refs, key=lambda x: x["$ref"])
 
         # W3C additionalSecurityScheme: a prefixed scheme, so the catch-all does not overlap the known schemes (KNOWN_LINKML_GAPS.md #9).
         if dispatch.include_unknown:
