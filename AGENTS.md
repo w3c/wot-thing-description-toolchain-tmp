@@ -28,7 +28,7 @@ resources/schemas/          ← SOURCE OF TRUTH (edit here, not in gens/)
   README.md                 ← points to docs/guidelines/ (read before touching schemas)
 
 src/wot_toolchain/
-  cli.py                    ← entry point: wot-toolchain generate-wot-resources [-d]
+  cli.py                    ← entry point: wot-toolchain generate-wot-resources (generators listed in wot-toolchain.yaml)
   generators/               ← LinkML → raw artifacts
   postprocessors/           ← adjust raw LinkML output to meet W3C WoT TD requirements
     json_schema_postprocessor.py
@@ -84,7 +84,7 @@ See [WoT Custom Annotations](docs/guidelines/wot-custom-annotations.md) for the 
 
 ```bash
 # Full pipeline — verify it exits cleanly
-uv run wot-toolchain generate-wot-resources -d 2>&1 | grep -E "ERROR|WARNING"
+uv run wot-toolchain generate-wot-resources 2>&1 | grep -E "ERROR|WARNING"
 
 # All tests (on main branch)
 uv run pytest tests/ -v
@@ -112,7 +112,7 @@ These failures exist in CI on `main`. A PR that does not touch the Form class or
 
 ### Generation Error Taxonomy
 
-`uv run wot-toolchain generate-wot-resources -d` output signals:
+`uv run wot-toolchain generate-wot-resources` output signals:
 
 | Pattern | Action |
 |---|---|
@@ -149,7 +149,7 @@ Two categories with different update policies:
 
 A change is complete when all of these hold:
 
-1. `uv run wot-toolchain generate-wot-resources -d` exits without ERROR.
+1. `uv run wot-toolchain generate-wot-resources` exits without ERROR.
 2. `uv run pytest tests/ -v` passes (xfail acceptable, no new unexpected failures).
 3. Snippets in `resources/snippets/` validate against the generated JSON Schema. Every `.json` linked to a changed class or slot must pass; `validate: false` is only acceptable for non-TD/TM examples.
 4. HTML output is correct — see below.

@@ -43,12 +43,10 @@ uv run pre-commit install
 To generate the WoT resources run
 
 ```bash
-uv run wot-toolchain generate-wot-resources -d
+uv run wot-toolchain generate-wot-resources
 ```
 
-Options:
- - `generate-wot-resources` generates the resource artifacts
- - `-d` additionally generates the ReSpec TD specification and its assertion CSV inventory
+It runs the generators listed under `generators` in `wot-toolchain.yaml`. With `spec` listed, it also builds the ReSpec TD specification and its assertion CSV inventory.
 
 Run `uv run wot-toolchain --help` to view all the available command and options.
 
@@ -109,11 +107,8 @@ See [tests/README.md](tests/README.md) for the complete test inventory and the u
 Useful commands:
 
 ```bash
-# Generate resource artifacts only
+# Generate the resource artifacts and the ReSpec TD specification
 uv run wot-toolchain generate-wot-resources
-
-# Generate resource artifacts and the ReSpec TD specification
-uv run wot-toolchain generate-wot-resources -d
 
 # Run the complete test suite
 uv run pytest tests/ -v

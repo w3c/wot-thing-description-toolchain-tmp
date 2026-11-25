@@ -136,7 +136,7 @@ def _descendants_of(roots: Iterable[str], children_index: Dict[str, Set[str]]) -
     return out
 
 
-def _collapse_to_visible_ancestor(target: str, all_classes: Dict[str, object], *, hidden: Set[str],
+def _collapse_to_visible_ancestor(target: Optional[str], all_classes: Dict[str, object], *, hidden: Set[str],
                                   stop_at: Set[str]) -> Optional[str]:
     cur = target
     while cur in hidden:
@@ -253,24 +253,14 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
     return "\n".join(lines)
 
 
-def generate_visualizations(schemas_dir: Path, visualization_dir: Path) -> None:
+def generate_visualizations(diagrams: Iterable[tuple[Path, str]], visualization_dir: Path) -> None:
     if not _require_dot():
         logging.error("Graphviz 'dot' executable not found.")
         return
 
-    mapping = {
-        "thing_description.yaml": "td.svg",
-        "jsonschema.yaml": "jsonschema.svg",
-        "wot_security.yaml": "wotsec.svg",
-        "hypermedia.yaml": "hctl.svg"
-    }
-
     visualization_dir.mkdir(parents=True, exist_ok=True)
 
-    for filename, target_svg in mapping.items():
-        path = schemas_dir / filename
-        if not path.exists():
-            continue
+    for path, target_svg in diagrams:
         try:
             sv_merged = SchemaView(str(path), merge_imports=True)
             sv_unmerged = SchemaView(str(path), merge_imports=False)
@@ -279,4 +269,4 @@ def generate_visualizations(schemas_dir: Path, visualization_dir: Path) -> None:
             _dot_to_svg(dot_source, visualization_dir / target_svg)
             logging.info(f"Generated {target_svg}")
         except Exception as e:
-            logging.error(f"Failed {filename}: {e}", exc_info=True)
+            logging.error(f"Failed {path.name}: {e}", exc_info=True)

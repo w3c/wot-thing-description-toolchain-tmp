@@ -3,7 +3,6 @@ import logging
 import shutil
 
 from pathlib import Path
-from typing import Optional
 
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.shaclgen import ShaclGenerator
@@ -12,20 +11,18 @@ from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
-from .. import (SCHEMA_PATH, GENS_PATH, GENERATORS,
-                RESPEC_TEMPLATE_PATH, FINAL_SPEC_PATH,
-                CORE_SCHEMA_PLACEHOLDER, ASSERTION_PATH,
-                STATIC_VISUALIZATION_PATH)
+from ..config import Config
+from ..errors import GenerationError, SchemaError
 from ..postprocessors.jsonschema_postprocessor import post_process_jsonschema
 from ..postprocessors.shacl_postprocessor import post_process_shacl
 from .visualization import generate_visualizations
 from .respec import generate_respec_spec
 
+# Hand-drawn spec figures copied from w3c/wot-thing-description visualization/.
+STATIC_VISUALIZATION_PATH = Path('resources') / 'static' / 'visualization'
 
-RESOURCE_GENERATORS = [g for g in GENERATORS if g != "visualization"]
 
-
-def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: Path):
+def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: Path, top_class: str | None) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     if generator == 'jsonschema':
@@ -33,7 +30,7 @@ def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: P
         json_schema_generator = JsonSchemaGenerator(
             schema_view.schema,
             mergeimports=True,
-            top_class='Thing',
+            top_class=top_class,
             not_closed=True,
             include_null=False,
             preserve_names=True,
@@ -75,32 +72,38 @@ def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: P
         logging.warning(f"Unknown generator: {generator}")
 
 
-def run_pipeline(
-    input_path: Path,
-    *,
-    generate_docs: bool = False,
-    assertions_csv_path: Optional[Path] = None,
-    extra_asserts_path: Optional[Path] = None,
-) -> None:
-    schema_view = SchemaView(input_path, merge_imports=True)
-    logging.info(f"Input schema {input_path} loaded successfully!")
+def run_pipeline(config: Config) -> None:
+    """Run the configured generators, the spec last; raises SchemaError or GenerationError."""
+    schema_view = _load_schema_view(config.root_schema)
+    logging.info(f"Input schema {config.root_schema} loaded successfully!")
 
-    for generator in RESOURCE_GENERATORS:
-        output_dir = GENS_PATH / generator
+    for generator in config.generators:
+        if generator in ("visualization", "spec"):
+            continue
         logging.info(f"Proceeding with WoT resource generation for {generator}")
-        _run_linkml_generator(schema_view, generator, output_dir)
+        try:
+            _run_linkml_generator(schema_view, generator, config.output_dir / generator, config.top_class)
+        except Exception as exc:
+            raise GenerationError(f"{generator} generation failed: {exc}") from exc
 
-    generate_visualizations(SCHEMA_PATH, GENS_PATH / "static" / "visualization")
+    visualization_dir = config.output_dir / "static" / "visualization"
+    if "visualization" in config.generators:
+        diagrams = [(vocabulary.schema, vocabulary.diagram) for vocabulary in config.vocabularies if vocabulary.diagram]
+        generate_visualizations(diagrams, visualization_dir)
 
-    if generate_docs:
-        shutil.copytree(STATIC_VISUALIZATION_PATH, GENS_PATH / "static" / "visualization", dirs_exist_ok=True)
+    if config.spec is not None:
+        shutil.copytree(STATIC_VISUALIZATION_PATH, visualization_dir, dirs_exist_ok=True)
         logging.info("Starting ReSpec specification generation...")
-        generate_respec_spec(
-            input_path,
-            RESPEC_TEMPLATE_PATH,
-            FINAL_SPEC_PATH,
-            CORE_SCHEMA_PLACEHOLDER,
-            assertions_csv_path=assertions_csv_path or ASSERTION_PATH,
-            extra_asserts_path=extra_asserts_path,
-        )
+        generate_respec_spec(config.root_schema, config.spec, config.schema_prefixes)
         logging.info("ReSpec specification generation complete.")
+
+
+def _load_schema_view(schema_path: Path) -> SchemaView:
+    if not schema_path.is_file():
+        raise SchemaError(f"{schema_path}: LinkML schema file not found.")
+    try:
+        schema_view = SchemaView(schema_path, merge_imports=True)
+        schema_view.all_classes()
+    except Exception as exc:
+        raise SchemaError(f"{schema_path}: LinkML schema could not be loaded: {exc}") from exc
+    return schema_view
