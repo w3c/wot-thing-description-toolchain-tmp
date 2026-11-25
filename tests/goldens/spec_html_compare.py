@@ -25,7 +25,7 @@ def parse_html(path: Path) -> HtmlElement:
 def generated_sections_html(path: Path) -> str:
     """The four generated sections, serialized the same way every run.
 
-    Used as the snapshot in test_golden_diff.py. Only the four sections are
+    Used as the snapshot in test_snapshots.py. Only the four sections are
     taken, so hand-written parts of the template do not end up in the snapshot.
     """
     tree = parse_html(path)

@@ -121,9 +121,9 @@ regression fails the relevant test directly.
 | `resources/upstream/` | W3C reference files: td-next JSON Schema, `assertions.csv`, `html/index.html` | Never updated by a test; change only with maintainer approval in the PR description |
 | `tests/resources/snapshots/` | Snapshots of the generated JSON Schema, JSON-LD context and spec sections | Update with `--update-goldens` after reviewing an intended change |
 
-**When `tests/goldens/test_golden_diff.py` fails:**
+**When `tests/goldens/test_snapshots.py` fails:**
 1. Read the diff — is it expected from the schema change?
-2. If expected: run `uv run pytest tests/goldens/test_golden_diff.py --update-goldens`, commit the updated snapshot, explain in PR description.
+2. If expected: run `uv run pytest tests/goldens/test_snapshots.py --update-goldens`, commit the updated snapshot, explain in PR description.
 3. If unexpected: the change has a side-effect — investigate before updating.
 
 ### What "Correct" Means
