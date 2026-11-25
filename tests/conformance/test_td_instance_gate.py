@@ -35,7 +35,9 @@ def _samples():
 
 @pytest.mark.parametrize("td_path", _samples())
 def test_td_instance(validator, rejections, td_path: Path):
-    expected_valid = "invalid" not in td_path.name.lower()
+    verdict_dir = td_path.parent.name
+    assert verdict_dir in ("valid", "invalid"), f"{td_path}: must be in a valid/ or invalid/ directory"
+    expected_valid = verdict_dir == "valid"
     instance = json.loads(td_path.read_text(encoding="utf-8"))
     errors = list(validator.iter_errors(instance))
     if expected_valid:

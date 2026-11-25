@@ -84,7 +84,16 @@ uv run pytest tests/goldens/test_golden_diff.py --update-goldens
 ## Test Data
 
 `resources/td/` contains the td-next TD instance files, one directory per topic
-(`1-simple-default/` to `15-link-relation-type/`). To add a test case, add a
-`*.jsonld` file to the directory of its topic.
-`conformance/test_td_instance_gate.py` reads every `*.jsonld` file: a file
-whose name contains `invalid` must be rejected, all others must be accepted.
+(`1-simple-default/` to `15-link-relation-type/`):
+
+```
+resources/td/<topic>/valid/<case>.jsonld     must be accepted
+resources/td/<topic>/invalid/<case>.jsonld   must be rejected
+```
+
+`<case>` names what the instance shows, in lower-case words joined by `-`
+(protocol and term names keep their spelling, e.g. `CoAP-hop-limit`,
+`readOnly`). To add a test case, add one `*.jsonld` file to `valid/` or
+`invalid/` of its topic; no Python change is needed.
+`conformance/test_td_instance_gate.py` reads every `*.jsonld` file and fails
+for a file outside a `valid/` or `invalid/` directory.
