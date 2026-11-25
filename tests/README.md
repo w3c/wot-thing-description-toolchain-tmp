@@ -35,7 +35,7 @@ The specification HTML is built when `spec` is listed under `generators` in
   `resources/upstream/schemas/td20-json-schema-validation.json`.
 - `goldens/test_golden_diff.py` detects changes to the generated JSON Schema,
   JSON-LD context, and generated specification sections.
-- `goldens/test_golden_form_structure.py` checks that the Form and
+- `goldens/test_spec_form_sections.py` checks that the Form and
   ExpectedResponse sections of the generated specification contain the
   expected tables, operation types, and assertion ids.
 - `unit/spec/test_spec_content_rendering.py` checks the HTML rendered from

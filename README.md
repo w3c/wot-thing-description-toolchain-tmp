@@ -93,7 +93,7 @@ The checks include:
 - `tests/conformance/test_td_instance_gate.py`: validates valid and invalid TD/TM 2.0 test instances against the generated JSON Schema.
 - `tests/conformance/test_td_crosscheck.py`: compares generated-schema validation verdicts with the upstream W3C TD schemas manually specified in `resources/upstream/schemas/`.
 - `tests/goldens/test_golden_diff.py`: compares generated JSON Schema, JSON-LD context, and generated specification sections with machine-updatable snapshots in `tests/resources/snapshots/`.
-- `tests/goldens/test_golden_form_structure.py` and `tests/unit/spec/test_spec_content_rendering.py`: check generated ReSpec structure and rendering behavior.
+- `tests/goldens/test_spec_form_sections.py` and `tests/unit/spec/test_spec_content_rendering.py`: check generated ReSpec structure and rendering behavior.
 - `tests/unit/snippets/test_snippet_schema.py` and `tests/unit/snippets/test_snippet_crossrefs.py`: validate snippet metadata, source files, and ReSpec cross-references.
 
 `resources/upstream/html/index.html` and `resources/upstream/assertions.csv` are upstream reference files used for TD specification and assertion-inventory comparison. `tests/resources/snapshots/` contains this toolchain's generated-output snapshots; update them only with `uv run pytest tests/goldens/test_golden_diff.py --update-goldens` after reviewing an intended change.
