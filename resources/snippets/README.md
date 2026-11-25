@@ -7,5 +7,5 @@ For the complete authoring guide — naming, metadata fields, path notation, gro
 The snippet schema is defined in `../schemas/snippet_schema.yaml`. Validate with:
 
 ```bash
-uv run pytest tests/test_snippet_schema.py -v
+uv run pytest tests/unit/snippets/test_snippets_yaml.py -v
 ```

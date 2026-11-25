@@ -142,11 +142,11 @@ def _flatten_subclasses(schema: dict, sv: SchemaView, config: TransformConfig) -
 
 **Rule: postprocessor output is validated through golden file comparison.**
 
-The test suite (`tests/test_golden_diff.py`) compares full generated output — including postprocessor transforms — against snapshots. After modifying a postprocessor:
+The test suite (`tests/goldens/test_snapshots.py`) compares full generated output — including postprocessor transforms — against snapshots. After modifying a postprocessor:
 
 1. Regenerate: `uv run wot-toolchain generate-wot-resources`
 2. Review the diff in `resources/gens/`
-3. Update goldens: `uv run pytest tests/test_golden_diff.py --update-goldens`
+3. Update goldens: `uv run pytest tests/goldens/test_snapshots.py --update-goldens`
 4. Run full suite: `uv run pytest tests/ -v`
 
 **Rule: the entry point function must be pure — `deepcopy` the input, return a new dict.**

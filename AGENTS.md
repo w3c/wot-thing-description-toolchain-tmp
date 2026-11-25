@@ -45,9 +45,10 @@ resources/snippets/         ← TD/TM code examples shown in the spec
   _snippets.yaml            ← snippet metadata (id, title, hide_paths, etc.)
 
 tests/
-  manual_goldens/           ← authoritative hand-verified reference outputs
-  data/td11/                ← TD 1.1 instance files (valid + invalid)
-  data/td20/                ← TD 2.0 instance files (valid + invalid)
+  unit/                     ← tests that run without generated files
+  conformance/              ← TD instances validated against the generated JSON Schema
+  goldens/                  ← generated output compared with snapshots and upstream files
+  resources/td/<topic>/     ← td-next TD instance files in valid/ and invalid/
 ```
 
 ## Setup
@@ -83,32 +84,15 @@ See [WoT Custom Annotations](docs/guidelines/wot-custom-annotations.md) for the 
 ### Running Tests
 
 ```bash
-# Full pipeline — verify it exits cleanly
-uv run wot-toolchain generate-wot-resources 2>&1 | grep -E "ERROR|WARNING"
+# Generate the artifacts; the tests in conformance/ and goldens/ read them
+uv run wot-toolchain generate-wot-resources
 
-# All tests (on main branch)
-uv run pytest tests/ -v
-
-# Spec HTML structure tests
-uv run pytest tests/test_spec_content_rendering.py tests/test_golden_form_structure.py -v
-
-# Generated spec HTML vs the manual golden
-uv run pytest tests/test_spec_html_vs_golden.py -v
-
-# Assertion inventory vs upstream
-uv run pytest tests/test_assertion_inventory.py -v
+# All tests
+uv run pytest
 ```
 
-### Test Suite State on `main`
-
-Known pre-existing failures on `main` as of 2026-07 — do not investigate, do not try to fix unless specifically assigned:
-
-| Test | Failure | Root cause |
-|---|---|---|
-| `test_golden_form_structure.py` — 21 failures | `Form section not found` in generated HTML | `Form` class subsections not emitted correctly by HTML generator; added by PR #58 as a regression baseline |
-| `test_spec_html_vs_golden.py` — 4 failures | 79 differences in the four generated sections | 26 of them are real: slot description, type and mandatory/optional differ from the golden. The rest is markup and punctuation, the golden keeps the ReSpec source form (`` `Form` ``, `[[RFC2046]]`) and we emit the tags. The step is commented out in `main.yaml` until this is fixed |
-
-These failures exist in CI on `main`. A PR that does not touch the Form class or HTML generation must not introduce new failures in this file.
+CI runs the same `uv run pytest` call. Every test must pass; the suite has no
+known failures. `tests/README.md` lists what each test file checks.
 
 ### Generation Error Taxonomy
 
@@ -132,25 +116,22 @@ regression fails the relevant test directly.
 
 ### Golden Files
 
-Two categories with different update policies:
-
-| Directory | Type | Update policy |
+| Directory | Content | Update policy |
 |---|---|---|
-| `tests/manual_goldens/` | Hand-verified, authoritative | Require explicit maintainer approval in PR description; never auto-update |
-| `tests/goldens/` (PR #63+) | Machine-updatable snapshots | Update via `--update-goldens` flag when an intentional change is verified |
+| `resources/upstream/` | W3C reference files: td-next JSON Schema, `assertions.csv`, `html/index.html` | Never updated by a test; change only with maintainer approval in the PR description |
+| `tests/resources/snapshots/` | Snapshots of the generated JSON Schema, JSON-LD context and spec sections | Update with `--update-goldens` after reviewing an intended change |
 
-**When a golden diff CI job fails:**
+**When `tests/goldens/test_snapshots.py` fails:**
 1. Read the diff — is it expected from the schema change?
-2. If expected: run `uv run pytest tests/test_golden_diff.py --update-goldens`, commit the updated snapshot, explain in PR description.
+2. If expected: run `uv run pytest tests/goldens/test_snapshots.py --update-goldens`, commit the updated snapshot, explain in PR description.
 3. If unexpected: the change has a side-effect — investigate before updating.
-4. Never update `manual_goldens/` via `--update-goldens` — these require human review.
 
 ### What "Correct" Means
 
 A change is complete when all of these hold:
 
 1. `uv run wot-toolchain generate-wot-resources` exits without ERROR.
-2. `uv run pytest tests/ -v` passes (xfail acceptable, no new unexpected failures).
+2. `uv run pytest` passes with no failures.
 3. Snippets in `resources/snippets/` validate against the generated JSON Schema. Every `.json` linked to a changed class or slot must pass; `validate: false` is only acceptable for non-TD/TM examples.
 4. HTML output is correct — see below.
 
@@ -160,7 +141,7 @@ A change is complete when all of these hold:
 
 Check the auto-generated sections for:
 
-- **Vocabulary tables** — every term in the table must match the LinkML schema: name, description, type column, and optionality (REQUIRED / OPTIONAL). Cross-check against `tests/manual_goldens/html/` for any change.
+- **Vocabulary tables** — every term in the table must match the LinkML schema: name, description, type column, and optionality (REQUIRED / OPTIONAL). Cross-check against `resources/upstream/html/index.html` for any change.
 - **Assertion anchors** — every normative statement that should be an assertion must have a Respec `<span id="td-...">` anchor. If a normative statement lacks an anchor, it is a gap. Anchor IDs must follow the `td-{kebab-case}` convention and be globally unique in the document.
 - **Respec cross-references** — terms referenced inside the spec must use `<a>` with the correct definition link or `[[RFC####]]` bibliography syntax. Bare URLs are not acceptable for normative references.
 - **Class names** — class names in the vocabulary tables must match the LinkML class names exactly (no renaming, no abbreviation).
@@ -171,15 +152,14 @@ When reviewing HTML changes, do not evaluate the entire document — scope the c
 
 ### CI Pipeline (GitHub Actions)
 
-`main.yaml` runs the following jobs in sequence: `static-analysis` → `build` → [`test-gates` ∥ `golden-diff`] → `deploy-pages`.
+`main.yaml` runs the following jobs in sequence: `static-analysis` → `build` → `tests` → `deploy-pages`.
 
 | Job | What it checks |
 |---|---|
 | `static-analysis` | Ruff lint; LinkML schema lint (non-blocking) |
 | `build` | Full artifact generation; all output files non-empty; package builds; uploads `resources/gens/` as the Pages artifact on `main` |
-| `test-gates` | TD instance gate; W3C cross-check; HTML structure tests; assertion inventory vs upstream |
-| `golden-diff` | Generated JSON Schema + context + the four generated spec sections vs committed snapshots |
-| `deploy-pages` | Pushes to `main` only: publishes the tested `resources/gens/` to GitHub Pages once `test-gates` and `golden-diff` pass |
+| `tests` | The whole test suite: `uv run pytest` |
+| `deploy-pages` | Pushes to `main` only: publishes the tested `resources/gens/` to GitHub Pages once `tests` passes |
 
 The hand-drawn spec figures live in `resources/static/visualization/` (copied from `w3c/wot-thing-description`) and are copied into `resources/gens/visualization/` during `-d` generation.
 
@@ -239,7 +219,7 @@ The hand-drawn spec figures live in `resources/static/visualization/` (copied fr
 - **Never edit `resources/gens/`** — generated on every run.
 - **Schema is authoritative.** If a generated artifact looks wrong, fix the schema or the postprocessor.
 - **Postprocessors patch generator gaps** — document the W3C requirement the fix satisfies.
-- **Golden files in `tests/manual_goldens/`** are authoritative and require maintainer approval to update.
+- **Reference files in `resources/upstream/`** are authoritative and require maintainer approval to update.
 - **PRs target `main` directly** (fork → branch → PR to main).
 - **W3C compliance is a hard constraint**, not a preference. Spec text must use RFC 2119 (MUST/SHOULD/MAY) where normative, and bibliography refs must use Respec `[[RFC####]]` syntax.
 
@@ -251,7 +231,7 @@ Files with high concurrent-edit risk. Check for in-progress PRs before touching.
 |---|---|---|
 | `resources/schemas/thing_description.yaml` | Main schema — almost every PR touches it | Always branch from a fresh `main`; rebase before opening PR |
 | `resources/index.template.html` | Hand-written spec prose — merge conflicts are semantic | Coordinate with maintainer before large structural edits |
-| `tests/manual_goldens/` | Authoritative reference outputs | Never update without maintainer sign-off; see Golden Files above |
+| `resources/upstream/` | W3C reference files | Never update without maintainer sign-off; see Golden Files above |
 
 **Branching strategy:**
 - Fork the repo; branch from `main` (not from another contributor's branch).
@@ -260,12 +240,12 @@ Files with high concurrent-edit risk. Check for in-progress PRs before touching.
 
 ## Current Priorities (2026-07)
 
-1. JSON Schema correctness — all td11 + td20 instance validations pass.
-2. HTML spec correctness — structure and vocabulary tables match `tests/manual_goldens/html/`.
+1. JSON Schema correctness — all td-next instance validations pass.
+2. HTML spec correctness — structure and vocabulary tables match `resources/upstream/html/index.html`.
 3. Snippet validity — all `.json` files validate against the generated JSON Schema.
 4. Assertion CSVs — assertions match anchors in `index.html`.
 
-Out of scope for now: automated ontology/SHACL consistency (manual_goldens exist as reference only).
+Out of scope for now: automated ontology/SHACL consistency.
 
 **Before running any pipeline command**, ensure deps are current:
 ```bash

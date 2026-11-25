@@ -65,7 +65,7 @@ Paths use dot-separated keys to target nested JSON properties:
 The snippet schema is defined in `resources/schemas/snippet_schema.yaml`. Validate with:
 
 ```bash
-uv run pytest tests/test_snippet_schema.py -v
+uv run pytest tests/unit/snippets/test_snippets_yaml.py -v
 ```
 
 ---
