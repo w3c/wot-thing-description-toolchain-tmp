@@ -316,10 +316,8 @@ def _resolve_refs(schema: dict, sv: SchemaView) -> None:
             enum_values[enum_name] = pvs
 
     def _extract_ref_name(ref: str) -> str | None:
-        for prefix in ('#/$defs/', '#/definitions/'):
-            if ref.startswith(prefix):
-                return ref[len(prefix):]
-        return None
+        prefix = '#/$defs/'
+        return ref[len(prefix):] if ref.startswith(prefix) else None
 
     def _is_string_map(cls_name: str | None) -> bool:
         if cls_name is None:
@@ -380,8 +378,6 @@ def _resolve_refs(schema: dict, sv: SchemaView) -> None:
             base = ref_name.replace('__identifier_optional', '')
             if base in valid_def_names:
                 obj['$ref'] = f'#/$defs/{base}'
-        elif not ref.startswith('#/$defs/'):
-            obj['$ref'] = f'#/$defs/{ref_name}'
 
         return None
 
@@ -396,11 +392,6 @@ def _clean_metadata(schema: dict) -> None:
 
     schema.pop('metamodel_version', None)
     schema.pop('version', None)
-
-    if 'required' in schema:
-        req = schema['required']
-        if 'name' in req:
-            req.remove('name')
 
 
 JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
@@ -458,15 +449,13 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
         name="resolve_refs",
         kind=TransformKind.WOT_SHAPING,
         reason="Repairs references after the removals: inlines enums, removes refs to Any, points "
-        "__identifier_optional refs to the base def, rewrites #/definitions/ to #/$defs/, and reduces an anyOf in "
-        "additionalProperties to one schema.",
+        "__identifier_optional refs to the base def, and reduces an anyOf in additionalProperties to one schema.",
         apply=lambda schema, sv, config: _resolve_refs(schema, sv),
     ),
     Transform(
         name="clean_metadata",
         kind=TransformKind.COSMETIC,
-        reason="Removes description and title from every def, metamodel_version and version from the root, and "
-        "name from the root required list.",
+        reason="Removes description and title from every def, and metamodel_version and version from the root.",
         apply=lambda schema, sv, config: _clean_metadata(schema),
     ),
 )
