@@ -386,7 +386,7 @@ BearerSecurityScheme:
 
 ## JSON Schema Annotations (`jsonschema_*`)
 
-These annotations control how the JSON Schema postprocessor (`src/wot_toolchain/postprocessors/jsonschema_postprocessor.py`) transforms raw LinkML generator output. They have **no effect** on HTML, OWL, or SHACL output.
+These annotations control how the JSON Schema postprocessor (`src/wot_toolchain/artifacts/jsonschema/postprocess.py`) transforms raw LinkML generator output. They have **no effect** on HTML, OWL, or SHACL output.
 
 The postprocessor reads these annotations via `_read_annotations()` and applies transforms in a fixed pipeline order. Adding an annotation to a class automatically activates the corresponding transform — no Python code changes needed.
 

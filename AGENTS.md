@@ -29,11 +29,12 @@ resources/schemas/          ← SOURCE OF TRUTH (edit here, not in gens/)
 
 src/wot_toolchain/
   cli.py                    ← entry point: wot-toolchain generate-wot-resources (generators listed in wot-toolchain.yaml)
-  generators/               ← LinkML → raw artifacts
-  postprocessors/           ← adjust raw LinkML output to meet W3C WoT TD requirements
-    json_schema_postprocessor.py
-    jsonld_context_postprocessor.py
-    shacl_postprocessor.py
+  pipeline.py               ← runs the LinkML generators and the postprocessors
+  generators/               ← respec.py (specification HTML), visualization.py (diagrams)
+  artifacts/                ← adjust raw LinkML output to meet W3C WoT TD requirements
+    jsonschema/postprocess.py
+    jsonld_context/postprocess.py
+    shacl/postprocess.py
   specgen/                  ← HTML spec generation
     respec.py / bikeshed_processor.py
     tables.py               ← vocabulary tables

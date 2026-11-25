@@ -5,7 +5,7 @@
 
 ---
 
-Conventions for writing and maintaining postprocessors — the Python functions in [`src/wot_toolchain/postprocessors/`](../../src/wot_toolchain/postprocessors/) that transform raw LinkML generator output into spec-compliant artifacts.
+Conventions for writing and maintaining postprocessors — the Python functions in [`src/wot_toolchain/artifacts/`](../../src/wot_toolchain/artifacts/) that transform raw LinkML generator output into spec-compliant artifacts.
 
 For the catalog of known LinkML limitations that motivate postprocessors, see [Known LinkML Gaps](../known-linkml-gaps.md).
 
@@ -35,9 +35,9 @@ If you suspect LinkML cannot express a requirement, verify by testing with the g
 
 | Module | Artifact |
 |--------|----------|
-| `jsonschema_postprocessor.py` | JSON Schema |
-| `jsonld_context_postprocessor.py` | JSON-LD Context |
-| `shacl_postprocessor.py` | SHACL Shapes |
+| `artifacts/jsonschema/postprocess.py` | JSON Schema |
+| `artifacts/jsonld_context/postprocess.py` | JSON-LD Context |
+| `artifacts/shacl/postprocess.py` | SHACL Shapes |
 
 **Rule: add new transform functions to the existing module. Do not create new files.**
 

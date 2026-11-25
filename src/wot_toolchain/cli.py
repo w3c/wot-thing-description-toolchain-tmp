@@ -9,7 +9,7 @@ import click
 
 from .config import DEFAULT_CONFIG, Config, load_config
 from .errors import SchemaError, WotToolchainError
-from .generators import run_pipeline
+from .pipeline import run_pipeline
 
 UNEXPECTED_ERROR_EXIT_CODE = 1
 
