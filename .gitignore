@@ -131,9 +131,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Only commit the lockfile in the release branch
-uv.lock
-
 # Never commit generated files
 resources/gens/
 src/wot_thing_description_toolchain_tmp
