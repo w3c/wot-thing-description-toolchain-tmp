@@ -1,4 +1,4 @@
-name: Deploy specification to GitHub Pages
+name: Deploy docs site to GitHub Pages
 
 on:
   push:
@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build specification
+    name: Build docs site and specification
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -30,18 +30,32 @@ jobs:
         run: uv python install 3.14
 
       - name: Install dependencies
-        run: uv sync --locked
+        run: uv sync --locked --group docs
 
       - name: Install Graphviz
         run: sudo apt-get update -qq && sudo apt-get install -y -qq graphviz
 
       - name: Generate WoT resources and specification
+        # The docs site does not depend on the generated resources; publish it even when generation fails.
+        # The CI workflow is the gate for generation failures.
+        continue-on-error: true
         run: uv run wot-toolchain generate-wot-resources
+
+      - name: Generate config file reference
+        run: uv run python scripts/gen_config_docs.py
+
+      - name: Build docs site
+        run: uv run zensical build --strict
+
+      - name: Add generated resources under gens/
+        # Temporary: the generated artifacts will be published from the repository that owns the schemas.
+        if: hashFiles('resources/gens/index.html') != ''
+        run: cp -r resources/gens site/gens
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          path: resources/gens
+          path: site
 
   deploy:
     name: Deploy to GitHub Pages

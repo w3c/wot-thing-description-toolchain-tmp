@@ -4,7 +4,7 @@ This note compares the generated JSON-LD context `resources/gens/jsonldcontext/c
 It lists every difference that changes how a TD is interpreted, and the defects of the published context that explain why the generated context departs from it.
 To reproduce an entry, put either context in place of the TD 1.1 context URL in the fragment's `@context`, convert the fragment to RDF with a JSON-LD 1.1 processor whose document loader refuses remote loads, and compare the N-Quads.
 
-The status words Undecided and Published defect are defined in the [README](README.md) of this directory.
+The status words Undecided and Published defect are defined in the [README](index.md) of this directory.
 
 ## Method
 
@@ -52,6 +52,8 @@ Generated. `unit` maps to `qudt:unit` (`http://qudt.org/schema/qudt/unit`) with 
 
 Effect. `"unit":"qudt:DEG_C"` gives `schema:unitCode <qudt:DEG_C>` under the published context and `qudt:unit <http://qudt.org/schema/qudt/DEG_C>` under the generated one.
 An absolute IRI value such as the om-2 `degree_Celsius` IRI is kept under both, with the two different predicates.
+
+Cause. `slot_uri: qudt:unit` on `unit` in `resources/schemas/jsonschema.yaml`. A QUDT unit IRI carries dimensions and conversion factors, where `schema:unitCode` takes a UN/CEFACT code such as `CEL`.
 
 Status. Undecided.
 
@@ -348,6 +350,8 @@ The published shapes constrain `wotsec:in` on the API key scheme as well, so the
 Generated. The generated context also gives `wotsec:in "header"` for an API key scheme, while the generated shapes constrain `wotsec:apikeyIn`; see "API key `in` path" in Part 1 of the [SHACL note](shacl.md).
 
 Effect. `{"securityDefinitions":{"k":{"scheme":"apikey","in":"header","name":"x"}}}` gives `rdf:type wotsec:APIKeySecurityScheme` and `wotsec:in "header"`.
+A context scoped at `securityDefinitions` cannot pick `wotsec:apikeyIn` only when `scheme` is `apikey`, because JSON-LD does not select a context by a member value.
+The Working Group has to decide which predicate is canonical: `wotsec:in` for every scheme, `wotsec:apikeyIn` for API key schemes with a context design that can select it, or an explicit RDF relation between the two.
 
 Status. Published defect.
 
@@ -373,6 +377,7 @@ The TD 1.1 specification `resources/upstream/html/index.html` states that the de
 Generated. `title` and `description` have no language mapping; with `"@language":"de"`, `"title":"Lampe"` gives `td:title "Lampe"@de`.
 
 Effect. With `"@language":"de"`, `"title":"Lampe"` gives `td:title "Lampe"@en`; the test corpus shows German and Arabic titles and a German description tagged `@en`.
+A term-level language mapping overrides the document default (JSON-LD 1.1), so the TD 1.1 test instance `tests/data/11-multilanguage/string-direction-td-valid.jsonld`, which sets `"@language": "ar-EG"`, gets an Arabic `title` tagged `@en`. After expansion and compaction its `title` and `description` come back as `td:title` and `td:description`, because the compactor cannot pick a term whose language mapping differs from the value's.
 
 Status. Published defect.
 

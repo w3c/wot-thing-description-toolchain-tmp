@@ -1,9 +1,9 @@
 # Snippet Authoring Guide
 
 Worked examples for authoring TD/TM JSON snippets rendered in the generated specification.
-Where snippets fit in a schema change is shown in the [authoring guide](../authoring-guide.md).
+Where snippets fit in a schema change is shown in [Your first schema change](first-change.md).
 
-For the schema of `_snippets.yaml`, see `resources/schemas/snippet_schema.yaml`.
+The format of `_snippets.yaml` is defined by [`snippet_schema.yaml`](https://github.com/w3c/wot-thing-description-toolchain-tmp/blob/main/resources/schemas/snippet_schema.yaml) in the toolchain repository.
 
 ---
 
@@ -19,7 +19,7 @@ myThing_example.json          # wrong: not kebab-case
 
 **Rule: `id` in `_snippets.yaml` must be globally unique and use the pattern `{topic}-{qualifier}`.**
 
-Rationale: the `id` becomes the HTML element ID used for cross-referencing with `[[[#id]]]` in the spec. Neither generation nor the tests detect a collision; the generated page then contains two elements with the same ID. Before assigning an `id`, check that it does not conflict with an existing `id` already defined in `resources/index.template.html`. The template contains hand-authored section and element IDs that share the same HTML ID namespace.
+Rationale: the `id` becomes the HTML element ID used for cross-referencing with `[[[#id]]]` in the spec. Generation does not detect a collision; the generated page then contains two elements with the same ID. Before assigning an `id`, check that it does not conflict with an existing `id` already defined in `index.template.html`. The template contains hand-authored section and element IDs that share the same HTML ID namespace.
 
 ```yaml
 action-serialization:
@@ -58,11 +58,7 @@ Paths use dot-separated keys to target nested JSON properties:
 
 ### Schema Validation
 
-Validate `_snippets.yaml` against its schema with:
-
-```bash
-uv run pytest tests/test_snippet_schema.py -v
-```
+Generation does not check `_snippets.yaml` against [`snippet_schema.yaml`](https://github.com/w3c/wot-thing-description-toolchain-tmp/blob/main/resources/schemas/snippet_schema.yaml): a field the schema does not know is ignored. Keep to the fields in the table above.
 
 ---
 
@@ -70,7 +66,7 @@ uv run pytest tests/test_snippet_schema.py -v
 
 A minimal snippet with default settings.
 
-**Step 1: Create the JSON file** (`resources/snippets/simple-td.json`):
+**Step 1: Create the JSON file** (`linkml/snippets/simple-td.json`):
 
 ```json
 {
@@ -101,7 +97,7 @@ snippets:
 
 With no `hide_paths`, `show_paths`, or `layout` override, the snippet renders in full inside an `<aside class="example">` block with the given title.
 
-**Step 3: Add the template directive** in `resources/index.template.html`:
+**Step 3: Add the template directive** in `index.template.html`:
 
 ```
 %snippet('simple-td')%
@@ -187,7 +183,7 @@ snippets:
 
 **Effect:** only `properties.lampState.type` and `properties.lampState.properties` are shown in full. Everything else (context, security, forms) is replaced with `// ...`.
 
-**Rule: `hide_paths` and `show_paths` are mutually exclusive.** If both are set, generation applies `hide_paths`, ignores `show_paths`, and `tests/test_snippet_schema.py` fails.
+**Rule: `hide_paths` and `show_paths` are mutually exclusive.** If both are set, generation applies `hide_paths` and silently ignores `show_paths`.
 
 ---
 
@@ -243,7 +239,7 @@ Renders as a tabbed interface with one tab per snippet. `selected: true` marks t
 
 **Rule: set `validate: false` only for partial, non-TD/TM, or placeholder-containing snippets.**
 
-Rationale: by default, every snippet registered in `_snippets.yaml` is validated during `uv run wot-toolchain generate-wot-resources` against the JSON Schema that `generators.spec.snippet_validation_schemas` in `wot-toolchain.yaml` lists for its kind (`td` or `tm`, chosen by `schema` or `default_schema`). These are the static files under `resources/upstream/schemas/`, not the JSON Schema generated from the LinkML model. A violation fails generation. Partial examples (e.g., protocol binding fragments, context expansion examples) fail validation because they are not complete TDs. With `validate: false` the snippet is not validated at all and is still rendered.
+Rationale: by default, every snippet registered in `_snippets.yaml` is validated during `wot-toolchain generate-wot-resources` against the JSON Schema that `generators.spec.snippet_validation_schemas` in `wot-toolchain.yaml` lists for its kind (`td` or `tm`, chosen by `schema` or `default_schema`). These are static files, not the JSON Schema generated from the LinkML model. A violation fails generation. Partial examples (e.g., protocol binding fragments, context expansion examples) fail validation because they are not complete TDs. With `validate: false` the snippet is not validated at all and is still rendered.
 
 ```yaml
 snippets:

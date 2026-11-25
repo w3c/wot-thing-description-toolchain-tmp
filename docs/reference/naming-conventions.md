@@ -1,8 +1,8 @@
 # LinkML Naming Conventions
 
-Naming and structural conventions for the WoT LinkML schemas under `resources/schemas/`.
+Naming and structural conventions for the WoT LinkML schemas under `linkml/`.
 
-For the complete annotation API, see [WoT Custom Annotations](wot-custom-annotations.md). For postprocessor conventions, see [Postprocessor Conventions](../guidelines/postprocessor-conventions.md).
+For the complete annotation API, see [WoT Custom Annotations](annotations.md). For postprocessor conventions, see [Postprocessor Conventions](../contributing/postprocessors.md).
 
 ---
 
@@ -330,7 +330,7 @@ Since the identifier slot is a structural artifact of JSON serialization (the ma
 4. Add `spec_description` if HTML version needs markup or RFC refs.
 5. Add all slots with explicit `range`, `required` list, and `slot_uri` where applicable.
 6. If the class appears as a range on another slot, verify the other slot has `inlined: true` if instances are embedded.
-7. Regenerate and run the tests: `uv run wot-toolchain generate-wot-resources`, then `uv run pytest`.
+7. Regenerate and check the result as described in [Checking a change](../editing-schemas/checking-a-change.md).
 
 ---
 
@@ -343,7 +343,7 @@ Since the identifier slot is a structural artifact of JSON serialization (the ma
 5. Set `inlined: true` if the range is a class and instances are embedded.
 6. Add to the class `required:` list if normative.
 7. Write both `description` and `spec_description` (if different).
-8. Regenerate and run the tests: `uv run wot-toolchain generate-wot-resources`, then `uv run pytest`.
+8. Regenerate and check the result as described in [Checking a change](../editing-schemas/checking-a-change.md).
 
 ---
 

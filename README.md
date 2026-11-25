@@ -23,38 +23,27 @@ The toolchain models WoT resources in LinkML and generates the related artifacts
 
 ## Usage
 
-Requirements:
-
-- Python 3.14, as declared in `pyproject.toml`;
-- [uv](https://docs.astral.sh/uv/); and
-- [Graphviz](https://graphviz.org/), required by `generate-wot-resources` to generate class-hierarchy diagrams for the index.html.
+Requirements: Python 3.14, [uv](https://docs.astral.sh/uv/) and [Graphviz](https://graphviz.org/).
 
 ```bash
 git clone https://github.com/w3c/wot-thing-description-toolchain-tmp.git
 cd wot-thing-description-toolchain-tmp
 uv sync --locked
 uv run wot-toolchain generate-wot-resources
-uv run pytest tests/ -v
+uv run pytest tests/
 ```
 
-`wot-toolchain` is the Python command-line interface installed from this checkout by `uv sync`. `generate-wot-resources` runs every generator listed under `generators` in the config file; the `spec` generator builds the ReSpec TD specification and its assertion CSV inventory. `--only GENERATOR` runs a subset of the config file's generators and `--output-dir DIR` redirects the resource artifacts. Run `uv run wot-toolchain generate-wot-resources --help` for all options.
+The checkout also needs the reference files in `resources/upstream/`, which are not tracked; see [Set up a checkout](docs/contributing/setup.md).
+What is generated, from which schemas and into which files is described by the config file [`wot-toolchain.yaml`](wot-toolchain.yaml) ([reference](docs/reference/config-file.md)); the commands and options are in the [CLI reference](docs/reference/cli.md).
 
-`wot-toolchain diff-report GENERATED REFERENCE` prints a Markdown report of the JSON paths added, removed or changed in a generated JSON Schema or JSON-LD context relative to a reference file; it exits 0 whether or not they differ, so its output can be appended to `$GITHUB_STEP_SUMMARY`.
-
-What is generated, from which schemas and into which files is described by the project config file [`wot-toolchain.yaml`](wot-toolchain.yaml); select another config file with `-c`.
-
-### Use from another repository
-
-The toolchain contains no schemas of its own. A repository that owns LinkML schemas and a config file installs a tagged release and runs it against that config file:
+Another repository installs a tagged release and runs it against its own config file:
 
 ```bash
 uv tool install git+https://github.com/w3c/wot-thing-description-toolchain-tmp@<tag>
 wot-toolchain generate-wot-resources -c path/to/wot-toolchain.yaml
 ```
 
-The toolchain is not published on PyPI. Bikeshed, used by the `spec` generator, is installed with the toolchain. The visualization generator needs Graphviz `dot` on `PATH`.
-
-Generated files are written under `resources/gens/`. Do not edit them directly.
+See [Getting started](docs/getting-started.md).
 
 ## How It Works
 
@@ -79,50 +68,22 @@ From these source models, the generation pipeline has two paths:
 
 ![WoT Toolchain generation flow](images/wot-toolchain.svg)
 
-The code in [`src/wot_toolchain/artifacts/`](src/wot_toolchain/artifacts/) subclasses the LinkML generators and runs passes on their output. It changes the LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`LinkML gaps`](docs/linkml-gaps.md) records each known limitation and workaround.
+The code in [`src/wot_toolchain/artifacts/`](src/wot_toolchain/artifacts/) subclasses the LinkML generators and runs passes on their output. It changes the LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`LinkML gaps`](docs/contributing/linkml-gaps.md) records each known limitation and workaround.
 
 ## Testing
 
-Run the complete checks after generating artifacts:
+Run the tests after generating the artifacts:
 
 ```bash
-uv run pytest tests/ -v
+uv run pytest tests/
 ```
 
-The checks include:
+What each test covers, the expected-failure lists and the snapshot update rules are described in [Testing](docs/contributing/testing.md).
 
-- `tests/test_td_instance_gate.py`: validates the valid and invalid TD test instances in `tests/data/`, as TD 1.1 and as td-next, against the generated JSON Schema.
-- `tests/test_td_crosscheck.py`: compares generated-schema validation verdicts with the upstream W3C TD schemas manually specified in `resources/upstream/schemas/`.
-- `tests/test_golden_diff.py`: compares generated JSON Schema, JSON-LD context, OWL modules, SHACL shapes, and generated specification sections with machine-updatable snapshots in `tests/snapshots/`.
-- `tests/test_golden_form_structure.py` and `tests/test_spec_content_rendering.py`: check generated ReSpec structure and rendering behavior.
-- `tests/test_snippet_schema.py` and `tests/test_snippet_crossrefs.py`: validate snippet metadata, source files, and ReSpec cross-references.
-- `tests/test_jsonld_roundtrip.py`: round-trips the valid TD test instances through `jsonld.js`; requires Node.js with the `jsonld` package in `node_modules/`.
+## Documentation
 
-`resources/upstream/html/index.html` and `resources/upstream/assertions.csv` are upstream reference files used for TD specification and assertion-inventory comparison. `tests/snapshots/` contains this toolchain's generated-output snapshots; update them only with `uv run pytest tests/test_golden_diff.py --update-goldens` after reviewing an intended change.
-
-Known failures are listed one per line in `tests/known_failures/` and marked as strict expected failures: a listed case that starts passing fails the suite until its entry is removed. Any other rejection of a valid sample or mismatch with the W3C reference schema fails the relevant test directly.
-
-See [tests/README.md](tests/README.md) for the complete test inventory and the upstream reference files used by each check.
-
-## Development
-
-Useful commands:
-
-```bash
-# Run every generator listed in wot-toolchain.yaml
-uv run wot-toolchain generate-wot-resources
-
-# Run one generator (repeat --only for more)
-uv run wot-toolchain generate-wot-resources --only jsonschema
-
-# Run the complete test suite
-uv run pytest tests/ -v
-
-# Check linting
-uv run ruff check .
-```
-
-Before changing a schema or generator, read the [modeling guidelines](docs/guidelines/index.md) for naming conventions, custom annotations, postprocessor patterns, and snippet authoring. For documented LinkML limitations and workarounds, see [`LinkML gaps`](docs/linkml-gaps.md). Files under `resources/gens/` are generated outputs and should not be edited manually. Each postprocessor should document the LinkML limitation it addresses.
+The documentation in [`docs/`](docs/index.md) is published at <https://w3c.github.io/wot-thing-description-toolchain-tmp/>.
+Before changing a schema or generator, read [Your first schema change](docs/editing-schemas/first-change.md) and the [annotations](docs/reference/annotations.md) and [naming conventions](docs/reference/naming-conventions.md) references.
 
 ## Current Status
 

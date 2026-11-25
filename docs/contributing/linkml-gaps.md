@@ -1,14 +1,9 @@
 # LinkML gaps
 
-**Author:** Mahda Noura (mahda.noura@siemens.com)
-**Date:** 22.11.2026
-
----
-
 This note records where the upstream LinkML generators (linkml 1.12) do not produce what the WoT Thing Description needs and what wot-toolchain does about it.
-Differences between the generated artifacts and the published W3C artifacts are recorded in [`differences/`](differences/README.md).
+Differences between the generated artifacts and the published W3C artifacts are recorded in [`differences/`](../differences/index.md).
 It is meant for WoT WG members who review the generated artifacts and for LinkML maintainers who want to know which gaps are worth closing upstream.
-How to change the schemas is described in the [authoring guide](authoring-guide.md).
+How to change the schemas is described in the [Your first schema change](../editing-schemas/first-change.md).
 
 Each entry ends with one status word:
 
@@ -223,7 +218,7 @@ Workaround.
 
 Upstream gives a slot without a single `domain` no domain at all, so `td:title`, which `Thing`, `InteractionAffordance` and `DataSchema` use, gets none.
 A graph pass adds one `schema:domainIncludes` triple per class for properties used by several classes.
-How this compares with the published ontologies is under "Single-class includes replaced by rdfs:domain and rdfs:range" in [OWL differences](differences/owl.md#single-class-includes-replaced-by-rdfsdomain-and-rdfsrange).
+How this compares with the published ontologies is under "Single-class includes replaced by rdfs:domain and rdfs:range" in [OWL differences](../differences/owl.md#single-class-includes-replaced-by-rdfsdomain-and-rdfsrange).
 Workaround.
 
 ### Attribute ranges
@@ -258,14 +253,10 @@ The same object before the passes, and the YAML serialization of the object afte
 The tool passes the YAML serialization.
 Workaround.
 
-## Differences from the published artifacts
-
-The differences between the generated and the published artifacts, and the defects of the published artifacts, are recorded per artifact in [`differences/`](differences/README.md).
-There is one file each for the [JSON-LD context](differences/jsonld-context.md), the [JSON Schema](differences/json-schema.md), the [SHACL shapes](differences/shacl.md) and the [OWL ontologies](differences/owl.md).
-
 ## LinkML modelling gaps
 
 Several workarounds above are driven by schema annotations, because the LinkML metamodel cannot state the requirement.
+What each annotation is for, and what would let it go, is listed in [WoT custom annotations](../reference/annotations.md#when-an-annotation-can-go).
 The semantics that LinkML can express are written with native metaslots: `implements: [owl:ObjectProperty]` or `[owl:DatatypeProperty]`, `identifier`, `inlined`, `designates_type` and `meaning` on permissible values.
 
 ### JSON-LD containers and indexes

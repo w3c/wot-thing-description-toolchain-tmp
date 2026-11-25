@@ -1,8 +1,8 @@
 # Postprocessor Conventions
 
-Conventions for the code in [`src/wot_toolchain/artifacts/`](../../src/wot_toolchain/artifacts/) that adjusts the output of the LinkML generators until it meets the WoT Thing Description requirements.
+Conventions for the code in [`src/wot_toolchain/artifacts/`](https://github.com/w3c/wot-thing-description-toolchain-tmp/tree/main/src/wot_toolchain/artifacts) that adjusts the output of the LinkML generators until it meets the WoT Thing Description requirements.
 
-[LinkML gaps](../linkml-gaps.md) lists the LinkML limitations that this code works around.
+[LinkML gaps](linkml-gaps.md) lists the LinkML limitations that this code works around.
 
 ## 1. When to write a workaround
 
@@ -11,8 +11,8 @@ Conventions for the code in [`src/wot_toolchain/artifacts/`](../../src/wot_toolc
 A workaround is code this project must maintain and must remove when LinkML closes the gap.
 
 1. LinkML can express the requirement (`exactly_one_of`, `rules`, `minimum_value`, `inlined`, ...): use the native feature.
-2. [LinkML gaps](../linkml-gaps.md) already describes the gap and its workaround: extend that workaround.
-3. Otherwise: write a new workaround and describe the gap in [LinkML gaps](../linkml-gaps.md).
+2. [LinkML gaps](linkml-gaps.md) already describes the gap and its workaround: extend that workaround.
+3. Otherwise: write a new workaround and describe the gap in [LinkML gaps](linkml-gaps.md).
 
 Before you conclude that LinkML cannot express a requirement, run the generator on a small schema and inspect its output.
 
@@ -55,7 +55,7 @@ Each package has the same parts:
 
 ## 4. Passes
 
-[`artifacts/passes.py`](../../src/wot_toolchain/artifacts/passes.py) defines the contract:
+[`artifacts/passes.py`](https://github.com/w3c/wot-thing-description-toolchain-tmp/blob/main/src/wot_toolchain/artifacts/passes.py) defines the contract:
 
 ```python
 class PassKind(StrEnum):
@@ -111,13 +111,13 @@ workaround_linkml_bug    # wrong: says nothing about the transformation
 
 A pass with a class name written into it breaks when the class is renamed and cannot serve a second class.
 
-The JSON Schema passes are configured by five schema annotations: `jsonschema_flatten_subclasses`, `jsonschema_oneof_dispatch`, `jsonschema_enum_subset_partition`, `jsonschema_form_subset` and `jsonschema_exclude`. `read_annotations` in [`artifacts/jsonschema/annotations.py`](../../src/wot_toolchain/artifacts/jsonschema/annotations.py) reads them into a `TransformConfig`, which every JSON Schema pass receives. [WoT custom annotations](../reference/wot-custom-annotations.md) describes each annotation.
+The JSON Schema passes are configured by five schema annotations: `jsonschema_flatten_subclasses`, `jsonschema_oneof_dispatch`, `jsonschema_enum_subset_partition`, `jsonschema_form_subset` and `jsonschema_exclude`. `read_annotations` in [`artifacts/jsonschema/annotations.py`](https://github.com/w3c/wot-thing-description-toolchain-tmp/blob/main/src/wot_toolchain/artifacts/jsonschema/annotations.py) reads them into a `TransformConfig`, which every JSON Schema pass receives. [WoT custom annotations](../reference/annotations.md) describes each annotation.
 
 ## 7. Documentation
 
 **Rule: the `reason` of a pass states the TD requirement it serves or the LinkML limitation that forces it.**
 
-**Rule: describe every LinkML limitation in [LinkML gaps](../linkml-gaps.md),** with the symptom and the workaround, in the section of the affected artifact.
+**Rule: describe every LinkML limitation in [LinkML gaps](linkml-gaps.md),** with the symptom and the workaround, in the section of the affected artifact.
 
 ## 8. Testing
 
@@ -129,7 +129,7 @@ The JSON Schema passes are configured by five schema annotations: `jsonschema_fl
 2. Run the suite: `uv run pytest`
 3. If a golden test fails, review the difference. Update the snapshots only when the new output is the intended output: `uv run pytest tests/test_golden_diff.py --update-goldens`
 
-**Rule: a workaround for a defect in LinkML gets a canary test.** A canary in `tests/test_upstream_canaries.py` asserts the defective LinkML behaviour. It fails when LinkML changes that behaviour, which is the signal to remove the workaround. Name the canary in the [LinkML gaps](../linkml-gaps.md) entry.
+**Rule: a workaround for a defect in LinkML gets a canary test.** A canary in `tests/test_upstream_canaries.py` asserts the defective LinkML behaviour. It fails when LinkML changes that behaviour, which is the signal to remove the workaround. Name the canary in the [LinkML gaps](linkml-gaps.md) entry.
 
 **Rule: `post_process_jsonschema` does not modify its input.** It copies the raw schema and returns the copy.
 
@@ -138,4 +138,4 @@ The JSON Schema passes are configured by five schema annotations: `jsonschema_fl
 - **A class or slot name written into a pass.** Use annotations or `SchemaView` queries.
 - **A pass for something LinkML expresses natively.**
 - **A modeling fix in a pass.** Fix the schema.
-- **A workaround without an entry in [LinkML gaps](../linkml-gaps.md).**
+- **A workaround without an entry in [LinkML gaps](linkml-gaps.md).**

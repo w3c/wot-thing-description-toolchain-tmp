@@ -1,0 +1,97 @@
+# Docs site for the toolchain, built from docs/ with Zensical (https://zensical.org).
+# Generate the config file reference first: uv run --group docs python scripts/gen_config_docs.py
+# Preview: uv run --group docs zensical serve
+# Build:   uv run --group docs zensical build --strict   (writes site/)
+
+[project]
+site_name = "WoT Toolchain"
+site_description = "LinkML-based generation of Web of Things artifacts"
+site_url = "https://w3c.github.io/wot-thing-description-toolchain-tmp/"
+repo_url = "https://github.com/w3c/wot-thing-description-toolchain-tmp"
+repo_name = "w3c/wot-thing-description-toolchain-tmp"
+edit_uri = "edit/main/docs/"
+docs_dir = "docs"
+site_dir = "site"
+
+# Broken links and anchors between documents fail the build.
+strict = true
+
+nav = [
+  { "Home" = "index.md" },
+  { "Getting started" = "getting-started.md" },
+  { "Editing schemas" = [
+    "editing-schemas/first-change.md",
+    "editing-schemas/schema-changes.md",
+    "editing-schemas/snippets.md",
+    "editing-schemas/owl.md",
+    "editing-schemas/checking-a-change.md",
+  ] },
+  { "Reference" = [
+    "reference/cli.md",
+    "reference/config-file.md",
+    "reference/annotations.md",
+    "reference/annotations-spec.md",
+    "reference/naming-conventions.md",
+    "reference/linkml-cheatsheet.md",
+    "reference/glossary.md",
+  ] },
+  { "Differences from TD 1.1" = [
+    "differences/index.md",
+    { "JSON Schema" = "differences/json-schema.md" },
+    { "JSON-LD context" = "differences/jsonld-context.md" },
+    { "OWL" = "differences/owl.md" },
+    { "SHACL" = "differences/shacl.md" },
+  ] },
+  { "Contribute to the tool" = [
+    "contributing/setup.md",
+    "contributing/architecture.md",
+    "contributing/postprocessors.md",
+    "contributing/jsonld-context.md",
+    "contributing/testing.md",
+    "contributing/linkml-gaps.md",
+    "contributing/linkml-issue-drafts.md",
+  ] },
+]
+
+[project.validation]
+invalid_links = true
+invalid_link_anchors = true
+
+[project.theme]
+features = [
+  "navigation.sections",
+  "navigation.indexes",
+  "navigation.top",
+  "navigation.footer",
+  "search.highlight",
+  "content.code.copy",
+  "content.action.edit",
+  "toc.follow",
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "indigo"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "indigo"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to light mode"
+
+[project.markdown_extensions]
+tables = {}
+def_list = {}
+attr_list = {}
+admonition = {}
+toc.permalink = true
+# GitHub-style lowercase heading anchors, so #links work both on GitHub and on this site.
+toc.slugify.object = "pymdownx.slugs.slugify"
+toc.slugify.kwds.case = "lower"
+pymdownx.highlight.anchor_linenums = true
+pymdownx.inlinehilite = {}
+pymdownx.superfences = {}

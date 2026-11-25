@@ -3,7 +3,7 @@
 The generated JSON Schema is release quality; the generated SHACL shapes are experimental.
 This note compares the generated shapes `resources/gens/shacl/shapes.shacl.ttl` with the published W3C TD validation shapes `resources/upstream/validation/td-validation.ttl`, and lists defects of the published shapes.
 
-The status words Undecided and Published defect are defined in the [README](README.md) of this directory.
+The status words Undecided and Published defect are defined in the [README](index.md) of this directory.
 
 ## Method
 

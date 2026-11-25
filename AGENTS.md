@@ -37,21 +37,7 @@ Output paths and generators are configured in the project config file `wot-toolc
 
 ### CLI
 
-```bash
-wot-toolchain [-v|-vv|-q] generate-wot-resources [OPTIONS]
-wot-toolchain diff-report GENERATED REFERENCE
-```
-
-`generate-wot-resources` options:
-
-| Option | Effect |
-|---|---|
-| `-c`, `--config PATH` | Project config file (default `wot-toolchain.yaml` in the current directory) |
-| `-i`, `--input_schema PATH` | LinkML schema to use instead of the config file's `root_schema` |
-| `--output-dir DIR` | Replaces the config file's `output_dir` for generator artifacts only; it does **not** redirect `generators.spec.output` (spec HTML) or `generators.spec.assertions_csv` |
-| `--only GENERATOR` | Run only this generator; repeatable; must be listed in the config file's `generators`. `spec` builds the specification (requires `bikeshed`) |
-
-`diff-report` prints a Markdown report of the JSON paths in which `GENERATED` differs from `REFERENCE`; differences do not fail the command. Errors derived from `WotToolchainError` (`errors.py`) are logged and exit with status 1.
+Commands and options: [CLI reference](docs/reference/cli.md); config file keys: [config file reference](docs/reference/config-file.md) (generate it with `uv run --group docs python scripts/gen_config_docs.py`). `--output-dir` does not move the spec HTML or the assertions CSV, and `--only` accepts only generators listed in the config file.
 
 ## Codebase Layout
 
@@ -63,7 +49,7 @@ resources/schemas/          ← SOURCE OF TRUTH
   jsonschema.yaml           ← JSON Schema vocabulary
   thing_model.yaml          ← Thing Model vocabulary
   snippet_schema.yaml       ← schema of resources/snippets/_snippets.yaml
-  README.md                 ← points to docs/guidelines/ (read before touching schemas)
+  README.md                 ← points to the docs pages to read before touching schemas
 
 src/wot_toolchain/
   cli.py                    ← entry point: wot-toolchain generate-wot-resources | diff-report (see CLI above)
@@ -102,29 +88,17 @@ tests/
 
 ## Setup
 
-After cloning, run once:
-
-```bash
-uv sync
-pre-commit install
-```
-
-`pre-commit install` activates the hooks in `.pre-commit-config.yaml`. On every commit:
-- **ruff** lints and auto-fixes Python files
-- **ruff-format** formats Python files
-- **linkml-lint** checks `thing_description.yaml`, `hypermedia.yaml`, `wot_security.yaml` and `jsonschema.yaml` (only when any `resources/schemas/*.yaml` changed)
-
-If `pre-commit` is not installed: `uv tool install pre-commit` or `pip install pre-commit`.
+After cloning, run `uv sync` and `uv run pre-commit install`, and restore `resources/upstream/` — without it the config file does not load. Details, including the test prerequisites (jsonld.js, ROBOT), are in [Set up a checkout](docs/contributing/setup.md).
 
 ---
 
 ## The Postprocessor Pattern
 
-See [Postprocessor Conventions](docs/guidelines/postprocessor-conventions.md) for when and how to write a workaround for a LinkML limitation. See [LinkML gaps](docs/linkml-gaps.md) for documented generator limitations. See [OWL differences](docs/differences/owl.md) for the authoritative list of known differences between generated and target OWL ontologies — check it before investigating or reporting any OWL gap.
+See [Postprocessor Conventions](docs/contributing/postprocessors.md) for when and how to write a workaround for a LinkML limitation. See [LinkML gaps](docs/contributing/linkml-gaps.md) for documented generator limitations. See [OWL differences](docs/differences/owl.md) for the authoritative list of known differences between generated and target OWL ontologies — check it before investigating or reporting any OWL gap.
 
 ## Custom LinkML Annotations
 
-See [WoT Custom Annotations](docs/reference/wot-custom-annotations.md) for the full annotation API, examples, and decision principles. See [LinkML Naming Conventions](docs/reference/linkml-naming-conventions.md) for schema structural rules, `inlined`/`identifier` patterns, and checklists.
+See [WoT Custom Annotations](docs/reference/annotations.md) for the full annotation API, examples, and decision principles. See [LinkML Naming Conventions](docs/reference/naming-conventions.md) for schema structural rules, `inlined`/`identifier` patterns, and checklists.
 
 ## Testing and Quality
 
@@ -148,22 +122,9 @@ uv run pytest tests/test_spec_html_vs_golden.py -v
 uv run pytest tests/test_assertion_inventory.py -v
 ```
 
-### Known Failures
+### Known Failures and Generation Output
 
-Expected failures are listed one per line in `tests/known_failures/` (`td_gate.txt`, `td_crosscheck.txt`, `shacl_gate.txt`, `jsonld_roundtrip.txt`, `spec_structure.txt`) and marked `xfail(strict=True)`: a listed case that starts passing fails the suite until its entry is removed, so the lists can only shrink. Reviewed divergences from upstream text and snippets are recorded in `tests/approved_divergences/`. Other failures are not accepted baselines; see Failure Policy below.
-
-### Generation Error Taxonomy
-
-`uv run wot-toolchain generate-wot-resources` output signals:
-
-| Pattern | Action |
-|---|---|
-| `WARNING: SCHEMA: slots not defined in this schema or its imports are left out of NAME.svg: ...` | **Expected** for `hypermedia.yaml`, `wot_security.yaml` and `jsonschema.yaml`: the diagram of that vocabulary omits the listed slots. **Investigate** for any other schema. |
-| Any other `WARNING:` line | **Investigate** |
-| `ERROR: N spec snippet(s) in DIR are invalid:` followed by `FILE: PATH — MESSAGE [schema: ...]` or `FILE: invalid JSON` lines | **Fix** — snippet has invalid JSON or fails validation against the schemas in the config file's `generators.spec.snippet_validation_schemas`; the command exits non-zero |
-| Any other `ERROR:` line | **Fix** — generation failed; the command exits non-zero |
-
-Generation aborts on any snippet validation error. Fix before declaring the change complete.
+The expected-failure lists in `tests/known_failures/` are strict and can only shrink; see [Testing](docs/contributing/testing.md#expected-failures). Which `WARNING` and `ERROR` lines of `generate-wot-resources` are expected, and what to do about the others, is in [Checking a change](docs/editing-schemas/checking-a-change.md#read-the-generation-output). Generation aborts on any snippet validation error; fix it before declaring the change complete.
 
 ### Failure Policy
 
@@ -216,13 +177,7 @@ When reviewing HTML changes, do not evaluate the entire document — scope the c
 
 ### CI Pipeline (GitHub Actions)
 
-`main.yaml` runs three jobs in sequence: `static-analysis` → `build` → `tests`.
-
-| Job | What it does |
-|---|---|
-| `static-analysis` | Ruff lint; Ruff format check; mypy; LinkML schema lint (non-blocking) |
-| `build` | Graphviz install; `uv run wot-toolchain generate-wot-resources`; package build; upload of the generated resources |
-| `tests` | Graphviz, jsonld.js and ROBOT install; download of the generated resources; `uv run pytest` |
+The jobs of `main.yaml` are described in [Testing](docs/contributing/testing.md#ci).
 
 ## Language Style
 
@@ -272,7 +227,7 @@ When reviewing HTML changes, do not evaluate the entire document — scope the c
 - Metadata (id, title, hide_paths, show_paths) lives in `_snippets.yaml`, not in the JSON file.
 - Snippet `id` must be unique across all snippets and not conflict with IDs in `index.template.html`.
 - Set `validate: false` only for non-TD/TM snippets (e.g., partial examples).
-- See [Snippet Authoring Guide](docs/guidelines/snippet-authoring.md) for worked examples.
+- See [Snippet Authoring Guide](docs/editing-schemas/snippets.md) for worked examples.
 
 ## General Project Conventions
 
@@ -306,10 +261,3 @@ Everything in this section is **PLANNED and not yet implemented** unless stated 
 3. Snapshots, goldens and known-failure baselines change only with explicit maintainer approval (current rule; see Golden Files).
 
 Out of scope for now: automated ontology/SHACL consistency (the reference ontologies in `resources/upstream/ontology/` are used for reference only).
-
-## Before running the pipeline
-
-Make sure the dependencies are current:
-```bash
-uv sync
-```
