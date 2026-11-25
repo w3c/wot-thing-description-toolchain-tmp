@@ -4,7 +4,7 @@ from pathlib import Path
 
 from jsonschema.exceptions import best_match
 
-SCHEMAS_DIR = Path(__file__).resolve().parent.parent / "resources" / "schemas"
+SCHEMAS_DIR = Path(__file__).resolve().parents[2] / "resources" / "schemas"
 
 MAX_MESSAGE = 120
 

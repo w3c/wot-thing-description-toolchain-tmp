@@ -10,11 +10,11 @@ from jsonschema import validators
 
 from .baselines import TD_VERSIONS, as_td20
 
-TESTS_DIR = Path(__file__).resolve().parent
+TESTS_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = TESTS_DIR.parent
 SCHEMA_PATH = REPO_ROOT / "resources" / "gens" / "jsonschema" / "jsonschema.json"
 GROUND_TRUTH = REPO_ROOT / "resources" / "upstream" / "schemas"
-DATA_DIR = TESTS_DIR / "data"
+DATA_DIR = TESTS_DIR / "resources" / "td"
 GROUND_TRUTH_SCHEMAS = {
     "td11": GROUND_TRUTH / "td11-json-schema-validation.json",
     "td20": GROUND_TRUTH / "td20-json-schema-validation.json",

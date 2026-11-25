@@ -25,7 +25,7 @@ TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent.parent
 GOLDEN_PATH = REPO_ROOT / "resources" / "upstream" / "html" / "index.html"
 GENERATED_PATH = REPO_ROOT / "resources" / "gens" / "index.html"
-DIVERGENCES_PATH = TESTS_DIR.parent / "approved_divergences" / "html.yaml"
+DIVERGENCES_PATH = TESTS_DIR.parent / "resources" / "approved_divergences" / "html.yaml"
 
 @pytest.fixture(scope="module")
 def golden_tree():

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-GENERATED_HTML_PATH = Path(__file__).resolve().parent.parent / "resources" / "gens" / "index.html"
+GENERATED_HTML_PATH = Path(__file__).resolve().parents[2] / "resources" / "gens" / "index.html"
 
 EXPECTED_OPERATION_TYPES = [
     "readproperty",

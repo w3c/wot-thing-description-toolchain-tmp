@@ -2,7 +2,7 @@
 import os
 import pytest
 
-from .rejections import defined_at
+from .conformance.rejections import defined_at
 
 
 def pytest_addoption(parser):

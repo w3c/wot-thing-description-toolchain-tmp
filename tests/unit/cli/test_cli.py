@@ -6,7 +6,7 @@ from click.testing import CliRunner
 
 from wot_toolchain.cli import main
 
-REPO_CONFIG = Path(__file__).parents[1] / "wot-toolchain.yaml"
+REPO_CONFIG = Path(__file__).parents[3] / "wot-toolchain.yaml"
 
 
 def test_missing_config_exits_3(tmp_path):

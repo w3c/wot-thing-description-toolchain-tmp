@@ -8,11 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from .tmp.spec_html_compare import generated_sections_html
+from .spec_html_compare import generated_sections_html
 
-TESTS_DIR = Path(__file__).resolve().parent
+TESTS_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = TESTS_DIR.parent
-GOLDENS_DIR = TESTS_DIR / "snapshots"
+GOLDENS_DIR = TESTS_DIR / "resources" / "snapshots"
 
 def _normalize_json(path: Path) -> str:
     data = json.loads(path.read_text(encoding="utf-8"))

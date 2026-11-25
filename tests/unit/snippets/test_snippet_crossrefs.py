@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[3]
 TEMPLATE = REPO_ROOT / "resources" / "index.template.html"
 MANIFEST_PATH = REPO_ROOT / "resources" / "snippets" / "_snippets.yaml"
 

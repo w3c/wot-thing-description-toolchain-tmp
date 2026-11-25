@@ -90,13 +90,13 @@ uv run pytest tests/ -v
 
 The checks include:
 
-- `tests/test_td_instance_gate.py`: validates valid and invalid TD/TM 2.0 test instances against the generated JSON Schema.
-- `tests/test_td_crosscheck.py`: compares generated-schema validation verdicts with the upstream W3C TD schemas manually specified in `resources/upstream/schemas/`.
-- `tests/test_golden_diff.py`: compares generated JSON Schema, JSON-LD context, and generated specification sections with machine-updatable snapshots in `tests/snapshots/`.
-- `tests/test_golden_form_structure.py` and `tests/test_spec_content_rendering.py`: check generated ReSpec structure and rendering behavior.
-- `tests/test_snippet_schema.py` and `tests/test_snippet_crossrefs.py`: validate snippet metadata, source files, and ReSpec cross-references.
+- `tests/conformance/test_td_instance_gate.py`: validates valid and invalid TD/TM 2.0 test instances against the generated JSON Schema.
+- `tests/conformance/test_td_crosscheck.py`: compares generated-schema validation verdicts with the upstream W3C TD schemas manually specified in `resources/upstream/schemas/`.
+- `tests/goldens/test_golden_diff.py`: compares generated JSON Schema, JSON-LD context, and generated specification sections with machine-updatable snapshots in `tests/resources/snapshots/`.
+- `tests/goldens/test_golden_form_structure.py` and `tests/unit/spec/test_spec_content_rendering.py`: check generated ReSpec structure and rendering behavior.
+- `tests/unit/snippets/test_snippet_schema.py` and `tests/unit/snippets/test_snippet_crossrefs.py`: validate snippet metadata, source files, and ReSpec cross-references.
 
-`resources/upstream/html/index.html` and `resources/upstream/assertions.csv` are upstream reference files used for TD specification and assertion-inventory comparison. `tests/snapshots/` contains this toolchain's generated-output snapshots; update them only with `uv run pytest tests/test_golden_diff.py --update-goldens` after reviewing an intended change.
+`resources/upstream/html/index.html` and `resources/upstream/assertions.csv` are upstream reference files used for TD specification and assertion-inventory comparison. `tests/resources/snapshots/` contains this toolchain's generated-output snapshots; update them only with `uv run pytest tests/goldens/test_golden_diff.py --update-goldens` after reviewing an intended change.
 
 The test suite has no accepted validation differences. A generated-schema rejection of a valid sample or a mismatch with the W3C reference schema fails the relevant test directly.
 

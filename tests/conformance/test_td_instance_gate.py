@@ -11,10 +11,10 @@ from jsonschema.exceptions import best_match
 from .baselines import TD_VERSIONS, as_td20
 from .rejections import defined_at, main_rejection, rejection_details
 
-TESTS_DIR = Path(__file__).resolve().parent
+TESTS_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = TESTS_DIR.parent
 SCHEMA_PATH = REPO_ROOT / "resources" / "gens" / "jsonschema" / "jsonschema.json"
-DATA_DIR = TESTS_DIR / "data"
+DATA_DIR = TESTS_DIR / "resources" / "td"
 
 
 @pytest.fixture(scope="session")

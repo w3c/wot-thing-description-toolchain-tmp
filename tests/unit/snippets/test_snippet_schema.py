@@ -9,7 +9,7 @@ import pytest
 import yaml
 from jsonschema import Draft7Validator
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[3]
 SNIPPET_SCHEMA = REPO_ROOT / "resources" / "schemas" / "snippet_schema.yaml"
 MANIFEST_PATH = REPO_ROOT / "resources" / "snippets" / "_snippets.yaml"
 

@@ -17,7 +17,7 @@ TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent.parent
 UPSTREAM_PATH = REPO_ROOT / "resources" / "upstream" / "html" / "index.html"
 GENERATED_PATH = REPO_ROOT / "resources" / "gens" / "index.html"
-APPROVED_DIVERGENCES_PATH = TESTS_DIR.parent / "approved_divergences" / "snippets.yaml"
+APPROVED_DIVERGENCES_PATH = TESTS_DIR.parent / "resources" / "approved_divergences" / "snippets.yaml"
 _MISSING = object()
 
 _JSON_STRING_RE = re.compile(r'"(?:[^"\\]|\\.)*"')

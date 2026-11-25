@@ -110,22 +110,22 @@ jobs:
           path: resources/gens/
 
       - name: TD instance gate
-        run: uv run pytest tests/test_td_instance_gate.py -v
+        run: uv run pytest tests/conformance/test_td_instance_gate.py -v
 
       - name: Cross-check against W3C schemas
-        run: uv run pytest tests/test_td_crosscheck.py -v
+        run: uv run pytest tests/conformance/test_td_crosscheck.py -v
 
       - name: Spec HTML structure tests
-        run: uv run pytest tests/test_spec_content_rendering.py tests/test_golden_form_structure.py -v
+        run: uv run pytest tests/unit/spec/test_spec_content_rendering.py tests/goldens/test_golden_form_structure.py -v
 
       - name: Spec HTML vs upstream golden
-        run: uv run pytest tests/tmp/test_spec_html_vs_golden.py -v
+        run: uv run pytest tests/goldens/test_spec_html_vs_golden.py -v
 
       - name: Assertion inventory vs upstream
-        run: uv run pytest tests/tmp/test_assertion_inventory.py -v
+        run: uv run pytest tests/goldens/test_assertion_inventory.py -v
 
       - name: Default assignments
-        run: uv run pytest tests/tmp/test_default_assignments.py -v
+        run: uv run pytest tests/unit/spec/test_default_assignments.py -v
 
   golden-diff:
     name: Golden diff
@@ -146,7 +146,7 @@ jobs:
           path: resources/gens/
 
       - name: Golden diff
-        run: uv run pytest tests/test_golden_diff.py -v
+        run: uv run pytest tests/goldens/test_golden_diff.py -v
 
   deploy-pages:
     name: Deploy to GitHub Pages

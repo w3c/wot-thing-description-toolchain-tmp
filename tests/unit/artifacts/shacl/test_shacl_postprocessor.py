@@ -10,7 +10,7 @@ from linkml.generators.shaclgen import ShaclGenerator
 from linkml_runtime.utils.schemaview import SchemaView
 
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[4]
 SCHEMA_PATH = REPO_ROOT / "resources" / "schemas" / "thing_description.yaml"
 TD_TITLE = URIRef("https://www.w3.org/2019/wot/td#title")
 TD_THING = URIRef("https://www.w3.org/2019/wot/td#Thing")

@@ -11,7 +11,7 @@ TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent.parent
 OUR_CSV = REPO_ROOT / "resources" / "gens" / "assertions" / "assertions.csv"
 UPSTREAM_CSV = REPO_ROOT / "resources" / "upstream" / "assertions.csv"
-APPROVED_DIVERGENCES = TESTS_DIR.parent / "approved_divergences" / "html.yaml"
+APPROVED_DIVERGENCES = TESTS_DIR.parent / "resources" / "approved_divergences" / "html.yaml"
 
 
 def assertion_rows(path: Path) -> dict[str, dict[str, str]]:

@@ -8,7 +8,7 @@ import yaml
 
 
 TESTS_DIR = Path(__file__).resolve().parent.parent
-DIVERGENCES_DIR = TESTS_DIR / "approved_divergences"
+DIVERGENCES_DIR = TESTS_DIR / "resources" / "approved_divergences"
 DOCUMENTS = {
     "html.yaml": {"semantic-correction", "editorial-correction"},
     "snippets.yaml": {"complete-example"},
