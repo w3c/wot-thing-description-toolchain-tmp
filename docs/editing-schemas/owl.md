@@ -1,6 +1,6 @@
 # OWL ontologies
 
-How to author LinkML schema YAML so the OWL generation pipeline (`preprocess_for_gen_owl` → `WotOwlGenerator` → `postprocess_owl_graph`, under `src/wot_toolchain/artifacts/owl/`) produces correct OWL ontologies. Cross-references: [LinkML Naming Conventions](../reference/naming-conventions.md), [Postprocessor Conventions](postprocessors.md), [LinkML gaps](../status/linkml-gaps.md). How the generated ontologies differ from the published TD 1.1 ontologies is recorded only in [OWL differences](../status/differences/owl.md).
+How to author LinkML schema YAML so the OWL generation pipeline (`preprocess_for_gen_owl` → `WotOwlGenerator` → `postprocess_owl_graph`, under `src/wot_toolchain/artifacts/owl/`) produces correct OWL ontologies. Cross-references: [LinkML Naming Conventions](../reference/naming-conventions.md), [Postprocessor Conventions](../contributing/postprocessors.md), [LinkML gaps](../contributing/linkml-gaps.md). How the generated ontologies differ from the published TD 1.1 ontologies is recorded only in [OWL differences](../differences/owl.md).
 
 ## 1. OWL Property Types and `implements`
 
@@ -46,7 +46,7 @@ security:
   range: SecurityScheme
 ```
 
-Generated: `hctl:hasAnchor`, `wotsec:proxy`, `wotsec:authorization`, `wotsec:token` and `wotsec:refresh` are `owl:DatatypeProperty` with `rdfs:range xsd:anyURI`. `td:hasSecurityConfiguration` is an `owl:ObjectProperty` with `rdfs:range wotsec:SecurityScheme`, and `hctl:hasAdditionalOutputSchema` one with `rdfs:range jsonschema:DataSchema`. See [JSON-LD context, Rule 2](jsonld-context.md#rule-2-a-uri-value-is-a-literal-a-name-reference-is-a-node) for the JSON-LD and SHACL side.
+Generated: `hctl:hasAnchor`, `wotsec:proxy`, `wotsec:authorization`, `wotsec:token` and `wotsec:refresh` are `owl:DatatypeProperty` with `rdfs:range xsd:anyURI`. `td:hasSecurityConfiguration` is an `owl:ObjectProperty` with `rdfs:range wotsec:SecurityScheme`, and `hctl:hasAdditionalOutputSchema` one with `rdfs:range jsonschema:DataSchema`. See [JSON-LD context, Rule 2](../contributing/jsonld-context.md#rule-2-a-uri-value-is-a-literal-a-name-reference-is-a-node) for the JSON-LD and SHACL side.
 
 ## 2. The Three-Way Split: JSON Key, OWL IRI, JSON-LD Bridge
 
@@ -252,7 +252,7 @@ The function handles `slot_usage` overrides (e.g., `ObjectSchema.properties` ove
 
 1. **Semantic correctness:** `rdfs:domain` is safe and informative for single-domain properties. Multi-domain properties use `schema:domainIncludes` to avoid intersection semantics.
 2. **Upstream alignment:** WoT upstream ontologies use `schema:domainIncludes` for multi-domain properties across td.ttl, hctl.ttl, jsonschema.ttl, wotsec.ttl.
-3. **LinkML limitation:** `SlotDefinition.domain` is `str | ClassDefinitionName | None` — single class only. No native way to express multi-domain (see [LinkML gaps, Multiple domains](../status/linkml-gaps.md#multiple-domains)).
+3. **LinkML limitation:** `SlotDefinition.domain` is `str | ClassDefinitionName | None` — single class only. No native way to express multi-domain (see [LinkML gaps, Multiple domains](../contributing/linkml-gaps.md#multiple-domains)).
 4. **No hardcoded tables:** both mechanisms derive from schema structure — `domain:` field for single, class membership for multi.
 
 ## 7. Enum-to-OWL Patterns
@@ -287,7 +287,7 @@ OperationType:
 | Permissible value with `meaning` | IRI = `meaning`; `a <Enum>`, `rdfs:label` (the value text), `skos:definition`, `rdfs:isDefinedBy <ontology>` (own namespace only) |
 | Permissible value without `meaning` | nothing |
 
-`rdfs:subClassOf schema:Enumeration` is not added by code. It comes from the schema annotation on `OperationType` (`resources/schemas/hypermedia.yaml`), which `WotOwlGenerator.add_metadata` emits as an IRI. Only `td:OperationType` carries it today.
+`rdfs:subClassOf schema:Enumeration` is not added by code. It comes from the schema annotation on `OperationType` (`linkml/hypermedia.yaml`), which `WotOwlGenerator.add_metadata` emits as an IRI. Only `td:OperationType` carries it today.
 
 Emitted by `WotOwlGenerator.add_enum` and `_add_enum_instance` in `src/wot_toolchain/artifacts/owl/generator.py`.
 
@@ -304,14 +304,14 @@ Emitted by `WotOwlGenerator.add_enum` and `_add_enum_instance` in `src/wot_toolc
 
 Consequence: the OWL enum class has no closure axiom, so the ontology does not state that the listed values are the only members. The closed value set is enforced by the validation artifacts instead:
 
-- SHACL: `sh:in ( td:readProperty ... )` on `hctl:hasOperationType` (`resources/gens/shacl/shapes.shacl.ttl`)
-- JSON Schema: `"enum": [ "readproperty", ... ]` in the array branch of `op` (`resources/gens/jsonschema/jsonschema.json`)
+- SHACL: `sh:in ( td:readProperty ... )` on `hctl:hasOperationType` (`shacl/shapes.shacl.ttl` in the output directory)
+- JSON Schema: `"enum": [ "readproperty", ... ]` in the array branch of `op` (`jsonschema/jsonschema.json` in the output directory)
 
 ### 7.4 Option
 
 Selected by `OwlOptions(permissible_values=PermissibleValueKind.INSTANCE)` (`src/wot_toolchain/artifacts/owl/options.py`), set by the pipeline in `src/wot_toolchain/pipeline.py`. The other kinds (`CLASS`, `INDIVIDUAL`) fall through to upstream `add_enum`.
 
-### 7.5 Example (`resources/gens/owl/td.ttl`, abridged)
+### 7.5 Example (`owl/td.ttl`, abridged)
 
 ```turtle
 td:OperationType
@@ -332,4 +332,4 @@ td:readProperty
 
 ## 8. Differences from the published ontologies
 
-The generated ontologies differ from the published TD 1.1 ontologies, for example in `owl:Class`-only typing, `rdfs:domain` and `rdfs:range` instead of single-class includes, and `rdfs:isDefinedBy` values. Every difference, with its status, is recorded in [OWL differences](../status/differences/owl.md); check there before treating an OWL diff as a bug.
+The generated ontologies differ from the published TD 1.1 ontologies, for example in `owl:Class`-only typing, `rdfs:domain` and `rdfs:range` instead of single-class includes, and `rdfs:isDefinedBy` values. Every difference, with its status, is recorded in [OWL differences](../differences/owl.md); check there before treating an OWL diff as a bug.

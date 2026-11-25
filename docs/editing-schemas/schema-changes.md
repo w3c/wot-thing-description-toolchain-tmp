@@ -1,6 +1,6 @@
 # Schema changes
 
-Each section starts from the [worked example](../getting-started/first-change.md#worked-example-an-optional-property), which adds an optional `firmware` slot to `VersionInfo` in `resources/schemas/thing_description.yaml`.
+Each section starts from the [worked example](first-change.md#worked-example-an-optional-property), which adds an optional `firmware` slot to `VersionInfo` in `linkml/thing_description.yaml`.
 
 ## Variations
 
@@ -12,7 +12,7 @@ Add `required: true`. JSON Schema adds the term to the class's list, `"required"
 
 Two keys look related and do different things. `ifabsent: string(1.0.0)` changes only the SHACL shapes, which gain `sh:defaultValue "1.0.0"`, and the merged `linkml/linkml.yaml`. JSON Schema gets no `default`, and the table still says `optional`.
 
-`spec_default: true` under `annotations` changes the table cell to `<a href="#sec-default-values">with default</a>` and the CSV row to `... with default string`. It carries no value. The values themselves are rows in a hand-written table in `resources/index.template.html`, such as `<tr class="rfc2119-default-assertion" id="td-default-observable">`. Add your row there.
+`spec_default: true` under `annotations` changes the table cell to `<a href="#sec-default-values">with default</a>` and the CSV row to `... with default string`. It carries no value. The values themselves are rows in a hand-written table in `index.template.html`, such as `<tr class="rfc2119-default-assertion" id="td-default-observable">`. Add your row there.
 
 Neither key produces a JSON Schema `default` keyword. No schema in the generated `jsonschema.json` has one. The only `default` in the file is the name of a `DataSchema` property.
 
@@ -107,7 +107,7 @@ OWL gains `td:Firmware` as an `owl:Class`. The specification gets a `Firmware` s
 
 ## A new schema file
 
-To keep firmware terms in their own vocabulary, move the class into `resources/schemas/firmware.yaml`:
+To keep firmware terms in their own vocabulary, move the class into `linkml/firmware.yaml`:
 
 ```yaml
 id: https://www.w3.org/2019/wot/firmware
@@ -128,7 +128,7 @@ Put the class under `classes:`, use `fw:` in its `class_uri` and in each `slot_u
 To get an ontology, a context and a diagram, add a module to `wot-toolchain.yaml`:
 
 ```yaml
-  - schema: resources/schemas/firmware.yaml
+  - schema: linkml/firmware.yaml
     prefix: fw
     ontology: [fw.ttl]
     context: firmware-context.jsonld
@@ -141,20 +141,20 @@ To give the vocabulary its own specification section, add it to `generators.spec
 
 ```yaml
     - id: sec-firmware-vocabulary-definition
-      schema: resources/schemas/firmware.yaml
+      schema: linkml/firmware.yaml
 ```
 
 Generation then fails until the template has a matching marker:
 
 ```
-ERROR: Section id(s) ['sec-firmware-vocabulary-definition'] in spec.sections have no %section()% marker in specification template .../resources/index.template.html
+ERROR: Section id(s) ['sec-firmware-vocabulary-definition'] in spec.sections have no %section()% marker in specification template .../index.template.html
 ```
 
-Add a `<section id="sec-firmware-vocabulary-definition">` with a heading to `resources/index.template.html`, and put `%section('sec-firmware-vocabulary-definition')%` inside it.
+Add a `<section id="sec-firmware-vocabulary-definition">` with a heading to `index.template.html`, and put `%section('sec-firmware-vocabulary-definition')%` inside it.
 
 ## A snippet
 
-Write the example as a complete TD in `resources/snippets/version-firmware.json`:
+Write the example as a complete TD in `linkml/snippets/version-firmware.json`:
 
 ```json
 {
@@ -186,11 +186,11 @@ Put `%snippet('version-firmware')%` where the example belongs in the template. I
 Generation validates the snippet. A missing `instance` fails the run:
 
 ```
-ERROR: 1 spec snippet(s) in .../resources/snippets are invalid:
+ERROR: 1 spec snippet(s) in .../linkml/snippets are invalid:
 version-firmware.json: version — 'instance' is a required property [schema: properties/version/required]
 ```
 
-The validator is the static schema under `resources/upstream/schemas/` named in `generators.spec.snippet_validation_schemas`, not the generated `jsonschema.json`. A snippet with `"firmware": 42` passes generation even though the generated schema rejects it. A marker for an unregistered snippet fails with `ERROR: Snippet 'missing-snippet' not found in _snippets.yaml`.
+The validator is the static JSON Schema that `generators.spec.snippet_validation_schemas` names, not the generated `jsonschema.json`. A snippet with `"firmware": 42` passes generation even though the generated schema rejects it. A marker for an unregistered snippet fails with `ERROR: Snippet 'missing-snippet' not found in _snippets.yaml`.
 
 For layouts, groups and path options, see [Snippets](snippets.md).
 

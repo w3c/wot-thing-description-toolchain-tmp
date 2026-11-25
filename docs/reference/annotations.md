@@ -12,7 +12,7 @@ LinkML is a general-purpose schema language — it generates JSON Schema, OWL, S
 
 Custom annotations are **workarounds, not features.** Each one exists because native LinkML cannot express a specific WoT requirement. When an upstream fix lands, the corresponding annotation should be retired.
 
-For the catalog of known LinkML limitations, see [LinkML gaps](../status/linkml-gaps.md).
+For the catalog of known LinkML limitations, see [LinkML gaps](../contributing/linkml-gaps.md).
 
 ## Quick Reference
 
@@ -38,16 +38,16 @@ For the catalog of known LinkML limitations, see [LinkML gaps](../status/linkml-
 ## When an Annotation Can Go
 
 An annotation stays only while it expresses semantic metadata, a verified generator gap, or a target-artifact policy.
-The right column names what would let it go; the linked [LinkML gaps](../status/linkml-gaps.md) entries describe the gap itself.
+The right column names what would let it go; the linked [LinkML gaps](../contributing/linkml-gaps.md) entries describe the gap itself.
 
 | Annotation | Why it is needed | Removable when |
 |-----------|------------------|----------------|
-| `jsonld_index` | LinkML emits `@container: @index` but not the predicate of the key. `identifier` describes the key field of the value object, not the predicate asserted for the key, and `instantiates` describes a metamodel extension, not an RDF mapping. | LinkML can state a keyed-map predicate ([JSON-LD containers and indexes](../status/linkml-gaps.md#json-ld-containers-and-indexes)). |
+| `jsonld_index` | LinkML emits `@container: @index` but not the predicate of the key. `identifier` describes the key field of the value object, not the predicate asserted for the key, and `instantiates` describes a metamodel extension, not an RDF mapping. | LinkML can state a keyed-map predicate ([JSON-LD containers and indexes](../contributing/linkml-gaps.md#json-ld-containers-and-indexes)). |
 | `jsonld_container` | LinkML emits only `@index` and `@set`, not language maps or id maps. | LinkML has a slot-level container setting (same gap). |
-| `jsonld_context` | `schemaDefinitions` must get no scoped context although its range would infer one; a slot cannot have a scope per containing class. | LinkML can vary a slot's scope by location ([Location-dependent terms](../status/linkml-gaps.md#location-dependent-terms)). |
+| `jsonld_context` | `schemaDefinitions` must get no scoped context although its range would infer one; a slot cannot have a scope per containing class. | LinkML can vary a slot's scope by location ([Location-dependent terms](../contributing/linkml-gaps.md#location-dependent-terms)). |
 | `jsonschema_flatten_subclasses` | The TD Data Schema definition is flat. Flattening every hierarchy by rule would also change unrelated ones, such as security schemes. | Not expected: it is a JSON Schema output choice. |
-| `jsonschema_oneof_dispatch` | `designates_type` identifies a LinkML class, while `scheme` values such as `basic` are vocabulary values, and the unknown-scheme fallback is a separate TD rule. | LinkML type designators can state an open extension branch ([Discriminated unions](../status/linkml-gaps.md#discriminated-unions)). |
-| `jsonschema_enum_subset_partition`, `jsonschema_form_subset` | One `Form` class carries every `op` value, so which values apply at each location is not derivable from the class graph. | LinkML links subsets to locations ([Enum subsets per location](../status/linkml-gaps.md#enum-subsets-per-location)), or the model gets Form subtypes, which would change every artifact. |
+| `jsonschema_oneof_dispatch` | `designates_type` identifies a LinkML class, while `scheme` values such as `basic` are vocabulary values, and the unknown-scheme fallback is a separate TD rule. | LinkML type designators can state an open extension branch ([Discriminated unions](../contributing/linkml-gaps.md#discriminated-unions)). |
+| `jsonschema_enum_subset_partition`, `jsonschema_form_subset` | One `Form` class carries every `op` value, so which values apply at each location is not derivable from the class graph. | LinkML links subsets to locations ([Enum subsets per location](../contributing/linkml-gaps.md#enum-subsets-per-location)), or the model gets Form subtypes, which would change every artifact. |
 | `jsonschema_exclude` | Not used. | — |
 | `dcterms:publisher` | LinkML has `contributors` but no publisher metaslot, and a contributor is not a publisher. | LinkML can model a publisher with a name and URL. |
 | `spec_*` | ReSpec placement, formatting, table visibility, assertion anchors and value presentation are editorial requirements, not facts about the model. | Not expected. |
@@ -58,7 +58,7 @@ Before introducing or keeping an annotation:
 
 1. **Can native LinkML express this, and does the target generator read it?** Prefer `exactly_one_of`, `rules`, `minimum_value`, `multivalued`, etc. See [Native LinkML Features for JSON Schema](#native-linkml-features-for-json-schema) below.
 2. **Does a deterministic rule over the resolved schema graph give the result for every current use?** Then derive it instead.
-3. **Is the gap already documented?** Check [LinkML gaps](../status/linkml-gaps.md) — a workaround may already exist.
+3. **Is the gap already documented?** Check [LinkML gaps](../contributing/linkml-gaps.md) — a workaround may already exist.
 4. **Which artifact does the concern affect?** Use `spec_*` for HTML output, `jsonschema_*` for JSON Schema output, and `jsonld_*` for the JSON-LD context. Never mix them.
 5. **Add a focused regression test** before removing an annotation or replacing it with inference.
 
@@ -95,7 +95,7 @@ The annotations below declare only mappings that the current LinkML context
 generator cannot express.
 
 A slot's scoped vocabulary is normally inferred from its range class; the rule is described in
-[JSON-LD context, Scoped Vocabulary Algorithm](../internals/jsonld-context.md#scoped-vocabulary-algorithm).
+[JSON-LD context, Scoped Vocabulary Algorithm](../contributing/jsonld-context.md#scoped-vocabulary-algorithm).
 `jsonld_context` overrides it.
 
 ### `jsonld_context`
@@ -139,7 +139,7 @@ through a vocabulary-specific lens.
 **What it does:** declares the RDF predicate represented by keys in an
 inlined dictionary-valued slot. LinkML generates `@container: "@index"`
 natively but does not currently generate this predicate.
-([LinkML gaps, Index maps](../status/linkml-gaps.md#index-maps))
+([LinkML gaps, Index maps](../contributing/linkml-gaps.md#index-maps))
 
 Declared on a slot (top-level slot or `slot_usage`). The value is a CURIE.
 
@@ -170,7 +170,7 @@ in the JSON Schema module (`jsonschema:propertyName`).
 **What it does:** overrides the `@container` value of a slot's JSON-LD term
 definition. LinkML emits only `@index` or `@set` containers and cannot express
 language maps or id maps.
-([LinkML gaps, Language maps](../status/linkml-gaps.md#language-maps))
+([LinkML gaps, Language maps](../contributing/linkml-gaps.md#language-maps))
 
 Declared on a slot. The value is a JSON-LD container keyword string.
 
@@ -224,7 +224,7 @@ The postprocessor reads these annotations via `read_annotations()` and applies t
 
 **What it does:** merges all subclass-specific slots into the parent class definition and removes the individual subclass `$defs`. The result is a single flat JSON Schema definition containing every slot from the parent and all its children.
 
-**Why it exists:** the W3C TD spec defines `DataSchema` as one flat type where type-specific properties (`items`, `properties`, `minItems`, etc.) are all merged together. But LinkML's inheritance model generates separate `$defs` for `ArraySchema`, `ObjectSchema`, `NumberSchema`, etc. ([LinkML gaps](../status/linkml-gaps.md))
+**Why it exists:** the W3C TD spec defines `DataSchema` as one flat type where type-specific properties (`items`, `properties`, `minItems`, etc.) are all merged together. But LinkML's inheritance model generates separate `$defs` for `ArraySchema`, `ObjectSchema`, `NumberSchema`, etc. ([LinkML gaps](../contributing/linkml-gaps.md))
 
 **What you need to do:**
 
@@ -260,7 +260,7 @@ Currently used on: `DataSchema`.
 
 **What it does:** replaces a class's definition with a `oneOf` of `$ref`s to its direct subclasses (`is_a`) that have a definition in `$defs`, sorted by reference. With `include_unknown: true`, a final object variant is appended that requires the discriminator slot and constrains it to a prefixed value (pattern `.+:.*`), so that unknown schemes do not overlap the known ones.
 
-**Why it exists:** the W3C TD specification uses the `scheme` field value (`"basic"`, `"oauth2"`, etc.) to select which `SecurityScheme` subclass applies, and admits additional schemes with a prefixed `scheme` value. LinkML has no native discriminated-union dispatch. ([LinkML gaps, Discriminated unions](../status/linkml-gaps.md#discriminated-unions))
+**Why it exists:** the W3C TD specification uses the `scheme` field value (`"basic"`, `"oauth2"`, etc.) to select which `SecurityScheme` subclass applies, and admits additional schemes with a prefixed `scheme` value. LinkML has no native discriminated-union dispatch. ([LinkML gaps, Discriminated unions](../contributing/linkml-gaps.md#discriminated-unions))
 
 **What you need to do:**
 
@@ -308,7 +308,7 @@ Currently used on: `SecurityScheme`.
 - `<Class>_element_<subset>` — an `allOf` of the base and a constraint on the partitioned slot: one of the subset's values, or an array of them.
 - `<Class>` — a `oneOf` of `$ref`s to all subset variants.
 
-**Why it exists:** the W3C TD specification restricts the allowed `op` values of a `Form` by where it appears (Thing level, property, action, event). LinkML generates a single `Form` definition. ([LinkML gaps, Form variants per affordance](../status/linkml-gaps.md#form-variants-per-affordance))
+**Why it exists:** the W3C TD specification restricts the allowed `op` values of a `Form` by where it appears (Thing level, property, action, event). LinkML generates a single `Form` definition. ([LinkML gaps, Form variants per affordance](../contributing/linkml-gaps.md#form-variants-per-affordance))
 
 **What you need to do:**
 

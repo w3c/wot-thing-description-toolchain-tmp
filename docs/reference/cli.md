@@ -5,7 +5,6 @@ wot-toolchain [-v | -vv | -q] generate-wot-resources [OPTIONS]
 wot-toolchain [-v | -vv | -q] diff-report GENERATED REFERENCE
 ```
 
-In a checkout, prefix each command with `uv run`.
 
 ## Global options
 
@@ -27,7 +26,7 @@ Runs the generators of the project that a [config file](config-file.md) describe
 | `--output-dir DIRECTORY` | Directory for the generated artifacts instead of the config file's `output_dir`, relative to the current directory. |
 | `--only GENERATOR` | Run only this generator; repeat the option for several. The generator must be listed under `generators` in the config file. |
 
-Each generator writes into `<output_dir>/<generator>/`, for example `resources/gens/jsonschema/`.
+Each generator writes into `<output_dir>/<generator>/`, for example `gens/jsonschema/` when `output_dir` is `gens`.
 The `spec` generator is the exception: it writes the specification HTML and the assertion CSV to the paths in `generators.spec.output` and `generators.spec.assertions_csv`, and `--output-dir` does not move them.
 `spec` runs after the other generators. It needs Bikeshed, which is installed with the toolchain; `visualization` needs Graphviz `dot` on `PATH`. A missing program is reported before anything is generated.
 
@@ -36,7 +35,7 @@ Exit status: 0 on success; 1 on an error of the toolchain (config file, schema, 
 ## `diff-report`
 
 ```bash
-wot-toolchain diff-report resources/gens/jsonschema/jsonschema.json tests/snapshots/jsonschema.json
+wot-toolchain diff-report gens/jsonschema/jsonschema.json jsonschema-before.json
 ```
 
 Prints a Markdown report of the JSON paths that were added, removed or changed in `GENERATED` relative to `REFERENCE`: first a table of counts, then the paths.

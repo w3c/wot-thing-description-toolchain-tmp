@@ -1,8 +1,10 @@
 # Testing
 
-The tests live in `tests/`. How to check a schema change before opening a pull request is described in [Checking a change](../authoring/checking-a-change.md).
+The tests live in `tests/`. Set up a checkout first, as described in [Set up a checkout](setup.md). A schema change also goes through [Checking a change](../editing-schemas/checking-a-change.md).
 
 ## Run the suite
+
+Some tests need extra tools; see [Tools for the tests](setup.md#tools-for-the-tests).
 
 Integration tests read generated artifacts. Generate them before running the
 full suite:
@@ -77,6 +79,24 @@ shapes), and `spec-sections.html` (the specification HTML sections).
 character-for-character identical to the saved copy. Any difference — even a
 single extra space — is a test failure.
 
+A failing snapshot test lists each difference:
+
+```
+E       Failed: Generated jsonschema.json differs from the golden snapshot:
+E       11 changes, 5 patterns
+...
+E           1  added    $.$defs.*   e.g. $.$defs.Firmware
+E           1  added    $.$defs.*.properties.*   e.g. $.$defs.VersionInfo.properties.firmware
+...
+E       if the change is intended, update with --update-goldens.
+```
+
+To see the differences of one artifact without running the tests, compare it with its snapshot:
+
+```bash
+uv run wot-toolchain diff-report resources/gens/jsonschema/jsonschema.json tests/snapshots/jsonschema.json
+```
+
 **If a snapshot test fails and you did not change a schema or generator:** there
 is a bug. Do not update the snapshots to silence it. Investigate the cause.
 
@@ -89,7 +109,8 @@ copies:
 uv run pytest tests/test_golden_diff.py --update-goldens
 ```
 
-Commit the updated `tests/snapshots/` files in the same commit as the schema or
+That run reports each test as skipped with `Golden updated: ...`; the next run
+passes. Commit the updated `tests/snapshots/` files in the same commit as the schema or
 generator change. Do not edit files in `tests/snapshots/` by hand.
 
 ## Expected Failures

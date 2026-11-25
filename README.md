@@ -33,7 +33,7 @@ uv run wot-toolchain generate-wot-resources
 uv run pytest tests/
 ```
 
-The checkout also needs the reference files in `resources/upstream/`, which are not tracked; see [Install](docs/getting-started/install.md#get-the-reference-files-in-resourcesupstream).
+The checkout also needs the reference files in `resources/upstream/`, which are not tracked; see [Set up a checkout](docs/contributing/setup.md).
 What is generated, from which schemas and into which files is described by the config file [`wot-toolchain.yaml`](wot-toolchain.yaml) ([reference](docs/reference/config-file.md)); the commands and options are in the [CLI reference](docs/reference/cli.md).
 
 Another repository installs a tagged release and runs it against its own config file:
@@ -43,7 +43,7 @@ uv tool install git+https://github.com/w3c/wot-thing-description-toolchain-tmp@<
 wot-toolchain generate-wot-resources -c path/to/wot-toolchain.yaml
 ```
 
-See [Use from another repository](docs/getting-started/using-from-another-repo.md).
+See [Getting started](docs/getting-started.md).
 
 ## How It Works
 
@@ -68,7 +68,7 @@ From these source models, the generation pipeline has two paths:
 
 ![WoT Toolchain generation flow](images/wot-toolchain.svg)
 
-The code in [`src/wot_toolchain/artifacts/`](src/wot_toolchain/artifacts/) subclasses the LinkML generators and runs passes on their output. It changes the LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`LinkML gaps`](docs/status/linkml-gaps.md) records each known limitation and workaround.
+The code in [`src/wot_toolchain/artifacts/`](src/wot_toolchain/artifacts/) subclasses the LinkML generators and runs passes on their output. It changes the LinkML generator output only where the generator cannot represent a TD requirement directly or needs a documented adjustment to produce the required TD representation. [`LinkML gaps`](docs/contributing/linkml-gaps.md) records each known limitation and workaround.
 
 ## Testing
 
@@ -78,12 +78,12 @@ Run the tests after generating the artifacts:
 uv run pytest tests/
 ```
 
-What each test covers, the expected-failure lists and the snapshot update rules are described in [Testing](docs/internals/testing.md).
+What each test covers, the expected-failure lists and the snapshot update rules are described in [Testing](docs/contributing/testing.md).
 
 ## Documentation
 
 The documentation in [`docs/`](docs/index.md) is published at <https://w3c.github.io/wot-thing-description-toolchain-tmp/>.
-Before changing a schema or generator, read [Your first schema change](docs/getting-started/first-change.md) and the [annotations](docs/reference/annotations.md) and [naming conventions](docs/reference/naming-conventions.md) references.
+Before changing a schema or generator, read [Your first schema change](docs/editing-schemas/first-change.md) and the [annotations](docs/reference/annotations.md) and [naming conventions](docs/reference/naming-conventions.md) references.
 
 ## Current Status
 

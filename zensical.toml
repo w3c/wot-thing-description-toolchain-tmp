@@ -18,15 +18,13 @@ strict = true
 
 nav = [
   { "Home" = "index.md" },
-  { "Getting started" = [
-    "getting-started/install.md",
-    "getting-started/first-change.md",
-    "getting-started/using-from-another-repo.md",
-  ] },
-  { "Authoring" = [
-    "authoring/schema-changes.md",
-    "authoring/snippets.md",
-    "authoring/checking-a-change.md",
+  { "Getting started" = "getting-started.md" },
+  { "Editing schemas" = [
+    "editing-schemas/first-change.md",
+    "editing-schemas/schema-changes.md",
+    "editing-schemas/snippets.md",
+    "editing-schemas/owl.md",
+    "editing-schemas/checking-a-change.md",
   ] },
   { "Reference" = [
     "reference/cli.md",
@@ -37,23 +35,21 @@ nav = [
     "reference/linkml-cheatsheet.md",
     "reference/glossary.md",
   ] },
-  { "Internals" = [
-    "internals/architecture.md",
-    "internals/postprocessors.md",
-    "internals/jsonld-context.md",
-    "internals/owl.md",
-    "internals/testing.md",
+  { "Differences from TD 1.1" = [
+    "differences/index.md",
+    { "JSON Schema" = "differences/json-schema.md" },
+    { "JSON-LD context" = "differences/jsonld-context.md" },
+    { "OWL" = "differences/owl.md" },
+    { "SHACL" = "differences/shacl.md" },
   ] },
-  { "Status" = [
-    "status/linkml-gaps.md",
-    { "Differences from TD 1.1" = [
-      "status/differences/index.md",
-      { "JSON Schema" = "status/differences/json-schema.md" },
-      { "JSON-LD context" = "status/differences/jsonld-context.md" },
-      { "OWL" = "status/differences/owl.md" },
-      { "SHACL" = "status/differences/shacl.md" },
-    ] },
-    "status/linkml-issue-drafts.md",
+  { "Contribute to the tool" = [
+    "contributing/setup.md",
+    "contributing/architecture.md",
+    "contributing/postprocessors.md",
+    "contributing/jsonld-context.md",
+    "contributing/testing.md",
+    "contributing/linkml-gaps.md",
+    "contributing/linkml-issue-drafts.md",
   ] },
 ]
 

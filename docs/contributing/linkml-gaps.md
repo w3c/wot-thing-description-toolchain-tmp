@@ -1,9 +1,9 @@
 # LinkML gaps
 
 This note records where the upstream LinkML generators (linkml 1.12) do not produce what the WoT Thing Description needs and what wot-toolchain does about it.
-Differences between the generated artifacts and the published W3C artifacts are recorded in [`differences/`](differences/index.md).
+Differences between the generated artifacts and the published W3C artifacts are recorded in [`differences/`](../differences/index.md).
 It is meant for WoT WG members who review the generated artifacts and for LinkML maintainers who want to know which gaps are worth closing upstream.
-How to change the schemas is described in the [authoring guide](../getting-started/first-change.md).
+How to change the schemas is described in the [Your first schema change](../editing-schemas/first-change.md).
 
 Each entry ends with one status word:
 
@@ -218,7 +218,7 @@ Workaround.
 
 Upstream gives a slot without a single `domain` no domain at all, so `td:title`, which `Thing`, `InteractionAffordance` and `DataSchema` use, gets none.
 A graph pass adds one `schema:domainIncludes` triple per class for properties used by several classes.
-How this compares with the published ontologies is under "Single-class includes replaced by rdfs:domain and rdfs:range" in [OWL differences](differences/owl.md#single-class-includes-replaced-by-rdfsdomain-and-rdfsrange).
+How this compares with the published ontologies is under "Single-class includes replaced by rdfs:domain and rdfs:range" in [OWL differences](../differences/owl.md#single-class-includes-replaced-by-rdfsdomain-and-rdfsrange).
 Workaround.
 
 ### Attribute ranges

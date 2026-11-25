@@ -88,13 +88,13 @@ tests/
 
 ## Setup
 
-After cloning, run `uv sync` and `uv run pre-commit install`, and restore `resources/upstream/` — without it the config file does not load. Details, including the test prerequisites (jsonld.js, ROBOT), are in [Install](docs/getting-started/install.md).
+After cloning, run `uv sync` and `uv run pre-commit install`, and restore `resources/upstream/` — without it the config file does not load. Details, including the test prerequisites (jsonld.js, ROBOT), are in [Set up a checkout](docs/contributing/setup.md).
 
 ---
 
 ## The Postprocessor Pattern
 
-See [Postprocessor Conventions](docs/internals/postprocessors.md) for when and how to write a workaround for a LinkML limitation. See [LinkML gaps](docs/status/linkml-gaps.md) for documented generator limitations. See [OWL differences](docs/status/differences/owl.md) for the authoritative list of known differences between generated and target OWL ontologies — check it before investigating or reporting any OWL gap.
+See [Postprocessor Conventions](docs/contributing/postprocessors.md) for when and how to write a workaround for a LinkML limitation. See [LinkML gaps](docs/contributing/linkml-gaps.md) for documented generator limitations. See [OWL differences](docs/differences/owl.md) for the authoritative list of known differences between generated and target OWL ontologies — check it before investigating or reporting any OWL gap.
 
 ## Custom LinkML Annotations
 
@@ -124,7 +124,7 @@ uv run pytest tests/test_assertion_inventory.py -v
 
 ### Known Failures and Generation Output
 
-The expected-failure lists in `tests/known_failures/` are strict and can only shrink; see [Testing](docs/internals/testing.md#expected-failures). Which `WARNING` and `ERROR` lines of `generate-wot-resources` are expected, and what to do about the others, is in [Checking a change](docs/authoring/checking-a-change.md#read-the-generation-output). Generation aborts on any snippet validation error; fix it before declaring the change complete.
+The expected-failure lists in `tests/known_failures/` are strict and can only shrink; see [Testing](docs/contributing/testing.md#expected-failures). Which `WARNING` and `ERROR` lines of `generate-wot-resources` are expected, and what to do about the others, is in [Checking a change](docs/editing-schemas/checking-a-change.md#read-the-generation-output). Generation aborts on any snippet validation error; fix it before declaring the change complete.
 
 ### Failure Policy
 
@@ -177,7 +177,7 @@ When reviewing HTML changes, do not evaluate the entire document — scope the c
 
 ### CI Pipeline (GitHub Actions)
 
-The jobs of `main.yaml` are described in [Testing](docs/internals/testing.md#ci).
+The jobs of `main.yaml` are described in [Testing](docs/contributing/testing.md#ci).
 
 ## Language Style
 
@@ -227,7 +227,7 @@ The jobs of `main.yaml` are described in [Testing](docs/internals/testing.md#ci)
 - Metadata (id, title, hide_paths, show_paths) lives in `_snippets.yaml`, not in the JSON file.
 - Snippet `id` must be unique across all snippets and not conflict with IDs in `index.template.html`.
 - Set `validate: false` only for non-TD/TM snippets (e.g., partial examples).
-- See [Snippet Authoring Guide](docs/authoring/snippets.md) for worked examples.
+- See [Snippet Authoring Guide](docs/editing-schemas/snippets.md) for worked examples.
 
 ## General Project Conventions
 

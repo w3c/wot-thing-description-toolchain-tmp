@@ -5,7 +5,7 @@ modules remain the source of truth; this composition step must not contain a
 list of TD paths, class names, or vocabulary-specific rules.
 
 How the generated context differs from the published TD 1.1 context is recorded only in
-[JSON-LD context differences](../status/differences/jsonld-context.md).
+[JSON-LD context differences](../differences/jsonld-context.md).
 
 ## Purpose
 
@@ -125,7 +125,7 @@ The generated context must provide the following behavior:
 
 The TD Data Schema member `type` is outside this contract. It
 must remain distinct from semantic JSON-LD `@type`; its RDF representation is
-tracked in [JSON-LD context differences](../status/differences/jsonld-context.md#data-schema-type-is-a-property-not-type).
+tracked in [JSON-LD context differences](../differences/jsonld-context.md#data-schema-type-is-a-property-not-type).
 
 ## Type Coercion Rules
 
@@ -345,8 +345,8 @@ both literal kinds this produces: the generated OWL gives `td:title` and
 for explicit language maps.
 
 How this differs from the published context, ontology and shapes is recorded in
-[JSON-LD context differences](../status/differences/jsonld-context.md#forced-english-language),
-[OWL differences](../status/differences/owl.md) and [SHACL differences](../status/differences/shacl.md#title-and-description-datatype).
+[JSON-LD context differences](../differences/jsonld-context.md#forced-english-language),
+[OWL differences](../differences/owl.md) and [SHACL differences](../differences/shacl.md#title-and-description-datatype).
 
 ## Snippet Expectations
 

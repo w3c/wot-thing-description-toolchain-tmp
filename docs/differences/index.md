@@ -13,11 +13,11 @@ Each file has a short introduction, then `## Method`, which names the published 
 Each entry is written in fixed paragraphs, in this order: Published, Generated, Effect, Cause and Status.
 Cause is given only where it was established by experiment.
 
-Two status words occur here. Undecided has the same meaning as at the top of [LinkML gaps](../linkml-gaps.md).
+Two status words occur here. Undecided has the same meaning as at the top of [LinkML gaps](../contributing/linkml-gaps.md).
 
 - Undecided: the generated artifact differs from the published one, and no decision has been taken. Every Part 1 entry has this status.
 - Published defect: the published artifact is wrong against the TD 1.1 Recommendation or is inconsistent with a published companion artifact, for example the context with the shapes, and the generated artifact does not reproduce it. Every Part 2 entry has this status.
 
 All comparisons are made on the output of `wot-toolchain generate-wot-resources` against the files in `resources/upstream/`.
 
-How to change the schemas and regenerate the artifacts is described in the [authoring guide](../../getting-started/first-change.md).
+How to change the schemas and regenerate the artifacts is described in the [Your first schema change](../editing-schemas/first-change.md).

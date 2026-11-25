@@ -16,9 +16,9 @@ the repository license.
 
 ## Development setup
 
-Install the toolchain, its test prerequisites, the pre-commit hooks and the
-reference files in `resources/upstream/` as described in
-[Install](docs/getting-started/install.md). The commands and their options are
+Install the toolchain, the pre-commit hooks, the reference files in
+`resources/upstream/` and the test prerequisites as described in
+[Set up a checkout](docs/contributing/setup.md). The commands and their options are
 in the [CLI reference](docs/reference/cli.md). Do not edit files under
 `resources/gens/`; they are overwritten on every run.
 
@@ -32,8 +32,8 @@ uv run ruff check .
 
 Failures are investigated, not skipped. The expected-failure lists, the
 snapshots in `tests/snapshots/` and when they may be updated are described in
-[Testing](docs/internals/testing.md). Before opening a pull request, go through
-[Checking a change](docs/authoring/checking-a-change.md).
+[Testing](docs/contributing/testing.md). Before opening a pull request, go through
+[Checking a change](docs/editing-schemas/checking-a-change.md).
 
 ## Modeling changes
 
@@ -41,7 +41,7 @@ snapshots in `tests/snapshots/` and when they may be updated are described in
   Fix modeling problems (types, cardinalities, enumerations, descriptions)
   there, not in the code under `src/wot_toolchain/artifacts/`.
   That code only adjusts generator output that LinkML cannot express; see
-  [Postprocessor Conventions](docs/internals/postprocessors.md).
+  [Postprocessor Conventions](docs/contributing/postprocessors.md).
 - Schema changes must align with the
   [WoT Thing Description specification](https://www.w3.org/TR/wot-thing-description11/).
   A change that departs from the specification needs a reference to the
