@@ -4,6 +4,8 @@ from linkml_runtime.utils.schemaview import SchemaView
 
 from wot_toolchain.specgen.tables import collect_slot_rows
 
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
 
 def _plain_markdown(text: str) -> str:
     return text or ""
@@ -40,7 +42,7 @@ def test_td20_default_assignments_match_manual_golden_rows() -> None:
 
     actual = set()
     for schema_path, class_name in cases:
-        schema_view = SchemaView(str(Path(schema_path)), merge_imports=True)
+        schema_view = SchemaView(str(REPO_ROOT / schema_path), merge_imports=True)
         for row in collect_slot_rows(schema_view, class_name, _plain_markdown, "td"):
             if row["assignment"] == '<a href="#sec-default-values">with default</a>':
                 actual.add(row["assertion_id"])
@@ -49,8 +51,8 @@ def test_td20_default_assignments_match_manual_golden_rows() -> None:
 
 
 def test_type_value_hints_are_independent_from_default_assignment() -> None:
-    security = SchemaView("resources/schemas/wot_security.yaml", merge_imports=True)
-    hypermedia = SchemaView("resources/schemas/hypermedia.yaml", merge_imports=True)
+    security = SchemaView(str(REPO_ROOT / "resources/schemas/wot_security.yaml"), merge_imports=True)
+    hypermedia = SchemaView(str(REPO_ROOT / "resources/schemas/hypermedia.yaml"), merge_imports=True)
 
     basic_rows = {
         row["assertion_id"]: row
