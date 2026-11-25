@@ -1,6 +1,6 @@
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         { "saref": "https://w3id.org/saref#" }
     ],
     "id": "urn:uuid:300f4c4b-ca6b-484a-88cf-fd5224a9a61d",

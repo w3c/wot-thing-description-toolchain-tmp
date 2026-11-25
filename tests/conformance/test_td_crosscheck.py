@@ -1,4 +1,4 @@
-"""Compare generated JSON Schema verdicts with W3C reference schemas."""
+"""Compare generated JSON Schema verdicts with the W3C td-next JSON Schema."""
 from __future__ import annotations
 
 import json
@@ -8,17 +8,12 @@ import jsonschema
 import pytest
 from jsonschema import validators
 
-from .baselines import TD_VERSIONS, as_td20
 
 TESTS_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = TESTS_DIR.parent
 SCHEMA_PATH = REPO_ROOT / "resources" / "gens" / "jsonschema" / "jsonschema.json"
-GROUND_TRUTH = REPO_ROOT / "resources" / "upstream" / "schemas"
+GROUND_TRUTH_PATH = REPO_ROOT / "resources" / "upstream" / "schemas" / "td20-json-schema-validation.json"
 DATA_DIR = TESTS_DIR / "resources" / "td"
-GROUND_TRUTH_SCHEMAS = {
-    "td11": GROUND_TRUTH / "td11-json-schema-validation.json",
-    "td20": GROUND_TRUTH / "td20-json-schema-validation.json",
-}
 
 
 def _make_validator(schema_path: Path):
@@ -37,14 +32,10 @@ def _accepts(validator, instance) -> bool:
 
 
 def _samples():
-    params = []
-    for version in TD_VERSIONS:
-        if not GROUND_TRUTH_SCHEMAS[version].exists():
-            continue
-        for path in sorted(DATA_DIR.rglob("*.jsonld")):
-            sample = f"{version}/{path.relative_to(DATA_DIR).as_posix()}"
-            params.append(pytest.param(path, version, id=sample))
-    return params
+    return [
+        pytest.param(path, id=path.relative_to(DATA_DIR).as_posix())
+        for path in sorted(DATA_DIR.rglob("*.jsonld"))
+    ]
 
 
 @pytest.fixture(scope="session")
@@ -55,25 +46,16 @@ def generated_validator():
 
 
 @pytest.fixture(scope="session")
-def golden_validators():
-    cache: dict[str, object] = {}
-
-    def get(version: str):
-        if version not in cache:
-            cache[version] = _make_validator(GROUND_TRUTH_SCHEMAS[version])
-        return cache[version]
-
-    return get
+def golden_validator():
+    return _make_validator(GROUND_TRUTH_PATH)
 
 
-@pytest.mark.parametrize("td_path, version", _samples())
-def test_generated_agrees_with_ground_truth(generated_validator, golden_validators, td_path: Path, version: str):
+@pytest.mark.parametrize("td_path", _samples())
+def test_generated_agrees_with_ground_truth(generated_validator, golden_validator, td_path: Path):
     instance = json.loads(td_path.read_text(encoding="utf-8"))
-    if version == "td20":
-        instance = as_td20(instance)
     gen_errors = list(generated_validator.iter_errors(instance))
     generated = not gen_errors
-    golden = _accepts(golden_validators(version), instance)
+    golden = _accepts(golden_validator, instance)
     assert generated == golden, (
         f"verdict mismatch on {td_path.name}: "
         f"generated={'accept' if generated else 'reject'}, golden={'accept' if golden else 'reject'}"

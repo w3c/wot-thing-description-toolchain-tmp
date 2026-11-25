@@ -1,5 +1,5 @@
 {
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:014139c9-b267-4db5-9c61-cc2d2bfc217d",
     "@type": "Thing",
     "title": "MyCameraThing",

@@ -1,5 +1,5 @@
 {
-  "@context": ["https://www.w3.org/2019/wot/td/v1"],
+  "@context": ["https://www.w3.org/ns/wot-next/td"],
   "@type": "Thing",
   "id": "urn:example:thing:securityDefinitions1",
   "title": "Example Thing with Security Definitions",

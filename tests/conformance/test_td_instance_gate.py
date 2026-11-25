@@ -8,7 +8,6 @@ import pytest
 from jsonschema import validators
 from jsonschema.exceptions import best_match
 
-from .baselines import TD_VERSIONS, as_td20
 from .rejections import defined_at, main_rejection, rejection_details
 
 TESTS_DIR = Path(__file__).resolve().parent.parent
@@ -28,25 +27,20 @@ def validator():
 
 
 def _samples():
-    params = []
-    for version in TD_VERSIONS:
-        for path in sorted(DATA_DIR.rglob("*.jsonld")):
-            sample = f"{version}/{path.relative_to(DATA_DIR).as_posix()}"
-            params.append(pytest.param(path, version, id=sample))
-    return params
+    return [
+        pytest.param(path, id=path.relative_to(DATA_DIR).as_posix())
+        for path in sorted(DATA_DIR.rglob("*.jsonld"))
+    ]
 
 
-@pytest.mark.parametrize("td_path, version", _samples())
-def test_td_instance(validator, rejections, td_path: Path, version: str):
+@pytest.mark.parametrize("td_path", _samples())
+def test_td_instance(validator, rejections, td_path: Path):
     expected_valid = "invalid" not in td_path.name.lower()
     instance = json.loads(td_path.read_text(encoding="utf-8"))
-    if version == "td20":
-        instance = as_td20(instance)
     errors = list(validator.iter_errors(instance))
     if expected_valid:
-        sample = f"{version}/{td_path.relative_to(DATA_DIR).as_posix()}"
         for _, spath, msg in rejection_details(errors):
-            entry = rejections.setdefault((version, spath), {"count": 0, "example": msg})
+            entry = rejections.setdefault(spath, {"count": 0, "example": msg})
             entry["count"] += 1
         error = best_match(errors)
         assert error is None, f"expected VALID but schema rejected {td_path.name}: {error and error.message}"

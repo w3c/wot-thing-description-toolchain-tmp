@@ -20,7 +20,7 @@ def pytest_configure(config):
 
 @pytest.fixture
 def rejections(request):
-    """{(td version, schema location): {"count": n, "example": message}}"""
+    """{schema location: {"count": n, "example": message}}"""
     return request.config.rejections
 
 
@@ -39,22 +39,14 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     html_findings = config.spec_html_findings
     if not config.rejections and not html_findings:
         return
-    versions = sorted({v for v, _ in config.rejections})
-    # regroup per schema location, with per-version counts and one example message
-    locations = {}
-    for (version, spath), entry in config.rejections.items():
-        loc = locations.setdefault(spath, {"example": entry["example"], "total": 0})
-        loc[version] = loc.get(version, 0) + entry["count"]
-        loc["total"] += entry["count"]
-    ordered = sorted(locations.items(), key=lambda kv: -kv[1]["total"])
+    ordered = sorted(config.rejections.items(), key=lambda kv: -kv[1]["count"])
 
     # plain text for the terminal
     if ordered:
-        terminalreporter.write_line(f"rejected valid samples by schema location ({' / '.join(versions)}):")
+        terminalreporter.write_line("rejected valid samples by schema location:")
         for spath, loc in ordered:
-            nums = " / ".join(str(loc.get(v, 0)).rjust(3) for v in versions)
             src = defined_at(spath)
-            terminalreporter.write_line(f"  {spath}: {nums}" + (f"  (defined at {src})" if src else ""))
+            terminalreporter.write_line(f"  {spath}: {loc['count']:>3}" + (f"  (defined at {src})" if src else ""))
             terminalreporter.write_line(f"      e.g. {loc['example']}")
     if html_findings:
         terminalreporter.write_line(f"spec HTML vs manual golden, {len(html_findings)} difference(s):")
@@ -69,13 +61,12 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     if ordered:
         md.append("### Rejected valid samples, by the schema location that rejected them")
         md.append("")
-        md.append("| schema location | " + " | ".join(versions) + " | example error | defined at |")
-        md.append("|---|" + "---:|" * len(versions) + "---|---|")
+        md.append("| schema location | samples | example error | defined at |")
+        md.append("|---|---:|---|---|")
         for spath, loc in ordered:
-            nums = " | ".join(str(loc.get(v, 0)) for v in versions)
             example = loc["example"].replace("|", "\\|")
             src = defined_at(spath)
-            md.append(f"| `{spath}` | {nums} | `{example}` | " + (f"`{src}` |" if src else "|"))
+            md.append(f"| `{spath}` | {loc['count']} | `{example}` | " + (f"`{src}` |" if src else "|"))
         md.append("")
     if html_findings:
         md.append(f"### Spec HTML vs manual golden, {len(html_findings)} differences")

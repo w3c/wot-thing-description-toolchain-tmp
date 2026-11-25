@@ -1,5 +1,5 @@
 {
-    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+    "@context": "https://www.w3.org/ns/wot-next/td",
     "id": "urn:uuid:3deca264-4f90-4321-a5ea-f197e6a1c7cf",
     "@type": "Thing",
     "title": "MyLampThing",

@@ -45,9 +45,10 @@ resources/snippets/         ← TD/TM code examples shown in the spec
   _snippets.yaml            ← snippet metadata (id, title, hide_paths, etc.)
 
 tests/
-  manual_goldens/           ← authoritative hand-verified reference outputs
-  data/td11/                ← TD 1.1 instance files (valid + invalid)
-  data/td20/                ← TD 2.0 instance files (valid + invalid)
+  unit/                     ← tests that run without generated files
+  conformance/              ← TD instances validated against the generated JSON Schema
+  goldens/                  ← generated output compared with snapshots and upstream files
+  resources/td/             ← td-next TD instance files (valid + invalid)
 ```
 
 ## Setup
@@ -260,7 +261,7 @@ Files with high concurrent-edit risk. Check for in-progress PRs before touching.
 
 ## Current Priorities (2026-07)
 
-1. JSON Schema correctness — all td11 + td20 instance validations pass.
+1. JSON Schema correctness — all td-next instance validations pass.
 2. HTML spec correctness — structure and vocabulary tables match `tests/manual_goldens/html/`.
 3. Snippet validity — all `.json` files validate against the generated JSON Schema.
 4. Assertion CSVs — assertions match anchors in `index.html`.

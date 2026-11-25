@@ -8,7 +8,7 @@ the full suite:
 
 ```bash
 uv run wot-toolchain generate-wot-resources
-uv run pytest tests/ -v
+uv run pytest
 ```
 
 The specification HTML is built when `spec` is listed under `generators` in
@@ -31,8 +31,8 @@ The specification HTML is built when `spec` is listed under `generators` in
 - `conformance/test_td_instance_gate.py` validates the generated JSON Schema
   against every valid and invalid TD sample in `resources/td/`.
 - `conformance/test_td_crosscheck.py` compares the generated schema's
-  validation verdicts with the W3C reference schemas in
-  `resources/upstream/schemas/`.
+  validation verdicts with the W3C td-next JSON Schema
+  `resources/upstream/schemas/td20-json-schema-validation.json`.
 - `goldens/test_golden_diff.py` detects changes to the generated JSON Schema,
   JSON-LD context, and generated specification sections.
 - `goldens/test_golden_form_structure.py` checks that the Form and
@@ -59,7 +59,7 @@ The specification HTML is built when `spec` is listed under `generators` in
   `unit/artifacts/shacl/test_shacl_postprocessor.py` tests the SHACL
   postprocessor.
 
-`conftest.py`, `conformance/baselines.py`, `conformance/rejections.py`, and
+`conftest.py`, `conformance/rejections.py`, and
 `goldens/spec_html_compare.py` are shared test helpers, not test modules.
 
 The upstream-comparison tests `test_spec_html_vs_golden.py`,
@@ -70,8 +70,8 @@ w3c/wot-thing-description.
 ## Reference Outputs
 
 `resources/upstream/` at the repository root contains the W3C reference
-files that the comparison tests read: the TD 1.1 and TD 2.0 JSON Schemas in
-`schemas/`, the assertion inventory `assertions.csv`, and the specification
+files that the comparison tests read: the td-next JSON Schema
+`schemas/td20-json-schema-validation.json`, the assertion inventory `assertions.csv`, and the specification
 `html/index.html`.
 
 `resources/snapshots/` contains machine-updatable snapshots of this toolchain's
@@ -83,7 +83,7 @@ uv run pytest tests/goldens/test_golden_diff.py --update-goldens
 
 ## Test Data
 
-`resources/td/` contains the TD instance files, one directory per topic
+`resources/td/` contains the td-next TD instance files, one directory per topic
 (`1-simple-default/` to `15-link-relation-type/`). To add a test case, add a
 `*.jsonld` file to the directory of its topic.
 `conformance/test_td_instance_gate.py` reads every `*.jsonld` file: a file

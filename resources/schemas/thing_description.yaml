@@ -92,10 +92,6 @@ enums:
     description: Valid W3C WoT Thing Description context URIs.
     enum_uri: linkml:uri
     permissible_values:
-      "https://www.w3.org/2019/wot/td/v1":
-        description: WoT Thing Description 1.0 JSON-LD context URI.
-      "https://www.w3.org/2022/wot/td/v1.1":
-        description: WoT Thing Description 1.1 JSON-LD context URI.
       "https://www.w3.org/ns/wot-next/td":
         description: WoT Thing Description 2.0 JSON-LD context URI.
 
@@ -111,10 +107,7 @@ slots:
           - range: uri
           - range: Any
         has_member:
-          equals_string_in:
-            - "https://www.w3.org/2019/wot/td/v1"
-            - "https://www.w3.org/2022/wot/td/v1.1"
-            - "https://www.w3.org/ns/wot-next/td"
+          equals_string: "https://www.w3.org/ns/wot-next/td"
   "@type":
     description: JSON-LD keyword to label the object with semantic tags (or types).
     range: string

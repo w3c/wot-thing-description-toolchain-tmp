@@ -1,6 +1,6 @@
 {
     "@context": [
-        "https://www.w3.org/2022/wot/td/v1.1",
+        "https://www.w3.org/ns/wot-next/td",
         {
             "saref": "https://w3id.org/saref#",
             "om": "http://www.ontology-of-units-of-measure.org/resource/om-2/",

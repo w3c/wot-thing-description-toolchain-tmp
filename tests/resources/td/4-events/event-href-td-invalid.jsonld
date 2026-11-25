@@ -1,5 +1,5 @@
 {
-    "@context": ["https://www.w3.org/2019/wot/td/v1", "https://www.w3.org/2022/wot/td/v1.1"],
+    "@context": ["https://www.w3.org/ns/wot-next/td"],
     "title": "Minimal TD missing href",
     "@type": "Thing",
     "security": ["nosec_sc"],
