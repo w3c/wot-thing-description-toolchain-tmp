@@ -48,13 +48,11 @@ Rationale: the generation pipeline calls one entry point per artifact. Splitting
 def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     schema = copy.deepcopy(raw_schema)
     config = _read_annotations(schema_view)
-    _flatten_subclasses(schema, schema_view, config)
-    _build_oneof_dispatch(schema, schema_view, config)
-    # ... each transform in sequence ...
+    run_transforms(JSONSCHEMA_TRANSFORMS, schema, schema_view, config)
     return schema
 ```
 
-New transforms are added as private functions and called from the entry point in the correct order.
+A new transform is a private function plus one `Transform` entry in the module's list (`JSONSCHEMA_TRANSFORMS`, `SHACL_TRANSFORMS`). The list order is the run order. Each entry has a `name`, a `kind` (`LINKML_BUG`, `LINKML_GAP`, `WOT_SHAPING`, `COSMETIC`) and a `reason` that says what the transform changes and why. `Transform` and `run_transforms` are defined in `artifacts/transforms.py`; a transform that raises ends the run with a `GenerationError` that names it.
 
 ---
 
@@ -96,14 +94,14 @@ class FormVariantsConfig:
 Rationale: annotation-driven transforms decouple postprocessor logic from specific schema content. Adding a new `jsonschema_flatten_subclasses` annotation to a class automatically triggers flattening without changing Python code.
 
 ```python
-def _read_annotations(sv: SchemaView) -> TransformConfig:
+def _read_annotations(sv: SchemaView) -> Annotations:
     flatten_parents = []
     for cls in sv.all_classes():
         val = _get_annotation_value(cls, "jsonschema_flatten_subclasses")
         if val:
             flatten_parents.append(cls.name)
     # ... read other annotations ...
-    return TransformConfig(flatten_subclass_parents=flatten_parents, ...)
+    return Annotations(flatten_subclass_parents=flatten_parents, ...)
 ```
 
 **Anti-pattern:** hardcoding class names in the transform function.
@@ -127,7 +125,7 @@ A one-line comment before the function is sufficient:
 
 ```python
 # W3C TD spec requires flat DataSchema; LinkML generates separate subclass $defs (gap #3).
-def _flatten_subclasses(schema: dict, sv: SchemaView, config: TransformConfig) -> None:
+def _flatten_subclasses(schema: dict, sv: SchemaView, config: Annotations) -> None:
     ...
 ```
 

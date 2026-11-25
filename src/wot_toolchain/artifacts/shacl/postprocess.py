@@ -9,6 +9,8 @@ from rdflib.term import Node
 
 from linkml_runtime.utils.schemaview import SchemaView
 
+from ..transforms import Transform, TransformKind, run_transforms
+
 
 def _langstring_unions(schema_view: SchemaView) -> dict[tuple[URIRef, URIRef], list[URIRef]]:
     unions: dict[tuple[URIRef, URIRef], list[URIRef]] = {}
@@ -38,13 +40,7 @@ def _langstring_unions(schema_view: SchemaView) -> dict[tuple[URIRef, URIRef], l
     return unions
 
 
-# W3C WoT requires rdf:langString alternatives for selected scalar slots; LinkML
-# SHACL generation drops heterogeneous exactly_one_of branches (discussion #2199).
-# TODO: remove when https://github.com/orgs/linkml/discussions/2199 is resolved.
-def post_process_shacl(raw_shacl: str, schema_view: SchemaView) -> str:
-    graph = Graph()
-    graph.parse(data=raw_shacl, format="turtle")
-
+def _add_langstring_alternatives(graph: Graph, schema_view: SchemaView) -> None:
     for (class_uri, path), datatypes in _langstring_unions(schema_view).items():
         for node_shape in graph.subjects(SH.targetClass, class_uri):
             for property_shape in graph.objects(node_shape, SH.property):
@@ -63,4 +59,21 @@ def post_process_shacl(raw_shacl: str, schema_view: SchemaView) -> str:
                 Collection(graph, union, branches)
                 graph.add((property_shape, SH["or"], union))
 
+
+SHACL_TRANSFORMS: tuple[Transform, ...] = (
+    # TODO: remove when https://github.com/orgs/linkml/discussions/2199 is resolved.
+    Transform(
+        name="add_langstring_alternatives",
+        kind=TransformKind.LINKML_GAP,
+        reason="LinkML emits one sh:datatype for a slot whose exactly_one_of ranges are several datatypes "
+        "(discussion #2199). When one of them is langString, replaces sh:datatype by an sh:or over all of them.",
+        apply=_add_langstring_alternatives,
+    ),
+)
+
+
+def post_process_shacl(raw_shacl: str, schema_view: SchemaView) -> str:
+    graph = Graph()
+    graph.parse(data=raw_shacl, format="turtle")
+    run_transforms(SHACL_TRANSFORMS, graph, schema_view)
     return graph.serialize(format="turtle")

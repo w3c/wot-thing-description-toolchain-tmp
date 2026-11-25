@@ -14,6 +14,8 @@ from typing import Any
 
 from linkml_runtime.utils.schemaview import SchemaView
 
+from ..transforms import Transform, TransformKind, run_transforms
+
 logger = logging.getLogger(__name__)
 
 
@@ -32,7 +34,7 @@ class FormVariantsConfig:
 
 
 @dataclass
-class TransformConfig:
+class Annotations:
     flatten_subclass_parents: list[str] = field(default_factory=list)
     oneof_dispatches: list[OneOfDispatchConfig] = field(default_factory=list)
     form_variants: list[FormVariantsConfig] = field(default_factory=list)
@@ -83,8 +85,8 @@ def _get_annotation_value(annotatable, key: str) -> Any | None:
     return None
 
 
-def _read_annotations(sv: SchemaView) -> TransformConfig:
-    config = TransformConfig()
+def _read_annotations(sv: SchemaView) -> Annotations:
+    config = Annotations()
 
     for cls_name, cls_def in sv.all_classes().items():
         if _get_annotation_value(cls_def, 'jsonschema_flatten_subclasses'):
@@ -113,7 +115,7 @@ def _read_annotations(sv: SchemaView) -> TransformConfig:
 
 
 
-def _flatten_subclasses(schema: dict, sv: SchemaView, config: TransformConfig) -> None:
+def _flatten_subclasses(schema: dict, sv: SchemaView, config: Annotations) -> None:
     defs = schema.get('$defs', {})
 
     for parent_name in config.flatten_subclass_parents:
@@ -149,7 +151,7 @@ def _flatten_subclasses(schema: dict, sv: SchemaView, config: TransformConfig) -
                     logger.debug(f"Propagated flattened props to mixin user {cls_name}")
 
 
-def _build_oneof_dispatch(schema: dict, sv: SchemaView, config: TransformConfig) -> None:
+def _build_oneof_dispatch(schema: dict, sv: SchemaView, config: Annotations) -> None:
     defs = schema.get('$defs', {})
 
     for dispatch in config.oneof_dispatches:
@@ -176,7 +178,7 @@ def _build_oneof_dispatch(schema: dict, sv: SchemaView, config: TransformConfig)
         defs[cls_name] = {"oneOf": one_of_list}
 
 
-def _build_form_variants(schema: dict, config: TransformConfig) -> None:
+def _build_form_variants(schema: dict, config: Annotations) -> None:
     defs = schema.get('$defs', {})
 
     for fv in config.form_variants:
@@ -259,7 +261,7 @@ def _simplify_exclusive_minimum(schema: dict) -> None:
     _walk_schema(schema, _fix)
 
 
-def _remove_excluded_defs(schema: dict, sv: SchemaView, config: TransformConfig) -> None:
+def _remove_excluded_defs(schema: dict, sv: SchemaView, config: Annotations) -> None:
     defs = schema.get('$defs', {})
     to_remove = set()
 
@@ -401,6 +403,75 @@ def _clean_metadata(schema: dict) -> None:
             req.remove('name')
 
 
+JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
+    Transform(
+        name="flatten_subclasses",
+        kind=TransformKind.WOT_SHAPING,
+        reason="Merges the properties of the direct subclasses of a class annotated jsonschema_flatten_subclasses "
+        "into that class, deletes the subclass defs, and copies the merged properties to the classes that use it "
+        "as a mixin.",
+        apply=_flatten_subclasses,
+    ),
+    Transform(
+        name="build_oneof_dispatch",
+        kind=TransformKind.WOT_SHAPING,
+        reason="Replaces a class annotated jsonschema_oneof_dispatch by a oneOf over its direct subclasses. With "
+        "include_unknown it adds a branch for objects whose discriminator value has a prefix.",
+        apply=_build_oneof_dispatch,
+    ),
+    Transform(
+        name="build_form_variants",
+        kind=TransformKind.WOT_SHAPING,
+        reason="Replaces a class annotated jsonschema_form_variants by a oneOf over one def per listed group of op "
+        "values and a base def that only matches objects without op.",
+        apply=lambda schema, sv, config: _build_form_variants(schema, config),
+    ),
+    Transform(
+        name="normalize_types",
+        kind=TransformKind.LINKML_BUG,
+        reason="LinkML emits type next to oneOf for a property with exactly_one_of. Removes that type, which "
+        "rejects the oneOf branches of another type.",
+        apply=lambda schema, sv, config: _normalize_types(schema),
+    ),
+    Transform(
+        name="simplify_exclusive_minimum",
+        kind=TransformKind.LINKML_GAP,
+        reason="LinkML has no exclusive minimum. The schema writes minimum_value plus none_of equals_number with "
+        "the same value, which LinkML emits as minimum plus not.anyOf.const. Rewrites that to exclusiveMinimum.",
+        apply=lambda schema, sv, config: _simplify_exclusive_minimum(schema),
+    ),
+    Transform(
+        name="remove_identifier_slots",
+        kind=TransformKind.WOT_SHAPING,
+        reason="Removes identifier slots from properties and required. They are the keys of a map, not members of "
+        "the JSON object.",
+        apply=lambda schema, sv, config: _remove_identifier_slots(schema, sv),
+    ),
+    Transform(
+        name="remove_excluded_defs",
+        kind=TransformKind.COSMETIC,
+        reason="Removes the defs of classes annotated jsonschema_exclude, of enums, the __identifier_optional defs, "
+        "and the defs Any, Thing and InteractionAffordance.",
+        apply=_remove_excluded_defs,
+    ),
+    Transform(
+        name="resolve_refs",
+        kind=TransformKind.WOT_SHAPING,
+        reason="Repairs references after the removals: inlines enums, removes refs to Any, points "
+        "__identifier_optional refs to the base def, rewrites #/definitions/ to #/$defs/, and reduces an anyOf in "
+        "additionalProperties to one schema.",
+        apply=lambda schema, sv, config: _resolve_refs(schema, sv),
+    ),
+    Transform(
+        name="clean_metadata",
+        kind=TransformKind.COSMETIC,
+        reason="Removes description and title from every def, metamodel_version and version from the root, and "
+        "name from the root required list.",
+        apply=lambda schema, sv, config: _clean_metadata(schema),
+    ),
+)
+
+
 def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     schema = copy.deepcopy(raw_schema)
     config = _read_annotations(schema_view)
@@ -410,14 +481,6 @@ def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
     logger.debug(f"  oneof_dispatches: {[d.class_name for d in config.oneof_dispatches]}")
     logger.debug(f"  form_variants: {[f.class_name for f in config.form_variants]}")
 
-    _flatten_subclasses(schema, schema_view, config)
-    _build_oneof_dispatch(schema, schema_view, config)
-    _build_form_variants(schema, config)
-    _normalize_types(schema)
-    _simplify_exclusive_minimum(schema)
-    _remove_identifier_slots(schema, schema_view)
-    _remove_excluded_defs(schema, schema_view, config)
-    _resolve_refs(schema, schema_view)
-    _clean_metadata(schema)
+    run_transforms(JSONSCHEMA_TRANSFORMS, schema, schema_view, config)
 
     return schema
