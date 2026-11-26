@@ -17,8 +17,10 @@ from .spec_html_compare import (
     parse_html,
     row_key,
     section_by_id,
+    table_cell_texts,
     table_rows,
     tables_by_caption,
+    tables_without_caption,
 )
 
 TESTS_DIR = Path(__file__).resolve().parent
@@ -159,6 +161,31 @@ def test_table_content_matches(
             generated_tables[caption],
         )
         findings.extend(finding for finding in table_findings if not _is_approved_table_finding(finding, approved))
+    _fail_on_findings(spec_html_findings, findings)
+
+
+def test_tables_without_caption_match(golden_tree, generated_tree, spec_html_findings) -> None:
+    """Every table without a caption has the same cells as the generated one at the same place in its section."""
+    golden_tables = tables_without_caption(golden_tree)
+    generated_tables = tables_without_caption(generated_tree)
+    findings = []
+    for section_id, position in sorted(golden_tables.keys() - generated_tables.keys()):
+        findings.append(f"section '{section_id}': caption-less table {position} missing in generated file")
+    for section_id, position in sorted(generated_tables.keys() - golden_tables.keys()):
+        findings.append(f"section '{section_id}': caption-less table {position} only in generated file")
+    for section_id, position in sorted(golden_tables.keys() & generated_tables.keys()):
+        golden_rows = table_cell_texts(golden_tables[section_id, position])
+        generated_rows = table_cell_texts(generated_tables[section_id, position])
+        context = f"section '{section_id}', caption-less table {position}"
+        if len(golden_rows) != len(generated_rows):
+            findings.append(f"{context}: {len(golden_rows)} rows in golden, {len(generated_rows)} in generated")
+        for row, (golden_row, generated_row) in enumerate(zip(golden_rows, generated_rows), start=1):
+            if golden_row != generated_row:
+                findings.append(
+                    f"{context}, row {row}: cells differ\n"
+                    f"    golden:    {golden_row}\n"
+                    f"    generated: {generated_row}"
+                )
     _fail_on_findings(spec_html_findings, findings)
 
 

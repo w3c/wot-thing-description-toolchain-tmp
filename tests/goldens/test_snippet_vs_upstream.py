@@ -12,14 +12,13 @@ import pytest
 import yaml
 from lxml.html import HtmlElement
 
-from .spec_html_compare import normalize_text, parse_html
+from .spec_html_compare import EXAMPLE_SELECTOR, normalize_text, parse_html
 
 TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent.parent
 UPSTREAM_PATH = REPO_ROOT / "resources" / "upstream" / "html" / "index.html"
 GENERATED_PATH = REPO_ROOT / "resources" / "gens" / "index.html"
 APPROVED_DIVERGENCES_PATH = TESTS_DIR.parent / "resources" / "approved_divergences" / "snippets.yaml"
-EXAMPLE_SELECTOR = "aside.example, pre.example"
 _MISSING = object()
 
 _JSON_STRING_RE = re.compile(r'"(?:[^"\\]|\\.)*"')
@@ -146,6 +145,7 @@ class Snippet(NamedTuple):
     pre: int
     pre_count: int
     example_id: str | None
+    title: str | None
     text: str
 
     @property
@@ -176,7 +176,15 @@ def _snippets(tree: HtmlElement) -> list[Snippet]:
         examples_per_section[section_id] += 1
         pres = example.cssselect("pre")
         snippets.extend(
-            Snippet(section_id, examples_per_section[section_id], index, len(pres), example.get("id"), pre.text_content())
+            Snippet(
+                section_id,
+                examples_per_section[section_id],
+                index,
+                len(pres),
+                example.get("id"),
+                example.get("title"),
+                pre.text_content(),
+            )
             for index, pre in enumerate(pres, start=1)
         )
     return snippets
@@ -194,6 +202,7 @@ def _show(value: object) -> str:
 
 UPSTREAM_TREE = parse_html(UPSTREAM_PATH)
 UPSTREAM_SNIPPETS = _snippets(UPSTREAM_TREE)
+UPSTREAM_EXAMPLES = [snippet for snippet in UPSTREAM_SNIPPETS if snippet.pre == 1]
 
 
 @pytest.fixture(scope="module")
@@ -247,6 +256,21 @@ def test_example_matches_upstream(
             f"snippet divergence '{entry['id']}' no longer has the expected generated value "
             f"at '{path}': expected {expected!r}, got {actual!r}"
         )
+
+
+@pytest.mark.parametrize("upstream", UPSTREAM_EXAMPLES, ids=lambda example: f"{example.section_id}#{example.position}")
+def test_example_title_matches_upstream(
+    upstream: Snippet, generated_snippets: dict[tuple[str, int, int], Snippet]
+) -> None:
+    """Every upstream example has the same title as the generated one at the same place."""
+    generated = generated_snippets.get(upstream.place)
+    assert generated is not None, f"[{upstream}] no generated example at {upstream.place}"
+    upstream_title, generated_title = normalize_text(upstream.title), normalize_text(generated.title)
+    assert upstream_title == generated_title, (
+        f"[{upstream}] title differs from upstream\n"
+        f"    upstream:  {upstream_title!r}\n"
+        f"    generated: {generated_title!r}"
+    )
 
 
 def test_every_snippet_divergence_locates_an_upstream_example(snippet_divergences: list[dict]) -> None:
