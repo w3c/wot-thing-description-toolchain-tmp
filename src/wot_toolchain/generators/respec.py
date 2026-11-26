@@ -21,7 +21,6 @@ from ..specgen.assertions import html_assertions_to_csv
 
 JINJA_TEMPLATE_DIR = Path('resources') / 'jinja_templates'
 CORE_SCHEMA_PLACEHOLDER = "%s"
-SNIPPET_SCHEMAS_DIR = Path('resources') / 'upstream' / 'schemas'
 
 
 def _annotation_value(annotations: dict, key: str):
@@ -443,7 +442,9 @@ def render_explicit_assertion_annotation(
     return "\n".join(rendered)
 
 
-def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Mapping[Path, str]) -> None:
+def generate_respec_spec(
+    input_path: Path, spec: SpecConfig, schema_prefixes: Mapping[Path, str], td_schema: Path
+) -> None:
     """
     Generate the ReSpec-compatible HTML document from the LinkML schema.
 
@@ -584,11 +585,7 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
     if spec.snippets.is_dir():
         from ..specgen.snippets import validate_all_snippets
 
-        snippet_errors = validate_all_snippets(
-            spec.snippets,
-            SNIPPET_SCHEMAS_DIR / "td20-json-schema-validation.json",
-            SNIPPET_SCHEMAS_DIR / "tm-json-schema-validation.json",
-        )
+        snippet_errors = validate_all_snippets(spec.snippets, td_schema, spec.thing_model_schema)
         if snippet_errors:
             raise GenerationError(
                 f"{spec.snippets}: {len(snippet_errors)} snippet(s) are invalid:\n" + "\n".join(snippet_errors)

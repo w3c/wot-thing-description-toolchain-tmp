@@ -1,5 +1,6 @@
 """Exit codes of the wot-toolchain command line interface."""
 
+import json
 import shutil
 from pathlib import Path
 
@@ -53,7 +54,7 @@ def test_invalid_snippet_exits_5(tmp_path, caplog):
     snippets = tmp_path / "snippets"
     shutil.copytree(REPO / "resources" / "snippets", snippets)
     (snippets / "action-serialization.json").write_text("{}", encoding="utf-8")
-    config = _config(tmp_path, "spec", snippets=str(snippets))
+    config = _config(tmp_path, "jsonschema", "spec", snippets=str(snippets))
     result = CliRunner().invoke(main, ["generate-wot-resources", "-c", str(config)])
     assert result.exit_code == 5
     assert "action-serialization.json" in caplog.text
@@ -63,7 +64,7 @@ def test_prose_file_of_unknown_class_exits_5(tmp_path, caplog):
     prose = tmp_path / "sections"
     shutil.copytree(REPO / "resources" / "spec" / "sections", prose)
     (prose / "NoSuchClass.html").write_text("<p>Orphan.</p>\n", encoding="utf-8")
-    config = _config(tmp_path, "spec", prose=str(prose))
+    config = _config(tmp_path, "jsonschema", "spec", prose=str(prose))
     result = CliRunner().invoke(main, ["generate-wot-resources", "-c", str(config)])
     assert result.exit_code == 5
     assert "NoSuchClass.html" in caplog.text
@@ -72,7 +73,7 @@ def test_prose_file_of_unknown_class_exits_5(tmp_path, caplog):
 def test_unwritable_assertions_csv_exits_5(tmp_path):
     blocker = tmp_path / "blocker"
     blocker.write_text("", encoding="utf-8")
-    config = _config(tmp_path, "spec", assertions_csv=str(blocker / "assertions.csv"))
+    config = _config(tmp_path, "jsonschema", "spec", assertions_csv=str(blocker / "assertions.csv"))
     result = CliRunner().invoke(main, ["generate-wot-resources", "-c", str(config)])
     assert result.exit_code == 5
 
@@ -90,8 +91,26 @@ def test_invalid_snippet_metadata_exits_5(tmp_path, caplog):
     metadata = yaml.safe_load((snippets / "_snippets.yaml").read_text(encoding="utf-8"))
     metadata["snippets"]["action-serialization"]["layout"] = "sidebar"
     (snippets / "_snippets.yaml").write_text(yaml.safe_dump(metadata), encoding="utf-8")
-    config = _config(tmp_path, "spec", snippets=str(snippets))
+    config = _config(tmp_path, "jsonschema", "spec", snippets=str(snippets))
     result = CliRunner().invoke(main, ["generate-wot-resources", "-c", str(config)])
     assert result.exit_code == 5
     assert "_snippets.yaml" in caplog.text
     assert "sidebar" in caplog.text
+
+
+def test_td_snippet_is_validated_against_generated_json_schema(tmp_path, caplog):
+    snippets = tmp_path / "snippets"
+    shutil.copytree(REPO / "resources" / "snippets", snippets)
+    snippet = json.loads((snippets / "action-serialization.json").read_text(encoding="utf-8"))
+    snippet["@type"] = []  # The upstream TD schema accepts an empty @type; the generated JSON Schema rejects it.
+    (snippets / "action-serialization.json").write_text(json.dumps(snippet), encoding="utf-8")
+    config = _config(tmp_path, "jsonschema", "spec", snippets=str(snippets))
+    result = CliRunner().invoke(main, ["generate-wot-resources", "-c", str(config)])
+    assert result.exit_code == 5
+    assert "action-serialization.json: @type — [] is not valid" in caplog.text
+
+
+def test_spec_without_jsonschema_generator_exits_3(tmp_path, caplog):
+    result = CliRunner().invoke(main, ["generate-wot-resources", "-c", str(_config(tmp_path, "spec"))])
+    assert result.exit_code == 3
+    assert "/generators/spec" in caplog.text

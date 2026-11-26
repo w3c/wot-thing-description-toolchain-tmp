@@ -11,7 +11,9 @@ import jsonfold
 from dataclasses import replace as _replace
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from jsonschema import Draft7Validator
+from jsonschema.exceptions import SchemaError
+from jsonschema.protocols import Validator
+from jsonschema.validators import validator_for
 from linkml.validator import validate
 
 from ..errors import GenerationError
@@ -233,17 +235,27 @@ def _build_element_attrs(snippet_id: str, title: str) -> str:
     return attrs
 
 
-def _load_schema(schema_path: Path) -> Draft7Validator:
-    raw = json.loads(schema_path.read_text(encoding="utf-8"))
-    schema = json.loads(raw) if isinstance(raw, str) else raw
-    return Draft7Validator(schema)
+def _load_validator(schema_path: Path) -> Validator:
+    """Return a validator of the dialect that the JSON Schema at ``schema_path`` declares in ``$schema``."""
+    try:
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise GenerationError(f"{schema_path}: JSON Schema for the snippets could not be read: {exc}") from exc
+    validator_class = validator_for(schema, default=None)
+    if validator_class is None:
+        raise GenerationError(f"{schema_path}: \"$schema\" is missing or names an unsupported JSON Schema dialect.")
+    try:
+        validator_class.check_schema(schema)
+    except SchemaError as exc:
+        raise GenerationError(f"{schema_path}: not a valid JSON Schema: {exc.message}") from exc
+    return validator_class(schema)
 
 
 def _collect_schema_errors(
     instance: Any,
     filename: str,
-    td_validator: Draft7Validator,
-    tm_validator: Draft7Validator,
+    td_validator: Validator,
+    tm_validator: Validator,
     errors: list[str],
 ) -> None:
     is_thing_model = isinstance(instance, dict) and instance.get("@type") == "tm:ThingModel"
@@ -259,11 +271,12 @@ def validate_all_snippets(
     td_schema_path: Path,
     tm_schema_path: Path,
 ) -> list[str]:
+    """Validate the Thing Description snippets against one JSON Schema and the Thing Model snippets against the other."""
     if not snippets_dir.exists():
         return []
 
-    td_validator = _load_schema(td_schema_path)
-    tm_validator = _load_schema(tm_schema_path)
+    td_validator = _load_validator(td_schema_path)
+    tm_validator = _load_validator(tm_schema_path)
     errors: list[str] = []
 
     manifest = _load_manifest(snippets_dir)

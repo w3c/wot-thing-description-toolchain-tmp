@@ -54,6 +54,8 @@ generators:
     # Prose of the class sections: <Class>.html after the vocabulary table, <Class>.intro.html before it.
     prose: resources/spec/sections
     snippets: resources/snippets
+    # Thing Description snippets are validated against the generated JSON Schema, Thing Model snippets against this one.
+    thing_model_schema: resources/upstream/schemas/tm-json-schema-validation.json
     glossary: resources/xref/glossary.yaml
     # Assertions that are tested but are not in the specification. They are added to assertions_csv.
     extra_asserts: resources/upstream/extra-asserts.html

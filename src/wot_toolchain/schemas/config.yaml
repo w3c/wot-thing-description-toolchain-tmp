@@ -104,7 +104,12 @@ classes:
           Directory of the section prose files. <Class>.html is shown after the vocabulary table of the class and
           <Class>.intro.html before it, in place of the class description.
       snippets:
-        description: Directory of the example snippets.
+        description: >-
+          Directory of the example snippets. The Thing Description snippets are validated against the JSON Schema
+          that the jsonschema generator writes, so the spec generator needs the jsonschema generator.
+        required: true
+      thing_model_schema:
+        description: Path of the JSON Schema that the Thing Model snippets are validated against.
         required: true
       glossary:
         description: Path of the glossary used for cross-references.
