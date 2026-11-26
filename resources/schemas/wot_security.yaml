@@ -638,5 +638,6 @@ classes:
           - range: string
           - range: string
             multivalued: true
+            minimum_cardinality: 1
       flow:
         required: true

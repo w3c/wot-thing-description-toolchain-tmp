@@ -267,3 +267,12 @@ divergences:
     rationale: "The upstream schema does not constrain contentMediaType of a property affordance although the spec types it as string."
     expected_generated:
       verdict: reject
+  - id: jsonschema-oauth2-scheme-scopes-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/oauth2-scheme-scopes-empty-array-td-invalid.jsonld
+    rationale: "The upstream scopes array has no minItems, so it accepts [] although an array of scopes needs at least one scope."
+    expected_generated:
+      verdict: reject
