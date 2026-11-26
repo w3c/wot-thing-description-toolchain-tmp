@@ -31,18 +31,30 @@ If you suspect LinkML cannot express a requirement, verify by testing with the g
 
 ## 2. File Organization
 
-**Rule: one postprocessor module per artifact type.**
+**Rule: one postprocessor package per artifact type, with `postprocess.py` as its entry module.**
 
 | Module | Artifact |
 |--------|----------|
 | `artifacts/jsonschema/postprocess.py` | JSON Schema |
 | `artifacts/shacl/postprocess.py` | SHACL Shapes |
 
-**Rule: add new transform functions to the existing module. Do not create new files.**
+The JSON Schema transform functions are in modules next to `postprocess.py`, which holds only the transform list and the entry point:
 
-Rationale: the generation pipeline calls one entry point per artifact. Splitting logic across files creates import complexity with no benefit.
+| Module | Content |
+|--------|---------|
+| `annotations.py` | `Annotations` config and `_read_annotations` |
+| `traversal.py` | `_walk_schema` |
+| `subclasses.py` | `_flatten_subclasses`, `_build_oneof_dispatch` |
+| `variants.py` | `_build_form_variants` |
+| `cleanups.py` | `_normalize_types`, `_simplify_exclusive_minimum`, `_remove_identifier_slots`, `_clean_metadata` |
+| `pruning.py` | `_remove_excluded_defs` |
+| `refs.py` | `_resolve_refs` |
 
-**Rule: each module has one public entry point at the bottom.**
+**Rule: add a new transform function to the module that matches its responsibility. Create a new module only when none matches.**
+
+Rationale: the generation pipeline calls one entry point per artifact, and the transform list in `postprocess.py` is the one place that shows the run order.
+
+**Rule: each `postprocess.py` has one public entry point at the bottom.**
 
 ```python
 def post_process_jsonschema(raw_schema: dict, schema_view: SchemaView) -> dict:
