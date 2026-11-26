@@ -297,27 +297,6 @@ Both support `aliases` — alternative spellings or plural forms that link to th
 - Referencing an external definition (e.g., an XML Schema datatype, a term from WoT Architecture) → add an `href` entry.
 - A term appears unlinked in generated HTML → check if it's missing from the glossary or if the casing doesn't match.
 
-#### Full example
-
-```yaml
-Thing:
-  annotations:
-    spec_content:
-      value:
-        - type: note
-          text: |
-            This is an informative note about the Thing class.
-        - type: paragraph
-          segments:
-            - id: td-context-requirement
-              text: |
-                This segment becomes a testable assertion.
-        - type: list
-          items:
-            - id: td-context-rule-1
-              text: First rule about context handling.
-```
-
 ---
 
 ### `spec_subsections`
@@ -326,7 +305,7 @@ Thing:
 
 **What you need to do:**
 
-- Add a `value` list where each item defines `id` (becomes the HTML anchor), `title` (the heading text), optional `class` (`informative` or `normative`), and `content` (same block types as `spec_content`).
+- Add a `value` list where each item defines `id` (becomes the HTML anchor), `title` (the heading text), optional `class` (`informative` or `normative`), and `content` (the block types above).
 
 ```yaml
 Form:
@@ -470,72 +449,6 @@ Currently used on: `SecurityScheme`.
 
 ---
 
-### `jsonschema_form_variants`
-
-**What it does:** splits a single class into operation-specific variant definitions. Each variant is constrained to a subset of values for the `op` slot. Creates separate `$defs` per variant (e.g., `PropertyForm`, `ActionForm`, `EventForm`) and a top-level `oneOf` referencing them.
-
-**Why it exists:** the W3C TD spec defines different allowed `op` values depending on where a `Form` appears (inside a property, action, event, or at root level). LinkML generates a single `Form` definition. ([Known LinkML Gaps, gap #10](../known-linkml-gaps.md#10-no-form-variants-per-affordance-type))
-
-**What you need to do:**
-
-- Add `jsonschema_form_variants` on the class with:
-  - `op_slot` — the slot name whose values determine variants.
-  - `variants` — a dict mapping variant names to their allowed `op` values.
-
-```yaml
-Form:
-  annotations:
-    jsonschema_form_variants:
-      value:
-        op_slot: op
-        variants:
-          property:
-            - readproperty
-            - writeproperty
-            - observeproperty
-            - unobserveproperty
-          action:
-            - invokeaction
-            - queryaction
-            - cancelaction
-          event:
-            - subscribeevent
-            - unsubscribeevent
-```
-
-Currently used on: `Form`.
-
----
-
-### `jsonschema_config`
-
-**What it does:** injects raw JSON Schema properties into a slot's generated definition. This is a last-resort escape hatch for when native LinkML features (`inlined: true`, `identifier: true`, `extra_slots`) and other annotations cannot produce the correct output shape.
-
-**Why it exists:** some dict-valued slots (e.g., `actions`, `events`) require a specific `additionalProperties: { $ref: ... }` map pattern that the generator does not emit correctly despite correct `inlined` + `identifier` settings. ([Known LinkML Gaps](../known-linkml-gaps.md))
-
-**What you need to do:**
-
-- Add `jsonschema_config` on the **slot** (typically in `slot_usage`), not on the class.
-- Must cite the corresponding entry in [Known LinkML Gaps](../known-linkml-gaps.md). If no entry exists, add one first.
-- Include the `tag: jsonschema_config` field (required for the postprocessor to identify the annotation).
-
-```yaml
-Thing:
-  slot_usage:
-    actions:
-      annotations:
-        jsonschema_config:
-          tag: jsonschema_config
-          value:
-            type: object
-            additionalProperties:
-              $ref: "#/$defs/ActionAffordance"
-```
-
-Currently not actively used in schemas — documented in `AGENTS.md` as a pattern for when native features fail on dict-valued slots.
-
----
-
 ## Quick Reference
 
 | Annotation | Level | Domain | Purpose |
@@ -547,5 +460,3 @@ Currently not actively used in schemas — documented in `AGENTS.md` as a patter
 | `spec_type_values` | slot | HTML | Custom "Type" column in vocab table |
 | `jsonschema_flatten_subclasses` | class | JSON Schema | Merge subclass slots into parent |
 | `jsonschema_oneof_dispatch` | class | JSON Schema | Discriminated union from subclasses |
-| `jsonschema_form_variants` | class | JSON Schema | Operation-specific Form variants |
-| `jsonschema_config` | slot | JSON Schema | Raw JSON Schema escape hatch (last resort) |

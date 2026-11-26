@@ -252,7 +252,7 @@ def _render_list_block(
 ) -> str:
     items = _record_value(block, "items") or []
     if not isinstance(items, list):
-        logging.warning("Ignoring spec_content list block with non-list items: %r", items)
+        logging.warning("Ignoring spec_subsections list block with non-list items: %r", items)
         return ""
 
     rendered_items: list[str] = []
@@ -281,7 +281,7 @@ def _render_paragraph_block(
     segments = _record_value(block, "segments") or []
     if not isinstance(segments, list):
         logging.warning(
-            "Ignoring spec_content paragraph block with non-list segments: %r",
+            "Ignoring spec_subsections paragraph block with non-list segments: %r",
             segments,
         )
         return ""
@@ -336,7 +336,7 @@ def _render_content_blocks(
         elif block_type == "enum_table":
             rendered = _render_enum_table(block, process_description, schema_view)
         else:
-            logging.warning("Ignoring unsupported spec_content block type: %s", block_type)
+            logging.warning("Ignoring unsupported spec_subsections block type: %s", block_type)
             rendered = ""
 
         if rendered:
