@@ -59,6 +59,16 @@ def test_invalid_snippet_exits_5(tmp_path, caplog):
     assert "action-serialization.json" in caplog.text
 
 
+def test_prose_file_of_unknown_class_exits_5(tmp_path, caplog):
+    prose = tmp_path / "sections"
+    shutil.copytree(REPO / "resources" / "spec" / "sections", prose)
+    (prose / "NoSuchClass.html").write_text("<p>Orphan.</p>\n", encoding="utf-8")
+    config = _config(tmp_path, "spec", prose=str(prose))
+    result = CliRunner().invoke(main, ["generate-wot-resources", "-c", str(config)])
+    assert result.exit_code == 5
+    assert "NoSuchClass.html" in caplog.text
+
+
 def test_unwritable_assertions_csv_exits_5(tmp_path):
     blocker = tmp_path / "blocker"
     blocker.write_text("", encoding="utf-8")

@@ -149,7 +149,7 @@ Check the auto-generated sections for:
 - **Type column accuracy** — the type shown for each slot must match the LinkML range: if range is a class, the type should name that class; if range is a scalar, the JSON Schema primitive must be correct. `spec_type_values` overrides must be verified for exhaustiveness when `mode: one_of`.
 - **Optional/mandatory** — a slot marked `required` in LinkML must appear as REQUIRED in the table. A slot not in `required` must appear as OPTIONAL. Mismatches are blocking errors.
 
-When reviewing HTML changes, do not evaluate the entire document — scope the check to the `%`-replaced sections and any `spec_content` / `spec_intro_content` blocks that changed.
+When reviewing HTML changes, do not evaluate the entire document — scope the check to the `%`-replaced sections and any section prose files under `resources/spec/sections/` that changed.
 
 ### CI Pipeline (GitHub Actions)
 

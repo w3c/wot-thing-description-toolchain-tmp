@@ -234,35 +234,6 @@ classes:
       jsonschema_flatten_subclasses: true
       spec_description: >-
         Metadata that describes the data format used. It can be used for validation.
-      spec_content:
-        value:
-          - type: markdown
-            text: |
-              The class DataSchema has the following subclasses:
-
-              - ArraySchema
-              - BooleanSchema
-              - NumberSchema
-              - IntegerSchema
-              - ObjectSchema
-              - StringSchema
-              - NullSchema
-          - type: paragraph
-            segments:
-              - text: |
-                  The format string values are known from a fixed set of values and their corresponding format rules defined in [[JSON-SCHEMA]] (Section 7.3 Defined Formats in particular).
-              - id: td-format-validation-known-values
-                text: |
-                  Servients *MAY* use the `format` value to perform additional validation accordingly.
-              - id: td-format-validation-other-values
-                text: |
-                  When a value that is not found in the known set of values is assigned to `format`, such a validation *SHOULD* succeed.
-          - type: markdown
-            text: |
-              Vocabulary terms typed as any `type` (e.g., `const`, `default`) follow data types compatible with JSON Schema (boolean, integer, number, string, object, array, or null).
-          - type: note
-            text: |
-              The format term is not widely implemented by JSON Schema tools. In addition, the term `format` is being discussed by the JSON Schema standardisation community and may be replaced by another mechanism or removed in a future JSON Schema version.
     extra_slots:
       allowed: true
     attributes:
@@ -439,11 +410,6 @@ classes:
     annotations:
       spec_description: >-
         Metadata describing data of type `string`. This Subclass is indicated by the value `string` assigned to `type` in `DataSchema` instances.
-      spec_content:
-        value:
-          - type: note
-            text: |
-              The length of a string (i.e., `minLength` and `maxLength`) is defined as the number of Unicode code points, as defined by [[RFC8259]]. Note that some [user-perceived characters](https://www.w3.org/TR/i18n-glossary/#dfn-grapheme) are composed of more than one Unicode code point. Arbitrary index values might not fall on these grapheme boundaries, so truncation according to `maxLength` might alter the appearance or meaning of the string.
     extra_slots:
       allowed: true
     attributes:

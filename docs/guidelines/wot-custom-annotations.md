@@ -125,9 +125,26 @@ name:
 
 ---
 
-### `spec_content`
+### Section prose files (not an annotation)
 
-**What it does:** adds structured content blocks **after** a class's vocabulary table in the HTML specification. Supports notes, paragraphs with testable assertions, ordered/unordered lists, enum tables, and raw markdown.
+The prose of a class section is not kept in the schema. It lives in one file per class in the directory named by `generators.spec.prose` in `wot-toolchain.yaml` (`resources/spec/sections/`):
+
+- `<Class>.html` is placed **after** the vocabulary table of the class.
+- `<Class>.intro.html` is placed **before** the table, in place of the class description.
+
+A file holds the HTML fragment handed to Bikeshed: plain HTML plus the usual shorthands (`` `code` ``, `*MUST*`, `[[RFC8259]]`, Markdown links). Assertions are written as `<span class="rfc2119-assertion" id="...">`. **Never change or delete an existing `id`** — external W3C implementations reference them.
+
+The rows of a table that lists an enum come from the schema through an include marker inside `<tbody>`, for example `%enum_rows('OperationType', 'name', 'description')%`. A column is `name`, `description` or `comment:<prefix>` (the text of the enum value comment that starts with `<prefix>:`).
+
+Generation fails (exit 5) for a file whose class has no section in the specification, a file that cannot be read, and an unknown or invalid include marker.
+
+---
+
+### Content blocks (`spec_subsections`)
+
+The `spec_content` and `spec_intro_content` annotations no longer exist; the block format below is read only by `spec_subsections`.
+
+**What it does:** describes structured content blocks rendered into the HTML specification. Supports notes, paragraphs with testable assertions, ordered/unordered lists, enum tables, and raw markdown.
 
 **What you need to do:**
 
@@ -248,7 +265,7 @@ These are **document-level references** to external specifications. They appear 
 
 #### Glossary — cross-reference term linking
 
-The glossary (`resources/xref/glossary.yaml`) handles **term-level cross-referencing** — linking occurrences of vocabulary terms in spec text to their definitions. Any occurrence of a known term in `spec_description`, `spec_content`, or `spec_intro_content` text becomes a clickable `<a>` link.
+The glossary (`resources/xref/glossary.yaml`) handles **term-level cross-referencing** — linking occurrences of vocabulary terms in spec text to their definitions. Any occurrence of a known term in `spec_description` text or in a section prose file becomes a clickable `<a>` link.
 
 The toolchain generates a Bikeshed `<pre class=anchors>` block from the glossary, which Bikeshed/ReSpec uses to resolve term references during spec processing.
 
@@ -303,22 +320,9 @@ Thing:
 
 ---
 
-### `spec_intro_content`
-
-**What it does:** same structure as `spec_content`, but rendered **before** the vocabulary table as introductory prose.
-
-**What you need to do:**
-
-- Use the same block type format as `spec_content`.
-- Choose placement by asking: is this introductory context or a consequence of the vocabulary? Before the table = `spec_intro_content`, after = `spec_content`.
-
-Currently used on: `SecurityScheme`, `ComboSecurityScheme`, `BearerSecurityScheme`.
-
----
-
 ### `spec_subsections`
 
-**What it does:** creates sub-headings with their own content blocks after a class's main `spec_content`. Each subsection gets its own HTML `<section>` with a heading.
+**What it does:** creates sub-headings with their own content blocks after the section prose of a class. Each subsection gets its own HTML `<section>` with a heading.
 
 **What you need to do:**
 
@@ -539,8 +543,6 @@ Currently not actively used in schemas — documented in `AGENTS.md` as a patter
 | `spec_description` | slot | HTML | Spec text with markup (`[[RFC]]`, backticks) |
 | `spec_default` | slot | HTML | Normative default value for vocab table |
 | `spec_exclude` | slot | HTML | Hide structural slot from vocab table |
-| `spec_content` | class | HTML | Rich content blocks after vocab table |
-| `spec_intro_content` | class | HTML | Rich content blocks before vocab table |
 | `spec_subsections` | class | HTML | Sub-headings after class content |
 | `spec_type_values` | slot | HTML | Custom "Type" column in vocab table |
 | `jsonschema_flatten_subclasses` | class | JSON Schema | Merge subclass slots into parent |

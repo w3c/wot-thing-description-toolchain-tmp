@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
 from wot_toolchain.generators.respec import (
-    render_spec_content_annotation,
+    _render_content_blocks,
     render_subsections,
 )
 
@@ -48,7 +48,7 @@ def test_spec_content_renders_assertion_list_items() -> None:
         }
     }
 
-    html = render_spec_content_annotation(annotations, _process_description)
+    html = _render_content_blocks(annotations["spec_content"]["value"], _process_description)
 
     assert '<ul id=' not in html
     assert '<span class="rfc2119-assertion" id="td-context-ns-thing-mandatory">' in html
@@ -75,7 +75,7 @@ def test_spec_content_renders_assertion_inside_paragraph() -> None:
         }
     }
 
-    html = render_spec_content_annotation(annotations, _process_description)
+    html = _render_content_blocks(annotations["spec_content"]["value"], _process_description)
 
     assert html.startswith("<p>Before. ")
     assert '<p id=' not in html
@@ -96,7 +96,7 @@ def test_spec_content_renders_note_block_directly() -> None:
         }
     }
 
-    html = render_spec_content_annotation(annotations, _process_description)
+    html = _render_content_blocks(annotations["spec_content"]["value"], _process_description)
 
     assert html == '<div class="note">\n<p><a>Thing Description</a> note.</p>\n</div>'
     assert ":::NOTE" not in html
@@ -115,7 +115,7 @@ def test_note_block_with_title() -> None:
         }
     }
 
-    html = render_spec_content_annotation(annotations, _process_description)
+    html = _render_content_blocks(annotations["spec_content"]["value"], _process_description)
 
     assert '<p class="note" title="Important caveat">' in html
     assert "Some note text." in html
@@ -147,8 +147,7 @@ def test_enum_table_renders_columns() -> None:
         }
     }
 
-    html = render_spec_content_annotation(
-        annotations, _process_description, schema_view=sv
+    html = _render_content_blocks(annotations["spec_content"]["value"], _process_description, schema_view=sv
     )
 
     assert '<div id="test-table">' in html
@@ -197,8 +196,7 @@ def test_enum_table_extracts_comment_columns() -> None:
         }
     }
 
-    html = render_spec_content_annotation(
-        annotations, _process_description, schema_view=sv
+    html = _render_content_blocks(annotations["spec_content"]["value"], _process_description, schema_view=sv
     )
 
     assert "<td>readproperty</td>" in html

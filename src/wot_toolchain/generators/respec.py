@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import partial
 from html import escape
 import logging
 import re
@@ -13,6 +14,7 @@ from typing import Callable, Dict, List, Optional
 from ..config import SpecConfig
 from ..errors import GenerationError, SchemaError
 from ..specgen.bikeshed_processor import process_fragments
+from ..specgen.prose import SectionProse
 from ..specgen.respec import build_jinja_env, assemble
 from ..specgen.tables import collect_slot_rows
 from ..specgen.assertions import html_assertions_to_csv
@@ -123,6 +125,27 @@ def _extract_enum_cell(
     return "<td></td>"
 
 
+def _enum_row(pv, fields: list[str], process_description: Callable[[str], str]) -> list[str]:
+    return ["<tr>", *(_extract_enum_cell(pv, field, process_description) for field in fields), "</tr>"]
+
+
+def _enum_rows(
+    schema_view: SchemaView,
+    process_description: Callable[[str], str],
+    enum_name: str,
+    *fields: str,
+) -> str:
+    """Return one table row per permissible value of an enum, with one cell per field."""
+    enum_def = schema_view.get_enum(enum_name)
+    if not enum_def:
+        raise ValueError(f"enum {enum_name!r} is not in the schema")
+    unknown = [field for field in fields if field not in ("name", "description") and not field.startswith("comment:")]
+    if unknown or not fields:
+        raise ValueError(f"columns are 'name', 'description' or 'comment:<prefix>', at least one; got {list(fields)}")
+    rows = (_enum_row(pv, list(fields), process_description) for pv in enum_def.permissible_values.values())
+    return "\n".join(line for row in rows for line in row)
+
+
 def _render_enum_table(
     block: dict,
     process_description: Callable[[str], str],
@@ -173,13 +196,10 @@ def _render_enum_table(
 
     require_comments = _record_value(block, "require_comments")
     pvs = enum_def.permissible_values or {}
-    for pv_key, pv in pvs.items():
+    for pv in pvs.values():
         if require_comments and not (getattr(pv, "comments", None) or []):
             continue
-        lines.append("<tr>")
-        for field in fields:
-            lines.append(_extract_enum_cell(pv, field, process_description))
-        lines.append("</tr>")
+        lines.extend(_enum_row(pv, fields, process_description))
 
     lines.append("</tbody>")
     lines.append("</table>")
@@ -288,19 +308,6 @@ def _render_paragraph_block(
     if not content:
         return ""
     return f"<p>{content}</p>"
-
-
-def render_spec_content_annotation(
-    annotations: dict,
-    process_description: Callable[[str], str],
-    annotation_key: str = "spec_content",
-    schema_view: Optional["SchemaView"] = None,
-) -> str:
-    blocks = _as_block_list(_annotation_value(annotations, annotation_key))
-    if not blocks:
-        return ""
-
-    return _render_content_blocks(blocks, process_description, schema_view)
 
 
 def _render_content_blocks(
@@ -449,7 +456,7 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
 
     Args:
         input_path: Path to the root LinkML YAML schema file.
-        spec: Template, output, sections, snippets and assertion paths of the specification.
+        spec: Template, output, sections, prose, snippets and assertion paths of the specification.
         schema_prefixes: Module prefix per schema path, used for the section anchors.
     """
     try:
@@ -465,6 +472,8 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
         text = str(raw_text or "")
         text = re.sub(r"`([^`]+)`", r"<code>\1</code>", text)
         return text
+
+    prose = SectionProse(spec.prose, process_description, {"enum_rows": partial(_enum_rows, sv, process_description)})
 
     file_to_classes: Dict[str, List[str]] = {}
     for section_path in spec.sections.values():
@@ -523,15 +532,9 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
                 range_labels=spec.range_labels,
                 default_values_anchor=spec.default_values_anchor,
             )
-            intro_html = ""
+            intro_html = prose.intro(cls)
             desc_html = ""
-            if "spec_intro_content" in ann:
-                intro_html = render_spec_content_annotation(
-                    ann,
-                    process_description,
-                    annotation_key="spec_intro_content",
-                )
-            else:
+            if not intro_html:
                 raw_desc = getattr(cdef, "description", "") or ""
                 if "spec_description" in ann:
                     spec_def = (
@@ -540,13 +543,7 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
                     )
                     raw_desc = str(spec_def) or raw_desc
                 desc_html = process_description(raw_desc)
-            spec_content_html = ""
-            if "spec_content" in ann:
-                spec_content_html = render_spec_content_annotation(
-                    ann,
-                    process_description,
-                    schema_view=sv,
-                )
+            spec_content_html = prose.content(cls)
             assertion_html = render_explicit_assertion_annotation(
                 ann,
                 process_description,
@@ -577,6 +574,8 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
 
         section_html_fragment = "\n\n".join(sections_html)
         sections_content.append(section_html_fragment)
+
+    prose.require_all_read()
 
     section_ids = list(spec.sections.keys())
     sections_content = process_fragments(section_ids, sections_content, spec.glossary)

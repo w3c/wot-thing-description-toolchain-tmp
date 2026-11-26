@@ -1,0 +1,31 @@
+<div class="note">
+<p>The hreflang attribute is allowed to be a `string` or `array` in this version of the spec. Depending on the result of [[LINKSET-MEDIA-TYPES]] the values of `hrefLang` can be restricted to `array` only.</p>
+</div>
+Link relations can be used to describe relations such as to other Things (e.g., a Switch Thing controls a Lamp Thing), to a specific kind of Thing Models (e.g., a Thing Description is an instance of a specific Thing Model), or to further documentations information (e.g., device manual of a Thing). It is recommended to reuse existing and established Link Relation definitions from IANA.
+
+The link relation types follow Web Linking [[RFC8288]], meaning:
+
+<ul>
+<li><span class="rfc2119-assertion" id="td-rel-type-case-insensitive">Relation types *MUST* be compared as strings using case-insensitive comparison.
+</span></li>
+<li><span class="rfc2119-assertion" id="td-rel-type-lowercase">All-lowercase URIs *SHOULD* be used for extension relation types.
+</span></li>
+</ul>
+In the following a best practice relation type table is introduced that is recommended to use within WoT Thing Description or Thing Model instances.
+
+<div id="table-rel-type">
+<table class="def numbered">
+<caption>Best practice relation type table</caption>
+<thead>
+<tr>
+<th>Value</th>
+<th>Occurrence</th>
+<th>Explanation</th>
+<th>Source of value origin</th>
+</tr>
+</thead>
+<tbody>
+%enum_rows('LinkRelationType', 'name', 'comment:Occurrence', 'description', 'comment:Source')%
+</tbody>
+</table>
+</div>

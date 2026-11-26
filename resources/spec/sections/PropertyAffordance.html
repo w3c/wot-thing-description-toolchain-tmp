@@ -1,0 +1,11 @@
+<div class="note">
+<p>Property instances are also instances of the class DataSchema. Therefore, it can contain the `type`, `unit`, `readOnly` and `writeOnly` members, among others.</p>
+</div>
+<p>`PropertyAffordance` is a Subclass of the `InteractionAffordance` Class and the DataSchema Class. <span class="rfc2119-assertion" id="td-op-for-property">When a Form instance is within a `PropertyAffordance` instance, the value assigned to `op` MUST be one of `readproperty`, `writeproperty`, `observeproperty`, `unobserveproperty` or an Array containing a combination of these terms.
+</span></p>
+<div class="note">
+<p>It is considered to be good practice that each `observeproperty` has a corresponding `unobserveproperty` unless the protocol supports implicit unsubscription mechanisms (e.g., heartbeat to detect connection loss).</p>
+</div>
+<div class="note">
+<p>The observation mechanism depends on the underlying protocol or sub-protocol. Having said that, it is not guaranteed that the current Property value will be provided once the subscription is initiated. Hence, it may be necessary to read the current Property value before/after the subscription to get a first value.</p>
+</div>
