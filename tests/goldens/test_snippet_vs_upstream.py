@@ -3,15 +3,16 @@ from __future__ import annotations
 
 import json
 import re
+from collections import Counter
 from collections.abc import Callable
 from pathlib import Path
+from typing import NamedTuple
 
-import lxml.html
 import pytest
 import yaml
 from lxml.html import HtmlElement
 
-from .spec_html_compare import normalize_text, parse_html
+from .spec_html_compare import EXAMPLE_SELECTOR, normalize_text, parse_html
 
 TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent.parent
@@ -105,10 +106,6 @@ def test_illustrative_jsonc_normalization_preserves_string_literals() -> None:
     }
 
 
-def _canonical_json(obj: object) -> str:
-    return json.dumps(obj, sort_keys=True, indent=2)
-
-
 def _path_value(document: object, path: str) -> object:
     value = document
     for segment in path.split("."):
@@ -140,210 +137,151 @@ def _difference_paths(upstream: object, generated: object, path: str = "") -> li
     return []
 
 
-def _extract_pre_text(element: HtmlElement) -> str:
-    pres = element.cssselect("pre")
-    if pres:
-        return pres[0].text_content()
-    return element.text_content()
+class Snippet(NamedTuple):
+    """One `pre` of a spec example, addressed by its place in the document."""
+
+    section_id: str
+    position: int
+    pre: int
+    pre_count: int
+    example_id: str | None
+    title: str | None
+    text: str
+
+    @property
+    def place(self) -> tuple[str, int, int]:
+        return self.section_id, self.position, self.pre
+
+    @property
+    def locator(self) -> dict[str, object]:
+        """Return the `upstream_locator` an approved divergence uses for this snippet."""
+        example = (
+            {"example_id": self.example_id}
+            if self.example_id
+            else {"section_id": self.section_id, "position": self.position}
+        )
+        return {"kind": "example"} | example | ({"pre": self.pre} if self.pre_count > 1 else {})
+
+    def __str__(self) -> str:
+        name = self.example_id or f"{self.section_id}#{self.position}"
+        return f"{name}/pre{self.pre}" if self.pre_count > 1 else name
 
 
-def _examples_by_id(tree: HtmlElement) -> dict[str, HtmlElement]:
-    result: dict[str, HtmlElement] = {}
-    for el in tree.cssselect('aside.example[id], pre.example[id]'):
-        eid = el.get("id")
-        if eid:
-            result[eid] = el
-    return result
+def _snippets(tree: HtmlElement) -> list[Snippet]:
+    """Return every `pre` of every example, numbered within its section and its example."""
+    examples_per_section: Counter[str] = Counter()
+    snippets: list[Snippet] = []
+    for example in tree.cssselect(EXAMPLE_SELECTOR):
+        section_id = example.xpath("ancestor::section[@id][1]/@id")[0]
+        examples_per_section[section_id] += 1
+        pres = example.cssselect("pre")
+        snippets.extend(
+            Snippet(
+                section_id,
+                examples_per_section[section_id],
+                index,
+                len(pres),
+                example.get("id"),
+                example.get("title"),
+                pre.text_content(),
+            )
+            for index, pre in enumerate(pres, start=1)
+        )
+    return snippets
 
 
-def _tabbed_groups_by_title(tree: HtmlElement) -> dict[str, HtmlElement]:
-    result: dict[str, HtmlElement] = {}
-    for aside in tree.cssselect("aside.example.ds-selector-tabs"):
-        spans = aside.cssselect("span.example-title")
-        if spans:
-            title = normalize_text(spans[0].text_content())
-            result[title] = aside
-    return result
+def _comparable(text: str) -> object:
+    """Return the parsed JSONC of a snippet, or its normalized text when it is not JSON."""
+    parsed = _try_parse_json(text)
+    return normalize_text(text) if parsed is None else parsed
 
 
-def _tab_contents(group: HtmlElement) -> list[str]:
-    return [pre.text_content().strip() for pre in group.cssselect("pre")]
+def _show(value: object) -> str:
+    return value if isinstance(value, str) else json.dumps(value, sort_keys=True, indent=2)
+
+
+UPSTREAM_TREE = parse_html(UPSTREAM_PATH)
+UPSTREAM_SNIPPETS = _snippets(UPSTREAM_TREE)
+UPSTREAM_EXAMPLES = [snippet for snippet in UPSTREAM_SNIPPETS if snippet.pre == 1]
 
 
 @pytest.fixture(scope="module")
-def upstream_tree():
-    if not UPSTREAM_PATH.exists():
-        pytest.fail(f"Upstream HTML not found at {UPSTREAM_PATH}")
-    return parse_html(UPSTREAM_PATH)
-
-
-@pytest.fixture(scope="module")
-def generated_tree():
+def generated_tree() -> HtmlElement:
     if not GENERATED_PATH.exists():
         pytest.fail(f"Generated HTML not found at {GENERATED_PATH}; run `wot-toolchain generate-wot-resources` first.")
     return parse_html(GENERATED_PATH)
 
 
 @pytest.fixture(scope="module")
-def approved_snippet_divergences() -> dict[str, dict]:
+def generated_snippets(generated_tree: HtmlElement) -> dict[tuple[str, int, int], Snippet]:
+    return {snippet.place: snippet for snippet in _snippets(generated_tree)}
+
+
+@pytest.fixture(scope="module")
+def snippet_divergences() -> list[dict]:
     with APPROVED_DIVERGENCES_PATH.open(encoding="utf-8") as divergence_file:
-        divergences = yaml.safe_load(divergence_file)["divergences"]
-    return {entry["upstream_locator"]["example_id"]: entry for entry in divergences}
+        return yaml.safe_load(divergence_file)["divergences"]
 
 
-def _compare_example_json(example_id: str, upstream_el: HtmlElement, generated_el: HtmlElement) -> list[str]:
-    upstream_text = _extract_pre_text(upstream_el)
-    generated_text = _extract_pre_text(generated_el)
+@pytest.mark.parametrize("upstream", UPSTREAM_SNIPPETS, ids=str)
+def test_example_matches_upstream(
+    upstream: Snippet,
+    generated_snippets: dict[tuple[str, int, int], Snippet],
+    snippet_divergences: list[dict],
+) -> None:
+    """Every upstream example `pre` equals the generated one at the same place, or is a recorded divergence."""
+    generated = generated_snippets.get(upstream.place)
+    assert generated is not None, f"[{upstream}] no generated example at {upstream.place}"
+    assert generated.pre_count == upstream.pre_count, f"[{upstream}] number of `pre` blocks differs"
+    if upstream.example_id:
+        assert generated.example_id == upstream.example_id, f"[{upstream}] generated example has another id"
 
-    upstream_json = _try_parse_json(upstream_text)
-    generated_json = _try_parse_json(generated_text)
-
-    diffs: list[str] = []
-
-    if upstream_json is None and generated_json is None:
-        up_norm = normalize_text(upstream_text)
-        gen_norm = normalize_text(generated_text)
-        if up_norm != gen_norm:
-            diffs.append(
-                f"[{example_id}] text content differs (non-JSON)\n"
-                f"--- UPSTREAM ---\n{upstream_text.strip()}\n"
-                f"--- GENERATED ---\n{generated_text.strip()}"
-            )
-        return diffs
-
-    if upstream_json is None:
-        diffs.append(
-            f"[{example_id}] upstream not valid JSON, generated is\n"
-            f"--- UPSTREAM ---\n{upstream_text.strip()}\n"
-            f"--- GENERATED ---\n{generated_text.strip()}"
-        )
-        return diffs
-    if generated_json is None:
-        diffs.append(
-            f"[{example_id}] generated not valid JSON, upstream is\n"
-            f"--- UPSTREAM ---\n{upstream_text.strip()}\n"
-            f"--- GENERATED ---\n{generated_text.strip()}"
-        )
-        return diffs
-
-    if _canonical_json(upstream_json) != _canonical_json(generated_json):
-        diffs.append(
-            f"[{example_id}] JSON content differs semantically\n"
-            f"--- UPSTREAM ---\n{_canonical_json(upstream_json)}\n"
-            f"--- GENERATED ---\n{_canonical_json(generated_json)}"
-        )
-    return diffs
-
-
-@pytest.mark.parametrize("example_id", [
-    "simple-thing-description-sample",
-    "thing-description-full-serialization",
-    "td-model-example-lamp",
-    "thing-serialization-sample",
-    "security-basic-example",
-    "multiple-security-definitions1",
-    "multiple-security-definitions2a",
-    "multiple-security-definitions2b",
-    "example-oauth2-scopes",
-    "property-serialization-sample",
-    "action-serialization-sample",
-    "event-serialization-sample",
-    "link-serialization-sample",
-    "form-serialization-sample",
-    "td-forms-readall-example",
-    "td-forms-urivariables-thing-example",
-    "dataschema-serialization-sample",
-    "saref-state-annotation-example",
-    "saref-geolocation-annotation-example",
-    "saref-geolocation-annotation-example-2",
-    "saref-geolocation-annotation-example-3",
-    "example-payload-binding",
-    "td-model-example-basic-on-off",
-    "td-model-example-smart-lamp-control",
-    "td-model-example-tmRef",
-])
-def test_example_json_matches_upstream(
-    upstream_tree, generated_tree, approved_snippet_divergences, example_id
-):
-    upstream_examples = _examples_by_id(upstream_tree)
-    generated_examples = _examples_by_id(generated_tree)
-
-    if example_id not in upstream_examples:
-        pytest.fail(f"[{example_id}] not found in upstream")
-    if example_id not in generated_examples:
-        pytest.fail(f"[{example_id}] not found in generated output")
-
-    upstream_el = upstream_examples[example_id]
-    generated_el = generated_examples[example_id]
-    diffs = _compare_example_json(example_id, upstream_el, generated_el)
-    entry = approved_snippet_divergences.get(example_id)
-    if not diffs:
-        assert entry is None, f"approved snippet divergence '{example_id}' is stale"
+    upstream_value, generated_value = _comparable(upstream.text), _comparable(generated.text)
+    entry = next((e for e in snippet_divergences if e["upstream_locator"] == upstream.locator), None)
+    if upstream_value == generated_value:
+        assert entry is None, f"snippet divergence '{entry and entry['id']}' is stale"
         return
 
-    assert entry is not None, "\n".join(diffs)
-    upstream_json = _try_parse_json(_extract_pre_text(upstream_el))
-    generated_json = _try_parse_json(_extract_pre_text(generated_el))
-    assert upstream_json is not None, f"[{example_id}] expected upstream JSONC to parse"
-    assert generated_json is not None, f"[{example_id}] expected generated JSONC to parse"
-    assert _difference_paths(upstream_json, generated_json) == entry["expected_difference_paths"], (
-        f"approved snippet divergence '{example_id}' no longer has the expected semantic differences"
+    assert entry is not None, (
+        f"[{upstream}] differs from upstream; locator {upstream.locator}\n"
+        f"--- UPSTREAM ---\n{_show(upstream_value)}\n"
+        f"--- GENERATED ---\n{_show(generated_value)}"
+    )
+    assert _difference_paths(upstream_value, generated_value) == entry["expected_difference_paths"], (
+        f"snippet divergence '{entry['id']}' no longer has the expected semantic differences"
     )
     for path, expected in entry["expected_generated"]["json_paths"].items():
-        actual = _path_value(generated_json, path)
+        actual = _path_value(generated_value, path)
         assert actual == expected, (
-            f"approved snippet divergence '{example_id}' no longer has the expected generated value "
+            f"snippet divergence '{entry['id']}' no longer has the expected generated value "
             f"at '{path}': expected {expected!r}, got {actual!r}"
         )
 
 
-TABBED_GROUP_TITLES = [
-    "Top level/parent Smart Ventilator Thing Model",
-    "Thing Descriptions of the Smart Ventilator",
-    "Thing Description generation from Thing Model",
-    "Linking Thing Description to a Thing Model Definition",
-    "Temperature Sensor with a Temperature Event with subscription and cancellation",
-]
+@pytest.mark.parametrize("upstream", UPSTREAM_EXAMPLES, ids=lambda example: f"{example.section_id}#{example.position}")
+def test_example_title_matches_upstream(
+    upstream: Snippet, generated_snippets: dict[tuple[str, int, int], Snippet]
+) -> None:
+    """Every upstream example has the same title as the generated one at the same place."""
+    generated = generated_snippets.get(upstream.place)
+    assert generated is not None, f"[{upstream}] no generated example at {upstream.place}"
+    upstream_title, generated_title = normalize_text(upstream.title), normalize_text(generated.title)
+    assert upstream_title == generated_title, (
+        f"[{upstream}] title differs from upstream\n"
+        f"    upstream:  {upstream_title!r}\n"
+        f"    generated: {generated_title!r}"
+    )
 
 
-@pytest.mark.parametrize("group_title", TABBED_GROUP_TITLES)
-def test_tabbed_group_matches_upstream(upstream_tree, generated_tree, group_title):
-    upstream_groups = _tabbed_groups_by_title(upstream_tree)
-    generated_groups = _tabbed_groups_by_title(generated_tree)
-
-    if group_title not in upstream_groups:
-        pytest.fail(f"[{group_title}] tabbed group not found in upstream")
-    if group_title not in generated_groups:
-        pytest.fail(f"[{group_title}] tabbed group not found in generated output")
-
-    upstream_tabs = _tab_contents(upstream_groups[group_title])
-    generated_tabs = _tab_contents(generated_groups[group_title])
-
-    if len(upstream_tabs) != len(generated_tabs):
-        pytest.fail(
-            f"[{group_title}] tab count differs: upstream={len(upstream_tabs)}, generated={len(generated_tabs)}"
-        )
-
-    for i, (up_text, gen_text) in enumerate(zip(upstream_tabs, generated_tabs)):
-        up_json = _try_parse_json(up_text)
-        gen_json = _try_parse_json(gen_text)
-        if up_json is not None and gen_json is not None:
-            assert _canonical_json(up_json) == _canonical_json(gen_json), (
-                f"[{group_title}] tab {i} JSON content differs\n"
-                f"--- UPSTREAM ---\n{_canonical_json(up_json)}\n"
-                f"--- GENERATED ---\n{_canonical_json(gen_json)}"
-            )
-        else:
-            assert normalize_text(up_text) == normalize_text(gen_text), (
-                f"[{group_title}] tab {i} text content differs\n"
-                f"--- UPSTREAM ---\n{up_text.strip()}\n"
-                f"--- GENERATED ---\n{gen_text.strip()}"
-            )
+def test_every_snippet_divergence_locates_an_upstream_example(snippet_divergences: list[dict]) -> None:
+    locators = [snippet.locator for snippet in UPSTREAM_SNIPPETS]
+    unlocated = [entry["id"] for entry in snippet_divergences if entry["upstream_locator"] not in locators]
+    assert not unlocated, f"snippet divergences that match no upstream example: {unlocated}"
 
 
-def test_example_count_parity(upstream_tree, generated_tree):
-    upstream_count = len(upstream_tree.cssselect("aside.example, pre.example"))
-    generated_count = len(generated_tree.cssselect("aside.example, pre.example"))
+def test_example_count_parity(generated_tree: HtmlElement) -> None:
+    upstream_count = len(UPSTREAM_TREE.cssselect(EXAMPLE_SELECTOR))
+    generated_count = len(generated_tree.cssselect(EXAMPLE_SELECTOR))
     assert upstream_count == generated_count, (
         f"Example count differs: upstream={upstream_count}, generated={generated_count}"
     )

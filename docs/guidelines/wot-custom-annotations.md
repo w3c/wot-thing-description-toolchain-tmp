@@ -125,120 +125,26 @@ name:
 
 ---
 
-### `spec_content`
+### Section prose files (not an annotation)
 
-**What it does:** adds structured content blocks **after** a class's vocabulary table in the HTML specification. Supports notes, paragraphs with testable assertions, ordered/unordered lists, enum tables, and raw markdown.
+The prose of a class section is not kept in the schema. It lives in one file per class in the directory named by `generators.spec.prose` in `wot-toolchain.yaml` (`resources/spec/sections/`):
 
-**What you need to do:**
+- `<Class>.html` is placed **after** the vocabulary table of the class.
+- `<Class>.intro.html` is placed **before** the table, in place of the class description.
 
-- Add a `value` list where each item has a `type` field determining the content block kind.
-- For testable assertions, give segments an `id` field — this becomes an `rfc2119-assertion` anchor in the HTML. **Never change or delete an existing `id`** — external W3C implementations reference them.
+A file holds the HTML fragment handed to Bikeshed: plain HTML plus the usual shorthands (`` `code` ``, `[[RFC8259]]`, Markdown links). RFC 2119 keywords are written as bare words (`MUST`); ReSpec marks them up. Assertions are written as `<span class="rfc2119-assertion" id="...">`. **Never change or delete an existing `id`** — external W3C implementations reference them.
 
-Available block types:
+The rows of a table that lists an enum come from the schema through an include marker inside `<tbody>`, for example `%enum_rows('OperationType', 'name', 'description')%`. A column is `name`, `description` or `comment:<prefix>` (the text of the enum value comment that starts with `<prefix>:`).
 
-| Type | Purpose | Key fields |
-|------|---------|------------|
-| `note` | Informative note box | `text`, optional `title` |
-| `paragraph` | Prose with optional assertion segments | `segments[].id`, `segments[].text` |
-| `list` | Ordered/unordered list of assertions | `items[].id`, `items[].text` |
-| `enum_table` | Table of enumeration values | `enum`, `columns` |
-| `markdown` | Raw markdown (no assertions) | `text` |
-
-#### `markdown`
-
-Plain prose. Processed for cross-references, RFC keywords, and term links, then wrapped in `<p>`. Use when no assertion IDs are needed.
-
-```yaml
-- type: markdown
-  text: |
-    A Thing Description *MUST* include a valid context.
-    See [[JSON-LD11]] for details.
-```
-
-Renders as: `<p>A Thing Description <em>MUST</em> include a valid context. See [[JSON-LD11]] for details.</p>`
-
-#### `paragraph`
-
-A structured paragraph composed of **segments**. All segments concatenate into a single `<p>`. Any segment with an `id` becomes an assertion `<span>`.
-
-Use `paragraph` instead of `markdown` only when you need to attach an `id` to a specific segment. Both process text identically.
-
-```yaml
-- type: paragraph
-  segments:
-    - text: Introductory sentence.
-    - id: td-my-assertion
-      text: TD Processors *MUST* do something specific.
-    - text: Closing sentence.
-```
-
-Renders as: `<p>Introductory sentence. <span class="rfc2119-assertion" id="td-my-assertion">TD Processors <em>MUST</em> do something specific.</span> Closing sentence.</p>`
-
-#### `list`
-
-Unordered list. Each item can optionally carry an assertion ID.
-
-```yaml
-- type: list
-  items:
-    - text: Plain list item.
-    - id: td-some-assertion
-      text: A Thing Description *MUST* satisfy this requirement.
-```
-
-#### `note`
-
-A ReSpec note block. The HTML structure differs based on whether `title` is present:
-
-- **Untitled** → `<div class="note"><p>text</p></div>` — ReSpec needs the block-level `<div>`.
-- **Titled** → `<p class="note" title="...">text</p>` — ReSpec reads the `title` attribute directly.
-
-```yaml
-# Untitled
-- type: note
-  text: This is an informative note.
-
-# Titled
-- type: note
-  title: Important caveat
-  text: This note has a title displayed by ReSpec.
-```
-
-#### `enum_table`
-
-Renders a LinkML enum as an HTML table. The toolchain reads the enum definition and generates rows automatically.
-
-```yaml
-- type: enum_table
-  enum: OperationType
-  caption: Well-known types
-  table_id: table-op-types
-  columns:
-    - field: name
-      header: Operation
-    - field: description
-      header: Description
-```
-
-Column `field` values:
-
-| Field | Source |
-|-------|--------|
-| `name` | The permissible value key (e.g., `readproperty`) |
-| `description` | The `description` field of the permissible value |
-| `comment:<prefix>` | Extracts from the value's `comments` list — finds the first comment starting with `<prefix>`, strips the prefix and ` - ` separator, returns the remainder |
-
-**Comment extraction example** — given an enum value with `comments: ["Thing to Consumer - All fields without writeOnly", "Consumer to Thing - No correlation"]`, using `field: "comment:Consumer to Thing"` produces `No correlation`.
+Generation fails (exit 5) for a file whose class has no section in the specification, a file that cannot be read, and an unknown or invalid include marker.
 
 #### Text processing
 
-All text fields go through the same pipeline regardless of block type:
+Text in section prose files follows these conventions:
 
-- `*MUST*`, `*SHOULD*`, `*MAY*`, etc. → `<em>MUST</em>` (RFC 2119 keywords)
+- RFC 2119 keywords (`MUST`, `SHOULD`, `MAY`, etc.) are written as bare words; ReSpec marks them up. Do not write `*MUST*`: it renders as nested `<em>`.
 - `[[SPEC-NAME]]` → ReSpec bibliographic reference (see below)
 - Known terms (e.g., `Thing Description`, `TD Processors`) → cross-reference links via the glossary (see below)
-
-No HTML needed in text fields — write plain text with these conventions.
 
 #### Bibliographic references (`[[SPEC-NAME]]`)
 
@@ -248,7 +154,7 @@ These are **document-level references** to external specifications. They appear 
 
 #### Glossary — cross-reference term linking
 
-The glossary (`resources/xref/glossary.yaml`) handles **term-level cross-referencing** — linking occurrences of vocabulary terms in spec text to their definitions. Any occurrence of a known term in `spec_description`, `spec_content`, or `spec_intro_content` text becomes a clickable `<a>` link.
+The glossary (`resources/xref/glossary.yaml`) handles **term-level cross-referencing** — linking occurrences of vocabulary terms in spec text to their definitions. Any occurrence of a known term in `spec_description` text or in a section prose file becomes a clickable `<a>` link.
 
 The toolchain generates a Bikeshed `<pre class=anchors>` block from the glossary, which Bikeshed/ReSpec uses to resolve term references during spec processing.
 
@@ -279,68 +185,6 @@ Both support `aliases` — alternative spellings or plural forms that link to th
 - Adding a new class or concept to the spec that other sections reference by name → add an `id` entry matching the HTML anchor.
 - Referencing an external definition (e.g., an XML Schema datatype, a term from WoT Architecture) → add an `href` entry.
 - A term appears unlinked in generated HTML → check if it's missing from the glossary or if the casing doesn't match.
-
-#### Full example
-
-```yaml
-Thing:
-  annotations:
-    spec_content:
-      value:
-        - type: note
-          text: |
-            This is an informative note about the Thing class.
-        - type: paragraph
-          segments:
-            - id: td-context-requirement
-              text: |
-                This segment becomes a testable assertion.
-        - type: list
-          items:
-            - id: td-context-rule-1
-              text: First rule about context handling.
-```
-
----
-
-### `spec_intro_content`
-
-**What it does:** same structure as `spec_content`, but rendered **before** the vocabulary table as introductory prose.
-
-**What you need to do:**
-
-- Use the same block type format as `spec_content`.
-- Choose placement by asking: is this introductory context or a consequence of the vocabulary? Before the table = `spec_intro_content`, after = `spec_content`.
-
-Currently used on: `SecurityScheme`, `ComboSecurityScheme`, `BearerSecurityScheme`.
-
----
-
-### `spec_subsections`
-
-**What it does:** creates sub-headings with their own content blocks after a class's main `spec_content`. Each subsection gets its own HTML `<section>` with a heading.
-
-**What you need to do:**
-
-- Add a `value` list where each item defines `id` (becomes the HTML anchor), `title` (the heading text), optional `class` (`informative` or `normative`), and `content` (same block types as `spec_content`).
-
-```yaml
-Form:
-  annotations:
-    spec_subsections:
-      value:
-        - id: sec-response-usage
-          title: Response-related Terms Usage
-          class: informative
-          content:
-            - type: paragraph
-              segments:
-                - id: td-expectedResponse-default-contentType
-                  text: |
-                    If not specified, the default content type...
-```
-
-Currently used on: `Form` (one subsection for response-related terms).
 
 ---
 
@@ -466,72 +310,6 @@ Currently used on: `SecurityScheme`.
 
 ---
 
-### `jsonschema_form_variants`
-
-**What it does:** splits a single class into operation-specific variant definitions. Each variant is constrained to a subset of values for the `op` slot. Creates separate `$defs` per variant (e.g., `PropertyForm`, `ActionForm`, `EventForm`) and a top-level `oneOf` referencing them.
-
-**Why it exists:** the W3C TD spec defines different allowed `op` values depending on where a `Form` appears (inside a property, action, event, or at root level). LinkML generates a single `Form` definition. ([Known LinkML Gaps, gap #10](../known-linkml-gaps.md#10-no-form-variants-per-affordance-type))
-
-**What you need to do:**
-
-- Add `jsonschema_form_variants` on the class with:
-  - `op_slot` — the slot name whose values determine variants.
-  - `variants` — a dict mapping variant names to their allowed `op` values.
-
-```yaml
-Form:
-  annotations:
-    jsonschema_form_variants:
-      value:
-        op_slot: op
-        variants:
-          property:
-            - readproperty
-            - writeproperty
-            - observeproperty
-            - unobserveproperty
-          action:
-            - invokeaction
-            - queryaction
-            - cancelaction
-          event:
-            - subscribeevent
-            - unsubscribeevent
-```
-
-Currently used on: `Form`.
-
----
-
-### `jsonschema_config`
-
-**What it does:** injects raw JSON Schema properties into a slot's generated definition. This is a last-resort escape hatch for when native LinkML features (`inlined: true`, `identifier: true`, `extra_slots`) and other annotations cannot produce the correct output shape.
-
-**Why it exists:** some dict-valued slots (e.g., `actions`, `events`) require a specific `additionalProperties: { $ref: ... }` map pattern that the generator does not emit correctly despite correct `inlined` + `identifier` settings. ([Known LinkML Gaps](../known-linkml-gaps.md))
-
-**What you need to do:**
-
-- Add `jsonschema_config` on the **slot** (typically in `slot_usage`), not on the class.
-- Must cite the corresponding entry in [Known LinkML Gaps](../known-linkml-gaps.md). If no entry exists, add one first.
-- Include the `tag: jsonschema_config` field (required for the postprocessor to identify the annotation).
-
-```yaml
-Thing:
-  slot_usage:
-    actions:
-      annotations:
-        jsonschema_config:
-          tag: jsonschema_config
-          value:
-            type: object
-            additionalProperties:
-              $ref: "#/$defs/ActionAffordance"
-```
-
-Currently not actively used in schemas — documented in `AGENTS.md` as a pattern for when native features fail on dict-valued slots.
-
----
-
 ## Quick Reference
 
 | Annotation | Level | Domain | Purpose |
@@ -539,11 +317,6 @@ Currently not actively used in schemas — documented in `AGENTS.md` as a patter
 | `spec_description` | slot | HTML | Spec text with markup (`[[RFC]]`, backticks) |
 | `spec_default` | slot | HTML | Normative default value for vocab table |
 | `spec_exclude` | slot | HTML | Hide structural slot from vocab table |
-| `spec_content` | class | HTML | Rich content blocks after vocab table |
-| `spec_intro_content` | class | HTML | Rich content blocks before vocab table |
-| `spec_subsections` | class | HTML | Sub-headings after class content |
 | `spec_type_values` | slot | HTML | Custom "Type" column in vocab table |
 | `jsonschema_flatten_subclasses` | class | JSON Schema | Merge subclass slots into parent |
 | `jsonschema_oneof_dispatch` | class | JSON Schema | Discriminated union from subclasses |
-| `jsonschema_form_variants` | class | JSON Schema | Operation-specific Form variants |
-| `jsonschema_config` | slot | JSON Schema | Raw JSON Schema escape hatch (last resort) |

@@ -1,0 +1,9 @@
+<p>The optional `response` name-value pair can be used to provide metadata for the expected response message. With the core vocabulary, it can include only content type information, but TD Context Extensions could be applied. <span class="rfc2119-assertion" id="td-expectedResponse-default-contentType">If no `response` name-value pair is provided, it MUST be assumed that the content type of the response is equal to the content type assigned to the Form instance.
+</span> Note that `contentType` within an `ExpectedResponse` Class does not have a Default Value.</p>
+<p>In some use cases, input and output data might be represented in a different form, for instance an Action that accepts JSON, but returns an image. In such a case, the optional `response` key-value pair can describe the content type of the expected response. As there is no default value defined, the following assertions apply:</p>
+<ul>
+<li><span class="rfc2119-assertion" id="td-expectedResponse-missing-contentType">If there is no `contentType` value defined in a `response` object within a form, a Consumer MUST expect that the respective response does not contain any payload.
+</span></li>
+<li><span class="rfc2119-assertion" id="td-expectedResponse-defined-contentType">If a content type is defined in the `response` object within a form, a Consumer MUST expect a response containing a payload in the respective format, e.g., an image in the case of `image/jpeg`.
+</span></li>
+</ul>

@@ -82,7 +82,13 @@ classes:
 
   LinkmlSettings: {}
 
-  VisualizationSettings: {}
+  VisualizationSettings:
+    attributes:
+      range_labels:
+        description: Text shown as the type of an attribute in the class diagrams for a LinkML range.
+        range: RangeLabel
+        multivalued: true
+        inlined: true
 
   SpecSettings:
     attributes:
@@ -99,6 +105,10 @@ classes:
         inlined_as_list: true
         required: true
         minimum_cardinality: 1
+      prose:
+        description: >-
+          Directory of the section prose files. <Class>.html is shown after the vocabulary table of the class and
+          <Class>.intro.html before it, in place of the class description.
       snippets:
         description: Directory of the example snippets.
         required: true

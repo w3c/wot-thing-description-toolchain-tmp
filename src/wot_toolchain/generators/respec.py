@@ -1,25 +1,26 @@
 from __future__ import annotations
 
+from functools import partial
 from html import escape
 import logging
 import re
 import yaml
 
-from jinja2 import exceptions
 from linkml_runtime.utils.schemaview import SchemaView
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
 from ..config import SpecConfig
+from ..errors import GenerationError, SchemaError
 from ..specgen.bikeshed_processor import process_fragments
+from ..specgen.prose import SectionProse
 from ..specgen.respec import build_jinja_env, assemble
 from ..specgen.tables import collect_slot_rows
 from ..specgen.assertions import html_assertions_to_csv
 
 JINJA_TEMPLATE_DIR = Path('resources') / 'jinja_templates'
 CORE_SCHEMA_PLACEHOLDER = "%s"
-SNIPPET_SCHEMAS_DIR = Path('resources') / 'upstream' / 'schemas'
 
 
 def _annotation_value(annotations: dict, key: str):
@@ -64,40 +65,6 @@ def _inline_html(html: str) -> str:
     return html or ""
 
 
-def _as_block_list(value) -> list[dict]:
-    value = getattr(value, "value", value)
-    if isinstance(value, dict) and "value" in value:
-        value = value["value"]
-    if isinstance(value, list):
-        return [block for block in value if isinstance(block, dict)]
-    if isinstance(value, dict):
-        return [value]
-    return []
-
-
-def _render_inline_markdown(
-    text: str,
-    process_description: Callable[[str], str],
-) -> str:
-    return _inline_html(process_description(str(text or "")))
-
-
-def _render_note_block(
-    text: str,
-    process_description: Callable[[str], str],
-    title: Optional[str] = None,
-) -> str:
-    body = _inline_html(process_description(str(text or ""))).strip()
-    if not body:
-        return ""
-    if title:
-        return (
-            f'<p class="note" title="{escape(str(title), quote=True)}">'
-            f"{body}</p>"
-        )
-    return f'<div class="note">\n<p>{body}</p>\n</div>'
-
-
 def _extract_enum_cell(
     pv,
     field: str,
@@ -123,259 +90,25 @@ def _extract_enum_cell(
     return "<td></td>"
 
 
-def _render_enum_table(
-    block: dict,
-    process_description: Callable[[str], str],
-    schema_view: Optional["SchemaView"] = None,
-) -> str:
-    enum_name = _record_value(block, "enum")
-    if not enum_name or not schema_view:
-        logging.warning("enum_table block requires 'enum' and a SchemaView")
-        return ""
+def _enum_row(pv, fields: list[str], process_description: Callable[[str], str]) -> list[str]:
+    return ["<tr>", *(_extract_enum_cell(pv, field, process_description) for field in fields), "</tr>"]
 
-    enum_def = schema_view.get_enum(str(enum_name))
+
+def _enum_rows(
+    schema_view: SchemaView,
+    process_description: Callable[[str], str],
+    enum_name: str,
+    *fields: str,
+) -> str:
+    """Return one table row per permissible value of an enum, with one cell per field."""
+    enum_def = schema_view.get_enum(enum_name)
     if not enum_def:
-        logging.warning("Enum %r not found in schema", enum_name)
-        return ""
-
-    columns = _record_value(block, "columns") or []
-    if not isinstance(columns, list) or not columns:
-        logging.warning("enum_table block requires a non-empty 'columns' list")
-        return ""
-
-    caption = _record_value(block, "caption") or ""
-    table_id = _record_value(block, "table_id") or ""
-
-    headers = []
-    fields = []
-    for col in columns:
-        if isinstance(col, dict):
-            headers.append(escape(str(_record_value(col, "header") or "")))
-            fields.append(str(_record_value(col, "field") or "name"))
-        else:
-            headers.append(escape(str(col)))
-            fields.append("name")
-
-    lines: list[str] = []
-    if table_id:
-        lines.append(f'<div id="{escape(str(table_id), quote=True)}">')
-
-    lines.append('<table class="def numbered">')
-    if caption:
-        lines.append(f"<caption>{escape(str(caption))}</caption>")
-    lines.append("<thead>")
-    lines.append("<tr>")
-    for h in headers:
-        lines.append(f"<th>{h}</th>")
-    lines.append("</tr>")
-    lines.append("</thead>")
-    lines.append("<tbody>")
-
-    require_comments = _record_value(block, "require_comments")
-    pvs = enum_def.permissible_values or {}
-    for pv_key, pv in pvs.items():
-        if require_comments and not (getattr(pv, "comments", None) or []):
-            continue
-        lines.append("<tr>")
-        for field in fields:
-            lines.append(_extract_enum_cell(pv, field, process_description))
-        lines.append("</tr>")
-
-    lines.append("</tbody>")
-    lines.append("</table>")
-    if table_id:
-        lines.append("</div>")
-
-    return "\n".join(lines)
-
-
-def _render_assertion_span(
-    record: dict,
-    process_description: Callable[[str], str],
-) -> str:
-    assertion_id = _record_value(record, "id") or _record_value(record, "assertion_id")
-    assertion_text = _record_value(record, "text") or _record_value(
-        record,
-        "assertion_text",
-    )
-    assertion_type = _record_value(record, "assertion_type") or "rfc2119-assertion"
-
-    if not assertion_id or not assertion_text:
-        logging.warning(
-            "Ignoring incomplete assertion block: id=%r text=%r",
-            assertion_id,
-            assertion_text,
-        )
-        return ""
-
-    allowed_types = {
-        "rfc2119-assertion",
-        "rfc2119-default-assertion",
-        "rfc2119-table-assertion",
-    }
-    if str(assertion_type) not in allowed_types:
-        logging.warning(
-            "Unsupported assertion type %r; using rfc2119-assertion",
-            assertion_type,
-        )
-        assertion_type = "rfc2119-assertion"
-
-    text_html = _render_inline_markdown(str(assertion_text), process_description)
-    return (
-        f'<span class="{escape(str(assertion_type), quote=True)}" '
-        f'id="{escape(str(assertion_id), quote=True)}">{text_html}</span>'
-    )
-
-
-def _render_list_block(
-    block: dict,
-    process_description: Callable[[str], str],
-) -> str:
-    items = _record_value(block, "items") or []
-    if not isinstance(items, list):
-        logging.warning("Ignoring spec_content list block with non-list items: %r", items)
-        return ""
-
-    rendered_items: list[str] = []
-    for item in items:
-        if not isinstance(item, dict):
-            rendered = _render_inline_markdown(str(item), process_description)
-        elif _record_value(item, "id") or _record_value(item, "assertion_id"):
-            rendered = _render_assertion_span(item, process_description)
-        else:
-            rendered = _render_inline_markdown(
-                str(_record_value(item, "text") or ""),
-                process_description,
-            )
-        if rendered:
-            rendered_items.append(f"<li>{rendered}</li>")
-
-    if not rendered_items:
-        return ""
-    return "<ul>\n" + "\n".join(rendered_items) + "\n</ul>"
-
-
-def _render_paragraph_block(
-    block: dict,
-    process_description: Callable[[str], str],
-) -> str:
-    segments = _record_value(block, "segments") or []
-    if not isinstance(segments, list):
-        logging.warning(
-            "Ignoring spec_content paragraph block with non-list segments: %r",
-            segments,
-        )
-        return ""
-
-    rendered_segments: list[str] = []
-    for segment in segments:
-        if not isinstance(segment, dict):
-            rendered_segments.append(
-                _render_inline_markdown(str(segment), process_description)
-            )
-            continue
-        if _record_value(segment, "id") or _record_value(segment, "assertion_id"):
-            rendered_segments.append(_render_assertion_span(segment, process_description))
-        else:
-            rendered_segments.append(
-                _render_inline_markdown(
-                    str(_record_value(segment, "text") or ""),
-                    process_description,
-                )
-            )
-
-    content = " ".join(part.strip() for part in rendered_segments if part.strip())
-    if not content:
-        return ""
-    return f"<p>{content}</p>"
-
-
-def render_spec_content_annotation(
-    annotations: dict,
-    process_description: Callable[[str], str],
-    annotation_key: str = "spec_content",
-    schema_view: Optional["SchemaView"] = None,
-) -> str:
-    blocks = _as_block_list(_annotation_value(annotations, annotation_key))
-    if not blocks:
-        return ""
-
-    return _render_content_blocks(blocks, process_description, schema_view)
-
-
-def _render_content_blocks(
-    blocks: list[dict],
-    process_description: Callable[[str], str],
-    schema_view: Optional["SchemaView"] = None,
-) -> str:
-    rendered_blocks: list[str] = []
-    for block in blocks:
-        block_type = str(_record_value(block, "type") or "markdown")
-        text = _record_value(block, "text") or ""
-
-        if block_type == "markdown":
-            rendered = process_description(str(text))
-        elif block_type == "note":
-            title = _record_value(block, "title")
-            rendered = _render_note_block(
-                str(text), process_description, title=str(title) if title else None
-            )
-        elif block_type == "assertion":
-            span = _render_assertion_span(block, process_description)
-            rendered = f"<p>{span}</p>" if span else ""
-        elif block_type in {"list", "assertion_list"}:
-            rendered = _render_list_block(block, process_description)
-        elif block_type == "paragraph":
-            rendered = _render_paragraph_block(block, process_description)
-        elif block_type == "enum_table":
-            rendered = _render_enum_table(block, process_description, schema_view)
-        else:
-            logging.warning("Ignoring unsupported spec_content block type: %s", block_type)
-            rendered = ""
-
-        if rendered:
-            rendered_blocks.append(rendered)
-
-    return "\n".join(rendered_blocks)
-
-
-def render_subsections(
-    annotations: dict,
-    process_description: Callable[[str], str],
-    schema_view: Optional["SchemaView"] = None,
-) -> str:
-    subsections = _as_block_list(_annotation_value(annotations, "spec_subsections"))
-    if not subsections:
-        return ""
-
-    rendered: list[str] = []
-    for sub in subsections:
-        sub_id = _record_value(sub, "id") or ""
-        sub_title = _record_value(sub, "title") or ""
-        sub_class = _record_value(sub, "class") or ""
-        content_blocks = _as_block_list(_record_value(sub, "content"))
-
-        attrs = ""
-        if sub_id:
-            attrs += f' id="{escape(str(sub_id), quote=True)}"'
-        if sub_class:
-            attrs += f' class="{escape(str(sub_class), quote=True)}"'
-
-        lines: list[str] = [f"<section{attrs}>"]
-        if sub_title:
-            lines.append(f"<h4>{escape(str(sub_title))}</h4>")
-
-        if content_blocks:
-            content_html = _render_content_blocks(
-                content_blocks, process_description, schema_view
-            )
-            if content_html:
-                lines.append(content_html)
-
-        lines.append("</section>")
-        rendered.append("\n".join(lines))
-
-    return "\n".join(rendered)
+        raise ValueError(f"enum {enum_name!r} is not in the schema")
+    unknown = [field for field in fields if field not in ("name", "description") and not field.startswith("comment:")]
+    if unknown or not fields:
+        raise ValueError(f"columns are 'name', 'description' or 'comment:<prefix>', at least one; got {list(fields)}")
+    rows = (_enum_row(pv, list(fields), process_description) for pv in enum_def.permissible_values.values())
+    return "\n".join(line for row in rows for line in row)
 
 
 def render_explicit_assertion_annotation(
@@ -449,30 +182,16 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
 
     Args:
         input_path: Path to the root LinkML YAML schema file.
-        spec: Template, output, sections, snippets and assertion paths of the specification.
+        spec: Template, output, sections, prose, snippets and assertion paths of the specification.
         schema_prefixes: Module prefix per schema path, used for the section anchors.
     """
     try:
         sv = SchemaView(input_path, merge_imports=True)
     except yaml.YAMLError as e:
-        logging.error("Failed to load LinkML schema: %s", e)
-        return
+        raise SchemaError(f"{input_path}: LinkML schema could not be loaded: {e}") from e
 
-    try:
-        env = build_jinja_env(JINJA_TEMPLATE_DIR)
-        section_tpl = env.get_template("class_section.jinja2")
-    except (exceptions.TemplateNotFound, FileNotFoundError) as e:
-        logging.error("Template error: %s", e, exc_info=True)
-        assemble(
-            spec.template,
-            f"",
-            "",
-            "",
-            "",
-            out_path=spec.output,
-            placeholder=CORE_SCHEMA_PLACEHOLDER,
-        )
-        return
+    env = build_jinja_env(JINJA_TEMPLATE_DIR)
+    section_tpl = env.get_template("class_section.jinja2")
 
     def process_description(raw_text: str) -> str:
         """Convert inline markdown backticks to <code> tags."""
@@ -480,25 +199,15 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
         text = re.sub(r"`([^`]+)`", r"<code>\1</code>", text)
         return text
 
+    prose = SectionProse(spec.prose, process_description, {"enum_rows": partial(_enum_rows, sv, process_description)})
+
     file_to_classes: Dict[str, List[str]] = {}
     for section_path in spec.sections.values():
         try:
-            if not section_path.exists():
-                logging.error(
-                    "Missing schema file: %s. Cannot render this section.",
-                    section_path.name,
-                )
-                file_to_classes[section_path.name] = []
-                continue
             section_sv = SchemaView(section_path, merge_imports=False)
-            file_to_classes[section_path.name] = list(section_sv.all_classes(imports=False).keys())
-        except (yaml.YAMLError, IOError) as e:
-            logging.error(
-                "Failed to load section schema %s due to: %s. Skipping section.",
-                section_path.name,
-                e,
-            )
-            file_to_classes[section_path.name] = []
+        except (yaml.YAMLError, OSError) as e:
+            raise SchemaError(f"{section_path}: section schema could not be loaded: {e}") from e
+        file_to_classes[section_path.name] = list(section_sv.all_classes(imports=False).keys())
 
     # Identify all non-core classes (defined outside the primary TD schema)
     non_core_classes: set[str] = set()
@@ -549,15 +258,9 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
                 range_labels=spec.range_labels,
                 default_values_anchor=spec.default_values_anchor,
             )
-            intro_html = ""
+            intro_html = prose.intro(cls)
             desc_html = ""
-            if "spec_intro_content" in ann:
-                intro_html = render_spec_content_annotation(
-                    ann,
-                    process_description,
-                    annotation_key="spec_intro_content",
-                )
-            else:
+            if not intro_html:
                 raw_desc = getattr(cdef, "description", "") or ""
                 if "spec_description" in ann:
                     spec_def = (
@@ -566,13 +269,7 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
                     )
                     raw_desc = str(spec_def) or raw_desc
                 desc_html = process_description(raw_desc)
-            spec_content_html = ""
-            if "spec_content" in ann:
-                spec_content_html = render_spec_content_annotation(
-                    ann,
-                    process_description,
-                    schema_view=sv,
-                )
+            spec_content_html = prose.content(cls)
             assertion_html = render_explicit_assertion_annotation(
                 ann,
                 process_description,
@@ -582,14 +279,6 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
                     part for part in [spec_content_html, assertion_html] if part
                 )
 
-            subsections_html = ""
-            if "spec_subsections" in ann:
-                subsections_html = render_subsections(
-                    ann,
-                    process_description,
-                    schema_view=sv,
-                )
-
             sections_html.append(
                 section_tpl.render(
                     class_name=cls,
@@ -597,32 +286,19 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
                     slots=rows,
                     spec_intro_html=intro_html,
                     spec_content_html=spec_content_html,
-                    subsections_html=subsections_html,
                 )
             )
 
         section_html_fragment = "\n\n".join(sections_html)
         sections_content.append(section_html_fragment)
 
+    prose.require_all_read()
+
     section_ids = list(spec.sections.keys())
     sections_content = process_fragments(section_ids, sections_content, spec.glossary)
 
     rendered_template = None
     if spec.snippets.is_dir():
-        from ..specgen.snippets import validate_all_snippets
-
-        snippet_errors = validate_all_snippets(
-            spec.snippets,
-            SNIPPET_SCHEMAS_DIR / "td20-json-schema-validation.json",
-            SNIPPET_SCHEMAS_DIR / "tm-json-schema-validation.json",
-        )
-        if snippet_errors:
-            for err in snippet_errors:
-                logging.error("Snippet validation error: %s", err)
-            logging.error(
-                "Snippet validation failed with %d error(s) — continuing", len(snippet_errors)
-            )
-
         rendered_template = spec.template.read_text(encoding="utf-8")
         if spec.snippets and spec.snippets.is_dir():
             from ..specgen.respec import process_snippet_placeholders
@@ -639,7 +315,4 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
     )
 
     if spec.assertions_csv is not None:
-        try:
-            html_assertions_to_csv(spec.output, spec.assertions_csv, spec.extra_asserts)
-        except Exception as exc:
-            logging.error("Assertion CSV generation failed: %s", exc, exc_info=True)
+        html_assertions_to_csv(spec.output, spec.assertions_csv, spec.extra_asserts)

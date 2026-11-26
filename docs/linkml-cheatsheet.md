@@ -115,7 +115,7 @@ rules:
 |---|---|
 | `permissible_values` | Enum members — keys become `"enum"` values in JSON Schema |
 | `description` on a value | Appears in generated HTML enum tables |
-| `comments` on a value | Internal metadata; extractable via `comment:<prefix>` in `enum_table` content blocks |
+| `comments` on a value | Internal metadata; extractable via `comment:<prefix>` in an `%enum_rows(...)%` marker of a section prose file |
 
 Permissible value keys must match the W3C spec exactly (typically lowercase). See [naming conventions §3](guidelines/linkml-naming-conventions.md#3-enum-naming).
 
@@ -134,4 +134,4 @@ Permissible value keys must match the W3C spec exactly (typically lowercase). Se
 
 `description` and `spec_description` must stay in sync (same meaning, different markup). See [naming conventions §7](guidelines/linkml-naming-conventions.md#7-description-and-spec_description-sync).
 
-For the full annotation API (`spec_content`, `spec_subsections`, `jsonschema_*`, etc.), see [custom annotations](guidelines/wot-custom-annotations.md).
+For the full annotation API (`spec_description`, `spec_default`, `jsonschema_*`, etc.), see [custom annotations](guidelines/wot-custom-annotations.md).

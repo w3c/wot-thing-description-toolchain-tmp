@@ -27,6 +27,14 @@ generators:
   owl:
   linkml:
   visualization:
+    # The class diagrams name these LinkML ranges as the published TD specification does.
+    range_labels:
+      Any: any type
+      uri: anyURI
+      uriorcurie: anyURI
+      datetime: dateTime
+      NonNegativeInteger: unsignedInt
+      decimal: double
   spec:
     template: resources/index.template.html
     output: resources/gens/index.html
@@ -51,6 +59,8 @@ generators:
         schema: resources/schemas/wot_security.yaml
       - id: sec-hypermedia-vocabulary-definition
         schema: resources/schemas/hypermedia.yaml
+    # Prose of the class sections: <Class>.html after the vocabulary table, <Class>.intro.html before it.
+    prose: resources/spec/sections
     snippets: resources/snippets
     glossary: resources/xref/glossary.yaml
     # Assertions that are tested but are not in the specification. They are added to assertions_csv.

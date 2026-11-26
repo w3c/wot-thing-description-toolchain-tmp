@@ -35,6 +35,7 @@ class SpecConfig:
     template: Path
     output: Path
     sections: Mapping[str, Path]
+    prose: Path | None
     snippets: Path
     glossary: Path
     extra_asserts: Path | None
@@ -54,6 +55,7 @@ class Config:
     top_class: str | None
     jsonschema_profile: Path | None
     vocabularies: tuple[Vocabulary, ...]
+    diagram_range_labels: Mapping[str, str]
     spec: SpecConfig | None
 
     @property
@@ -80,6 +82,7 @@ def load_config(path: Path) -> Config:
         if generators.get("jsonschema", {}).get("schema")
         else None,
         vocabularies=vocabularies,
+        diagram_range_labels=_range_labels((generators.get("visualization") or {}).get("range_labels")),
         spec=_spec(path, generators["spec"], vocabularies) if "spec" in generators else None,
     )
 
@@ -125,10 +128,12 @@ def _vocabularies(path: Path, entries: list[dict[str, Any]]) -> tuple[Vocabulary
 def _spec(path: Path, spec: dict[str, Any], vocabularies: tuple[Vocabulary, ...]) -> SpecConfig:
     where = "/generators/spec"
     extra_asserts, assertions_csv = spec.get("extra_asserts"), spec.get("assertions_csv")
+    prose = spec.get("prose")
     return SpecConfig(
         template=_input(path, spec["template"], f"{where}/template", "file"),
         output=_output(path, spec["output"]),
         sections=_sections(path, spec["sections"], {vocabulary.schema for vocabulary in vocabularies}),
+        prose=None if prose is None else _input(path, prose, f"{where}/prose", "directory"),
         snippets=_input(path, spec["snippets"], f"{where}/snippets", "directory"),
         glossary=_input(path, spec["glossary"], f"{where}/glossary", "file"),
         extra_asserts=None if extra_asserts is None else _input(path, extra_asserts, f"{where}/extra_asserts", "file"),

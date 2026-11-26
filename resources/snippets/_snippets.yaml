@@ -201,7 +201,7 @@ snippets:
     - properties
   link-electric-motor:
     id: example-an-electric-motor-is-member-of-the-electric-drive-collection
-    title: An electric motor is member of the electric drive collection
+    title: An electric motor is member of the electric drive collection.
     layout: pre
     hide_paths:
     - '@context'
@@ -544,6 +544,7 @@ snippets:
     id: td-model-example-tmRef2
     title: Smart Lamp Control extend and overwrite existing definitions
     layout: pre
+    validate: false
   tm-ref-import:
     id: td-model-example-tmRef
     title: Smart Lamp Control imports existing definition

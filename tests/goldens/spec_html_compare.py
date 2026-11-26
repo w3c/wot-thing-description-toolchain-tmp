@@ -1,7 +1,9 @@
 """Compare generated and upstream specification HTML by DOM structure."""
 from __future__ import annotations
 
+import copy
 import re
+from collections import Counter
 from pathlib import Path
 
 import lxml.etree
@@ -16,6 +18,7 @@ GENERATED_SECTION_IDS = [
     "sec-security-vocabulary-definition",
     "sec-hypermedia-vocabulary-definition",
 ]
+EXAMPLE_SELECTOR = "aside.example, pre.example"
 
 
 def parse_html(path: Path) -> HtmlElement:
@@ -67,6 +70,33 @@ def tables_by_caption(section: HtmlElement) -> dict[str, HtmlElement]:
         if captions:
             tables[normalize_text(captions[0].text_content())] = table
     return tables
+
+
+def tables_without_caption(tree: HtmlElement) -> dict[tuple[str, int], HtmlElement]:
+    """Map (enclosing section id, position among that section's caption-less tables) -> table."""
+    tables: dict[tuple[str, int], HtmlElement] = {}
+    per_section: Counter[str] = Counter()
+    for table in tree.cssselect("table"):
+        if table.cssselect("caption"):
+            continue
+        section_id = next(iter(table.xpath("ancestor::section[@id][1]/@id")), "(no section)")
+        per_section[section_id] += 1
+        tables[section_id, per_section[section_id]] = table
+    return tables
+
+
+def _cell_text(cell: HtmlElement) -> str:
+    """Normalized cell text, with each example reduced to a marker: test_snippet_vs_upstream.py compares its content."""
+    cell = copy.deepcopy(cell)
+    for example in cell.cssselect(EXAMPLE_SELECTOR):
+        example.clear(keep_tail=True)
+        example.text = "(example)"
+    return normalize_text(cell.text_content())
+
+
+def table_cell_texts(table: HtmlElement) -> list[list[str]]:
+    """Normalized text of every header and data cell, row by row."""
+    return [[_cell_text(cell) for cell in row.cssselect("th, td")] for row in table.cssselect("tr")]
 
 
 def table_rows(table: HtmlElement) -> list[HtmlElement]:

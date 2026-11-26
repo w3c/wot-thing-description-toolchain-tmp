@@ -7,7 +7,7 @@
 
 Worked examples for authoring TD/TM JSON snippets rendered in the generated specification.
 
-For schema validation, see `resources/schemas/snippet_schema.yaml`.
+For schema validation, see `src/wot_toolchain/schemas/snippets.yaml`.
 
 ---
 
@@ -62,11 +62,7 @@ Paths use dot-separated keys to target nested JSON properties:
 
 ### Schema Validation
 
-The snippet schema is defined in `resources/schemas/snippet_schema.yaml`. Validate with:
-
-```bash
-uv run pytest tests/unit/snippets/test_snippets_yaml.py -v
-```
+The snippet schema is part of the toolchain (`src/wot_toolchain/schemas/snippets.yaml`). `_snippets.yaml` is validated against it on every `wot-toolchain generate-wot-resources` run; an invalid file stops the run.
 
 ---
 
@@ -243,7 +239,7 @@ Renders as a tabbed interface with one tab per snippet. `selected: true` marks t
 
 **Rule: set `validate: false` only for partial, non-TD/TM, or placeholder-containing snippets.**
 
-Rationale: by default, all snippets are validated against the generated TD/TM JSON Schema. Partial examples (e.g., protocol binding fragments, context expansion examples) fail validation because they are not complete TDs.
+Rationale: by default, `scripts/validate_snippets.py` validates every Thing Description snippet against the generated JSON Schema and every Thing Model snippet (root `"@type": "tm:ThingModel"`) against the upstream TM JSON Schema. Partial examples (e.g., protocol binding fragments, context expansion examples) fail validation because they are not complete TDs.
 
 ```yaml
 snippets:

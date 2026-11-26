@@ -104,10 +104,9 @@ known failures. `tests/README.md` lists what each test file checks.
 | `DeprecationWarning` from `owlgen.py` lines 244/247/250 | **Ignore** — known LinkML 1.10.0 noise; issues #3190/#3191 |
 | `WARNING:linkml.generators.owlgen: Multiple owl types` | **Ignore** — known OWL gen behavior, not a bug |
 | `WARNING: Failed to parse JSON in snippet: *.json` | **Investigate** — snippet has invalid JSON syntax |
-| `ERROR:root:Snippet validation error: FILE: PATH — MESSAGE` | **Fix** — snippet fails JSON Schema validation; pipeline aborts |
 | Any other `ERROR:` line | **Fix** — generation failed |
 
-The pipeline aborts on any snippet validation ERROR. Fix before declaring the change complete.
+Generation does not validate the snippets against the JSON Schema. Run `uv run python scripts/validate_snippets.py` after generation; it prints `FILE: PATH — MESSAGE` for each invalid snippet and exits 1. Fix before declaring the change complete.
 
 ### Failure Policy
 
@@ -133,7 +132,7 @@ A change is complete when all of these hold:
 
 1. `uv run wot-toolchain generate-wot-resources` exits without ERROR.
 2. `uv run pytest` passes with no failures.
-3. Snippets in `resources/snippets/` validate against the generated JSON Schema. Every `.json` linked to a changed class or slot must pass; `validate: false` is only acceptable for non-TD/TM examples.
+3. `uv run python scripts/validate_snippets.py` exits 0: Thing Description snippets in `resources/snippets/` validate against the generated JSON Schema, Thing Model snippets against the upstream TM JSON Schema. Every `.json` linked to a changed class or slot must pass; `validate: false` is only acceptable for non-TD/TM examples.
 4. HTML output is correct — see below.
 
 #### HTML Correctness
@@ -149,7 +148,7 @@ Check the auto-generated sections for:
 - **Type column accuracy** — the type shown for each slot must match the LinkML range: if range is a class, the type should name that class; if range is a scalar, the JSON Schema primitive must be correct. `spec_type_values` overrides must be verified for exhaustiveness when `mode: one_of`.
 - **Optional/mandatory** — a slot marked `required` in LinkML must appear as REQUIRED in the table. A slot not in `required` must appear as OPTIONAL. Mismatches are blocking errors.
 
-When reviewing HTML changes, do not evaluate the entire document — scope the check to the `%`-replaced sections and any `spec_content` / `spec_intro_content` blocks that changed.
+When reviewing HTML changes, do not evaluate the entire document — scope the check to the `%`-replaced sections and any section prose files under `resources/spec/sections/` that changed.
 
 ### CI Pipeline (GitHub Actions)
 
@@ -243,7 +242,7 @@ Files with high concurrent-edit risk. Check for in-progress PRs before touching.
 
 1. JSON Schema correctness — all td-next instance validations pass.
 2. HTML spec correctness — structure and vocabulary tables match `resources/upstream/html/index.html`.
-3. Snippet validity — all `.json` files validate against the generated JSON Schema.
+3. Snippet validity — `scripts/validate_snippets.py` exits 0.
 4. Assertion CSVs — assertions match anchors in `index.html`.
 
 Out of scope for now: automated ontology/SHACL consistency.

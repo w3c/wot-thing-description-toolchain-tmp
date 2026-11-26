@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 from html import escape
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
@@ -10,7 +11,9 @@ import jsonfold
 from dataclasses import replace as _replace
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from jsonschema import Draft7Validator
+from linkml.validator import validate
+
+from ..errors import GenerationError
 
 
 logger = logging.getLogger(__name__)
@@ -22,17 +25,28 @@ _FOLD_CONFIG = _replace(
     fold_nesting=2,
 )
 
+SNIPPETS_SCHEMA = files("wot_toolchain") / "schemas" / "snippets.yaml"
+
 _manifest_cache: dict[str, dict] = {}
 
 
 def _load_manifest(snippets_dir: Path) -> dict:
     key = str(snippets_dir)
     if key not in _manifest_cache:
-        manifest_path = snippets_dir / "_snippets.yaml"
-        _manifest_cache[key] = yaml.safe_load(
-            manifest_path.read_text(encoding="utf-8")
-        )
+        _manifest_cache[key] = _read_manifest(snippets_dir / "_snippets.yaml")
     return _manifest_cache[key]
+
+
+def _read_manifest(path: Path) -> dict:
+    """Read the snippet metadata file and validate it against the snippet schema."""
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise GenerationError(f"{path}: snippet metadata could not be read: {exc}") from exc
+    messages = [result.message for result in validate(data, str(SNIPPETS_SCHEMA), "SnippetManifest").results]
+    if messages:
+        raise GenerationError("\n".join(f"{path}: {message}" for message in messages))
+    return data
 
 
 def _get_snippet_meta(snippets_dir: Path, name: str) -> dict[str, Any]:
@@ -216,61 +230,6 @@ def _build_element_attrs(snippet_id: str, title: str) -> str:
     if title:
         attrs += f' title="{escape(title, quote=True)}"'
     return attrs
-
-
-def _load_schema(schema_path: Path) -> Draft7Validator:
-    raw = json.loads(schema_path.read_text(encoding="utf-8"))
-    schema = json.loads(raw) if isinstance(raw, str) else raw
-    return Draft7Validator(schema)
-
-
-def _collect_schema_errors(
-    instance: Any,
-    filename: str,
-    td_validator: Draft7Validator,
-    tm_validator: Draft7Validator,
-    errors: list[str],
-) -> None:
-    is_thing_model = isinstance(instance, dict) and instance.get("@type") == "tm:ThingModel"
-    validator = tm_validator if is_thing_model else td_validator
-    for error in validator.iter_errors(instance):
-        path = ".".join(str(p) for p in error.absolute_path) or "(root)"
-        schema_path = "/".join(str(p) for p in error.absolute_schema_path)
-        errors.append(f"{filename}: {path} — {error.message} [schema: {schema_path}]")
-
-
-def validate_all_snippets(
-    snippets_dir: Path,
-    td_schema_path: Path,
-    tm_schema_path: Path,
-) -> list[str]:
-    if not snippets_dir.exists():
-        return []
-
-    td_validator = _load_schema(td_schema_path)
-    tm_validator = _load_schema(tm_schema_path)
-    errors: list[str] = []
-
-    manifest = _load_manifest(snippets_dir)
-    for name, meta in manifest.get("snippets", {}).items():
-        if meta.get("validate") is False:
-            logger.debug("Skipping validation (validate: false): %s", name)
-            continue
-
-        json_path = snippets_dir / f"{name}.json"
-        if not json_path.exists():
-            errors.append(f"{name}.json: file not found")
-            continue
-
-        try:
-            parsed = json.loads(json_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            errors.append(f"{name}.json: invalid JSON")
-            continue
-
-        _collect_schema_errors(parsed, f"{name}.json", td_validator, tm_validator, errors)
-
-    return errors
 
 
 def render_snippet(name: str, snippets_dir: Path) -> str:
