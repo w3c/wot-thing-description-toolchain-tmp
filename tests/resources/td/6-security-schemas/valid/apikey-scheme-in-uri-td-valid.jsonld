@@ -1,0 +1,12 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "apikey_sc": {
+      "scheme": "apikey",
+      "in": "uri",
+      "name": "key"
+    }
+  },
+  "security": "apikey_sc"
+}

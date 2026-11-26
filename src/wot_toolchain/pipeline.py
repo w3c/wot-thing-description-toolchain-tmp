@@ -2,6 +2,8 @@ import json
 import logging
 import shutil
 
+from copy import deepcopy
+
 from pathlib import Path
 
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
@@ -9,10 +11,13 @@ from linkml.generators.shaclgen import ShaclGenerator
 from linkml.generators.owlgen import OwlSchemaGenerator
 from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
+from linkml_runtime.linkml_model import SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
 from .config import Config
 from .errors import GenerationError, SchemaError
+from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
+from .artifacts.jsonschema.options import JsonSchemaOptions
 from .artifacts.jsonschema.postprocess import post_process_jsonschema
 from .artifacts.shacl.postprocess import post_process_shacl
 from .generators.visualization import generate_visualizations
@@ -22,21 +27,25 @@ from .generators.respec import generate_respec_spec
 STATIC_VISUALIZATION_PATH = Path('resources') / 'static' / 'visualization'
 
 
+def _for_rdf(schema: SchemaDefinition) -> SchemaDefinition:
+    """Return a copy of ``schema`` without "not empty" on optional slots, which RDF would read as mandatory."""
+    rdf_schema = deepcopy(schema)
+    for slot in rdf_schema.slots.values():
+        if slot.minimum_cardinality == 1 and not slot.required:
+            slot.minimum_cardinality = None
+    return rdf_schema
+
+
 def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: Path, top_class: str | None) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     if generator == 'jsonschema':
         logging.info("Proceeding with LinkML to JSON Schema conversion")
-        json_schema_generator = JsonSchemaGenerator(
-            schema_view.schema,
-            mergeimports=True,
-            top_class=top_class,
-            not_closed=True,
-            include_null=False,
-            preserve_names=True,
+        json_schema_generator = WotJsonSchemaGenerator.from_options(
+            schema_view.schema, JsonSchemaOptions(top_class=top_class)
         )
         raw_schema = json.loads(json_schema_generator.serialize())
-        processed_schema = post_process_jsonschema(raw_schema, schema_view)
+        processed_schema = post_process_jsonschema(raw_schema, schema_view, top_class)
         output_file = output_dir / 'jsonschema.json'
         with output_file.open('w', encoding='utf-8') as f:
             json.dump(processed_schema, f, indent=2, ensure_ascii=False)
@@ -44,7 +53,7 @@ def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: P
 
     elif generator == 'shacl':
         logging.info("Proceeding with LinkML to SHACL conversion")
-        shacl_generator = ShaclGenerator(schema_view.schema, mergeimports=False, closed=True, suffix='Shape')
+        shacl_generator = ShaclGenerator(_for_rdf(schema_view.schema), mergeimports=False, closed=True, suffix='Shape')
         raw_shacl = shacl_generator.serialize()
         processed_shacl = post_process_shacl(raw_shacl, schema_view)
         (output_dir / 'shapes.shacl.ttl').write_text(processed_shacl, encoding='utf-8')
@@ -52,7 +61,7 @@ def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: P
 
     elif generator == 'owl':
         logging.info("Proceeding with LinkML to OWL conversion")
-        owl_generator = OwlSchemaGenerator(schema_view.schema)
+        owl_generator = OwlSchemaGenerator(_for_rdf(schema_view.schema))
         (output_dir / 'ontology.owl.ttl').write_text(owl_generator.serialize())
         logging.info(f"OWL ontology saved to {output_dir / 'ontology.owl.ttl'}")
 
@@ -82,7 +91,10 @@ def run_pipeline(config: Config) -> None:
             continue
         logging.info(f"Proceeding with WoT resource generation for {generator}")
         try:
-            _run_linkml_generator(schema_view, generator, config.output_dir / generator, config.top_class)
+            view = schema_view
+            if generator == "jsonschema" and config.jsonschema_profile is not None:
+                view = SchemaView(config.jsonschema_profile, merge_imports=True)
+            _run_linkml_generator(view, generator, config.output_dir / generator, config.top_class)
         except Exception as exc:
             raise GenerationError(f"{generator} generation failed: {exc}") from exc
 

@@ -14,7 +14,93 @@ divergences:
       table: Vocabulary Terms in Thing Level
       row_id: td-vocab-title--Thing
       column: 3
-    rationale: ThingShape permits xsd:string or rdf:langString for title.
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-thing-description-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-core-vocabulary-definition
+      table: Vocabulary Terms in Thing Level
+      row_id: td-vocab-description--Thing
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-interaction-affordance-title-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-core-vocabulary-definition
+      table: Vocabulary Terms in InteractionAffordance Level
+      row_id: td-vocab-title--InteractionAffordance
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-interaction-affordance-description-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-core-vocabulary-definition
+      table: Vocabulary Terms in InteractionAffordance Level
+      row_id: td-vocab-description--InteractionAffordance
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-data-schema-title-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-data-schema-vocabulary-definition
+      table: Vocabulary Terms in DataSchema Level
+      row_id: td-vocab-title--DataSchema
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-data-schema-description-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-data-schema-vocabulary-definition
+      table: Vocabulary Terms in DataSchema Level
+      row_id: td-vocab-description--DataSchema
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+    expected_generated:
+      text: string or rdf:langString
+  - id: html-security-scheme-description-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-security-vocabulary-definition
+      table: Vocabulary Terms in SecurityScheme Level
+      row_id: td-vocab-description--SecurityScheme
+      column: 3
+    rationale: >-
+      JSON-LD @language in the TD context promotes plain strings to
+      rdf:langString; the OWL range is rdfs:Literal to cover both types.
     expected_generated:
       text: string or rdf:langString
   - id: html-interaction-affordance-uri-variables-spacing
@@ -194,6 +280,22 @@ divergences:
     rationale: Applies introductory comma punctuation without changing the requirement.
     expected_generated:
       text: For the client flow, authorization vocabulary term MUST NOT be included.
+  - id: html-data-schema-unit-type
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: table_cell
+      section_id: sec-data-schema-vocabulary-definition
+      table: Vocabulary Terms in DataSchema Level
+      row_id: td-vocab-unit--DataSchema
+      column: 3
+    rationale: >-
+      The spec recommends that unit "points to a semantic definition";
+      actual usage includes CURIEs (om:degreeCelsius) and plain strings
+      resolved via @vocab to IRIs.  anyURI is the correct XSD type.
+      Upstream incorrectly declares string.
+    expected_generated:
+      text: anyURI
   - id: html-assertion-oauth-code-flow-comma
     category: editorial-correction
     review: approved
@@ -203,3 +305,12 @@ divergences:
     rationale: Applies introductory comma punctuation without changing the requirement.
     expected_generated:
       text: For the code flow, both authorization and token vocabulary terms MUST be included.
+  - id: html-assertion-context-td-next-naming
+    category: editorial-correction
+    review: approved
+    upstream_locator:
+      kind: assertion
+      assertion_id: td-context-ns-thing-mandatory
+    rationale: Names the version as td-next, the name used throughout the generated specification, instead of TD 2.0.
+    expected_generated:
+      text: The @context name-value pair MUST contain the anyURI https://www.w3.org/ns/wot-next/td in order to identify the document as a td-next TD which would allow Consumers to use the newly introduced terms.

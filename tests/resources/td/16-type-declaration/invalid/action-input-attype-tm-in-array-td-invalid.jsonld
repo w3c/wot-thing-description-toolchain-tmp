@@ -1,0 +1,58 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/wot-next/td",
+    {
+      "saref": "https://saref.etsi.org/core/"
+    }
+  ],
+  "id": "urn:uuid:55f01138-5c96-4b3d-a5d0-81319a2db677",
+  "title": "AtType probe",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": [
+    "nosec_sc"
+  ],
+  "properties": {
+    "temp": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number"
+        }
+      },
+      "forms": [
+        {
+          "href": "https://example.com/temp"
+        }
+      ]
+    }
+  },
+  "actions": {
+    "toggle": {
+      "input": {
+        "type": "boolean",
+        "@type": [
+          "Thing",
+          "tm:ThingModel"
+        ]
+      },
+      "forms": [
+        {
+          "href": "https://example.com/toggle"
+        }
+      ]
+    }
+  },
+  "events": {
+    "overheat": {
+      "forms": [
+        {
+          "href": "https://example.com/overheat"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "basic_sc": {
+      "scheme": "basic",
+      "in": "uri"
+    }
+  },
+  "security": "basic_sc"
+}

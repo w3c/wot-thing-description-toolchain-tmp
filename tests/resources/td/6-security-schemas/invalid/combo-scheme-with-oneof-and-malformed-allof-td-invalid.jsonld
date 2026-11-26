@@ -1,0 +1,18 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "security": "x",
+  "securityDefinitions": {
+    "x": {
+      "scheme": "combo",
+      "oneOf": [
+        "a",
+        "b"
+      ],
+      "allOf": [
+        1,
+        2
+      ]
+    }
+  }
+}

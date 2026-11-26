@@ -35,7 +35,7 @@
       <td><code>title</code>
       </td><td>Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
       </td><td>mandatory
-      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <code>rdf:langString</code>
+      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#rdf:langString"><code>rdf:langString</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-titles--Thing">
       <td><code>titles</code>
       </td><td>Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages). Also see <a data-link-type="dfn" href="#multilanguage" id="ref-for-multilanguage">MultiLanguage</a>.
@@ -45,7 +45,7 @@
       <td><code>description</code>
       </td><td>Provides additional (human-readable) information based on a default language.
       </td><td>optional
-      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
+      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#rdf:langString"><code>rdf:langString</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-descriptions--Thing">
       <td><code>descriptions</code>
       </td><td>Can be used to support (human-readable) information in different languages. Also see <a data-link-type="dfn" href="#multilanguage" id="ref-for-multilanguage">MultiLanguage</a>.
@@ -138,7 +138,7 @@ For <code>@context</code> the following rules are defined for Thing Description 
 
    <ul>
     <li><span class="rfc2119-assertion" id="td-context-ns-thing-mandatory">The <code>@context</code> name-value pair <em>MUST</em> contain the anyURI <code>https://www.w3.org/ns/wot-next/td</code> in order
-to identify the document as a TD 2.0 which would allow Consumers to use the newly introduced terms.
+to identify the document as a td-next TD which would allow Consumers to use the newly introduced terms.
 </span>
     </li><li><span class="rfc2119-assertion" id="td-context-ns-thing-optional">When <code>@context</code> is an Array, the anyURI <code>https://www.w3.org/ns/wot-next/td</code> <em>MAY</em> be followed by elements of type
 <code>anyURI</code> or type Map in any order, while it is <em>RECOMMENDED</em> to include only one Map with all the name-value pairs in the <code>@context</code> Array.
@@ -192,7 +192,7 @@ The data schema for each of the property meta-interactions is constructed by com
       <td><code>title</code>
       </td><td>Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
       </td><td>optional
-      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
+      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#rdf:langString"><code>rdf:langString</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-titles--InteractionAffordance">
       <td><code>titles</code>
       </td><td>Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages). Also see <a data-link-type="dfn" href="#multilanguage" id="ref-for-multilanguage">MultiLanguage</a>.
@@ -202,7 +202,7 @@ The data schema for each of the property meta-interactions is constructed by com
       <td><code>description</code>
       </td><td>Provides additional (human-readable) information based on a default language.
       </td><td>optional
-      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
+      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#rdf:langString"><code>rdf:langString</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-descriptions--InteractionAffordance">
       <td><code>descriptions</code>
       </td><td>Can be used to support (human-readable) information in different languages. Also see <a data-link-type="dfn" href="#multilanguage" id="ref-for-multilanguage">MultiLanguage</a>.
@@ -463,7 +463,7 @@ The data schema for each of the property meta-interactions is constructed by com
       <td><code>title</code>
       </td><td>Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
       </td><td>optional
-      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
+      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#rdf:langString"><code>rdf:langString</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-titles--DataSchema">
       <td><code>titles</code>
       </td><td>Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages). Also see <a data-link-type="dfn" href="#multilanguage" id="ref-for-multilanguage">MultiLanguage</a>.
@@ -473,7 +473,7 @@ The data schema for each of the property meta-interactions is constructed by com
       <td><code>description</code>
       </td><td>Provides additional (human-readable) information based on a default language.
       </td><td>optional
-      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
+      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#rdf:langString"><code>rdf:langString</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-descriptions--DataSchema">
       <td><code>descriptions</code>
       </td><td>Can be used to support (human-readable) information in different languages. Also see <a data-link-type="dfn" href="#multilanguage" id="ref-for-multilanguage">MultiLanguage</a>.
@@ -493,7 +493,7 @@ The data schema for each of the property meta-interactions is constructed by com
       <td><code>unit</code>
       </td><td>Provides unit information that is used, e.g., in international science, engineering, and business. To preserve uniqueness, it is recommended that the value of the unit points to a semantic definition (also see Section <a href="#semantic-annotations-example-version-units">Semantic Annotations</a>).
       </td><td>optional
-      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
+      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"><code>anyURI</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-oneOf--DataSchema">
       <td><code>oneOf</code>
       </td><td>Used to ensure that the data is valid against one of the specified schemas in the array. This can be used to describe multiple input or output schemas.
@@ -817,7 +817,7 @@ If multiple parameters are needed for a security scheme, repeat the security sch
       <td><code>description</code>
       </td><td>Provides additional (human-readable) information based on a default language.
       </td><td>optional
-      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
+      </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#rdf:langString"><code>rdf:langString</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-descriptions--SecurityScheme">
       <td><code>descriptions</code>
       </td><td>Can be used to support (human-readable) information in different languages. Also see <a data-link-type="dfn" href="#multilanguage" id="ref-for-multilanguage">MultiLanguage</a>.
@@ -825,7 +825,7 @@ If multiple parameters are needed for a security scheme, repeat the security sch
       </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map">Map</a> of <a href="#multilanguage"><code>MultiLanguage</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-proxy--SecurityScheme">
       <td><code>proxy</code>
-      </td><td>URI of the proxy server this security configuration provides access to. If not given, the corresponding  security configuration is for the endpoint.
+      </td><td>URI of the proxy server this security configuration provides access to. If not given, the corresponding security configuration is for the endpoint.
       </td><td>optional
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"><code>anyURI</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-scheme--SecurityScheme">
@@ -950,7 +950,7 @@ If multiple parameters are needed for a security scheme, repeat the security sch
 
   <section>
    <h3 id="apikeysecurityscheme"><code>APIKeySecurityScheme</code></h3>
-   <p>API key authentication security configuration identified by the Vocabulary Term <code>apikey</code> (i.e., "scheme": "apikey").  This scheme is to be used when the access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.  In this case the key may not be using a standard token format.  This scheme indicates that the key provided by the service provider needs to be supplied as part of service requests using the mechanism indicated by the <code>in</code> field.</p>
+   <p>API key authentication security configuration identified by the Vocabulary Term <code>apikey</code> (i.e., "scheme": "apikey"). This scheme is to be used when the access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider. In this case the key may not be using a standard token format. This scheme indicates that the key provided by the service provider needs to be supplied as part of service requests using the mechanism indicated by the <code>in</code> field.</p>
    <table class="def numbered">
     <caption>Vocabulary Terms in APIKeySecurityScheme Level</caption>
     <thead>
@@ -1016,7 +1016,7 @@ If multiple parameters are needed for a security scheme, repeat the security sch
 
   <section>
    <h3 id="psksecurityscheme"><code>PSKSecurityScheme</code></h3>
-   <p>Pre-shared key authentication security configuration identified by the Vocabulary Term <code>psk</code> (i.e., "scheme": "psk").  This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[RFC4279]],  and that the ciphersuite used for keys will be established during protocol negotiation.</p>
+   <p>Pre-shared key authentication security configuration identified by the Vocabulary Term <code>psk</code> (i.e., "scheme": "psk"). This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[RFC4279]], and that the ciphersuite used for keys will be established during protocol negotiation.</p>
    <table class="def numbered">
     <caption>Vocabulary Terms in PSKSecurityScheme Level</caption>
     <thead>
@@ -1036,7 +1036,7 @@ If multiple parameters are needed for a security scheme, repeat the security sch
 
   <section>
    <h3 id="oauth2securityscheme"><code>OAuth2SecurityScheme</code></h3>
-   <p>OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]],  identified by the Vocabulary Term <code>oauth2</code> (i.e., "scheme": "oauth2").</p>
+   <p>OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]], identified by the Vocabulary Term <code>oauth2</code> (i.e., "scheme": "oauth2").</p>
    <table class="def numbered">
     <caption>Vocabulary Terms in OAuth2SecurityScheme Level</caption>
     <thead>
@@ -1063,7 +1063,7 @@ If multiple parameters are needed for a security scheme, repeat the security sch
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"><code>anyURI</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-scopes--OAuth2SecurityScheme">
       <td><code>scopes</code>
-      </td><td>Set of authorization scope identifiers provided as an array.  These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources  a client may access and how. The values associated with a form SHOULD be chosen from those defined in an <code>OAuth2SecurityScheme</code> active on that form.
+      </td><td>Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources a client may access and how. The values associated with a form SHOULD be chosen from those defined in an <code>OAuth2SecurityScheme</code> active on that form.
       </td><td>optional
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array">Array</a> of <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-flow--OAuth2SecurityScheme">
@@ -1127,7 +1127,7 @@ If multiple parameters are needed for a security scheme, repeat the security sch
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"><code>anyURI</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-sizes--Link">
       <td><code>sizes</code>
-      </td><td>Target attribute that specifies one or more sizes for the referenced icon. Only applicable for relation  type "icon". The value pattern follows {Height}x{Width} (e.g., "16x16", "16x16 32x32").
+      </td><td>Target attribute that specifies one or more sizes for the referenced icon. Only applicable for relation type "icon". The value pattern follows {Height}x{Width} (e.g., "16x16", "16x16 32x32").
       </td><td>optional
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-hreflang--Link">
@@ -1230,7 +1230,7 @@ In the following a best practice relation type table is introduced that is recom
 
   <section>
    <h3 id="form"><code>Form</code></h3>
-   <p>A form can be viewed as a statement of "To perform an <strong>operation type</strong> operation on <strong>form context</strong>, make a <strong>request method</strong> request to <strong>submission target</strong>" where the optional <strong>form fields</strong> may further describe the required request.  In Thing Descriptions, the <strong>form context</strong> is the surrounding Object, such as Properties, Actions, and Events or the Thing itself for meta-interactions.</p>
+   <p>A form can be viewed as a statement of "To perform an <strong>operation type</strong> operation on <strong>form context</strong>, make a <strong>request method</strong> request to <strong>submission target</strong>" where the optional <strong>form fields</strong> may further describe the required request. In Thing Descriptions, the <strong>form context</strong> is the surrounding Object, such as Properties, Actions, and Events or the Thing itself for meta-interactions.</p>
    <table class="def numbered">
     <caption>Vocabulary Terms in Form Level</caption>
     <thead>
@@ -1262,7 +1262,7 @@ In the following a best practice relation type table is introduced that is recom
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array">Array</a> of <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-scopes--Form">
       <td><code>scopes</code>
-      </td><td>Set of authorization scope identifiers provided as an array.  These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources  a client may access and how. The values associated with a form SHOULD be chosen from those defined in an <code>OAuth2SecurityScheme</code> active on that form.
+      </td><td>Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources a client may access and how. The values associated with a form SHOULD be chosen from those defined in an <code>OAuth2SecurityScheme</code> active on that form.
       </td><td>optional
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array">Array</a> of <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-response--Form">
@@ -1311,7 +1311,7 @@ In the following a best practice relation type table is introduced that is recom
        </td><td>Identifies the write operation on Property Affordances to update the corresponding data.
       </td></tr><tr>
        <td>observeproperty
-       </td><td>Identifies the observe operation on Property Affordances to be notified with the new data when the  Property is updated.
+       </td><td>Identifies the observe operation on Property Affordances to be notified with the new data when the Property is updated.
       </td></tr><tr>
        <td>unobserveproperty
        </td><td>Identifies the unobserve operation on Property Affordances to stop the corresponding notifications.
@@ -1332,31 +1332,31 @@ In the following a best practice relation type table is introduced that is recom
        </td><td>Identifies the unsubscribe operation on Event Affordances to stop the corresponding notifications.
       </td></tr><tr>
        <td>readallproperties
-       </td><td>Identifies the readallproperties operation on a Thing to retrieve the data of all Properties in a  single interaction.
+       </td><td>Identifies the readallproperties operation on a Thing to retrieve the data of all Properties in a single interaction.
       </td></tr><tr>
        <td>writeallproperties
-       </td><td>Identifies the writeallproperties operation on a Thing to update the data of all writable Properties  in a single interaction.
+       </td><td>Identifies the writeallproperties operation on a Thing to update the data of all writable Properties in a single interaction.
       </td></tr><tr>
        <td>readmultipleproperties
-       </td><td>Identifies the readmultipleproperties operation on a Thing to retrieve the data of selected Properties  in a single interaction.
+       </td><td>Identifies the readmultipleproperties operation on a Thing to retrieve the data of selected Properties in a single interaction.
       </td></tr><tr>
        <td>writemultipleproperties
-       </td><td>Identifies the writemultipleproperties operation on a Thing to update the data of selected writable  Properties in a single interaction.
+       </td><td>Identifies the writemultipleproperties operation on a Thing to update the data of selected writable Properties in a single interaction.
       </td></tr><tr>
        <td>observeallproperties
-       </td><td>Identifies the observeallproperties operation on Properties to be notified with new data when any  Property is updated.
+       </td><td>Identifies the observeallproperties operation on Properties to be notified with new data when any Property is updated.
       </td></tr><tr>
        <td>unobserveallproperties
-       </td><td>Identifies the unobserveallproperties operation on Properties to stop notifications from all Properties  in a single interaction.
+       </td><td>Identifies the unobserveallproperties operation on Properties to stop notifications from all Properties in a single interaction.
       </td></tr><tr>
        <td>queryallactions
        </td><td>Identifies the queryallactions operation on a Thing to get the status of all Actions in a single interaction.
       </td></tr><tr>
        <td>subscribeallevents
-       </td><td>Identifies the subscribeallevents operation on Events to subscribe to notifications from all Events in  a single interaction.
+       </td><td>Identifies the subscribeallevents operation on Events to subscribe to notifications from all Events in a single interaction.
       </td></tr><tr>
        <td>unsubscribeallevents
-       </td><td>Identifies the unsubscribeallevents operation on Events to unsubscribe from notifications from all Events  in a single interaction.
+       </td><td>Identifies the unsubscribeallevents operation on Events to unsubscribe from notifications from all Events in a single interaction.
     </td></tr></tbody></table>
    </div>
 

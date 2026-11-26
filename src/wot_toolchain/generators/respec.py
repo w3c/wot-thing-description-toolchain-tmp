@@ -491,7 +491,7 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
                 file_to_classes[section_path.name] = []
                 continue
             section_sv = SchemaView(section_path, merge_imports=False)
-            file_to_classes[section_path.name] = list(section_sv.all_classes().keys())
+            file_to_classes[section_path.name] = list(section_sv.all_classes(imports=False).keys())
         except (yaml.YAMLError, IOError) as e:
             logging.error(
                 "Failed to load section schema %s due to: %s. Skipping section.",
@@ -541,7 +541,14 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
                     )
                     continue
 
-            rows = collect_slot_rows(sv, cls, process_description, schema_prefix)
+            rows = collect_slot_rows(
+                sv,
+                cls,
+                process_description,
+                schema_prefix,
+                range_labels=spec.range_labels,
+                default_values_anchor=spec.default_values_anchor,
+            )
             intro_html = ""
             desc_html = ""
             if "spec_intro_content" in ann:

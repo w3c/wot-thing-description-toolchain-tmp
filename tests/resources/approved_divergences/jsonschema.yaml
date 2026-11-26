@@ -1,0 +1,161 @@
+schema_version: 1
+upstream:
+  repository: w3c/wot-thing-description
+  artifact: resources/upstream/schemas/td20-json-schema-validation.json
+policy: >-
+  Entries are TD instances on which the generated JSON Schema and the upstream JSON Schema give different
+  verdicts, and the generated verdict is the reviewed one.
+divergences:
+  - id: jsonschema-action-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 16-type-declaration/invalid/action-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-action-input-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 16-type-declaration/invalid/action-input-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-event-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 16-type-declaration/invalid/event-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-nested-dataschema-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 16-type-declaration/invalid/nested-dataschema-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-property-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 16-type-declaration/invalid/property-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-root-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 16-type-declaration/invalid/root-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-security-scheme-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 16-type-declaration/invalid/security-scheme-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-context-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 1-simple-default/invalid/context-empty-array-td-invalid.jsonld
+    rationale: "The upstream @context array has no minItems, so it accepts [] although @context needs the TD context URI."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-link-sizes-pattern
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 18-links/invalid/link-icon-sizes-not-height-x-width-td-invalid.jsonld
+    rationale: "The upstream schema has no pattern for sizes although the spec gives the value pattern {Height}x{Width}."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-dataschema-pattern-number
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 7-complex-data-schemas/invalid/property-pattern-number-td-invalid.jsonld
+    rationale: "The upstream schema does not constrain pattern although the spec types it as string."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-dataschema-allof-number
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 7-complex-data-schemas/invalid/property-allof-number-td-invalid.jsonld
+    rationale: "The upstream schema does not constrain allOf; ours types it as an array of DataSchema. The term is not in the spec DataSchema table."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-dataschema-properties-string
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 7-complex-data-schemas/invalid/property-properties-string-td-invalid.jsonld
+    rationale: "The upstream schema does not constrain properties of a property affordance although the spec types it as Map of DataSchema."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-dataschema-contentencoding-number
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 7-complex-data-schemas/invalid/property-contentencoding-number-td-invalid.jsonld
+    rationale: "The upstream schema does not constrain contentEncoding of a property affordance although the spec types it as string."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-combo-oneof-and-malformed-allof
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/combo-scheme-with-oneof-and-malformed-allof-td-invalid.jsonld
+    rationale: "The upstream oneOf over the two combo shapes accepts oneOf together with an allOf of numbers, because the malformed allOf makes only one branch match. A combo scheme has either oneOf or allOf."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-oauth2-without-flow
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/oauth2-scheme-without-flow-td-invalid.jsonld
+    rationale: "The upstream schema requires only scheme although the spec marks flow as mandatory for OAuth2SecurityScheme."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-form-scopes-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 17-forms/invalid/form-scopes-empty-array-td-invalid.jsonld
+    rationale: "The upstream scopes array has no minItems, so it accepts [] although an array of scopes needs at least one scope."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-link-hreflang-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 18-links/invalid/link-hreflang-empty-array-td-invalid.jsonld
+    rationale: "The upstream hreflang array has no minItems, so it accepts [] although an array of language tags needs at least one tag."
+    expected_generated:
+      verdict: reject

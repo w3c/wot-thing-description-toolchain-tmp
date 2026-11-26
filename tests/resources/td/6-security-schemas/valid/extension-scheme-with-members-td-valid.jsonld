@@ -1,0 +1,13 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "ext_sc": {
+      "scheme": "ace:ACESecurityScheme",
+      "proxy": "https://example.com/proxy",
+      "description": "ACE",
+      "ace:as": "coaps://as.example.com/token"
+    }
+  },
+  "security": "ext_sc"
+}

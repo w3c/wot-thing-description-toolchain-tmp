@@ -1,0 +1,11 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "ext_sc": {
+      "scheme": "ace:ACESecurityScheme",
+      "description": 1
+    }
+  },
+  "security": "ext_sc"
+}

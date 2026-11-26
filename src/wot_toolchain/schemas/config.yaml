@@ -71,6 +71,8 @@ classes:
       top_class:
         description: Class that the root of the JSON Schema describes.
         required: true
+      schema:
+        description: LinkML schema that the JSON Schema is generated from instead of the root schema.
 
   JsonLdContextSettings: {}
 
@@ -109,6 +111,13 @@ classes:
           They are added to the assertion inventory CSV.
       assertions_csv:
         description: Path of the generated CSV file of assertions.
+      default_values_anchor:
+        description: Fragment identifier of the template section that the "with default" assignment links to.
+      range_labels:
+        description: Text shown in the type column of the vocabulary tables for a LinkML range.
+        range: RangeLabel
+        multivalued: true
+        inlined: true
 
   SpecSection:
     attributes:
@@ -117,4 +126,13 @@ classes:
         required: true
       schema:
         description: Path of the vocabulary schema whose tables fill the section.
+        required: true
+
+  RangeLabel:
+    attributes:
+      range:
+        description: Name of the LinkML range.
+        key: true
+      label:
+        description: Text shown for the range.
         required: true

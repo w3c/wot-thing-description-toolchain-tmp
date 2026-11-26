@@ -1,0 +1,10 @@
+{
+  "@context": [],
+  "title": "t",
+  "security": "nosec_sc",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  }
+}

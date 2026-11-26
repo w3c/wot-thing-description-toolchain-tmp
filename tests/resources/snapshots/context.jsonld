@@ -3,9 +3,6 @@
     "@context": {
       "@id": "@context"
     },
-    "@name": {
-      "@id": "wotsec:name"
-    },
     "@type": {
       "@id": "@type"
     },
@@ -23,12 +20,6 @@
       "@id": "linkml:Any"
     },
     "ArraySchema": {
-      "@context": {
-        "items": {
-          "@id": "jsonschema:items",
-          "@type": "@id"
-        }
-      },
       "@id": "jsonschema:ArraySchema"
     },
     "AutoSecurityScheme": {
@@ -137,11 +128,6 @@
       "@type": "@id"
     },
     "alg": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "wotsec:alg"
     },
     "allOf": {
@@ -149,15 +135,15 @@
     },
     "anchor": {
       "@id": "hctl:hasAnchor",
-      "@type": "xsd:anyURI"
+      "@type": "@id"
     },
     "authorization": {
       "@id": "wotsec:authorization",
-      "@type": "xsd:anyURI"
+      "@type": "@id"
     },
     "base": {
       "@id": "baseURI",
-      "@type": "xsd:anyURI"
+      "@type": "@id"
     },
     "bcp47": {
       "@id": "https://tools.ietf.org/html/bcp47",
@@ -175,19 +161,9 @@
       "@id": "hctl:forContentCoding"
     },
     "contentEncoding": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "jsonschema:contentEncoding"
     },
     "contentMediaType": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "jsonschema:contentMediaType"
     },
     "contentType": {
@@ -211,7 +187,8 @@
       "@type": "@id"
     },
     "description": {
-      "@id": "description"
+      "@id": "description",
+      "@type": "rdfs:Literal"
     },
     "descriptions": {
       "@id": "descriptionInLanguage",
@@ -234,37 +211,34 @@
       "@type": "xsd:decimal"
     },
     "flow": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
       "@id": "wotsec:flow"
     },
     "foaf": "http://xmlns.com/foaf/0.1/",
     "format": {
-      "@context": {
-        "description": "skos:prefLabel",
-        "meaning": "@id",
-        "text": "skos:notation"
-      },
-      "@id": "wotsec:format"
+      "@id": "jsonschema:format"
     },
     "forms": {
       "@id": "hasForm",
       "@type": "@id"
     },
+    "hasInstanceConfiguration": {
+      "@id": "hasInstanceConfiguration"
+    },
+    "hasInteractionAffordance": {
+      "@id": "hasInteractionAffordance",
+      "@type": "@id"
+    },
     "hctl": "https://www.w3.org/2019/wot/hypermedia#",
     "href": {
       "@id": "hctl:hasTarget",
-      "@type": "xsd:anyURI"
+      "@type": "@id"
     },
     "hreflang": {
       "@id": "hctl:hasHreflang"
     },
     "id": {
       "@id": "id",
-      "@type": "xsd:anyURI"
+      "@type": "@id"
     },
     "idempotent": {
       "@id": "isIdempotent",
@@ -289,7 +263,8 @@
       "@id": "instance"
     },
     "items": {
-      "@id": "jsonschema:items"
+      "@id": "jsonschema:items",
+      "@type": "@id"
     },
     "jsonschema": "https://www.w3.org/2019/wot/json-schema#",
     "language_tag": "@id",
@@ -345,6 +320,11 @@
       "@id": "wotsec:oneOf"
     },
     "op": {
+      "@context": {
+        "description": "skos:prefLabel",
+        "meaning": "@id",
+        "text": "skos:notation"
+      },
       "@id": "hctl:hasOperationType"
     },
     "output": {
@@ -356,15 +336,19 @@
       "@id": "jsonschema:pattern"
     },
     "profile": {
-      "@id": "followsProfile"
+      "@id": "followsProfile",
+      "@type": "@id"
     },
     "properties": {
       "@id": "hasPropertyAffordance",
       "@type": "@id"
     },
+    "propertyName": {
+      "@id": "jsonschema:propertyName"
+    },
     "proxy": {
       "@id": "wotsec:proxy",
-      "@type": "xsd:anyURI"
+      "@type": "@id"
     },
     "qop": {
       "@context": {
@@ -374,6 +358,7 @@
       },
       "@id": "wotsec:qop"
     },
+    "qudt": "http://qudt.org/schema/qudt/",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "readOnly": {
@@ -382,7 +367,7 @@
     },
     "refresh": {
       "@id": "wotsec:refresh",
-      "@type": "xsd:anyURI"
+      "@type": "@id"
     },
     "rel": {
       "@id": "hctl:hasRelationType"
@@ -399,7 +384,8 @@
       "@type": "xsd:boolean"
     },
     "schema": {
-      "@id": "hctl:hasAdditionalOutputSchema"
+      "@id": "hctl:hasAdditionalOutputSchema",
+      "@type": "@id"
     },
     "schemaDefinitions": {
       "@id": "schemaDefinitions",
@@ -411,7 +397,7 @@
         "meaning": "@id",
         "text": "skos:notation"
       },
-      "@id": "scheme"
+      "@id": "wotsec:scheme"
     },
     "scopes": {
       "@id": "wotsec:scopes"
@@ -424,6 +410,7 @@
       "@id": "definesSecurityScheme",
       "@type": "@id"
     },
+    "security_scheme_key": "@id",
     "shex": "http://www.w3.org/ns/shex#",
     "sizes": {
       "@id": "hctl:hasSizes"
@@ -447,7 +434,7 @@
     },
     "support": {
       "@id": "supportContact",
-      "@type": "xsd:anyURI"
+      "@type": "@id"
     },
     "synchronous": {
       "@id": "isSynchronous",
@@ -455,7 +442,8 @@
     },
     "td": "https://www.w3.org/2019/wot/td#",
     "title": {
-      "@id": "title"
+      "@id": "title",
+      "@type": "rdfs:Literal"
     },
     "titles": {
       "@id": "titleInLanguage",
@@ -464,7 +452,7 @@
     "tm": "https://www.w3.org/2019/wot/tm#",
     "token": {
       "@id": "wotsec:token",
-      "@type": "xsd:anyURI"
+      "@type": "@id"
     },
     "type": {
       "@context": {
@@ -475,7 +463,8 @@
       "@id": "jsonschema:type"
     },
     "unit": {
-      "@id": "unit"
+      "@id": "qudt:unit",
+      "@type": "@id"
     },
     "uriVariables": {
       "@id": "hasUriTemplateSchema",

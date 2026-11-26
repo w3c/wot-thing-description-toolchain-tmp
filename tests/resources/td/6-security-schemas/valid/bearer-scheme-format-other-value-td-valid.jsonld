@@ -1,0 +1,11 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "security": "x",
+  "securityDefinitions": {
+    "x": {
+      "scheme": "bearer",
+      "format": "x"
+    }
+  }
+}

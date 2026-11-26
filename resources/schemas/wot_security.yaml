@@ -1,16 +1,16 @@
 id: https://www.w3.org/2019/wot/security
 name: wot_security
-title: Security mechanisms for the Web of Things
+title: WoT Security
 description: >-
-  LinkML schema for the Security vocabulary of the W3C Web of Things (WoT) Thing Description 2.0 model.
-version: "2.0"
-license: MIT
+  Schema for the WoT Security vocabulary of the W3C Web of Things.
+version: "td-next"
+license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
 contributors:
   - mailto:michael.mccool@intel.com
   - https://vcharpenay.link/#me
-created_on: "2023-12-05"
-last_updated_on: "2026-09-29"
+created_on: "2023-12-05T00:00:00Z"
+last_updated_on: "2026-10-16T00:00:00Z"
 see_also:
   - https://www.w3.org/TR/wot-thing-description11/
   - https://www.w3.org/TR/wot-thing-description11/#sec-security-vocabulary-definition
@@ -38,22 +38,31 @@ enums:
     permissible_values:
       nosec:
         description: No authentication or other security mechanism is required.
+        meaning: wotsec:NoSecurityScheme
       combo:
         description: A combination of named security schemes using oneOf or allOf.
+        meaning: wotsec:ComboSecurityScheme
       basic:
         description: HTTP Basic authentication using a username and password.
+        meaning: wotsec:BasicSecurityScheme
       digest:
         description: HTTP Digest Access Authentication.
+        meaning: wotsec:DigestSecurityScheme
       bearer:
         description: Bearer token authentication independent of OAuth 2.0.
+        meaning: wotsec:BearerSecurityScheme
       psk:
         description: Pre-shared key authentication, for example TLS-PSK.
+        meaning: wotsec:PSKSecurityScheme
       oauth2:
         description: OAuth 2.0 authentication.
+        meaning: wotsec:OAuth2SecurityScheme
       apikey:
         description: API key authentication using an opaque access token.
+        meaning: wotsec:APIKeySecurityScheme
       auto:
         description: Security parameters are negotiated by the underlying protocol at runtime.
+        meaning: wotsec:AutoSecurityScheme
   SecurityLocationType:
     description: Specifies the location where security authentication information should be provided
     permissible_values:
@@ -69,13 +78,6 @@ enums:
         description: The parameter is embedded in the URI itself using a URI template variable
       auto:
         description: The location is determined as part of the protocol, or negotiated
-  algList:
-    description: Examples of encoding, encryption, or digest algorithms for bearer tokens.
-    permissible_values:
-      ES256:
-        description: ECDSA using the P-256 curve and SHA-256.
-      ES512-256:
-        description: Algorithm identifier listed as an example by TD 1.1.
   QoPType:
     description: Quality of protection options for digest security
     permissible_values:
@@ -83,62 +85,48 @@ enums:
         description: Authentication only
       auth-int:
         description: Authentication with integrity protection
-  BearerFormat:
-    description: Format specifications for bearer tokens
-    permissible_values:
-      jwt:
-        description: JSON Web Token (RFC7519)
-      jws:
-        description: JSON Web Signature (RFC7797)
-      cwt:
-        description: CBOR Web Token (RFC8392)
-      jwe:
-        description: JSON Web Encryption (RFC7516)
-  OAuth2Flow:
-    description: OAuth 2.0 authorization flows
-    permissible_values:
-      code:
-        description: Authorization code flow
-      client:
-        description: Client credentials flow
-
 slots:
   scheme:
     description: Identification of the security mechanism being configured.
     required: true
+    slot_uri: wotsec:scheme
     range: SecuritySchemeList
   alg:
     description: Encoding, encryption, or digest algorithm (e.g., ES256, ES512-256).
     slot_uri: wotsec:alg
+    domain: BearerSecurityScheme
     annotations:
       spec_description: >-
         Encoding, encryption, or digest algorithm.
-    range: algList
+    range: string
+    examples:
+      - value: ES256
+      - value: ES512-256
   flow:
     description: Authorization flow.
     slot_uri: wotsec:flow
-    range: OAuth2Flow
-  format:
-    description: Specifies format of security authentication information.
-    slot_uri: wotsec:format
-    range: BearerFormat
+    domain: OAuth2SecurityScheme
+    range: string
+    examples:
+      - value: code
+      - value: client
   identity:
     description: Identifier providing information which can be used for selection or confirmation.
     slot_uri: wotsec:identity
+    domain: PSKSecurityScheme
     range: string
   in:
     description: Specifies the location of security authentication information.
     slot_uri: wotsec:in
-    annotations:
-      skos:note: >-
-        The API Key security scheme maps the JSON member `in` to `wotsec:apikeyIn`, while Basic, Digest, and Bearer schemes map it to `wotsec:in`.
     range: SecurityLocationType
     comments:
       - Default value should be provided by implementations
+      - >-
+        The API Key security scheme maps the JSON member `in` to `wotsec:apikeyIn`, while Basic, Digest, and Bearer schemes map it to `wotsec:in`.
   "@name":
-    #this is the name in wot_Security, modelled like this because in LinkML name is a reserved key
     description: >-
       Name for query, header, cookie, or uri parameters. When used with body location, must be a JSON pointer.
+    alias: name
     slot_uri: wotsec:name
     annotations:
       spec_description: >-
@@ -147,18 +135,21 @@ slots:
   qop:
     description: Quality of protection.
     slot_uri: wotsec:qop
+    domain: DigestSecurityScheme
     range: QoPType
     comments:
       - This feature is at risk.
   scopes:
     description: >-
-      Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an 
+      Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an
       authorization server and associated with forms in order to identify what resources a client may access and how.
     slot_uri: wotsec:scopes
+    domain: OAuth2SecurityScheme
+    range: string
     annotations:
       spec_description: >-
-        Set of authorization scope identifiers provided as an array. 
-        These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources 
+        Set of authorization scope identifiers provided as an array.
+        These are provided in tokens returned by an authorization server and associated with forms in order to identify what resources
         a client may access and how. The values associated with a form SHOULD be chosen from those defined in an `OAuth2SecurityScheme` active on that form.
     any_of:
       - range: string
@@ -168,9 +159,10 @@ slots:
       - This feature is at risk.
   proxy:
     description: >-
-      URI of the proxy server this security configuration provides access to. If not given, the corresponding 
+      URI of the proxy server this security configuration provides access to. If not given, the corresponding
       security configuration is for the endpoint.
     slot_uri: wotsec:proxy
+    domain: SecurityScheme
     range: uri
     comments:
       - This feature is at risk.
@@ -181,37 +173,41 @@ slots:
   refresh:
     description: URI of the refresh server.
     slot_uri: wotsec:refresh
+    domain: OAuth2SecurityScheme
     range: uri
   token:
     description: URI of the token server.
     slot_uri: wotsec:token
+    domain: OAuth2SecurityScheme
     range: uri
   security_oneOf:
     description: >-
       Array of two or more strings identifying other named security scheme definitions, any one of which, when satisfied, will allow access. Only one may be chosen for use.
     alias: oneOf
     slot_uri: wotsec:oneOf
-    annotations:
-      skos:note: >-
+    domain: ComboSecurityScheme
+    comments:
+      - >-
         In a Combo security scheme, `oneOf` maps to `wotsec:oneOf` rather than the distinct `jsonschema:oneOf` term.
     range: string
     multivalued: true
-    minimum_value: 2
+    minimum_cardinality: 2
   security_allOf:
     description: >-
       Array of two or more strings identifying other named security scheme definitions, all of which must be
       satisfied for access.
     alias: allOf
     slot_uri: wotsec:allOf
+    domain: ComboSecurityScheme
     range: string
     multivalued: true
-    minimum_value: 2
+    minimum_cardinality: 2
 classes:
   SecurityScheme:
     description: >-
-      Metadata describing the configuration of a security mechanism. The value assigned to the name scheme MUST be defined 
-      within a Vocabulary included in the Thing Description. For all security schemes, any keys, passwords, or other 
-      sensitive information directly providing access MUST NOT be stored in the TD and should instead be shared and 
+      Metadata describing the configuration of a security mechanism. The value assigned to the name scheme MUST be defined
+      within a Vocabulary included in the Thing Description. For all security schemes, any keys, passwords, or other
+      sensitive information directly providing access MUST NOT be stored in the TD and should instead be shared and
       stored out-of-band via other mechanisms.
     class_uri: wotsec:SecurityScheme
     annotations:
@@ -314,26 +310,30 @@ classes:
     extra_slots:
       allowed: true
     attributes:
-      name:
+      security_scheme_key:
         identifier: true
         range: string
         description: Name of the security scheme definition.
         annotations:
           spec_exclude: true
     slots:
-      - "@type"
+      - atType
       - description
       - descriptions
       - proxy
       - scheme
     slot_usage:
-      "@type":
+      atType:
         range: string
         exactly_one_of:
           - range: string
+            none_of:
+              - equals_string: "tm:ThingModel"
           - range: string
             multivalued: true
             minimum_cardinality: 1
+            none_of:
+              - equals_string: "tm:ThingModel"
   NoSecurityScheme:
     description: >-
       A security configuration indicating there is no authentication or other mechanism required to access the resource.
@@ -351,10 +351,14 @@ classes:
           - nosec
   AutoSecurityScheme:
     description: >-
-      An automatic authentication security configuration identified by the term auto. This scheme indicates that the security 
+      An automatic authentication security configuration identified by the term auto. This scheme indicates that the security
       parameters are going to be negotiated by the underlying protocols at runtime.
     class_uri: wotsec:AutoSecurityScheme
     is_a: SecurityScheme
+    none_of:
+      - slot_conditions:
+          "@name":
+            required: true
     annotations:
       spec_description: >-
         An automatic authentication security configuration identified by the term `auto` (i.e., "scheme": "auto"). This scheme indicates that the security parameters are going to be negotiated by the underlying protocols at runtime, subject to the respective specifications for the protocol (e.g. [[RFC7617]] for Basic Authentication when using HTTP).
@@ -370,6 +374,13 @@ classes:
       A combination of other security schemes. Exactly one of either oneOf or allOf vocabulary terms MUST be included.
     class_uri: wotsec:ComboSecurityScheme
     is_a: SecurityScheme
+    exactly_one_of:
+      - slot_conditions:
+          security_oneOf:
+            required: true
+      - slot_conditions:
+          security_allOf:
+            required: true
     annotations:
       spec_intro_content:
         value:
@@ -411,6 +422,8 @@ classes:
         equals_string_in:
           - basic
       in:
+        none_of:
+          - equals_string: uri
         annotations:
           spec_default: true
           spec_type_values:
@@ -424,7 +437,7 @@ classes:
                 - auto
   DigestSecurityScheme:
     description: >-
-      Digest Access Authentication security configuration. This scheme is similar to basic authentication but with 
+      Digest Access Authentication security configuration. This scheme is similar to basic authentication but with
       added features to avoid man-in-the-middle attacks.
     class_uri: wotsec:DigestSecurityScheme
     is_a: SecurityScheme
@@ -444,6 +457,8 @@ classes:
         equals_string_in:
           - digest
       in:
+        none_of:
+          - equals_string: uri
         annotations:
           spec_default: true
           spec_type_values:
@@ -466,29 +481,31 @@ classes:
                 - auth-int
   APIKeySecurityScheme:
     description: >-
-      API key authentication security configuration identified by the term apikey. This scheme is to be used when the 
+      API key authentication security configuration identified by the term apikey. This scheme is to be used when the
       access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.
     class_uri: wotsec:APIKeySecurityScheme
     is_a: SecurityScheme
     annotations:
       spec_description: >-
-        API key authentication security configuration identified by the Vocabulary Term `apikey` (i.e., "scheme": "apikey"). 
-        This scheme is to be used when the access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider. 
-        In this case the key may not be using a standard token format. 
+        API key authentication security configuration identified by the Vocabulary Term `apikey` (i.e., "scheme": "apikey").
+        This scheme is to be used when the access token is opaque, for example when a key in an unknown or proprietary format is provided by a cloud service provider.
+        In this case the key may not be using a standard token format.
         This scheme indicates that the key provided by the service provider needs to be supplied as part of service requests using the mechanism indicated by the `in` field.
     extra_slots:
       allowed: true
     slots:
       - "@name"
-      - in
     slot_usage:
       scheme:
         range: string
         equals_string_in:
           - apikey
-      in:
+    attributes:
+      apikeyIn:
+        alias: in
+        description: Specifies the location of security authentication information.
         slot_uri: wotsec:apikeyIn
-        required: true
+        domain: APIKeySecurityScheme
         range: SecurityLocationType
         annotations:
           spec_default: true
@@ -524,13 +541,27 @@ classes:
       - "@name"
       - in
       - alg
-      - format
+    attributes:
+      format:
+        description: Specifies format of security authentication information.
+        slot_uri: wotsec:format
+        domain: BearerSecurityScheme
+        range: string
+        examples:
+          - value: jwt
+          - value: cwt
+          - value: jwe
+          - value: jws
+        annotations:
+          spec_default: true
     slot_usage:
       scheme:
         range: string
         equals_string_in:
           - bearer
       in:
+        none_of:
+          - equals_string: uri
         annotations:
           spec_default: true
           spec_type_values:
@@ -545,33 +576,16 @@ classes:
       alg:
         annotations:
           spec_default: true
-          spec_type_values:
-            value:
-              mode: examples
-              values:
-                - ES256
-                - ES512-256
-      format:
-        annotations:
-          spec_default: true
-          spec_type_values:
-            value:
-              mode: examples
-              values:
-                - jwt
-                - cwt
-                - jwe
-                - jws
   PSKSecurityScheme:
     description: >-
-      Pre-shared key authentication security configuration. This is meant to identify that a standard is used for 
+      Pre-shared key authentication security configuration. This is meant to identify that a standard is used for
       pre-shared keys such as TLS-PSK.
     class_uri: wotsec:PSKSecurityScheme
     is_a: SecurityScheme
     annotations:
       spec_description: >-
-        Pre-shared key authentication security configuration identified by the Vocabulary Term `psk` (i.e., "scheme": "psk"). 
-        This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[RFC4279]], 
+        Pre-shared key authentication security configuration identified by the Vocabulary Term `psk` (i.e., "scheme": "psk").
+        This is meant to identify that a standard is used for pre-shared keys such as TLS-PSK [[RFC4279]],
         and that the ciphersuite used for keys will be established during protocol negotiation.
     extra_slots:
       allowed: true
@@ -589,7 +603,7 @@ classes:
     is_a: SecurityScheme
     annotations:
       spec_description: >-
-        OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]], 
+        OAuth 2.0 authentication security configuration for systems conformant with [[RFC6749]] and [[RFC8252]],
         identified by the Vocabulary Term `oauth2` (i.e., "scheme": "oauth2").
       spec_content:
         value:
