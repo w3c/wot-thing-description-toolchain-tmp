@@ -113,7 +113,7 @@ def run_pipeline(config: Config) -> None:
     if "visualization" in config.generators:
         diagrams = [(vocabulary.schema, vocabulary.diagram) for vocabulary in config.vocabularies if vocabulary.diagram]
         with _generation_errors("visualization"):
-            generate_visualizations(diagrams, visualization_dir)
+            generate_visualizations(config.root_schema, diagrams, visualization_dir, config.diagram_range_labels)
 
     if config.spec is not None:
         shutil.copytree(STATIC_VISUALIZATION_PATH, visualization_dir, dirs_exist_ok=True)

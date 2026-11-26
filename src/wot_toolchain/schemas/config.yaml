@@ -82,7 +82,13 @@ classes:
 
   LinkmlSettings: {}
 
-  VisualizationSettings: {}
+  VisualizationSettings:
+    attributes:
+      range_labels:
+        description: Text shown as the type of an attribute in the class diagrams for a LinkML range.
+        range: RangeLabel
+        multivalued: true
+        inlined: true
 
   SpecSettings:
     attributes:

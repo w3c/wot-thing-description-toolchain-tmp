@@ -55,6 +55,7 @@ class Config:
     top_class: str | None
     jsonschema_profile: Path | None
     vocabularies: tuple[Vocabulary, ...]
+    diagram_range_labels: Mapping[str, str]
     spec: SpecConfig | None
 
     @property
@@ -81,6 +82,7 @@ def load_config(path: Path) -> Config:
         if generators.get("jsonschema", {}).get("schema")
         else None,
         vocabularies=vocabularies,
+        diagram_range_labels=_range_labels((generators.get("visualization") or {}).get("range_labels")),
         spec=_spec(path, generators["spec"], vocabularies) if "spec" in generators else None,
     )
 
