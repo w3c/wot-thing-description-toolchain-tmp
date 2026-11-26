@@ -1,24 +1,27 @@
-name: snippet_schema
-title: WoT Thing Description ReSpec Snippet Schema
-description: >-
-  LinkML schema for snippet metadata used by the WoT Toolchain to render
-  examples in the Thing Description specification.
 id: https://w3c.github.io/wot-thing-description/snippets
-version: "2.0"
-license: MIT
+name: snippet_schema
+title: Snippet Metadata
+description: >-
+  Schema for the snippet metadata used to render examples in the Thing Description specification.
+version: "td-next"
+license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
-contributors:
-  - mailto:mahda.noura@siemens.com
-created_on: "2025-06-01"
-last_updated_on: "2026-08-28"
+created_on: "2025-06-01T00:00:00Z"
+last_updated_on: "2026-11-21T00:00:00Z"
+see_also:
+  - https://www.w3.org/TR/wot-thing-description11/
+annotations:
+  dcterms:publisher:
+    value:
+      "@type": schema:Organization
+      schema:name: W3C Web of Things Working Group
+      schema:url: https://www.w3.org/WoT/WG/
 
 prefixes:
-  linkml:
-    prefix_prefix: linkml
-    prefix_reference: https://w3id.org/linkml/
-  snippet:
-    prefix_prefix: snippet
-    prefix_reference: https://w3c.github.io/wot-thing-description/snippets/
+  dcterms: http://purl.org/dc/terms/
+  linkml: https://w3id.org/linkml/
+  snippet: https://w3c.github.io/wot-thing-description/snippets/
+default_prefix: snippet
 default_range: string
 imports:
   - linkml:types
@@ -75,6 +78,12 @@ classes:
           Map of group names to their composition definitions. Groups combine
           multiple snippets into tabbed or toggle views for side-by-side
           comparison in the specification.
+      default_schema:
+        description: >-
+          Snippet kind used to validate every snippet that does not set its
+          own schema. Must be a key of spec.snippet_validation_schemas in the
+          project manifest (e.g., "td"). Required as soon as one validated
+          snippet has no schema of its own.
   Snippet:
     description: >-
       Metadata for a single JSON-LD example file rendered in the Thing Description
@@ -111,6 +120,12 @@ classes:
           or Thing Model JSON Schema during the build process. Set to false
           for partial snippets or protocol binding examples that are not
           complete TD instances.
+      schema:
+        description: >-
+          Snippet kind used to validate this snippet, overriding the
+          manifest's default_schema. Must be a key of
+          spec.snippet_validation_schemas in the project manifest (e.g., "tm"
+          for Thing Model snippets). Ignored when validate is false.
       hide_paths:
         range: string
         multivalued: true

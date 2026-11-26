@@ -1,0 +1,31 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/wot-next/td",
+    {
+      "ex": "https://example.com/ns#"
+    }
+  ],
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "x_sc": {
+      "@type": "ex:Scheme",
+      "scheme": "combo",
+      "oneOf": [
+        "a_sc",
+        "b_sc"
+      ],
+      "description": "A scheme",
+      "descriptions": {
+        "en": "A scheme"
+      },
+      "proxy": "https://example.com/proxy"
+    },
+    "a_sc": {
+      "scheme": "basic"
+    },
+    "b_sc": {
+      "scheme": "bearer"
+    }
+  },
+  "security": "x_sc"
+}

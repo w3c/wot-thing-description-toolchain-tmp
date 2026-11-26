@@ -1,0 +1,25 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "actions": {
+    "a": {
+      "input": {
+        "enum": [
+          "on",
+          "on"
+        ]
+      },
+      "forms": [
+        {
+          "href": "https://example.com/a"
+        }
+      ]
+    }
+  }
+}

@@ -43,7 +43,9 @@ def test_td20_default_assignments_match_manual_golden_rows() -> None:
     actual = set()
     for schema_path, class_name in cases:
         schema_view = SchemaView(str(REPO_ROOT / schema_path), merge_imports=True)
-        for row in collect_slot_rows(schema_view, class_name, _plain_markdown, "td"):
+        for row in collect_slot_rows(
+            schema_view, class_name, _plain_markdown, "td", default_values_anchor="sec-default-values"
+        ):
             if row["assignment"] == '<a href="#sec-default-values">with default</a>':
                 actual.add(row["assertion_id"])
 

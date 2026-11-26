@@ -1,0 +1,13 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "security": "x",
+  "securityDefinitions": {
+    "x": {
+      "scheme": "oauth2",
+      "flow": "device",
+      "authorization": "https://example.com/authorize",
+      "token": "https://example.com/token"
+    }
+  }
+}

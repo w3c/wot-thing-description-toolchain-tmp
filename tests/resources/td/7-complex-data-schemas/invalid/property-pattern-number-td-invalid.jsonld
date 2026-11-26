@@ -1,0 +1,20 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "security": "nosec_sc",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "properties": {
+    "p": {
+      "pattern": 1,
+      "forms": [
+        {
+          "href": "h"
+        }
+      ]
+    }
+  }
+}

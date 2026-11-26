@@ -1,48 +1,44 @@
+"""Build the rows of the specification's vocabulary tables from LinkML class definitions."""
+
 from __future__ import annotations
+
 import re
-from typing import Any, Dict, List, Callable, Optional
+from collections.abc import Callable, Iterable, Mapping
+from pathlib import Path
+from typing import Any
+
+import yaml
+from linkml_runtime.linkml_model.meta import ClassDefinition, SlotDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
+from ..schema_utils import annotation_dict_value as _annotation_value
 from .assertions import make_slot_assertion_id
+
+
+def load_type_hrefs(glossary_path: Path) -> dict[str, str]:
+    """Return the ``href`` of every glossary term that has one, keyed by term; empty if the glossary is missing."""
+    if not glossary_path.exists():
+        return {}
+    data = yaml.safe_load(glossary_path.read_text(encoding="utf-8")) or {}
+    return {
+        term: entry["href"]
+        for term, entry in (data.get("terms") or {}).items()
+        if isinstance(entry, dict) and "href" in entry
+    }
 
 
 def _strip_outer_p(html: str) -> str:
     match = re.fullmatch(r"\s*<p>(?P<body>.*)</p>\s*", html or "", flags=re.DOTALL)
     return match.group("body") if match else (html or "")
 
-def _normalize_range_name(rng: str | None) -> str:
-    """
-    Map LinkML range names to the textual form expected in the TD spec.
 
-    Currently:
-      - LinkML 'uri' -> spec 'anyURI'
-      - everything else unchanged.
-    """
+def _normalize_range_name(rng: str | None, range_labels: Mapping[str, str] | None) -> str:
     if not rng:
         return ""
-    if rng in ["Any", "linkml:Any"]:
-        return "any type"
-    if rng == "langString":
-        return "rdf:langString"
-    if rng == "uri":
-        return "anyURI"
-    if rng == "datetime":
-        return "dateTime"
-    if rng == "NonNegativeInteger":
-        return "unsignedInt"
-    if rng == "decimal":
-        return "double"
-    return rng
+    return (range_labels or {}).get(rng, rng)
 
 
-def _annotation_value(annotations: dict, key: str):
-    ann = annotations.get(key)
-    if ann is None:
-        return None
-    return getattr(ann, "value", ann)
-
-
-def _is_truthy_annotation(value) -> bool:
+def _is_truthy_annotation(value: Any) -> bool:
     value = getattr(value, "value", value)
     if isinstance(value, bool):
         return value
@@ -51,34 +47,44 @@ def _is_truthy_annotation(value) -> bool:
     return value is not None
 
 
-def _has_default_assignment(slot_name: str, class_def, slot_def) -> bool:
+def _has_default_assignment(slot_name: str, class_def: ClassDefinition, slot_def: SlotDefinition) -> bool:
     return any(
         _is_truthy_annotation(_annotation_value(annotations, "spec_default"))
         for annotations in _annotation_candidates(slot_name, class_def, slot_def)
     )
 
 
-def _annotation_candidates(slot_name: str, class_def, slot_def) -> List[dict]:
+def _annotation_candidates(
+    slot_name: str, class_def: ClassDefinition, slot_def: SlotDefinition
+) -> list[dict[str, Any]]:
     candidates = [getattr(slot_def, "annotations", None) or {}]
     usage = (class_def.slot_usage or {}).get(slot_name)
     if usage:
         candidates.append(getattr(usage, "annotations", None) or {})
     if slot_name in (class_def.attributes or {}):
-        candidates.append(
-            getattr(class_def.attributes[slot_name], "annotations", None) or {}
-        )
+        candidates.append(getattr(class_def.attributes[slot_name], "annotations", None) or {})
     return candidates
 
 
-def _get_type_values_annotation(slot_name: str, class_def, slot_def):
-    for annotations in reversed(_annotation_candidates(slot_name, class_def, slot_def)):
-        value = _annotation_value(annotations, "spec_type_values")
+def _get_type_values_annotation(slot_name: str, class_def: ClassDefinition, slot_def: SlotDefinition) -> Any:
+    for candidate in reversed(_annotation_candidates(slot_name, class_def, slot_def)):
+        value = _annotation_value(candidate, "spec_type_values")
         if value is not None:
             return value
     return None
 
 
-def _format_value_list(values: List[str]) -> str:
+def _example_values(slot_name: str, class_def: ClassDefinition, slot_def: SlotDefinition) -> list[str]:
+    """Values of the LinkML ``examples`` nearest to the class: attribute, then slot usage, then slot."""
+    usage = (class_def.slot_usage or {}).get(slot_name)
+    for source in ((class_def.attributes or {}).get(slot_name), usage, slot_def):
+        examples = getattr(source, "examples", None) or []
+        if examples:
+            return [str(example.value) for example in examples if example.value is not None]
+    return []
+
+
+def _format_value_list(values: list[str]) -> str:
     values = [f"<code>{v}</code>" for v in (str(value) for value in values) if v]
     if not values:
         return ""
@@ -87,8 +93,10 @@ def _format_value_list(values: List[str]) -> str:
     return f"{', '.join(values[:-1])}, or {values[-1]}"
 
 
-def _append_type_values(type_text: str, slot_name: str, class_def, slot_def) -> str:
+def _append_type_values(type_text: str, slot_name: str, class_def: ClassDefinition, slot_def: SlotDefinition) -> str:
     value_config = _get_type_values_annotation(slot_name, class_def, slot_def)
+    if value_config is None:
+        value_config = {"mode": "examples", "values": _example_values(slot_name, class_def, slot_def)}
     if isinstance(value_config, dict):
         values = value_config.get("values") or []
         mode = value_config.get("mode")
@@ -103,49 +111,134 @@ def _append_type_values(type_text: str, slot_name: str, class_def, slot_def) -> 
         return type_text
 
     mode = str(mode or "examples").strip().lower()
-    if mode in {"one_of", "one-of", "one of", "closed"}:
-        label = "one of"
-    else:
-        label = "e.g.,"
+    label = "one of" if mode in {"one_of", "one-of", "one of", "closed"} else "e.g.,"
     return f"{type_text} ({label} {formatted_values})"
 
 
-def get_assignment(slot_name, class_def, slot_def) -> str:
+def get_assignment(
+    slot_name: str,
+    class_def: ClassDefinition,
+    slot_def: SlotDefinition,
+    default_values_anchor: str | None = None,
+) -> str:
+    """Return the assignment column text for a slot of a class.
+
+    A truthy ``spec_default`` annotation gives ``with default``, linked to the section with fragment id
+    ``default_values_anchor`` if one is given; ``required``, a positive ``minimum_value`` or being required by
+    one alternative of the class (``exactly_one_of`` / ``any_of``) gives ``mandatory``; otherwise ``optional``.
+    Slot usage of the class overrides the slot. ``minimum_cardinality`` bounds an array that is present and does
+    not make the slot mandatory.
+    """
     usage = (class_def.slot_usage or {}).get(slot_name)
     if _has_default_assignment(slot_name, class_def, slot_def):
-        return '<a href="#sec-default-values">with default</a>'
+        if default_values_anchor is None:
+            return "with default"
+        return f'<a href="#{default_values_anchor}">with default</a>'
     if getattr(slot_def, "required", False) or (usage and getattr(usage, "required", False)):
         return "mandatory"
     min_value = getattr(slot_def, "minimum_value", None)
     if usage and getattr(usage, "minimum_value", None) is not None:
         min_value = usage.minimum_value
-    try:
-        if min_value is not None and float(min_value) > 0:
-            return "mandatory"
-    except Exception:
-        pass
+    if min_value is not None and _is_positive_number(min_value):
+        return "mandatory"
+    if _required_by_alternative(slot_name, class_def):
+        return "mandatory"
     return "optional"
+
+
+def _required_by_alternative(slot_name: str, class_def: ClassDefinition) -> bool:
+    """Return whether one ``exactly_one_of`` / ``any_of`` alternative of the class requires the slot."""
+    alternatives = [*(class_def.exactly_one_of or []), *(class_def.any_of or [])]
+    return any(
+        (condition := (alternative.slot_conditions or {}).get(slot_name)) is not None and bool(condition.required)
+        for alternative in alternatives
+    )
+
+
+def _is_positive_number(value: Any) -> bool:
+    try:
+        return float(value) > 0
+    except TypeError, ValueError:
+        # LinkML allows non-numeric minimum values (e.g. dates or mappings); they never make a slot mandatory.
+        return False
 
 
 _XSD_BASE = "https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#"
 
 
-def _link(name: str, sv: SchemaView) -> str:
-    if name == "any type":
+_LINKML_ANY_URI = "https://w3id.org/linkml/Any"
+
+
+def _denotes_any(rng: str | None, sv: SchemaView) -> bool:
+    if not rng:
+        return False
+    class_def = sv.all_classes().get(rng)
+    uri = class_def.class_uri if class_def and class_def.class_uri else rng
+    return sv.expand_curie(uri) == _LINKML_ANY_URI
+
+
+def _link_range(rng: str | None, name: str, sv: SchemaView, type_hrefs: dict[str, str] | None) -> str:
+    # linkml:Any stands for any value, not a vocabulary term or datatype, so there is nothing to link to.
+    if _denotes_any(rng, sv):
         return name
-    if name == "rdf:langString":
-        return f"<code>{name}</code>"
+    return _link(name, sv, type_hrefs)
+
+
+def _link(name: str, sv: SchemaView, type_hrefs: dict[str, str] | None = None) -> str:
     if name in ("Array", "Map"):
         return f"<a>{name}</a>"
     if name in sv.all_classes():
         return f'<a href="#{name.lower()}"><code>{name}</code></a>'
+    if type_hrefs and name in type_hrefs:
+        return f'<a href="{type_hrefs[name]}"><code>{name}</code></a>'
     return f'<a href="{_XSD_BASE}{name}"><code>{name}</code></a>'
 
 
-def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effective_range: Optional[str] = None) -> str:
-    raw_rng = effective_range if effective_range else getattr(slot_def, "range", None)
-    # Choice Logic (exactly_one_of or any_of)
+def _identifier(class_name: str, sv: SchemaView) -> SlotDefinition | None:
+    """Return the slot that names an instance of ``class_name``, or ``None`` if instances have no name."""
+    # Not SchemaView.get_identifier_slot: it induces every slot, and a module lists slots only its importer defines.
+    slots = sv.all_slots()
+    for name in sv.class_ancestors(class_name):
+        class_def = sv.get_class(name)
+        candidates = [*class_def.attributes.values(), *(slots[slot] for slot in class_def.slots if slot in slots)]
+        for candidate in candidates:
+            if candidate.identifier or candidate.key:
+                return candidate
+    return None
+
+
+def _serialized_range(rng: str | None, holders: Iterable[Any], sv: SchemaView) -> str | None:
+    """Return the range a value of ``rng`` has in a document: the identifier's range for a reference by name."""
+    if rng is None or rng not in sv.all_classes():
+        return rng
+    identifier = _identifier(rng, sv)
+    if identifier is None or any(
+        getattr(holder, "inlined", None) or getattr(holder, "inlined_as_list", None) for holder in holders
+    ):
+        return rng
+    return identifier.range or sv.schema.default_range or "string"
+
+
+def slot_type_text(
+    slot_name: str,
+    slot_def: SlotDefinition,
+    class_def: ClassDefinition,
+    sv: SchemaView,
+    effective_range: str | None = None,
+    type_hrefs: dict[str, str] | None = None,
+    range_labels: Mapping[str, str] | None = None,
+) -> str:
+    """Return the type column HTML for a slot of a class.
+
+    ``exactly_one_of`` or ``any_of`` alternatives are joined with "or", enums render as ``anyURI`` or ``string``
+    with their values, multivalued slots as "Array of" and inlined multivalued slots as "Map of". Type names are
+    linked via ``_link``. ``effective_range``, if given, replaces the slot's own ``range``. A range with an entry
+    in ``range_labels`` is shown as that label instead of its name.
+    """
     usage = (getattr(class_def, "slot_usage", None) or {}).get(slot_name)
+    raw_rng = effective_range if effective_range else getattr(slot_def, "range", None)
+    raw_rng = _serialized_range(raw_rng, (slot_def, usage), sv)
+    # Choice Logic (exactly_one_of or any_of)
     choices = None
     if usage:
         choices = getattr(usage, "exactly_one_of", None) or getattr(usage, "any_of", None)
@@ -159,20 +252,25 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
             alt_rng_raw = getattr(alt, "range", None)
             if not alt_rng_raw:
                 alt_rng_raw = raw_rng
+            alt_rng_raw = _serialized_range(alt_rng_raw, (alt, slot_def, usage), sv)
             if alt_rng_raw is not None and alt_rng_raw in all_enums:
                 enum_def = all_enums[alt_rng_raw]
                 is_uri = enum_def.enum_uri in ["linkml:uri", "anyURI"] or alt_rng_raw.lower() == "uri"
                 rng = "anyURI" if is_uri else "string"
             else:
-                rng = _normalize_range_name(alt_rng_raw)
+                rng = _normalize_range_name(alt_rng_raw, range_labels)
             mv = bool(getattr(alt, "multivalued", False))
             if mv:
                 if slot_name == "@context":
-                    p = _link("Array", sv)
+                    p = _link("Array", sv, type_hrefs)
                 else:
-                    p = f"{_link('Array', sv)} of {_link(rng, sv)}" if rng else _link("Array", sv)
+                    p = (
+                        f"{_link('Array', sv, type_hrefs)} of {_link_range(alt_rng_raw, rng, sv, type_hrefs)}"
+                        if rng
+                        else _link("Array", sv, type_hrefs)
+                    )
             else:
-                p = _link(rng, sv) if rng else ""
+                p = _link_range(alt_rng_raw, rng, sv, type_hrefs) if rng else ""
             if p and p not in seen:
                 seen.add(p)
                 pretty.append(p)
@@ -186,47 +284,68 @@ def slot_type_text(slot_name: str, slot_def, class_def, sv: SchemaView, effectiv
     all_enums = sv.all_enums()
     if raw_rng is not None and raw_rng in all_enums:
         enum_def = all_enums[raw_rng]
-        is_uri_enum = (enum_def.enum_uri in ["linkml:uri", "anyURI"] or raw_rng.lower() == "uri")
-        enum_base = _link("anyURI", sv) if is_uri_enum else _link("string", sv)
+        is_uri_enum = enum_def.enum_uri in ["linkml:uri", "anyURI"] or raw_rng.lower() == "uri"
+        enum_base = _link("anyURI", sv, type_hrefs) if is_uri_enum else _link("string", sv, type_hrefs)
         if _get_type_values_annotation(slot_name, class_def, slot_def) is not None:
             return _append_type_values(enum_base, slot_name, class_def, slot_def)
         pv_names = list(enum_def.permissible_values.keys())
         if pv_names:
             formatted_pvs = _format_value_list(pv_names)
-            return f"{_link('anyURI', sv)} (one of {formatted_pvs})" if is_uri_enum else f"{_link('string', sv)} (e.g., {formatted_pvs})"
-        return _link("string", sv)
+            return (
+                f"{_link('anyURI', sv, type_hrefs)} (one of {formatted_pvs})"
+                if is_uri_enum
+                else f"{_link('string', sv, type_hrefs)} (e.g., {formatted_pvs})"
+            )
+        return _link("string", sv, type_hrefs)
     # STANDARD FALLBACK
-    rng = _normalize_range_name(raw_rng)
+    rng = _normalize_range_name(raw_rng, range_labels)
     if not rng:
         return ""
     if getattr(slot_def, "inlined", False) and getattr(slot_def, "multivalued", False):
-        return _append_type_values(f"{_link('Map', sv)} of {_link(rng, sv)}", slot_name, class_def, slot_def)
+        return _append_type_values(
+            f"{_link('Map', sv, type_hrefs)} of {_link_range(raw_rng, rng, sv, type_hrefs)}",
+            slot_name,
+            class_def,
+            slot_def,
+        )
     if getattr(slot_def, "multivalued", False):
-        return _append_type_values(f"{_link('Array', sv)} of {_link(rng, sv)}", slot_name, class_def, slot_def)
-    return _append_type_values(_link(rng, sv), slot_name, class_def, slot_def)
+        return _append_type_values(
+            f"{_link('Array', sv, type_hrefs)} of {_link_range(raw_rng, rng, sv, type_hrefs)}",
+            slot_name,
+            class_def,
+            slot_def,
+        )
+    return _append_type_values(_link_range(raw_rng, rng, sv, type_hrefs), slot_name, class_def, slot_def)
 
 
-def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Callable[[str], str], schema_prefix: str = "",
-                      ) -> List[Dict[str, Any]]:
+def collect_slot_rows(
+    sv: SchemaView,
+    class_name: str,
+    process_description: Callable[[str], str],
+    vocab_id_prefix: str = "",
+    type_hrefs: dict[str, str] | None = None,
+    range_labels: Mapping[str, str] | None = None,
+    default_values_anchor: str | None = None,
+) -> list[dict[str, Any]]:
+    """Collect all visible slot rows for *class_name* in schema-defined order.
+
+    Each returned dict includes an ``assertion_id`` key containing the stable RFC 2119 table-assertion ID for use
+    as the <tr id="..."> attribute, or an empty string when ``vocab_id_prefix`` is empty.
+
+    The ID is generated by ``make_slot_assertion_id(vocab_id_prefix, class_name, display_name)``, where
+    ``display_name`` is the slot's alias, or else the slot name. See ``make_slot_assertion_id`` for the ID format.
+    ``range_labels`` maps range names to the label shown in the type column; see ``slot_type_text``.
+    ``default_values_anchor`` is the fragment id the "with default" assignment links to; see ``get_assignment``.
     """
-        Collect all visible slot rows for *class_name* in schema-defined order.
-        Each returned dict now includes an ``assertion_id`` key containing the
-       stable RFC 2119 table-assertion ID for use as the <tr id="..."> attribute.
-
-        The ID is generated by make_slot_assertion_id(schema_prefix, class_name,
-        slot_name) and follows the convention: <prefix>-<ClassName-kebab>-<slotName-kebab>
-        e.g. "td-thing-context", "td-thing-title", "jsonschema-data-schema-type".
-    """
-
     class_def = sv.get_class(class_name)
     if not class_def:
         return []
-    rows: List[Dict[str, Any]] = []
-    slot_names: List[str] = class_def.slots or []
+    rows: list[dict[str, Any]] = []
+    slot_names: list[str] = class_def.slots or []
     # Get attribute names
-    attribute_names: List[str] = list(class_def.attributes.keys()) if class_def.attributes else []
+    attribute_names: list[str] = list(class_def.attributes.keys()) if class_def.attributes else []
     # unique list, prioritizing explicit slots first, followed by attributes
-    ordered_unique_names: List[str] = []
+    ordered_unique_names: list[str] = []
     seen = set()
     for name in slot_names + attribute_names:
         if name not in seen:
@@ -249,8 +368,8 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
             ann.update(raw_ann)
         spec_exclude_ann = ann.get("spec_exclude")
         if spec_exclude_ann:
-            val = getattr(spec_exclude_ann, 'value', spec_exclude_ann)
-            if str(val).lower() == 'true':
+            val = getattr(spec_exclude_ann, "value", spec_exclude_ann)
+            if str(val).lower() == "true":
                 continue
         raw_desc = getattr(slot_def, "description", "")
         usage_ann = getattr(usage, "annotations", None) or {} if usage else {}
@@ -258,32 +377,36 @@ def collect_slot_rows(sv: SchemaView, class_name: str, process_description: Call
             raw_desc = str(getattr(usage_ann["spec_description"], "value", usage_ann["spec_description"]))
         elif usage and getattr(usage, "description", None):
             raw_desc = usage.description
+        elif slot_name in class_def.attributes:
+            attr_ann = getattr(class_def.attributes[slot_name], "annotations", None) or {}
+            if "spec_description" in attr_ann:
+                raw_desc = str(getattr(attr_ann["spec_description"], "value", attr_ann["spec_description"]))
+            elif getattr(class_def.attributes[slot_name], "description", None):
+                raw_desc = class_def.attributes[slot_name].description
         elif "spec_description" in ann:
             raw_desc = str(getattr(ann["spec_description"], "value", ann["spec_description"]))
         desc_html = _strip_outer_p(process_description(raw_desc))
         desc = (desc_html or "").replace("'", "&#39;")
         slot_alias = getattr(slot_def, "alias", None)
         # A LinkML alias is the serialized JSON member name.
-        if slot_alias:
-            display_name = slot_alias
-        # special case for the name defined in wot_security.yaml, name is a reserved keyword in LinkML.
-        elif slot_name == "@name":
-            display_name = "name"
-        else:
-            display_name = slot_name
-        assertion_id = make_slot_assertion_id(schema_prefix, class_name, display_name) if schema_prefix else ""
-        rows.append({
-            "slot_name": display_name,
-            "assertion_id": assertion_id,
-            "description": desc,
-            "assignment": get_assignment(slot_name, class_def, slot_def),
-            "range_text": slot_type_text(
-                slot_name=slot_name,
-                slot_def=slot_def,
-                class_def=class_def,
-                sv=sv,
-                effective_range=effective_range_name
-            ),
-            "range_original": effective_range_name,
-        })
+        display_name = slot_alias or slot_name
+        assertion_id = make_slot_assertion_id(vocab_id_prefix, class_name, display_name) if vocab_id_prefix else ""
+        rows.append(
+            {
+                "slot_name": display_name,
+                "assertion_id": assertion_id,
+                "description": desc,
+                "assignment": get_assignment(slot_name, class_def, slot_def, default_values_anchor),
+                "range_text": slot_type_text(
+                    slot_name=slot_name,
+                    slot_def=slot_def,
+                    class_def=class_def,
+                    sv=sv,
+                    effective_range=effective_range_name,
+                    type_hrefs=type_hrefs,
+                    range_labels=range_labels,
+                ),
+                "range_original": effective_range_name,
+            }
+        )
     return rows

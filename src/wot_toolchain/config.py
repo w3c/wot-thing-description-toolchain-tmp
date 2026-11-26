@@ -39,6 +39,8 @@ class SpecConfig:
     glossary: Path
     extra_asserts: Path | None
     assertions_csv: Path | None
+    range_labels: Mapping[str, str]
+    default_values_anchor: str | None
 
 
 @dataclass(frozen=True)
@@ -50,6 +52,7 @@ class Config:
     output_dir: Path
     generators: tuple[str, ...]
     top_class: str | None
+    jsonschema_profile: Path | None
     vocabularies: tuple[Vocabulary, ...]
     spec: SpecConfig | None
 
@@ -73,6 +76,9 @@ def load_config(path: Path) -> Config:
         output_dir=_output(path, data["output_dir"]),
         generators=tuple(name for name in GENERATORS if name in generators),
         top_class=generators["jsonschema"]["top_class"] if "jsonschema" in generators else None,
+        jsonschema_profile=_input(path, generators["jsonschema"]["schema"], "/generators/jsonschema/schema", "file")
+        if generators.get("jsonschema", {}).get("schema")
+        else None,
         vocabularies=vocabularies,
         spec=_spec(path, generators["spec"], vocabularies) if "spec" in generators else None,
     )
@@ -127,6 +133,15 @@ def _spec(path: Path, spec: dict[str, Any], vocabularies: tuple[Vocabulary, ...]
         glossary=_input(path, spec["glossary"], f"{where}/glossary", "file"),
         extra_asserts=None if extra_asserts is None else _input(path, extra_asserts, f"{where}/extra_asserts", "file"),
         assertions_csv=None if assertions_csv is None else _output(path, assertions_csv),
+        range_labels=_range_labels(spec.get("range_labels")),
+        default_values_anchor=spec.get("default_values_anchor"),
+    )
+
+
+def _range_labels(entries: Mapping[str, Any] | None) -> Mapping[str, str]:
+    """Return the label of each range; a label is written as ``range: label`` or ``range: {label: label}``."""
+    return MappingProxyType(
+        {name: entry if isinstance(entry, str) else entry["label"] for name, entry in (entries or {}).items()}
     )
 
 

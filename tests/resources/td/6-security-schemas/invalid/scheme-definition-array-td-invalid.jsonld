@@ -1,0 +1,15 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    },
+    "other_sc": [
+      {
+        "scheme": "basic"
+      }
+    ]
+  },
+  "security": "nosec_sc"
+}

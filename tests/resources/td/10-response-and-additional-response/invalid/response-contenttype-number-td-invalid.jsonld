@@ -1,0 +1,23 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "actions": {
+    "toggle": {
+      "forms": [
+        {
+          "href": "https://example.com/toggle",
+          "op": "invokeaction",
+          "response": {
+            "contentType": 1
+          }
+        }
+      ]
+    }
+  }
+}

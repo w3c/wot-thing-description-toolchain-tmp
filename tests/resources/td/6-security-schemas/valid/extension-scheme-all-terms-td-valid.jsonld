@@ -1,0 +1,21 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/wot-next/td",
+    {
+      "ex": "https://example.com/ns#"
+    }
+  ],
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "x_sc": {
+      "@type": "ex:Scheme",
+      "scheme": "ace:ACESecurityScheme",
+      "description": "A scheme",
+      "descriptions": {
+        "en": "A scheme"
+      },
+      "proxy": "https://example.com/proxy"
+    }
+  },
+  "security": "x_sc"
+}

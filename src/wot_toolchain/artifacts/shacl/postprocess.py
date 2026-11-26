@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from rdflib import BNode, Graph, URIRef
 from rdflib.collection import Collection
-from rdflib.namespace import SH
+from rdflib.namespace import RDFS, SH
 from rdflib.term import Node
 
 from linkml_runtime.utils.schemaview import SchemaView
@@ -60,6 +60,12 @@ def _add_langstring_alternatives(graph: Graph, schema_view: SchemaView) -> None:
                 graph.add((property_shape, SH["or"], union))
 
 
+def _remove_literal_datatype(graph: Graph, schema_view: SchemaView) -> None:
+    """Remove ``sh:datatype rdfs:Literal``; the slot already carries ``sh:nodeKind sh:Literal``."""
+    for shape in list(graph.subjects(SH.datatype, RDFS.Literal)):
+        graph.remove((shape, SH.datatype, RDFS.Literal))
+
+
 SHACL_TRANSFORMS: tuple[Transform, ...] = (
     # TODO: remove when https://github.com/orgs/linkml/discussions/2199 is resolved.
     Transform(
@@ -68,6 +74,14 @@ SHACL_TRANSFORMS: tuple[Transform, ...] = (
         reason="LinkML emits one sh:datatype for a slot whose exactly_one_of ranges are several datatypes "
         "(discussion #2199). When one of them is langString, replaces sh:datatype by an sh:or over all of them.",
         apply=_add_langstring_alternatives,
+    ),
+    Transform(
+        name="remove_literal_datatype",
+        kind=TransformKind.LINKML_GAP,
+        reason="LinkML emits sh:datatype rdfs:Literal for a slot whose range is rdfs:Literal. No literal has that "
+        "datatype, so the constraint rejects every value. The shape keeps sh:nodeKind sh:Literal, which accepts "
+        "plain and language-tagged strings.",
+        apply=_remove_literal_datatype,
     ),
 )
 

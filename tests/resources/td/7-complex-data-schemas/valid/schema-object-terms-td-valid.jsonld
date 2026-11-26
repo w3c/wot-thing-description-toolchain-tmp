@@ -1,0 +1,33 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "actions": {
+    "a": {
+      "input": {
+        "type": "object",
+        "properties": {
+          "a": {
+            "type": "boolean"
+          },
+          "b": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "a"
+        ]
+      },
+      "forms": [
+        {
+          "href": "https://example.com/a"
+        }
+      ]
+    }
+  }
+}

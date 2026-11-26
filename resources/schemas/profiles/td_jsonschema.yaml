@@ -1,0 +1,59 @@
+id: https://www.w3.org/2019/wot/td-jsonschema
+name: td_jsonschema
+title: Thing Description
+description: >-
+  JSON validation profile of the Thing Description schema. It imports the Thing Description schema and narrows
+  the parts that JSON Schema can check but the vocabulary does not define, such as the shape of the @context
+  Array. Only the JSON Schema is generated from it.
+version: "td-next"
+license: http://purl.org/NET/rdflicense/cc-by4.0
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  td: https://www.w3.org/2019/wot/td#
+
+default_prefix: td
+default_range: string
+
+imports:
+  - linkml:types
+  - ../thing_description
+
+classes:
+  ContextMap:
+    description: >-
+      A Map in the @context Array whose values are strings, such as prefix declarations or a default language.
+    extra_slots:
+      range_expression:
+        range: string
+        required: true
+
+  RootForm:
+    is_a: Form
+    description: A form of the Thing itself, which has no default operation type.
+    slot_usage:
+      op:
+        required: true
+
+  JsonThing:
+    is_a: Thing
+    tree_root: true
+    description: A Thing as a JSON document, with the @context Array narrowed to URIs and string-valued Maps.
+    slot_usage:
+      forms:
+        range: RootForm
+        minimum_cardinality: 1
+      schemaDefinitions:
+        minimum_cardinality: 1
+      atContext:
+        exactly_one_of:
+          - range: ThingContextUri
+          - multivalued: true
+            minimum_cardinality: 1
+            any_of:
+              - range: uri
+              - range: ContextMap
+                inlined: true
+            # LinkML cannot fix the first Array item, so an annotation names it.
+            annotations:
+              jsonschema_prefix_members: ["https://www.w3.org/ns/wot-next/td"]

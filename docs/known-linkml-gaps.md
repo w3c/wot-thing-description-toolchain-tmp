@@ -65,6 +65,42 @@ The JSON Schema postprocessor (`src/wot_toolchain/artifacts/jsonschema/postproce
 **Workaround:** `artifacts/jsonschema/postprocess.py` → `_fix_additional_props_anyof()`, keeps only the string form for a key + one string value class
 **LinkML issue:** none found (2026-09-09)
 
+### 13. `list_elements_unique` emits no `uniqueItems`
+**Symptom:** A multivalued slot with `list_elements_unique: true` is emitted as a plain array; W3C requires `uniqueItems: true` for `enum`.
+**Artifact:** `jsonschema.json`
+**Workaround:** `artifacts/jsonschema/generator.py` → `get_subschema_for_slot()` adds `uniqueItems: true` to every array slot with `list_elements_unique`
+**LinkML issue:** unknown
+
+### 14. A slot condition is named by the slot name, not its alias
+**Symptom:** Class-level `slot_conditions` (in `rules`, `none_of`, `exactly_one_of`) on a slot with an `alias` emit the slot name as property name (`security_oneOf` instead of `oneOf`, `@name` instead of `name`), so the condition never matches.
+**Artifact:** `jsonschema.json`
+**Workaround:** `artifacts/jsonschema/generator.py` → `aliased_slot_name()` falls back to the alias of the slot the condition constrains
+**LinkML issue:** unknown
+
+### 15. "Not empty when present" becomes "mandatory" in SHACL and OWL
+**Symptom:** `enum` is optional but must not be empty when present. Slot-level `minimum_cardinality: 1` emits the right `minItems: 1` in JSON Schema, but LinkML also emits `sh:minCount 1` (SHACL) and `owl:minCardinality 1` (OWL), which make the slot mandatory. An empty array has no triples in RDF, so the bound can not be violated there.
+**Artifact:** `shapes.shacl.ttl`, `ontology.owl.ttl`
+**Workaround:** `pipeline.py` → `_for_rdf()` gives the SHACL and OWL generators a schema copy without `minimum_cardinality: 1` on slots that are not required. The spec table reads "mandatory" from `required` only (`specgen/tables.py`).
+**LinkML issue:** unknown
+
+### 16. Keywords next to an inlined enum `$ref` were dropped
+**Symptom:** `none_of` on a slot with an enum range emits `not` next to the `$ref`; inlining the enum kept only `description`.
+**Artifact:** `jsonschema.json`
+**Workaround:** `artifacts/jsonschema/refs.py` keeps every sibling keyword of the inlined `$ref`
+**LinkML issue:** not a LinkML gap — toolchain transform
+
+### 17. The partition dropped a subclass used as array item
+**Symptom:** W3C root-level forms require `op`. The class `RootForm` in the JSON Schema profile states that, but the enum subset partition replaced the `items` of the root `forms` by its own variant and dropped the subclass.
+**Artifact:** `jsonschema.json`
+**Workaround:** `artifacts/jsonschema/partitions.py` → `_narrow_slot_items()` keeps a subclass of the partitioned class and adds the variant next to it (`allOf`)
+**LinkML issue:** not a LinkML gap — toolchain transform
+
+### 18. The catch-all branch of a oneOf dispatch was untyped
+**Symptom:** The branch for values outside the known subclasses (gap #7) only constrained the discriminator; W3C `additionalSecurityScheme` also types the members of the base scheme.
+**Artifact:** `jsonschema.json`
+**Workaround:** `artifacts/jsonschema/subclasses.py` → `build_oneof_dispatch()` builds the catch-all from the dispatch class's own definition, without identifier slots
+**LinkML issue:** not a LinkML gap — toolchain transform
+
 ---
 
 ## SHACL Generator

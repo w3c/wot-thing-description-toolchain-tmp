@@ -20,7 +20,8 @@ vocabularies:
 
 generators:
   jsonschema:
-    top_class: Thing
+    top_class: JsonThing
+    schema: resources/schemas/profiles/td_jsonschema.yaml
   jsonldcontext:
   shacl:
   owl:
@@ -29,6 +30,18 @@ generators:
   spec:
     template: resources/index.template.html
     output: resources/gens/index.html
+    # The type column of the vocabulary tables names these LinkML ranges as the published TD specification does.
+    range_labels:
+      Any: any type
+      linkml:Any: any type
+      langString: rdf:langString
+      uri: anyURI
+      uriorcurie: anyURI
+      datetime: dateTime
+      NonNegativeInteger: unsignedInt
+      decimal: double
+    # The "with default" assignment in the vocabulary tables links to this section of the TD specification template.
+    default_values_anchor: sec-default-values
     sections:
       - id: sec-core-vocabulary-definition
         schema: resources/schemas/thing_description.yaml

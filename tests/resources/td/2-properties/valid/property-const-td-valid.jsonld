@@ -1,0 +1,65 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "properties": {
+    "string": {
+      "const": "on",
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    },
+    "number": {
+      "const": 1.5,
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    },
+    "boolean": {
+      "const": false,
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    },
+    "null": {
+      "const": null,
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    },
+    "array": {
+      "const": [
+        1,
+        2
+      ],
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    },
+    "object": {
+      "const": {
+        "a": 1
+      },
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    }
+  }
+}

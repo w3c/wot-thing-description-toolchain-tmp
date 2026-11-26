@@ -1,0 +1,11 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "bearer_sc": {
+      "scheme": "bearer",
+      "in": "uri"
+    }
+  },
+  "security": "bearer_sc"
+}

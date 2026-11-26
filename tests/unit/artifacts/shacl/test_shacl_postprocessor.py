@@ -3,7 +3,8 @@ from pathlib import Path
 from rdflib import Graph, URIRef
 from rdflib.collection import Collection
 from rdflib.namespace import RDF as RDF_NAMESPACE
-from rdflib.namespace import SH, XSD
+from rdflib import namespace
+from rdflib.namespace import SH
 
 from wot_toolchain.artifacts.shacl.postprocess import post_process_shacl
 from linkml.generators.shaclgen import ShaclGenerator
@@ -39,11 +40,11 @@ def test_title_accepts_string_or_langstring_in_shacl() -> None:
         union = graph.value(property_shape, SH["or"])
         assert union is not None
         branches = list(Collection(graph, union))
-        assert {graph.value(branch, SH.datatype) for branch in branches} == {XSD.string, RDF_NAMESPACE.langString}
+        assert {graph.value(branch, SH.datatype) for branch in branches} == {namespace.XSD.string, RDF_NAMESPACE.langString}
         assert (property_shape, SH.datatype, None) not in graph
 
 
-def test_title_remains_string_outside_thing_shape() -> None:
+def test_title_is_any_literal_outside_thing_shape() -> None:
     schema_view = SchemaView(SCHEMA_PATH, merge_imports=True)
     raw_shacl = ShaclGenerator(schema_view.schema, mergeimports=False, closed=True, suffix="Shape").serialize()
     graph = Graph().parse(data=post_process_shacl(raw_shacl, schema_view), format="turtle")
@@ -52,5 +53,6 @@ def test_title_remains_string_outside_thing_shape() -> None:
         property_shapes = _title_property_shapes(graph, class_uri)
         assert property_shapes
         for property_shape in property_shapes:
-            assert (property_shape, SH.datatype, XSD.string) in graph
+            assert (property_shape, SH.nodeKind, SH.Literal) in graph
+            assert (property_shape, SH.datatype, None) not in graph
             assert (property_shape, SH["or"], None) not in graph

@@ -1,0 +1,12 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "x_sc": {
+      "scheme": "oauth2",
+      "flow": "code",
+      "refresh": 1
+    }
+  },
+  "security": "x_sc"
+}

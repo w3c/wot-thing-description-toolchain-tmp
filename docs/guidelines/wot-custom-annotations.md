@@ -503,25 +503,6 @@ Currently used on: `Form`.
 
 ---
 
-### `jsonschema_exclude`
-
-**What it does:** removes a class entirely from the generated JSON Schema `$defs`. The class still exists in LinkML and appears in OWL, SHACL, and HTML output.
-
-**What you need to do:**
-
-- Add `jsonschema_exclude: true` on the class.
-- Use for classes that exist for LinkML structural or inheritance reasons but have no counterpart in the TD JSON Schema.
-
-```yaml
-SomeInternalClass:
-  annotations:
-    jsonschema_exclude: true
-```
-
-Currently not actively used in schemas — available for future needs.
-
----
-
 ### `jsonschema_config`
 
 **What it does:** injects raw JSON Schema properties into a slot's generated definition. This is a last-resort escape hatch for when native LinkML features (`inlined: true`, `identifier: true`, `extra_slots`) and other annotations cannot produce the correct output shape.
@@ -565,5 +546,4 @@ Currently not actively used in schemas — documented in `AGENTS.md` as a patter
 | `jsonschema_flatten_subclasses` | class | JSON Schema | Merge subclass slots into parent |
 | `jsonschema_oneof_dispatch` | class | JSON Schema | Discriminated union from subclasses |
 | `jsonschema_form_variants` | class | JSON Schema | Operation-specific Form variants |
-| `jsonschema_exclude` | class | JSON Schema | Remove class from `$defs` |
 | `jsonschema_config` | slot | JSON Schema | Raw JSON Schema escape hatch (last resort) |

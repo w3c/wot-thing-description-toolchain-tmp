@@ -1,0 +1,15 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "x_sc": {
+      "description": "No scheme",
+      "in": "header",
+      "name": "token",
+      "alg": "ES256",
+      "format": "jwt",
+      "authorization": "https://example.com/authorize"
+    }
+  },
+  "security": "x_sc"
+}

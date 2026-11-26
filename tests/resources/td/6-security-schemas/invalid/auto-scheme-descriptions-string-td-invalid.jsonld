@@ -1,0 +1,11 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "x_sc": {
+      "scheme": "auto",
+      "descriptions": "A scheme"
+    }
+  },
+  "security": "x_sc"
+}
