@@ -16,7 +16,7 @@ from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml_runtime.linkml_model import SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
-from .config import JSON_SCHEMA_FILE, Config
+from .config import Config
 from .errors import GenerationError, SchemaError, WotToolchainError
 from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
 from .artifacts.jsonschema.options import JsonSchemaOptions
@@ -48,7 +48,7 @@ def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: P
         )
         raw_schema = json.loads(json_schema_generator.serialize())
         processed_schema = post_process_jsonschema(raw_schema, schema_view, top_class)
-        output_file = output_dir / JSON_SCHEMA_FILE
+        output_file = output_dir / 'jsonschema.json'
         with output_file.open('w', encoding='utf-8') as f:
             json.dump(processed_schema, f, indent=2, ensure_ascii=False)
         logging.info(f"JSON Schema saved to {output_file}")
@@ -119,7 +119,7 @@ def run_pipeline(config: Config) -> None:
         shutil.copytree(STATIC_VISUALIZATION_PATH, visualization_dir, dirs_exist_ok=True)
         logging.info("Starting ReSpec specification generation...")
         with _generation_errors("spec"):
-            generate_respec_spec(config.root_schema, config.spec, config.schema_prefixes, config.json_schema)
+            generate_respec_spec(config.root_schema, config.spec, config.schema_prefixes)
         logging.info("ReSpec specification generation complete.")
 
 

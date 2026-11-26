@@ -11,9 +11,6 @@ import jsonfold
 from dataclasses import replace as _replace
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from jsonschema.exceptions import SchemaError
-from jsonschema.protocols import Validator
-from jsonschema.validators import validator_for
 from linkml.validator import validate
 
 from ..errors import GenerationError
@@ -233,72 +230,6 @@ def _build_element_attrs(snippet_id: str, title: str) -> str:
     if title:
         attrs += f' title="{escape(title, quote=True)}"'
     return attrs
-
-
-def _load_validator(schema_path: Path) -> Validator:
-    """Return a validator of the dialect that the JSON Schema at ``schema_path`` declares in ``$schema``."""
-    try:
-        schema = json.loads(schema_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise GenerationError(f"{schema_path}: JSON Schema for the snippets could not be read: {exc}") from exc
-    validator_class = validator_for(schema, default=None)
-    if validator_class is None:
-        raise GenerationError(f"{schema_path}: \"$schema\" is missing or names an unsupported JSON Schema dialect.")
-    try:
-        validator_class.check_schema(schema)
-    except SchemaError as exc:
-        raise GenerationError(f"{schema_path}: not a valid JSON Schema: {exc.message}") from exc
-    return validator_class(schema)
-
-
-def _collect_schema_errors(
-    instance: Any,
-    filename: str,
-    td_validator: Validator,
-    tm_validator: Validator,
-    errors: list[str],
-) -> None:
-    is_thing_model = isinstance(instance, dict) and instance.get("@type") == "tm:ThingModel"
-    validator = tm_validator if is_thing_model else td_validator
-    for error in validator.iter_errors(instance):
-        path = ".".join(str(p) for p in error.absolute_path) or "(root)"
-        schema_path = "/".join(str(p) for p in error.absolute_schema_path)
-        errors.append(f"{filename}: {path} — {error.message} [schema: {schema_path}]")
-
-
-def validate_all_snippets(
-    snippets_dir: Path,
-    td_schema_path: Path,
-    tm_schema_path: Path,
-) -> list[str]:
-    """Validate the Thing Description snippets against one JSON Schema and the Thing Model snippets against the other."""
-    if not snippets_dir.exists():
-        return []
-
-    td_validator = _load_validator(td_schema_path)
-    tm_validator = _load_validator(tm_schema_path)
-    errors: list[str] = []
-
-    manifest = _load_manifest(snippets_dir)
-    for name, meta in manifest.get("snippets", {}).items():
-        if meta.get("validate") is False:
-            logger.debug("Skipping validation (validate: false): %s", name)
-            continue
-
-        json_path = snippets_dir / f"{name}.json"
-        if not json_path.exists():
-            errors.append(f"{name}.json: file not found")
-            continue
-
-        try:
-            parsed = json.loads(json_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            errors.append(f"{name}.json: invalid JSON")
-            continue
-
-        _collect_schema_errors(parsed, f"{name}.json", td_validator, tm_validator, errors)
-
-    return errors
 
 
 def render_snippet(name: str, snippets_dir: Path) -> str:

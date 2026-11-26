@@ -51,6 +51,9 @@ jobs:
       - name: Generate WoT resources
         run: uv run wot-toolchain generate-wot-resources
 
+      - name: Validate snippets against the generated JSON Schema
+        run: uv run python scripts/validate_snippets.py
+
       - name: Check generated artifacts
         # the CLI logs errors but still exits 0, so check the output files here
         run: |

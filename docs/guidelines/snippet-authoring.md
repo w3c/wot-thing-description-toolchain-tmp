@@ -239,7 +239,7 @@ Renders as a tabbed interface with one tab per snippet. `selected: true` marks t
 
 **Rule: set `validate: false` only for partial, non-TD/TM, or placeholder-containing snippets.**
 
-Rationale: by default, all snippets are validated against the generated TD/TM JSON Schema. Partial examples (e.g., protocol binding fragments, context expansion examples) fail validation because they are not complete TDs.
+Rationale: by default, `scripts/validate_snippets.py` validates every Thing Description snippet against the generated JSON Schema and every Thing Model snippet (root `"@type": "tm:ThingModel"`) against the upstream TM JSON Schema. Partial examples (e.g., protocol binding fragments, context expansion examples) fail validation because they are not complete TDs.
 
 ```yaml
 snippets:

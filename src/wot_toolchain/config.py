@@ -14,7 +14,6 @@ from .errors import ConfigError
 
 DEFAULT_CONFIG = Path("wot-toolchain.yaml")
 CONFIG_SCHEMA = files("wot_toolchain") / "schemas" / "config.yaml"
-JSON_SCHEMA_FILE = "jsonschema.json"
 GENERATORS = ("jsonschema", "shacl", "jsonldcontext", "owl", "linkml", "visualization", "spec")
 
 type _Kind = Literal["file", "directory"]
@@ -38,7 +37,6 @@ class SpecConfig:
     sections: Mapping[str, Path]
     prose: Path | None
     snippets: Path
-    thing_model_schema: Path
     glossary: Path
     extra_asserts: Path | None
     assertions_csv: Path | None
@@ -60,11 +58,6 @@ class Config:
     spec: SpecConfig | None
 
     @property
-    def json_schema(self) -> Path:
-        """Path of the JSON Schema that the jsonschema generator writes."""
-        return self.output_dir / "jsonschema" / JSON_SCHEMA_FILE
-
-    @property
     def schema_prefixes(self) -> Mapping[Path, str]:
         """Prefix of each vocabulary, keyed by its schema path."""
         return MappingProxyType({vocabulary.schema: vocabulary.prefix for vocabulary in self.vocabularies})
@@ -77,9 +70,6 @@ def load_config(path: Path) -> Config:
     for name in ("jsonschema", "spec"):
         if name in generators and generators[name] is None:
             raise _error(path, f"/generators/{name}", "settings are required")
-    if "spec" in generators and "jsonschema" not in generators:
-        problem = "generators.jsonschema is missing (the snippets are validated against the JSON Schema it writes)"
-        raise _error(path, "/generators/spec", problem)
     vocabularies = _vocabularies(path, data["vocabularies"])
     return Config(
         path=path,
@@ -143,7 +133,6 @@ def _spec(path: Path, spec: dict[str, Any], vocabularies: tuple[Vocabulary, ...]
         sections=_sections(path, spec["sections"], {vocabulary.schema for vocabulary in vocabularies}),
         prose=None if prose is None else _input(path, prose, f"{where}/prose", "directory"),
         snippets=_input(path, spec["snippets"], f"{where}/snippets", "directory"),
-        thing_model_schema=_input(path, spec["thing_model_schema"], f"{where}/thing_model_schema", "file"),
         glossary=_input(path, spec["glossary"], f"{where}/glossary", "file"),
         extra_asserts=None if extra_asserts is None else _input(path, extra_asserts, f"{where}/extra_asserts", "file"),
         assertions_csv=None if assertions_csv is None else _output(path, assertions_csv),

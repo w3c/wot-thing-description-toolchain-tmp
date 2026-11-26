@@ -442,9 +442,7 @@ def render_explicit_assertion_annotation(
     return "\n".join(rendered)
 
 
-def generate_respec_spec(
-    input_path: Path, spec: SpecConfig, schema_prefixes: Mapping[Path, str], td_schema: Path
-) -> None:
+def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Mapping[Path, str]) -> None:
     """
     Generate the ReSpec-compatible HTML document from the LinkML schema.
 
@@ -583,14 +581,6 @@ def generate_respec_spec(
 
     rendered_template = None
     if spec.snippets.is_dir():
-        from ..specgen.snippets import validate_all_snippets
-
-        snippet_errors = validate_all_snippets(spec.snippets, td_schema, spec.thing_model_schema)
-        if snippet_errors:
-            raise GenerationError(
-                f"{spec.snippets}: {len(snippet_errors)} snippet(s) are invalid:\n" + "\n".join(snippet_errors)
-            )
-
         rendered_template = spec.template.read_text(encoding="utf-8")
         if spec.snippets and spec.snippets.is_dir():
             from ..specgen.respec import process_snippet_placeholders
