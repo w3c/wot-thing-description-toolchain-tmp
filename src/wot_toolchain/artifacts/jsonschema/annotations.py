@@ -44,7 +44,6 @@ class TransformConfig:
     oneof_dispatches: list[OneOfDispatchConfig] = field(default_factory=list)
     enum_subset_partitions: list[EnumSubsetPartitionConfig] = field(default_factory=list)
     form_subset_narrows: list[FormSubsetNarrowConfig] = field(default_factory=list)
-    excluded_classes: list[str] = field(default_factory=list)
     # Class whose content is the top-level schema; set by the caller, not by an annotation.
     top_class: str | None = None
 
@@ -85,9 +84,6 @@ def read_annotations(sv: SchemaView) -> TransformConfig:
                     subsets=subsets,
                 )
             )
-
-        if _get_annotation_value(cls_def, "jsonschema_exclude"):
-            config.excluded_classes.append(cls_name)
 
     for cls_name, cls_def in sv.all_classes().items():
         if not cls_def.slot_usage:

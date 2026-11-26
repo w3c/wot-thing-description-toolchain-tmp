@@ -9,6 +9,8 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 from linkml_runtime.utils.schemaview import SchemaView
 
+from ..artifacts.jsonschema.traversal import is_linkml_any
+
 
 ORANGE = "#C83500"
 BLUE_BORDER = "#8CCBF2"
@@ -19,15 +21,19 @@ GRAY_BORDER = "#8C8C8C"
 SVG_FONT = "Courier"
 
 HIDE_DETAILS_FOR: Set[str] = {"MultiLanguage"}
-HIDE_CLASSES: Set[str] = {"Any", "linkml:Any"}
 
 
-def _normalize_range(rng: Optional[str]) -> str:
+def _linkml_any_classes(sv: SchemaView) -> Set[str]:
+    """Return the names of the classes that stand for ``linkml:Any``."""
+    return {name for name, cls_def in sv.all_classes().items() if is_linkml_any(sv, cls_def)}
+
+
+def _normalize_range(rng: Optional[str], any_classes: Set[str]) -> str:
     if not rng:
         return ""
+    if rng in any_classes:
+        return "any type"
     mapping = {
-        "Any": "any type",
-        "linkml:Any": "any type",
         "uri": "anyURI",
         "datetime": "dateTime",
         "NonNegativeInteger": "unsignedInt",
@@ -56,11 +62,12 @@ def _slot_type_text(
     if usage:
         choices = getattr(usage, "exactly_one_of", None) or getattr(usage, "any_of", None)
 
+    any_classes = _linkml_any_classes(sv)
     if choices:
         pretty, seen = [], set()
         for alt in choices:
             alt_rng_raw = getattr(alt, "range", None) or raw_rng
-            rng = _normalize_range(alt_rng_raw)
+            rng = _normalize_range(alt_rng_raw, any_classes)
             mv = bool(getattr(alt, "multivalued", False))
             p = f"(Array of) {rng}" if mv and rng else (rng if rng else "")
             if p and p not in seen:
@@ -75,7 +82,7 @@ def _slot_type_text(
                        or (raw_rng or "").lower() == "uri")
         return "anyURI" if is_uri_enum else "string"
 
-    rng = _normalize_range(raw_rng)
+    rng = _normalize_range(raw_rng, any_classes)
     if not rng: return ""
     if getattr(slot_def, "multivalued", False): return f"(Array of) {rng}"
     return rng
@@ -170,9 +177,10 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
     kept_external_bases = _detect_kept_external_bases(sv, all_classes, local_classes=local_classes)
     children_index = _build_children_index(all_classes)
     hidden = _descendants_of(kept_external_bases, children_index)
+    any_classes = _linkml_any_classes(sv)
 
     def _is_visible(c: str) -> bool:
-        return c not in HIDE_CLASSES and c not in hidden and (c in local_classes or c in kept_external_bases)
+        return c not in any_classes and c not in hidden and (c in local_classes or c in kept_external_bases)
 
     lines: List[str] = [
         "digraph schema {",
@@ -198,7 +206,7 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
             for sname in attr_names:
                 slot = _induced_slot(sv, class_name, sname)
                 if slot is None or (getattr(slot, "range", None) in all_classes) or (
-                        getattr(slot, "range", None) in HIDE_CLASSES): continue
+                        getattr(slot, "range", None) in any_classes): continue
 
                 type_text = _slot_type_text(sname, slot, class_def, sv, getattr(slot, "range", None))
                 type_display = _format_type_html(type_text)

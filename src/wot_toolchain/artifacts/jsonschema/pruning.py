@@ -93,11 +93,9 @@ def remove_unreferenced_candidate_defs(schema: dict[str, Any], sv: SchemaView, c
 
 
 def remove_excluded_defs(schema: dict[str, Any], sv: SchemaView, config: TransformConfig) -> None:
-    """Delete the definitions of excluded classes, of enums and of ``__identifier_optional`` variants."""
+    """Delete the definitions of enums and of ``__identifier_optional`` variants."""
     defs = schema.get("$defs", {})
     to_remove = set()
-
-    to_remove.update(config.excluded_classes)
 
     for name in list(defs.keys()):
         if name.endswith("__identifier_optional"):
