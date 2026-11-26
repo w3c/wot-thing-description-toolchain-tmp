@@ -169,9 +169,9 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: set[str], rang
 
     lines: list[str] = [
         "digraph schema {",
-        # Compact Vertical: Tighter nodesep/ranksep and zero margin
-        f'  graph [rankdir=BT, bgcolor="white", splines=polyline, overlap=false, nodesep=0.5, ranksep=0.6, margin=0.1, concentrate=false, fontname="{SVG_FONT}"];',
-        f'  node  [fontname="{SVG_FONT}", fontsize=10, shape=none, margin=0];',
+        # Left to right keeps every diagram about equally wide, so the spec scales them alike.
+        f'  graph [rankdir=LR, bgcolor="white", splines=polyline, overlap=false, nodesep=0.5, ranksep=0.6, margin=0.1, concentrate=false, fontname="{SVG_FONT}"];',
+        f'  node  [fontname="{SVG_FONT}", fontsize=10, shape=none, margin=0, width=0, height=0];',
         f'  edge  [fontname="{SVG_FONT}", fontsize=9, color="black"];',
         "",
     ]
