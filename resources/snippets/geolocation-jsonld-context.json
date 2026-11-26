@@ -2,7 +2,7 @@
     "@context": [
         "https://www.w3.org/ns/wot-next/td",
         {
-            "schema": "https://schema.org#"
+            "schema": "https://schema.org/"
         }
     ],
     "id": "urn:uuid:f8b5d2e6-7a9c-4d3f-e4b6-8c0a2f4d7b9e",

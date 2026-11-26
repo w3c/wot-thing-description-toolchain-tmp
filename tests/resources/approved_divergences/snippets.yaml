@@ -73,9 +73,28 @@ divergences:
     upstream_locator:
       kind: example
       example_id: saref-geolocation-annotation-example-3
-    rationale: The generated complete TD includes the Form required to expose the position Property affordance.
+    rationale: >-
+      The generated complete TD includes the Form required to expose the position Property affordance, and
+      binds the schema prefix to https://schema.org/ because the upstream namespace https://schema.org# does
+      not expand to schema.org terms.
     expected_difference_paths:
+      - "@context"
       - properties.position.forms
     expected_generated:
       json_paths:
+        "@context.1.schema": https://schema.org/
         properties.position.forms.0.href: https://robot.example.com/position
+  - id: snippet-saref-geolocation-annotation-2
+    category: complete-example
+    review: approved
+    upstream_locator:
+      kind: example
+      example_id: saref-geolocation-annotation-example-2
+    rationale: >-
+      The generated TD binds the schema prefix to https://schema.org/ because the upstream namespace
+      https://schema.org# does not expand to schema.org terms.
+    expected_difference_paths:
+      - "@context"
+    expected_generated:
+      json_paths:
+        "@context.1.schema": https://schema.org/

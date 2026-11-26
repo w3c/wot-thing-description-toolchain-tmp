@@ -4,7 +4,7 @@
         {
             "saref": "https://w3id.org/saref#",
             "om": "http://www.ontology-of-units-of-measure.org/resource/om-2/",
-            "schema": "https://schema.org"
+            "schema": "https://schema.org/"
         }
     ],
     "version": {
