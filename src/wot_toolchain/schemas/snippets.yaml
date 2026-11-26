@@ -3,22 +3,7 @@ name: wot_toolchain_snippets
 title: Snippet Metadata
 description: >-
   Schema for the snippet metadata used to render examples in the Thing Description specification.
-version: "td-next"
-license: http://purl.org/NET/rdflicense/cc-by4.0
-created_by: mailto:mahda.noura@siemens.com
-created_on: "2025-06-01T00:00:00Z"
-last_updated_on: "2026-11-21T00:00:00Z"
-see_also:
-  - https://www.w3.org/TR/wot-thing-description11/
-annotations:
-  dcterms:publisher:
-    value:
-      "@type": schema:Organization
-      schema:name: W3C Web of Things Working Group
-      schema:url: https://www.w3.org/WoT/WG/
-
 prefixes:
-  dcterms: http://purl.org/dc/terms/
   linkml: https://w3id.org/linkml/
   snippets: https://w3c.github.io/wot-thing-description-toolchain/snippets/
 default_prefix: snippets
