@@ -81,12 +81,12 @@ def test_snippet_script_rejects_td_snippet_that_generated_json_schema_rejects(tm
 def test_snippet_script_rejects_invalid_thing_model_snippet(tmp_path):
     snippets = tmp_path / "snippets"
     shutil.copytree(REPO / "resources" / "snippets", snippets)
-    snippet = json.loads((snippets / "tm-overwrite.json").read_text(encoding="utf-8"))
-    snippet["properties"]["dimming"]["title"] = None
-    (snippets / "tm-overwrite.json").write_text(json.dumps(snippet), encoding="utf-8")
+    snippet = json.loads((snippets / "basic-on-off-tm.json").read_text(encoding="utf-8"))
+    snippet["title"] = None
+    (snippets / "basic-on-off-tm.json").write_text(json.dumps(snippet), encoding="utf-8")
     result = _validate_snippets(tmp_path, snippets)
     assert result.returncode == 1
-    assert "tm-overwrite.json: properties.dimming.title" in result.stderr
+    assert "basic-on-off-tm.json: title" in result.stderr
 
 
 def test_snippet_script_without_json_schema_exits_2(tmp_path):

@@ -223,23 +223,6 @@ divergences:
     expected_generated:
       json_paths:
         "@context.1.schema": https://schema.org/
-  - id: snippet-td-model-example-tmref2
-    category: complete-example
-    review: approved
-    upstream_locator:
-      kind: example
-      example_id: td-model-example-tmRef2
-    rationale: >-
-      The upstream example sets the title of the dimming Property to null; the generated
-      example has no title member there.
-    expected_difference_paths:
-      - properties.dimming.title
-    expected_generated:
-      json_paths:
-        properties.dimming:
-          tm:ref: http://example.com/SmartLampControlwithDimming.tm.jsonld#/properties/dim
-          maximum: 80
-          unit: "%"
   - id: snippet-td-derived-from-tm
     category: complete-example
     review: approved
