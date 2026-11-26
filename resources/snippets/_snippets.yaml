@@ -201,7 +201,7 @@ snippets:
     - properties
   link-electric-motor:
     id: example-an-electric-motor-is-member-of-the-electric-drive-collection
-    title: An electric motor is member of the electric drive collection
+    title: An electric motor is member of the electric drive collection.
     layout: pre
     hide_paths:
     - '@context'
