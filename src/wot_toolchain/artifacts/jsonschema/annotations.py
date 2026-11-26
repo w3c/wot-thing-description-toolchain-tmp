@@ -27,7 +27,6 @@ class Annotations:
     flatten_subclass_parents: list[str] = field(default_factory=list)
     oneof_dispatches: list[OneOfDispatchConfig] = field(default_factory=list)
     form_variants: list[FormVariantsConfig] = field(default_factory=list)
-    excluded_classes: list[str] = field(default_factory=list)
 
 
 def _jsonobj_to_dict(obj: Any) -> Any:
@@ -84,8 +83,5 @@ def _read_annotations(sv: SchemaView) -> Annotations:
                 op_slot=fv['op_slot'],
                 variants=fv['variants'],
             ))
-
-        if _get_annotation_value(cls_def, 'jsonschema_exclude'):
-            config.excluded_classes.append(cls_name)
 
     return config

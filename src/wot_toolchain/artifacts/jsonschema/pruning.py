@@ -15,8 +15,6 @@ def _remove_excluded_defs(schema: dict, sv: SchemaView, config: Annotations) -> 
     defs = schema.get('$defs', {})
     to_remove = set()
 
-    to_remove.update(config.excluded_classes)
-
     for name in list(defs.keys()):
         if name.endswith('__identifier_optional'):
             to_remove.add(name)
