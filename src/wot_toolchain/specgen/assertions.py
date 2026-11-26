@@ -44,6 +44,8 @@ from lxml import html
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from ..errors import GenerationError
+
 
 ASSERTION_TABLE   = "rfc2119-table-assertion"
 ASSERTION_INLINE  = "rfc2119-assertion"
@@ -322,7 +324,7 @@ def html_assertions_to_csv(
     assertions_to_csv(assertions, out_path)
     problems = validate_html_assertion_inventory(html_path, out_path, extra_ids=extra_ids)
     if problems:
-        raise ValueError("Assertion inventory compatibility failed:\n" + "\n".join(problems))
+        raise GenerationError(f"{html_path}: assertion inventory is inconsistent:\n" + "\n".join(problems))
 
 
 def _assertion_elements(doc) -> list:

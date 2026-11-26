@@ -10,6 +10,7 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 from linkml_runtime.utils.schemaview import SchemaView
 
 from ..artifacts.jsonschema.traversal import is_linkml_any
+from ..errors import GenerationError
 
 
 ORANGE = "#C83500"
@@ -263,18 +264,14 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: Set[str]) -> s
 
 def generate_visualizations(diagrams: Iterable[tuple[Path, str]], visualization_dir: Path) -> None:
     if not _require_dot():
-        logging.error("Graphviz 'dot' executable not found.")
-        return
+        raise GenerationError("Graphviz 'dot' executable not found; the diagrams cannot be drawn.")
 
     visualization_dir.mkdir(parents=True, exist_ok=True)
 
     for path, target_svg in diagrams:
-        try:
-            sv_merged = SchemaView(str(path), merge_imports=True)
-            sv_unmerged = SchemaView(str(path), merge_imports=False)
-            local_classes = set((sv_unmerged.schema.classes or {}).keys())
-            dot_source = _build_dot_from_schema_view(sv_merged, local_classes=local_classes)
-            _dot_to_svg(dot_source, visualization_dir / target_svg)
-            logging.info(f"Generated {target_svg}")
-        except Exception as e:
-            logging.error(f"Failed {path.name}: {e}", exc_info=True)
+        sv_merged = SchemaView(str(path), merge_imports=True)
+        sv_unmerged = SchemaView(str(path), merge_imports=False)
+        local_classes = set((sv_unmerged.schema.classes or {}).keys())
+        dot_source = _build_dot_from_schema_view(sv_merged, local_classes=local_classes)
+        _dot_to_svg(dot_source, visualization_dir / target_svg)
+        logging.info(f"Generated {target_svg}")

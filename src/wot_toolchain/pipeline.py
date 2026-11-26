@@ -2,6 +2,8 @@ import json
 import logging
 import shutil
 
+from collections.abc import Iterator
+from contextlib import contextmanager
 from copy import deepcopy
 
 from pathlib import Path
@@ -15,7 +17,7 @@ from linkml_runtime.linkml_model import SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
 from .config import Config
-from .errors import GenerationError, SchemaError
+from .errors import GenerationError, SchemaError, WotToolchainError
 from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
 from .artifacts.jsonschema.options import JsonSchemaOptions
 from .artifacts.jsonschema.postprocess import post_process_jsonschema
@@ -81,6 +83,17 @@ def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: P
         logging.warning(f"Unknown generator: {generator}")
 
 
+@contextmanager
+def _generation_errors(generator: str) -> Iterator[None]:
+    """Report any failure inside the block as a GenerationError naming the generator."""
+    try:
+        yield
+    except WotToolchainError:
+        raise
+    except Exception as exc:
+        raise GenerationError(f"{generator} generation failed: {exc}") from exc
+
+
 def run_pipeline(config: Config) -> None:
     """Run the configured generators, the spec last; raises SchemaError or GenerationError."""
     schema_view = _load_schema_view(config.root_schema)
@@ -90,23 +103,23 @@ def run_pipeline(config: Config) -> None:
         if generator in ("visualization", "spec"):
             continue
         logging.info(f"Proceeding with WoT resource generation for {generator}")
-        try:
+        with _generation_errors(generator):
             view = schema_view
             if generator == "jsonschema" and config.jsonschema_profile is not None:
                 view = SchemaView(config.jsonschema_profile, merge_imports=True)
             _run_linkml_generator(view, generator, config.output_dir / generator, config.top_class)
-        except Exception as exc:
-            raise GenerationError(f"{generator} generation failed: {exc}") from exc
 
     visualization_dir = config.output_dir / "static" / "visualization"
     if "visualization" in config.generators:
         diagrams = [(vocabulary.schema, vocabulary.diagram) for vocabulary in config.vocabularies if vocabulary.diagram]
-        generate_visualizations(diagrams, visualization_dir)
+        with _generation_errors("visualization"):
+            generate_visualizations(diagrams, visualization_dir)
 
     if config.spec is not None:
         shutil.copytree(STATIC_VISUALIZATION_PATH, visualization_dir, dirs_exist_ok=True)
         logging.info("Starting ReSpec specification generation...")
-        generate_respec_spec(config.root_schema, config.spec, config.schema_prefixes)
+        with _generation_errors("spec"):
+            generate_respec_spec(config.root_schema, config.spec, config.schema_prefixes)
         logging.info("ReSpec specification generation complete.")
 
 

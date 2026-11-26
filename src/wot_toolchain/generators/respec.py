@@ -5,13 +5,13 @@ import logging
 import re
 import yaml
 
-from jinja2 import exceptions
 from linkml_runtime.utils.schemaview import SchemaView
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
 from ..config import SpecConfig
+from ..errors import GenerationError, SchemaError
 from ..specgen.bikeshed_processor import process_fragments
 from ..specgen.respec import build_jinja_env, assemble
 from ..specgen.tables import collect_slot_rows
@@ -455,24 +455,10 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
     try:
         sv = SchemaView(input_path, merge_imports=True)
     except yaml.YAMLError as e:
-        logging.error("Failed to load LinkML schema: %s", e)
-        return
+        raise SchemaError(f"{input_path}: LinkML schema could not be loaded: {e}") from e
 
-    try:
-        env = build_jinja_env(JINJA_TEMPLATE_DIR)
-        section_tpl = env.get_template("class_section.jinja2")
-    except (exceptions.TemplateNotFound, FileNotFoundError) as e:
-        logging.error("Template error: %s", e, exc_info=True)
-        assemble(
-            spec.template,
-            f"",
-            "",
-            "",
-            "",
-            out_path=spec.output,
-            placeholder=CORE_SCHEMA_PLACEHOLDER,
-        )
-        return
+    env = build_jinja_env(JINJA_TEMPLATE_DIR)
+    section_tpl = env.get_template("class_section.jinja2")
 
     def process_description(raw_text: str) -> str:
         """Convert inline markdown backticks to <code> tags."""
@@ -483,22 +469,10 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
     file_to_classes: Dict[str, List[str]] = {}
     for section_path in spec.sections.values():
         try:
-            if not section_path.exists():
-                logging.error(
-                    "Missing schema file: %s. Cannot render this section.",
-                    section_path.name,
-                )
-                file_to_classes[section_path.name] = []
-                continue
             section_sv = SchemaView(section_path, merge_imports=False)
-            file_to_classes[section_path.name] = list(section_sv.all_classes(imports=False).keys())
-        except (yaml.YAMLError, IOError) as e:
-            logging.error(
-                "Failed to load section schema %s due to: %s. Skipping section.",
-                section_path.name,
-                e,
-            )
-            file_to_classes[section_path.name] = []
+        except (yaml.YAMLError, OSError) as e:
+            raise SchemaError(f"{section_path}: section schema could not be loaded: {e}") from e
+        file_to_classes[section_path.name] = list(section_sv.all_classes(imports=False).keys())
 
     # Identify all non-core classes (defined outside the primary TD schema)
     non_core_classes: set[str] = set()
@@ -617,10 +591,8 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
             SNIPPET_SCHEMAS_DIR / "tm-json-schema-validation.json",
         )
         if snippet_errors:
-            for err in snippet_errors:
-                logging.error("Snippet validation error: %s", err)
-            logging.error(
-                "Snippet validation failed with %d error(s) — continuing", len(snippet_errors)
+            raise GenerationError(
+                f"{spec.snippets}: {len(snippet_errors)} snippet(s) are invalid:\n" + "\n".join(snippet_errors)
             )
 
         rendered_template = spec.template.read_text(encoding="utf-8")
@@ -639,7 +611,4 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
     )
 
     if spec.assertions_csv is not None:
-        try:
-            html_assertions_to_csv(spec.output, spec.assertions_csv, spec.extra_asserts)
-        except Exception as exc:
-            logging.error("Assertion CSV generation failed: %s", exc, exc_info=True)
+        html_assertions_to_csv(spec.output, spec.assertions_csv, spec.extra_asserts)
