@@ -170,7 +170,7 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: set[str], rang
     lines: list[str] = [
         "digraph schema {",
         # Left to right keeps every diagram about equally wide, so the spec scales them alike.
-        f'  graph [rankdir=LR, bgcolor="white", splines=polyline, overlap=false, nodesep=0.5, ranksep=0.6, margin=0.1, concentrate=false, fontname="{SVG_FONT}"];',
+        f'  graph [rankdir=LR, bgcolor="white", splines=spline, overlap=false, nodesep=0.5, ranksep=0.6, margin=0.1, concentrate=false, fontname="{SVG_FONT}"];',
         f'  node  [fontname="{SVG_FONT}", fontsize=10, shape=none, margin=0, width=0, height=0];',
         f'  edge  [fontname="{SVG_FONT}", fontsize=9, color="black"];',
         "",
@@ -220,13 +220,11 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: set[str], rang
     for (src, dst, mult), labels in edge_groups.items():
         labels.sort(key=len)
         label_rows = "".join(
-            f'<TR><TD ALIGN="LEFT"><FONT COLOR="{ORANGE}">{_escape_dot(label)}</FONT></TD></TR>' for label in labels
+            f'<TR><TD ALIGN="LEFT"><FONT COLOR="{ORANGE}">{_escape_dot(label)}</FONT> [{mult}]</TD></TR>'
+            for label in labels
         )
         merged_label = f'<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="1">{label_rows}</TABLE>>'
-        # Kept the improved cardinality distance but reduced minlen for compactness
-        lines.append(
-            f'  "{src}" -> "{dst}" [label={merged_label}, headlabel="{mult}", labeldistance=3.0, labelangle=20, minlen=1, arrowhead=open, color="black"];'
-        )
+        lines.append(f'  "{src}" -> "{dst}" [label={merged_label}, minlen=1, arrowhead=open, color="black"];')
 
     lines.append("}")
     return "\n".join(lines)
