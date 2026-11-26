@@ -23,7 +23,7 @@ def _remove_excluded_defs(schema: dict, sv: SchemaView, config: Annotations) -> 
         if enum_name in defs:
             to_remove.add(enum_name)
 
-    to_remove.update(['Any', 'Thing', 'InteractionAffordance'])
+    to_remove.add('Any')
 
     for name in to_remove:
         if name in defs:

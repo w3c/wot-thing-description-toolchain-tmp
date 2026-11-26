@@ -65,8 +65,7 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
     Transform(
         name="remove_excluded_defs",
         kind=TransformKind.COSMETIC,
-        reason="Removes the defs of enums, the __identifier_optional defs, "
-        "and the defs Any, Thing and InteractionAffordance.",
+        reason="Removes the defs of enums, the __identifier_optional defs and the def Any.",
         apply=_remove_excluded_defs,
     ),
     Transform(

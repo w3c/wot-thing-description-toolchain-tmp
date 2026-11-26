@@ -1044,6 +1044,66 @@
         }
       ]
     },
+    "InteractionAffordance": {
+      "additionalProperties": true,
+      "properties": {
+        "@type": {
+          "description": "JSON-LD keyword to label the object with semantic tags (or types).",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          ]
+        },
+        "description": {
+          "description": "Provides additional (human-readable) information based on a default language.",
+          "type": "string"
+        },
+        "descriptions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Can be used to support (human-readable) information in different languages. Also see MultiLanguage*.",
+          "type": "object"
+        },
+        "forms": {
+          "description": "Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. Thing level forms are used to describe endpoints for a group of interaction affordances.",
+          "items": {
+            "$ref": "#/$defs/Form"
+          },
+          "type": "array"
+        },
+        "title": {
+          "description": "Provides a human-readable title (e.g., display a text for UI representation) based on a default language.",
+          "type": "string"
+        },
+        "titles": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages). Also see MultiLanguage.",
+          "type": "object"
+        },
+        "uriVariables": {
+          "additionalProperties": {
+            "$ref": "#/$defs/DataSchema"
+          },
+          "description": "Define URI template variables according to RFC6570 as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the href upon the execution of the operation. If the same variable is both declared in Thing level uriVariables and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.",
+          "type": "object"
+        }
+      },
+      "required": [
+        "forms"
+      ],
+      "type": "object"
+    },
     "Link": {
       "additionalProperties": true,
       "if": {
@@ -1563,6 +1623,195 @@
           "type": "object"
         }
       ]
+    },
+    "Thing": {
+      "additionalProperties": true,
+      "properties": {
+        "@context": {
+          "description": "JSON-LD keyword to define short-hand names called terms that are used throughout a TD document.",
+          "oneOf": [
+            {
+              "enum": [
+                "https://www.w3.org/ns/wot-next/td"
+              ],
+              "type": "string"
+            },
+            {
+              "contains": {
+                "const": "https://www.w3.org/ns/wot-next/td"
+              },
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {}
+                ]
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          ]
+        },
+        "@type": {
+          "description": "JSON-LD keyword to label the object with semantic tags (or types).",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          ]
+        },
+        "actions": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ActionAffordance"
+          },
+          "description": "All Action-based Interaction Affordances of the Thing.",
+          "type": "object"
+        },
+        "base": {
+          "description": "Define the absolute base URI that is used for all relative URI references throughout a TD document. In TD instances, all relative URIs are resolved relative to the base URI using the algorithm defined in RFC3986. Also see the note about the type of base URI.",
+          "type": "string"
+        },
+        "created": {
+          "description": "Provides information when the TD instance was created.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Provides additional (human-readable) information based on a default language.",
+          "type": "string"
+        },
+        "descriptions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Can be used to support (human-readable) information in different languages. Also see MultiLanguage*.",
+          "type": "object"
+        },
+        "events": {
+          "additionalProperties": {
+            "$ref": "#/$defs/EventAffordance"
+          },
+          "description": "All Event-based Interaction Affordances of the Thing.",
+          "type": "object"
+        },
+        "forms": {
+          "description": "Set of form hypermedia controls that describe how an operation can be performed. Forms are serializations of Protocol Bindings. Thing level forms are used to describe endpoints for a group of interaction affordances.",
+          "items": {
+            "$ref": "#/$defs/Form"
+          },
+          "type": "array"
+        },
+        "id": {
+          "description": "Identifier of the Thing in form of a URI RFC3986 (e.g., stable URI, temporary and mutable URI, URI with local IP address, URN, etc.).",
+          "type": "string"
+        },
+        "links": {
+          "description": "Provides Web links to arbitrary resources that relate to the specified Thing Description.",
+          "items": {
+            "$ref": "#/$defs/Link"
+          },
+          "type": "array"
+        },
+        "modified": {
+          "description": "Provides information when the TD instance was last modified.",
+          "type": "string"
+        },
+        "profile": {
+          "description": "Indicates the WoT Profile mechanisms followed by this Thing Description and the corresponding Thing implementation.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "properties": {
+          "additionalProperties": {
+            "$ref": "#/$defs/PropertyAffordance"
+          },
+          "description": "All Property-based Interaction Affordances of the Thing.",
+          "type": "object"
+        },
+        "schemaDefinitions": {
+          "additionalProperties": {
+            "$ref": "#/$defs/DataSchema"
+          },
+          "description": "Set of named data schemas. To be used in a schema name-value pair inside an AdditionalExpectedResponse object.",
+          "type": "object"
+        },
+        "security": {
+          "description": "Set of security definition names, chosen from those defined in securityDefinitions. These must all be satisfied for access to resources.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          ]
+        },
+        "securityDefinitions": {
+          "additionalProperties": {
+            "$ref": "#/$defs/SecurityScheme"
+          },
+          "description": "Set of named security configurations (definitions only). Not actually applied unless names are used in a security name-value pair.",
+          "minProperties": 1,
+          "type": "object"
+        },
+        "support": {
+          "description": "Provides information about the TD maintainer as URI scheme (e.g., mailto [RFC6068], tel [RFC3966], https [RFC9112]).",
+          "type": "string"
+        },
+        "title": {
+          "description": "Provides a human-readable title (e.g., display a text for UI representation) based on a default language.",
+          "oneOf": [
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "titles": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages). Also see MultiLanguage.",
+          "type": "object"
+        },
+        "uriVariables": {
+          "additionalProperties": {
+            "$ref": "#/$defs/DataSchema"
+          },
+          "description": "Define URI template variables according to RFC6570 as collection based on DataSchema declarations. The Thing level uriVariables can be used in Thing level forms or in Interaction Affordances. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the href upon the execution of the operation. If the same variable is both declared in Thing level uriVariables and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.",
+          "type": "object"
+        },
+        "version": {
+          "$ref": "#/$defs/VersionInfo",
+          "description": "Provides version information."
+        }
+      },
+      "required": [
+        "@context",
+        "title",
+        "security",
+        "securityDefinitions"
+      ],
+      "type": "object"
     },
     "VersionInfo": {
       "additionalProperties": true,
