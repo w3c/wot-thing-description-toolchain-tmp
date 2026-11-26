@@ -90,6 +90,8 @@ slots:
   atType:
     alias: "@type"
     description: JSON-LD keyword to label the object with semantic tags (or types).
+    annotations:
+      spec_description: JSON-LD keyword to label the object with [=semantic tags=] (or types).
     range: string
     exactly_one_of:
       - range: string
@@ -299,10 +301,10 @@ slots:
       jsonld_index: td:name
       spec_description: >-
         Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations.
-        The Thing level `uriVariables` can be used in Thing level forms or in Interaction Affordances.
+        The [=Thing level=] `uriVariables` can be used in [=Thing level=] forms or in Interaction Affordances.
         The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable
         needs to be serialized to a string inside the `href` upon the execution of the operation.
-        If the same variable is both declared in Thing level `uriVariables` and in Interaction Affordance
+        If the same variable is both declared in [=Thing level=] `uriVariables` and in Interaction Affordance
         level, the Interaction Affordance level variable takes precedence.
     range: DataSchema
     multivalued: true
@@ -433,16 +435,25 @@ classes:
         slot_uri: td:hasPropertyAffordance
         description: >-
           All Property-based Interaction Affordances of the Thing.
+        annotations:
+          spec_description: >-
+            All Property-based [=Interaction Affordances=] of the Thing.
         range: PropertyAffordance
       actions:
         description: >-
           All Action-based Interaction Affordances of the Thing.
+        annotations:
+          spec_description: >-
+            All Action-based [=Interaction Affordances=] of the Thing.
         range: ActionAffordance
         multivalued: true
         inlined: true
       events:
         description: >-
           All Event-based Interaction Affordances of the Thing.
+        annotations:
+          spec_description: >-
+            All Event-based [=Interaction Affordances=] of the Thing.
         range: EventAffordance
         multivalued: true
         inlined: true
@@ -503,7 +514,7 @@ classes:
           Define URI template variables according to RFC6570 as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the href upon the execution of the operation. If the same variable is both declared in Thing level uriVariables and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
         annotations:
           spec_description: >-
-            Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the `href` upon the execution of the operation. If the same variable is both declared in Thing level `uriVariables` and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
+            Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the `href` upon the execution of the operation. If the same variable is both declared in [=Thing level=] `uriVariables` and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
   PropertyAffordance:
     description: >-
       An Interaction Affordance that exposes state of the Thing.

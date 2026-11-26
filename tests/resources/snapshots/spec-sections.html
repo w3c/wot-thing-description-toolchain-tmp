@@ -23,7 +23,7 @@
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"><code>anyURI</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array">Array</a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-at-type--Thing">
       <td><code>@type</code>
-      </td><td>JSON-LD keyword to label the object with semantic tags (or types).
+      </td><td>JSON-LD keyword to label the object with <a data-link-type="dfn" href="#dfn-semantic-tag" id="ref-for-dfn-semantic-tag">semantic tags</a> (or types).
       </td><td>optional
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array">Array</a> of <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-id--Thing">
@@ -80,17 +80,17 @@ Also see <a href="#note-uri-iri">the note</a> about the type of base URI.
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"><code>anyURI</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-properties--Thing">
       <td><code>properties</code>
-      </td><td>All Property-based Interaction Affordances of the Thing.
+      </td><td>All Property-based <a data-link-type="dfn" href="#dfn-interaction-affordance" id="ref-for-dfn-interaction-affordance">Interaction Affordances</a> of the Thing.
       </td><td>optional
       </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map">Map</a> of <a href="#propertyaffordance"><code>PropertyAffordance</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-actions--Thing">
       <td><code>actions</code>
-      </td><td>All Action-based Interaction Affordances of the Thing.
+      </td><td>All Action-based <a data-link-type="dfn" href="#dfn-interaction-affordance" id="ref-for-dfn-interaction-affordance">Interaction Affordances</a> of the Thing.
       </td><td>optional
       </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map">Map</a> of <a href="#actionaffordance"><code>ActionAffordance</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-events--Thing">
       <td><code>events</code>
-      </td><td>All Event-based Interaction Affordances of the Thing.
+      </td><td>All Event-based <a data-link-type="dfn" href="#dfn-interaction-affordance" id="ref-for-dfn-interaction-affordance">Interaction Affordances</a> of the Thing.
       </td><td>optional
       </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map">Map</a> of <a href="#eventaffordance"><code>EventAffordance</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-links--Thing">
@@ -125,7 +125,7 @@ Also see <a href="#note-uri-iri">the note</a> about the type of base URI.
       </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map">Map</a> of <a href="#dataschema"><code>DataSchema</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-uriVariables--Thing">
       <td><code>uriVariables</code>
-      </td><td>Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations. The Thing level <code>uriVariables</code> can be used in Thing level forms or in Interaction Affordances. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the <code>href</code> upon the execution of the operation. If the same variable is both declared in Thing level <code>uriVariables</code> and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
+      </td><td>Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations. The <a data-link-type="dfn" href="#dfn-td-thing-level" id="ref-for-dfn-td-thing-level">Thing level</a> <code>uriVariables</code> can be used in <a data-link-type="dfn" href="#dfn-td-thing-level" id="ref-for-dfn-td-thing-level">Thing level</a> forms or in Interaction Affordances. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the <code>href</code> upon the execution of the operation. If the same variable is both declared in <a data-link-type="dfn" href="#dfn-td-thing-level" id="ref-for-dfn-td-thing-level">Thing level</a> <code>uriVariables</code> and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
       </td><td>optional
       </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map">Map</a> of <a href="#dataschema"><code>DataSchema</code></a>
    </td></tr></tbody></table>
@@ -185,7 +185,7 @@ The data schema for each of the property meta-interactions is constructed by com
     </th></tr></thead><tbody>
      <tr class="rfc2119-table-assertion" id="td-vocab-at-type--InteractionAffordance">
       <td><code>@type</code>
-      </td><td>JSON-LD keyword to label the object with semantic tags (or types).
+      </td><td>JSON-LD keyword to label the object with <a data-link-type="dfn" href="#dfn-semantic-tag" id="ref-for-dfn-semantic-tag">semantic tags</a> (or types).
       </td><td>optional
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array">Array</a> of <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-title--InteractionAffordance">
@@ -215,11 +215,11 @@ The data schema for each of the property meta-interactions is constructed by com
       </td><td><a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array">Array</a> of <a href="#form"><code>Form</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-uriVariables--InteractionAffordance">
       <td><code>uriVariables</code>
-      </td><td>Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the <code>href</code> upon the execution of the operation. If the same variable is both declared in Thing level <code>uriVariables</code> and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
+      </td><td>Define URI template variables according to [[RFC6570]] as collection based on DataSchema declarations. The individual variables DataSchema cannot be an ObjectSchema or an ArraySchema since each variable needs to be serialized to a string inside the <code>href</code> upon the execution of the operation. If the same variable is both declared in <a data-link-type="dfn" href="#dfn-td-thing-level" id="ref-for-dfn-td-thing-level">Thing level</a> <code>uriVariables</code> and in Interaction Affordance level, the Interaction Affordance level variable takes precedence.
       </td><td>optional
       </td><td><a data-link-type="dfn" href="#dfn-map" id="ref-for-dfn-map">Map</a> of <a href="#dataschema"><code>DataSchema</code></a>
    </td></tr></tbody></table>
-   <p>The !class <code>InteractionAffordance</code> has the following subclasses:</p>
+   <p>The class <code>InteractionAffordance</code> has the following subclasses:</p>
    <ul>
     <li data-md="">
      <p>PropertyAffordance</p>
@@ -341,7 +341,7 @@ The data schema for each of the property meta-interactions is constructed by com
    <div class="note" role="note">
     <p>It is considered to be good practice that each <code>subscribeevent</code> has a corresponding <code>unsubscribeevent</code> unless the protocol supports implicit unsubscription mechanisms (e.g., heartbeat to detect connection loss).</p>
    </div>
-   <p>EventAffordances are similar to observable PropertyAffordances in the sense that the Thing itself informs interested Consumers about state changes. However, a main difference of EventAffordances is that not every change of the associated resource needs to trigger an !event message to be emitted, e.g., a critical threshold for a numeric value. <span class="rfc2119-assertion" id="td-event-trigger">Events MAY be triggered through conditions that are not exposed as Properties.
+   <p>EventAffordances are similar to observable PropertyAffordances in the sense that the Thing itself informs interested Consumers about state changes. However, a main difference of EventAffordances is that not every change of the associated resource needs to trigger an event message to be emitted, e.g., a critical threshold for a numeric value. <span class="rfc2119-assertion" id="td-event-trigger">Events MAY be triggered through conditions that are not exposed as Properties.
 </span> Furthermore, EventAffordances allow for more complex subscribing and unsubscribing mechanisms via the definition of subscription, dataResponse, and cancellation DataSchema definitions. Not all protocols might support these more advanced mechanisms, however, which is why in some scenarios, events may be very similar to observable PropertyAffordances. In these cases, the choice between a Property and a Event for modelling the Affordance should be made based on the semantics of the underlying resource; for example, if the state of the affordance is also supposed to be read or written by a Consumer, then a Property is most likely the appropriate choice.</p>
   </section>
 
@@ -456,7 +456,7 @@ The data schema for each of the property meta-interactions is constructed by com
     </th></tr></thead><tbody>
      <tr class="rfc2119-table-assertion" id="td-vocab-at-type--DataSchema">
       <td><code>@type</code>
-      </td><td>JSON-LD keyword to label the object with semantic tags (or types).
+      </td><td>JSON-LD keyword to label the object with <a data-link-type="dfn" href="#dfn-semantic-tag" id="ref-for-dfn-semantic-tag">semantic tags</a> (or types).
       </td><td>optional
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array">Array</a> of <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-title--DataSchema">
@@ -810,7 +810,7 @@ If multiple parameters are needed for a security scheme, repeat the security sch
     </th></tr></thead><tbody>
      <tr class="rfc2119-table-assertion" id="td-vocab-at-type--SecurityScheme">
       <td><code>@type</code>
-      </td><td>JSON-LD keyword to label the object with semantic tags (or types).
+      </td><td>JSON-LD keyword to label the object with <a data-link-type="dfn" href="#dfn-semantic-tag" id="ref-for-dfn-semantic-tag">semantic tags</a> (or types).
       </td><td>optional
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> or <a data-link-type="dfn" href="#dfn-array" id="ref-for-dfn-array">Array</a> of <a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-description--SecurityScheme">
@@ -834,7 +834,7 @@ If multiple parameters are needed for a security scheme, repeat the security sch
       </td><td>mandatory
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#string"><code>string</code></a> (e.g., <code>nosec</code>, <code>combo</code>, <code>basic</code>, <code>digest</code>, <code>bearer</code>, <code>psk</code>, <code>oauth2</code>, <code>apikey</code>, or <code>auto</code>)
    </td></tr></tbody></table>
-   <p>The !class SecurityScheme has the following subclasses:</p>
+   <p>The class <code>SecurityScheme</code> has the following subclasses:</p>
    <ul>
     <li data-md="">
      <p>NoSecurityScheme</p>
@@ -1076,6 +1076,25 @@ If multiple parameters are needed for a security scheme, repeat the security sch
 </span> <span class="rfc2119-assertion" id="td-security-oauth2-client-flow">For the <code>client</code> flow, token vocabulary term <em>MUST</em> be included.
 </span> <span class="rfc2119-assertion" id="td-security-oauth2-client-flow-no-auth">For the <code>client</code> flow, <code>authorization</code> vocabulary term <em>MUST NOT</em> be included.
 </span> The mandatory elements for each flow are summarized in the following table:</p>
+   <table class="def numbered">
+    <tbody>
+     <tr>
+      <th>Element
+      </th><th><code>code</code>
+      </th><th><code>client</code>
+     </th></tr><tr>
+      <td><code>authorization</code>
+      </td><td>mandatory
+      </td><td>omit
+     </td></tr><tr>
+      <td><code>token</code>
+      </td><td>mandatory
+      </td><td>mandatory
+     </td></tr><tr>
+      <td><code>refresh</code>
+      </td><td>optional
+      </td><td>optional
+   </td></tr></tbody></table>
   </section>
         </section>
 
@@ -1107,7 +1126,7 @@ If multiple parameters are needed for a security scheme, repeat the security sch
     </th></tr></thead><tbody>
      <tr class="rfc2119-table-assertion" id="td-vocab-href--Link">
       <td><code>href</code>
-      </td><td>Target URI of a link.
+      </td><td><a href="#dfn-target-uri">Target URI</a> of a link.
       </td><td>mandatory
       </td><td><a href="https://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/#anyURI"><code>anyURI</code></a>
      </td></tr><tr class="rfc2119-table-assertion" id="td-vocab-type--Link">
@@ -1140,18 +1159,18 @@ If multiple parameters are needed for a security scheme, repeat the security sch
     <p>The hreflang attribute is allowed to be a <code>string</code> or <code>array</code> in this version of the spec. Depending on the result of [[LINKSET-MEDIA-TYPES]] the values of <code>hrefLang</code> can be restricted to <code>array</code> only.</p>
    </div>
 
-Link relations can be used to describe relations such as to other Things (e.g., a Switch Thing controls a Lamp Thing), to a specific kind of Thing Models (e.g., a Thing Description is an instance of a specific Thing Model), or to further documentations information (e.g., device manual of a Thing). It is recommended to reuse existing and established Link Relation definitions from IANA.
+Link relations can be used to describe relations such as to other Things (e.g., a Switch Thing controls a Lamp Thing), to a specific kind of Thing Models (e.g., a Thing Description is an instance of a specific Thing Model), or to further documentations information (e.g., device manual of a Thing). It is recommended to reuse existing and established <a href="https://www.iana.org/assignments/link-relations">Link Relation definitions from IANA.</a>
 
 
-   <p>The link relation types follow Web Linking [[RFC8288]], meaning:</p>
+   <p>The link relation types follow Web Linking [<a data-cite="RFC8288#rfc.section.2.1" href="https://www.rfc-editor.org/rfc/rfc8288#section-2.1">RFC8288 Section 2.1</a>], meaning:</p>
    <ul>
     <li><span class="rfc2119-assertion" id="td-rel-type-case-insensitive">Relation types <em>MUST</em> be compared as strings using case-insensitive comparison.
-</span>
+</span> (If they are serialized in a different format they are to be converted to URIs.) Because the general TD Information Model is strictly case-sensitive, this rule act as an explicit exception for link relations. TD Consumers should be permissive and handle mixed-case relation types gracefully.
     </li><li><span class="rfc2119-assertion" id="td-rel-type-lowercase">All-lowercase URIs <em>SHOULD</em> be used for extension relation types.
-</span>
+</span> Note that while this is the recommended practice for newly defined extensions, some existing WoT-specific relation types in the table below (such as <code>controlledBy</code>) have historically used mixed casing. Due to the case-insensitive comparison requirement, these legacy mixed-case types remain fully valid and interoperable.
    </li></ul>
 
-In the following a best practice relation type table is introduced that is recommended to use within WoT Thing Description or Thing Model instances.
+In the following a best practice relation type table is introduced that is recommended to use within WoT <a data-link-type="dfn" href="#dfn-td" id="ref-for-dfn-td">Thing Description</a> or <a data-link-type="dfn" href="#dfn-tm" id="ref-for-dfn-tm">Thing Model</a> instances.
 
 
    <div id="table-rel-type">

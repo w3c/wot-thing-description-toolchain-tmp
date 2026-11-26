@@ -418,7 +418,7 @@ classes:
         range: uri
         annotations:
           spec_description: >-
-            Target URI of a link.
+            [Target URI](#dfn-target-uri) of a link.
       type:
         range: string
       hreflang:
