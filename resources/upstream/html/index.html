@@ -154,10 +154,9 @@
           "WOT-BINDING-REGISTRY": {
             title: "Web of Things (WoT) Binding Registry",
             href: "https://www.w3.org/TR/wot-binding-registry/",
-            // href: "https://w3c.github.io/wot-binding-registry/",
             authors: ["Ege Korkan"],
             publisher: "W3C",
-            date: "TODO" //TODO: Add publication date
+            date: "November 2025"
           },
           "MQTT": {
             title: "MQTT Version 3.1.1",
@@ -572,7 +571,7 @@
           communication protocols declared in the <code>forms</code> field.
           <a href="#thing-description-full-serialization">Example 2</a> extends the TD sample from Example 1 by
           introducing a second definition in the <code>@context</code> to declare the prefix <code>saref</code> as
-          referring to <a href="https://ontology.tno.nl/saref.ttl">SAREF</a>, the Smart Appliance Reference Ontology
+          referring to <a href="https://ontology.tno.nl/saref.ttl">SAREF</a>, the Smart Appliance Reference Ontology
           [[SMARTM2M]]. This IoT ontology includes terms interpreted as semantic labels that can be set as values of the
           <code>@type</code> field, giving the semantics of <a>Things</a> and their <a>Interaction Affordances</a>. In
           the example below, the <a>Thing</a> is labelled with <code>saref:LightSwitch</code>, the <code>status</code>
@@ -779,7 +778,7 @@
         <dd>
           Set of <a>Class</a> definitions constructed from pre-defined <a>Vocabularies</a> on which constraints apply,
           thus defining the semantics of these <a>Vocabularies</a>. Class definitions are typically expressed in terms
-          of a <a>Signature</a> (a set of <a>Vocabulary Terms</a>) and functions over that <a>Signature</a>. The
+          of a <a>Signature</a> (a set of <a>Vocabulary Terms</a>) and functions over that <a>Signature</a>. The
           <a>TD Information Model</a> also includes <a>Default Values</a>, defined as a global function over
           <a>Classes</a>.
         </dd>
@@ -787,19 +786,19 @@
           <dfn id="dfn-td-processor">TD Processor</dfn>
         </dt>
         <dd>
-          A system that can serialize some internal representation of a <a>Thing Description</a> in a given format
+          A system that can serialize some internal representation of a <a>Thing Description</a> in a given format
           and/or deserialize it from that format. A <a>TD Processor</a> can follow validation steps to detect
           semantically inconsistent <a>Thing Descriptions</a>, that is, <a>Thing Descriptions</a> that cannot satisfy
           constraints on the <a>Instance Relation</a> of the <code>Thing</code> class. For that purpose, a
-          <a>TD Processor</a> can compute fill in the forms of <a>Thing Descriptions</a> in which all possible
+          <a>TD Processor</a> can compute fill in the forms of <a>Thing Descriptions</a> in which all possible
           <a>Default Values</a> are assigned. A <a>TD Processor</a> is typically a sub-system of a <a>WoT Runtime</a>.
           Implementations of a TD Processor can be a TD <a>producer</a> (able to serialize to TD Documents) or a TD
           consumer (able to deserialize from TD Documents) or both.
         </dd>
         <dt>
-          <dfn id="dfn-td-serialization">TD Serialization</dfn>
+          <dfn id="dfn-td-serialization">TD Serialization</dfn>
           or
-          <dfn id="dfn-td-document">TD Document</dfn>
+          <dfn id="dfn-td-document">TD Document</dfn>
         </dt>
         <dd>
           Textual or binary representation of <a>Thing Descriptions</a> that can be stored and exchanged between
@@ -852,7 +851,7 @@
         <a href="https://www.w3.org/ns/wot-next/td">JSON-LD context file</a> [[?json-ld11]], allowing the compact
         strings in <a>TD Documents</a> to be expanded to full IRI-based <a>Vocabulary Terms</a>. However, this
         processing is only required when transforming JSON-based <a>TD Documents</a> to RDF, an optional feature of
-        <a>TD Processor</a>
+        <a>TD Processor</a>
         implementations.
       </p>
 
@@ -866,7 +865,7 @@
         In the present specification, <a>Vocabulary Terms</a> are always presented in their compact form. Their expanded
         form can be accessed under the namespace IRI of the <a>Vocabulary</a> they belong to. These namespaces follow
         the structure of <a href="#class-definitions"></a>. Each <a>Vocabulary</a> used in the
-        <a>TD Information Model</a> has its own namespace IRI, as follows:
+        <a>TD Information Model</a> has its own namespace IRI, as follows:
       </p>
 
       <table class="def numbered">
@@ -993,7 +992,7 @@
         <!--<p><a href="http://visualdataweb.de/webvowl/#iri=https://rawgit.com/w3c/wot-thing-description/TD-JSON-LD-1.1/ontology/td.ttl">Click here for the visualization</a></p>-->
 
         <figure id="td-core-model">
-          <img src="visualization/td.svg" alt="UML diagram of the TD information model for the TD core vocabulary" />
+          <img src="visualization/td.svg" alt="UML diagram of the TD information model for the TD core vocabulary" />
           <figcaption>TD core vocabulary</figcaption>
         </figure>
 
@@ -1002,7 +1001,7 @@
         <figure id="td-data-schema-model">
           <img
             src="visualization/jsonschema.svg"
-            alt="UML diagram of the TD information model for the Data schema vocabulary"
+            alt="UML diagram of the TD information model for the Data schema vocabulary"
           />
           <figcaption>Data schema vocabulary</figcaption>
         </figure>
@@ -1012,7 +1011,7 @@
         <figure id="td-security-model">
           <img
             src="visualization/wotsec.svg"
-            alt="UML diagram of the TD information model for the WoT security vocabulary"
+            alt="UML diagram of the TD information model for the WoT security vocabulary"
           />
           <figcaption>WoT security vocabulary</figcaption>
         </figure>
@@ -1022,7 +1021,7 @@
         <figure id="hypermedia-model">
           <img
             src="visualization/hctl.svg"
-            alt="UML diagram of the TD information model for the hypermedia controls vocabulary"
+            alt="UML diagram of the TD information model for the hypermedia controls vocabulary"
           />
           <figcaption>Hypermedia controls vocabulary</figcaption>
         </figure>
@@ -1127,7 +1126,7 @@
 
         <p>
           By convention, <a>Simple Types</a> are denoted by names starting with lowercase. The
-          <a>TD Information Model</a> references the following <a>Simple Types</a>
+          <a>TD Information Model</a> references the following <a>Simple Types</a>
           defined in XML Schema [[XMLSCHEMA11-2-20120405]]:
           <code>string</code>, <code>anyURI</code>, <code>dateTime</code>, <code>integer</code>,
           <code>unsignedInt</code>, <code>double</code>, and <code>boolean</code>. Their definition (i.e., the
@@ -4863,7 +4862,7 @@
 
           <p>
             <span class="rfc2119-assertion" id="td-context">
-              The root element of a <a>TD Serialization</a> MUST be a JSON object that includes a member with the name
+              The root element of a <a>TD Serialization</a> MUST be a JSON object that includes a member with the name
               <code>@context</code> and a value of type string or array that equals or respectively contains
               <code>https://www.w3.org/ns/wot-next/td</code>.
             </span>
@@ -4937,7 +4936,7 @@
               <code>forms</code>
               in an instance of the <a>Class</a> <code>Thing</code> MUST be serialized as JSON arrays containing JSON
               objects as defined in <a href="#link-serialization-json"></a> and
-              <a href="#form-serialization-json"></a>, respectively.
+              <a href="#form-serialization-json"></a>, respectively.
             </span>
           </p>
 
@@ -4946,7 +4945,7 @@
               The value assigned to
               <code>security</code>
               in an instance of <a>Class</a> <code>Thing</code>
-              MUST be serialized as JSON string or as JSON array whose elements are JSON strings.
+              MUST be serialized as JSON string or as JSON array whose elements are JSON strings.
             </span>
           </p>
         </section>
@@ -5087,7 +5086,7 @@
             The JSON members named <code>titles</code> and <code>descriptions</code> are used within the TD document to
             provide human-readable metadata in multiple languages within a single TD document.
             <span class="rfc2119-assertion" id="td-multi-languages">
-              All name-value pairs of a <code>MultiLanguage</code> <a>Map</a> MUST be serialized as members of a JSON
+              All name-value pairs of a <code>MultiLanguage</code> <a>Map</a> MUST be serialized as members of a JSON
               object, where the name is a valid language tag as defined by [[!BCP47]] (also see [[I18N-Glossary]]) and
               the value is a human-readable string in the language indicated by the tag.
             </span>
@@ -5285,8 +5284,8 @@
             In a <code>Thing</code> instance, the value assigned to <code>securityDefinitions</code> is a <a>Map</a> of
             instances of <code>SecurityScheme</code>.
             <span class="rfc2119-assertion" id="td-security">
-              All name-value pairs of a <a>Map</a> of <code>SecurityScheme</code> instances MUST be serialized as
-              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
+              All name-value pairs of a <a>Map</a> of <code>SecurityScheme</code> instances MUST be serialized as
+              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
               serialized as a JSON string and the value of the pair, an instance of <code>SecurityScheme</code>, MUST be
               serialized as a JSON object.
             </span>
@@ -5868,8 +5867,8 @@
             The value assigned to <code>properties</code> in a <code>Thing</code> instance is a <a>Map</a> of instances
             of <code>PropertyAffordance</code>.
             <span class="rfc2119-assertion" id="td-properties">
-              All name-value pairs of a <a>Map</a> of <code>PropertyAffordance</code> instances MUST be serialized as
-              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
+              All name-value pairs of a <a>Map</a> of <code>PropertyAffordance</code> instances MUST be serialized as
+              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
               serialized as a JSON string and the value of the pair, an instance of <code>PropertyAffordance</code>,
               MUST be serialized as a JSON object.
             </span>
@@ -5944,8 +5943,8 @@
             In a <code>Thing</code> instance, the value assigned to <code>actions</code> is a <a>Map</a> of instances of
             <code>ActionAffordance</code>.
             <span class="rfc2119-assertion" id="td-actions">
-              All name-value pairs of a <a>Map</a> of <code>ActionAffordance</code> instances MUST be serialized as
-              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
+              All name-value pairs of a <a>Map</a> of <code>ActionAffordance</code> instances MUST be serialized as
+              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
               serialized as a JSON string and the value of the pair, an instance of <code>ActionAffordance</code>, MUST
               be serialized as a JSON object.
             </span>
@@ -6024,8 +6023,8 @@
             In a <code>Thing</code> instance, the value assigned to <code>events</code> is a map of instances of
             <code>EventAffordance</code>.
             <span class="rfc2119-assertion" id="td-events">
-              All name-value pairs of a <a>Map</a> of <code>EventAffordance</code> instances MUST be serialized as
-              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
+              All name-value pairs of a <a>Map</a> of <code>EventAffordance</code> instances MUST be serialized as
+              members of the JSON object that results from serializing the <a>Map</a>; the name of a pair MUST be
               serialized as a JSON string and the value of the pair, an instance of <code>EventAffordance</code>, MUST
               be serialized as a JSON object.
             </span>
@@ -7054,7 +7053,7 @@
     "@type": "saref:LightSwitch",
     "saref:hasState": {
         "@id": "urn:uuid:67c9122b-2680-4e1a-b41c-5af07edba1f4/state",
-        "@type": "saref:OnOffState"
+        "@type": "saref:OnOffState"
     },
     // ...
     "properties": {

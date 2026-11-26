@@ -238,3 +238,17 @@ divergences:
     expected_generated:
       json_paths:
         "@context": https://www.w3.org/ns/wot-next/td
+  - id: snippet-saref-state-annotation-example
+    category: complete-example
+    review: approved
+    upstream_locator:
+      kind: example
+      example_id: saref-state-annotation-example
+    rationale: >-
+      The upstream example has a non-breaking space (U+00A0) after "@type":, so it is not JSON and is
+      compared as text. The generated example uses a normal space.
+    expected_difference_paths:
+      - ""
+    expected_generated:
+      json_paths:
+        saref:hasState.@type: saref:OnOffState
