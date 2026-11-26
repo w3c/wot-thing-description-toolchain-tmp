@@ -7,7 +7,7 @@
 
 Worked examples for authoring TD/TM JSON snippets rendered in the generated specification.
 
-For schema validation, see `resources/schemas/snippet_schema.yaml`.
+For schema validation, see `src/wot_toolchain/schemas/snippets.yaml`.
 
 ---
 
@@ -62,11 +62,7 @@ Paths use dot-separated keys to target nested JSON properties:
 
 ### Schema Validation
 
-The snippet schema is defined in `resources/schemas/snippet_schema.yaml`. Validate with:
-
-```bash
-uv run pytest tests/unit/snippets/test_snippets_yaml.py -v
-```
+The snippet schema is part of the toolchain (`src/wot_toolchain/schemas/snippets.yaml`). `_snippets.yaml` is validated against it on every `wot-toolchain generate-wot-resources` run; an invalid file stops the run.
 
 ---
 

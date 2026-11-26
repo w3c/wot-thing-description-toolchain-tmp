@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 from html import escape
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +12,9 @@ from dataclasses import replace as _replace
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from jsonschema import Draft7Validator
+from linkml.validator import validate
+
+from ..errors import GenerationError
 
 
 logger = logging.getLogger(__name__)
@@ -22,17 +26,28 @@ _FOLD_CONFIG = _replace(
     fold_nesting=2,
 )
 
+SNIPPETS_SCHEMA = files("wot_toolchain") / "schemas" / "snippets.yaml"
+
 _manifest_cache: dict[str, dict] = {}
 
 
 def _load_manifest(snippets_dir: Path) -> dict:
     key = str(snippets_dir)
     if key not in _manifest_cache:
-        manifest_path = snippets_dir / "_snippets.yaml"
-        _manifest_cache[key] = yaml.safe_load(
-            manifest_path.read_text(encoding="utf-8")
-        )
+        _manifest_cache[key] = _read_manifest(snippets_dir / "_snippets.yaml")
     return _manifest_cache[key]
+
+
+def _read_manifest(path: Path) -> dict:
+    """Read the snippet metadata file and validate it against the snippet schema."""
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise GenerationError(f"{path}: snippet metadata could not be read: {exc}") from exc
+    messages = [result.message for result in validate(data, str(SNIPPETS_SCHEMA), "SnippetManifest").results]
+    if messages:
+        raise GenerationError("\n".join(f"{path}: {message}" for message in messages))
+    return data
 
 
 def _get_snippet_meta(snippets_dir: Path, name: str) -> dict[str, Any]:

@@ -72,3 +72,16 @@ def test_missing_graphviz_exits_5(tmp_path, monkeypatch, caplog):
     result = CliRunner().invoke(main, ["generate-wot-resources", "-c", str(_config(tmp_path, "visualization"))])
     assert result.exit_code == 5
     assert "dot" in caplog.text
+
+
+def test_invalid_snippet_metadata_exits_5(tmp_path, caplog):
+    snippets = tmp_path / "snippets"
+    shutil.copytree(REPO / "resources" / "snippets", snippets)
+    metadata = yaml.safe_load((snippets / "_snippets.yaml").read_text(encoding="utf-8"))
+    metadata["snippets"]["action-serialization"]["layout"] = "sidebar"
+    (snippets / "_snippets.yaml").write_text(yaml.safe_dump(metadata), encoding="utf-8")
+    config = _config(tmp_path, "spec", snippets=str(snippets))
+    result = CliRunner().invoke(main, ["generate-wot-resources", "-c", str(config)])
+    assert result.exit_code == 5
+    assert "_snippets.yaml" in caplog.text
+    assert "sidebar" in caplog.text

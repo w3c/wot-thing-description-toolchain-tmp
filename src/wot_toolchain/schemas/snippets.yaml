@@ -1,5 +1,5 @@
-id: https://w3c.github.io/wot-thing-description/snippets
-name: snippet_schema
+id: https://w3c.github.io/wot-thing-description-toolchain/snippets
+name: wot_toolchain_snippets
 title: Snippet Metadata
 description: >-
   Schema for the snippet metadata used to render examples in the Thing Description specification.
@@ -20,8 +20,8 @@ annotations:
 prefixes:
   dcterms: http://purl.org/dc/terms/
   linkml: https://w3id.org/linkml/
-  snippet: https://w3c.github.io/wot-thing-description/snippets/
-default_prefix: snippet
+  snippets: https://w3c.github.io/wot-thing-description-toolchain/snippets/
+default_prefix: snippets
 default_range: string
 imports:
   - linkml:types
@@ -78,12 +78,6 @@ classes:
           Map of group names to their composition definitions. Groups combine
           multiple snippets into tabbed or toggle views for side-by-side
           comparison in the specification.
-      default_schema:
-        description: >-
-          Snippet kind used to validate every snippet that does not set its
-          own schema. Must be a key of spec.snippet_validation_schemas in the
-          project manifest (e.g., "td"). Required as soon as one validated
-          snippet has no schema of its own.
   Snippet:
     description: >-
       Metadata for a single JSON-LD example file rendered in the Thing Description
@@ -120,12 +114,6 @@ classes:
           or Thing Model JSON Schema during the build process. Set to false
           for partial snippets or protocol binding examples that are not
           complete TD instances.
-      schema:
-        description: >-
-          Snippet kind used to validate this snippet, overriding the
-          manifest's default_schema. Must be a key of
-          spec.snippet_validation_schemas in the project manifest (e.g., "tm"
-          for Thing Model snippets). Ignored when validate is false.
       hide_paths:
         range: string
         multivalued: true

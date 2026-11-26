@@ -1,44 +1,19 @@
-"""Validate _snippets.yaml manifest against the LinkML snippet schema."""
+"""Check _snippets.yaml for rules the LinkML snippet schema cannot express."""
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
 import yaml
-from jsonschema import Draft7Validator
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SNIPPET_SCHEMA = REPO_ROOT / "resources" / "schemas" / "snippet_schema.yaml"
 MANIFEST_PATH = REPO_ROOT / "resources" / "snippets" / "_snippets.yaml"
-
-
-def _generate_json_schema() -> dict:
-    from linkml.generators.jsonschemagen import JsonSchemaGenerator
-
-    gen = JsonSchemaGenerator(str(SNIPPET_SCHEMA))
-    raw = gen.serialize()
-    return json.loads(raw)
-
-
-@pytest.fixture(scope="module")
-def manifest_validator() -> Draft7Validator:
-    schema = _generate_json_schema()
-    return Draft7Validator(schema)
 
 
 @pytest.fixture(scope="module")
 def manifest() -> dict:
     return yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
-
-
-def test_manifest_valid(manifest: dict, manifest_validator: Draft7Validator):
-    errors = list(manifest_validator.iter_errors(manifest))
-    assert not errors, (
-        f"Manifest validation errors:\n"
-        + "\n".join(f"  {e.json_path}: {e.message}" for e in errors)
-    )
 
 
 def test_hide_show_mutually_exclusive(manifest: dict):
