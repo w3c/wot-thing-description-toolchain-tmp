@@ -1,0 +1,45 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "properties": {
+    "p": {
+      "type": "object",
+      "properties": {
+        "string": {
+          "const": "on"
+        },
+        "number": {
+          "const": 1.5
+        },
+        "boolean": {
+          "const": false
+        },
+        "null": {
+          "const": null
+        },
+        "array": {
+          "const": [
+            1,
+            2
+          ]
+        },
+        "object": {
+          "const": {
+            "a": 1
+          }
+        }
+      },
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    }
+  }
+}

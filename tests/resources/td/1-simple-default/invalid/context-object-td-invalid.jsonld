@@ -1,0 +1,12 @@
+{
+  "@context": {
+    "ex": "https://example.com/ns#"
+  },
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc"
+}

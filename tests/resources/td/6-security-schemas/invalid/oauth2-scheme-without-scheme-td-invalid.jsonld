@@ -1,0 +1,18 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "x_sc": {
+      "flow": "code",
+      "description": "No scheme",
+      "authorization": "https://example.com/authorize",
+      "token": "https://example.com/token",
+      "refresh": "https://example.com/refresh",
+      "scopes": [
+        "read",
+        "write"
+      ]
+    }
+  },
+  "security": "x_sc"
+}

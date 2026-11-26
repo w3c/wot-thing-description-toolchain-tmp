@@ -1,0 +1,52 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/wot-next/td",
+    {
+      "ex": "https://example.com/ns#"
+    }
+  ],
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "events": {
+    "overheating": {
+      "forms": [
+        {
+          "href": "https://example.com/oh"
+        }
+      ],
+      "@type": [
+        "ex:OverheatingEvent"
+      ],
+      "title": "Overheating",
+      "titles": {
+        "en": "Overheating"
+      },
+      "description": "Lamp reaches a critical temperature",
+      "descriptions": {
+        "en": "Lamp reaches a critical temperature"
+      },
+      "subscription": {
+        "type": "object",
+        "properties": {
+          "callback": {
+            "type": "string"
+          }
+        }
+      },
+      "data": {
+        "type": "string"
+      },
+      "dataResponse": {
+        "type": "string"
+      },
+      "cancellation": {
+        "type": "object"
+      }
+    }
+  }
+}

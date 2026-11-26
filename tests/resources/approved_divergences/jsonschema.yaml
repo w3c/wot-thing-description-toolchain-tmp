@@ -96,15 +96,6 @@ divergences:
     rationale: "The upstream schema does not constrain pattern although the spec types it as string."
     expected_generated:
       verdict: reject
-  - id: jsonschema-dataschema-allof-number
-    category: semantic-correction
-    review: approved
-    upstream_locator:
-      kind: instance
-      instance: 7-complex-data-schemas/invalid/property-allof-number-td-invalid.jsonld
-    rationale: "The upstream schema does not constrain allOf; ours types it as an array of DataSchema. The term is not in the spec DataSchema table."
-    expected_generated:
-      verdict: reject
   - id: jsonschema-dataschema-properties-string
     category: semantic-correction
     review: approved
@@ -157,5 +148,122 @@ divergences:
       kind: instance
       instance: 18-links/invalid/link-hreflang-empty-array-td-invalid.jsonld
     rationale: "The upstream hreflang array has no minItems, so it accepts [] although an array of language tags needs at least one tag."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-apikey-scheme-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/apikey-scheme-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-auto-scheme-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/auto-scheme-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-basic-scheme-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/basic-scheme-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-bearer-scheme-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/bearer-scheme-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-combo-scheme-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/combo-scheme-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-digest-scheme-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/digest-scheme-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-extension-scheme-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/extension-scheme-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-oauth2-scheme-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/oauth2-scheme-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-psk-scheme-attype-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 6-security-schemas/invalid/psk-scheme-attype-empty-array-td-invalid.jsonld
+    rationale: The upstream type_declaration array has no minItems, so it accepts [] although @type needs at least one type.
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-property-form-scopes-empty-array
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 17-forms/invalid/property-form-scopes-empty-array-td-invalid.jsonld
+    rationale: "The upstream scopes array has no minItems, so it accepts [] although an array of scopes needs at least one scope."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-nested-dataschema-pattern-number
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 7-complex-data-schemas/invalid/schema-pattern-number-td-invalid.jsonld
+    rationale: "The upstream dataSchema has no pattern property, so it accepts a number although the spec types pattern as string."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-nested-dataschema-properties-string
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 7-complex-data-schemas/invalid/schema-properties-string-td-invalid.jsonld
+    rationale: "The upstream dataSchema properties has no type object, so it accepts a string although the spec types it as Map of DataSchema."
+    expected_generated:
+      verdict: reject
+  - id: jsonschema-property-contentmediatype-number
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: instance
+      instance: 2-properties/invalid/property-contentmediatype-number-td-invalid.jsonld
+    rationale: "The upstream schema does not constrain contentMediaType of a property affordance although the spec types it as string."
     expected_generated:
       verdict: reject

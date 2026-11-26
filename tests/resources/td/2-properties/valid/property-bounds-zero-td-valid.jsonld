@@ -1,0 +1,32 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "properties": {
+    "list": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 0,
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    },
+    "text": {
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 0,
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    }
+  }
+}

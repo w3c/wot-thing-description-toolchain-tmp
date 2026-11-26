@@ -1,0 +1,23 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "x_sc": {
+      "scheme": "combo",
+      "oneOf": [
+        "a_sc",
+        "b_sc"
+      ],
+      "@type": [
+        "tm:ThingModel"
+      ]
+    },
+    "a_sc": {
+      "scheme": "basic"
+    },
+    "b_sc": {
+      "scheme": "bearer"
+    }
+  },
+  "security": "x_sc"
+}

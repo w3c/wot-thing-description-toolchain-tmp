@@ -593,13 +593,6 @@
             }
           ]
         },
-        "allOf": {
-          "description": "Used to ensure that the data is valid against all of the specified schemas in the array.",
-          "items": {
-            "$ref": "#/$defs/DataSchema"
-          },
-          "type": "array"
-        },
         "const": {
           "description": "Provides a constant value."
         },
@@ -1003,6 +996,7 @@
                       "cancelaction"
                     ]
                   },
+                  "minItems": 1,
                   "type": "array"
                 }
               ]
@@ -1117,6 +1111,7 @@
                       "unsubscribeevent"
                     ]
                   },
+                  "minItems": 1,
                   "type": "array"
                 }
               ]
@@ -1156,6 +1151,7 @@
                       "unobserveproperty"
                     ]
                   },
+                  "minItems": 1,
                   "type": "array"
                 }
               ]
@@ -1215,6 +1211,7 @@
                       "unsubscribeallevents"
                     ]
                   },
+                  "minItems": 1,
                   "type": "array"
                 }
               ]
@@ -1660,13 +1657,6 @@
             }
           ]
         },
-        "allOf": {
-          "description": "Used to ensure that the data is valid against all of the specified schemas in the array.",
-          "items": {
-            "$ref": "#/$defs/DataSchema"
-          },
-          "type": "array"
-        },
         "const": {
           "description": "Provides a constant value."
         },
@@ -1882,39 +1872,58 @@
         },
         "op": {
           "description": "Indicates the operation type (e.g., readproperty, writeproperty, observeproperty, etc.)",
-          "enum": [
-            "readproperty",
-            "writeproperty",
-            "observeproperty",
-            "unobserveproperty",
-            "invokeaction",
-            "queryaction",
-            "cancelaction",
-            "subscribeevent",
-            "unsubscribeevent",
-            "readallproperties",
-            "writeallproperties",
-            "readmultipleproperties",
-            "writemultipleproperties",
-            "observeallproperties",
-            "unobserveallproperties",
-            "queryallactions",
-            "subscribeallevents",
-            "unsubscribeallevents"
-          ],
           "oneOf": [
             {
+              "enum": [
+                "readproperty",
+                "writeproperty",
+                "observeproperty",
+                "unobserveproperty",
+                "invokeaction",
+                "queryaction",
+                "cancelaction",
+                "subscribeevent",
+                "unsubscribeevent",
+                "readallproperties",
+                "writeallproperties",
+                "readmultipleproperties",
+                "writemultipleproperties",
+                "observeallproperties",
+                "unobserveallproperties",
+                "queryallactions",
+                "subscribeallevents",
+                "unsubscribeallevents"
+              ],
               "type": "string"
             },
             {
               "items": {
+                "enum": [
+                  "readproperty",
+                  "writeproperty",
+                  "observeproperty",
+                  "unobserveproperty",
+                  "invokeaction",
+                  "queryaction",
+                  "cancelaction",
+                  "subscribeevent",
+                  "unsubscribeevent",
+                  "readallproperties",
+                  "writeallproperties",
+                  "readmultipleproperties",
+                  "writemultipleproperties",
+                  "observeallproperties",
+                  "unobserveallproperties",
+                  "queryallactions",
+                  "subscribeallevents",
+                  "unsubscribeallevents"
+                ],
                 "type": "string"
               },
               "minItems": 1,
               "type": "array"
             }
-          ],
-          "type": "string"
+          ]
         },
         "response": {
           "$ref": "#/$defs/ExpectedResponse",

@@ -1,0 +1,39 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "properties": {
+    "p": {
+      "type": "object",
+      "properties": {
+        "a": {
+          "@type": "ex:Level",
+          "title": "Level",
+          "titles": {
+            "en": "Level",
+            "de": "Pegel"
+          },
+          "description": "Fill level",
+          "descriptions": {
+            "en": "Fill level",
+            "de": "Füllstand"
+          },
+          "unit": "percent",
+          "format": "x-level",
+          "readOnly": true,
+          "writeOnly": false
+        }
+      },
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    }
+  }
+}

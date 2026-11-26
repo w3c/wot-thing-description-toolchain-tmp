@@ -1,0 +1,24 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/wot-next/td",
+    {
+      "ex": "https://example.com/ns#"
+    }
+  ],
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "x_sc": {
+      "@type": "ex:Scheme",
+      "scheme": "digest",
+      "description": "A scheme",
+      "descriptions": {
+        "en": "A scheme"
+      },
+      "proxy": "https://example.com/proxy",
+      "in": "header",
+      "name": "token",
+      "qop": "auth-int"
+    }
+  },
+  "security": "x_sc"
+}

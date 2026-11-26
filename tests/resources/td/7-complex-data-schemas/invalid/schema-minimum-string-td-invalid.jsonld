@@ -1,18 +1,21 @@
 {
   "@context": "https://www.w3.org/ns/wot-next/td",
   "title": "t",
-  "security": "nosec_sc",
   "securityDefinitions": {
     "nosec_sc": {
       "scheme": "nosec"
     }
   },
-  "properties": {
-    "p": {
-      "allOf": 1,
+  "security": "nosec_sc",
+  "actions": {
+    "a": {
+      "input": {
+        "type": "number",
+        "minimum": "1"
+      },
       "forms": [
         {
-          "href": "h"
+          "href": "https://example.com/a"
         }
       ]
     }

@@ -1,0 +1,9 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc"
+}

@@ -1,0 +1,27 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "properties": {
+    "p": {
+      "type": "object",
+      "properties": {
+        "a": {
+          "@type": [
+            "tm:ThingModel"
+          ]
+        }
+      },
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    }
+  }
+}

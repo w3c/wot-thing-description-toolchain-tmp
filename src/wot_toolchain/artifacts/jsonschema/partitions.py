@@ -30,16 +30,25 @@ def build_enum_subset_partitions(schema: dict[str, Any], config: TransformConfig
         base_name = f"{cls_name}_element_base"
         defs[base_name] = base_def
 
+        array_constraints = _array_constraints(original_props.get(esp.slot_name, {}))
         variant_refs = []
         for subset_name, ops in esp.subsets.items():
             variant_def_name = f"{cls_name}_element_{subset_name}"
-            op_schema = {"oneOf": [{"const": op} for op in ops] + [{"type": "array", "items": {"enum": ops}}]}
+            array_branch = {"type": "array", "items": {"enum": ops}} | array_constraints
+            op_schema = {"oneOf": [{"const": op} for op in ops] + [array_branch]}
             narrowing = {"type": "object", "properties": {esp.slot_name: op_schema}}
             variant_def = {"allOf": [{"$ref": f"#/$defs/{base_name}"}, narrowing]}
             defs[variant_def_name] = variant_def
             variant_refs.append({"$ref": f"#/$defs/{variant_def_name}"})
 
         defs[cls_name] = {"oneOf": variant_refs}
+
+
+def _array_constraints(slot_schema: dict[str, Any]) -> dict[str, Any]:
+    """Return the array-level keywords (e.g. ``minItems``) of the array form of ``slot_schema``, without its items."""
+    branches = [slot_schema, *slot_schema.get("oneOf", []), *slot_schema.get("anyOf", [])]
+    array: dict[str, Any] = next((branch for branch in branches if branch.get("type") == "array"), {})
+    return {key: value for key, value in array.items() if key not in ("type", "items")}
 
 
 def _narrow_slot_items(props: dict[str, Any], slot_name: str, partition_ref: str, variant_ref: str) -> None:

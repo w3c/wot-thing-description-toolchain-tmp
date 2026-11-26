@@ -1,0 +1,16 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/wot-next/td",
+    "https://example.com/context",
+    {
+      "ex": "https://example.com/ns#"
+    }
+  ],
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc"
+}

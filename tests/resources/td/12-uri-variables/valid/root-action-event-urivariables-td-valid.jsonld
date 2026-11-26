@@ -1,0 +1,43 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "uriVariables": {
+    "unit": {
+      "type": "string"
+    }
+  },
+  "actions": {
+    "toggle": {
+      "uriVariables": {
+        "level": {
+          "type": "integer"
+        }
+      },
+      "forms": [
+        {
+          "href": "https://example.com/toggle{?level,unit}"
+        }
+      ]
+    }
+  },
+  "events": {
+    "overheating": {
+      "uriVariables": {
+        "threshold": {
+          "type": "number"
+        }
+      },
+      "forms": [
+        {
+          "href": "https://example.com/oh{?threshold,unit}"
+        }
+      ]
+    }
+  }
+}

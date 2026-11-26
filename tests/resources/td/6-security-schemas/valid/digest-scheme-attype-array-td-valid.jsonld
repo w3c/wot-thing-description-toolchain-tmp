@@ -1,0 +1,19 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/wot-next/td",
+    {
+      "ex": "https://example.com/ns#"
+    }
+  ],
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "x_sc": {
+      "@type": [
+        "ex:Scheme",
+        "ex:Other"
+      ],
+      "scheme": "digest"
+    }
+  },
+  "security": "x_sc"
+}

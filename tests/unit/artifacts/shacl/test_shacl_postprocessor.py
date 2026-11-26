@@ -3,7 +3,8 @@ from pathlib import Path
 from rdflib import Graph, URIRef
 from rdflib.collection import Collection
 from rdflib.namespace import RDF as RDF_NAMESPACE
-from rdflib.namespace import SH, XSD
+from rdflib import namespace
+from rdflib.namespace import SH
 
 from wot_toolchain.artifacts.shacl.postprocess import post_process_shacl
 from linkml.generators.shaclgen import ShaclGenerator
@@ -39,7 +40,7 @@ def test_title_accepts_string_or_langstring_in_shacl() -> None:
         union = graph.value(property_shape, SH["or"])
         assert union is not None
         branches = list(Collection(graph, union))
-        assert {graph.value(branch, SH.datatype) for branch in branches} == {XSD.string, RDF_NAMESPACE.langString}
+        assert {graph.value(branch, SH.datatype) for branch in branches} == {namespace.XSD.string, RDF_NAMESPACE.langString}
         assert (property_shape, SH.datatype, None) not in graph
 
 

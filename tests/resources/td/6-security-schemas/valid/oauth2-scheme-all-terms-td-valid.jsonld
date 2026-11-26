@@ -1,0 +1,29 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/wot-next/td",
+    {
+      "ex": "https://example.com/ns#"
+    }
+  ],
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "x_sc": {
+      "@type": "ex:Scheme",
+      "scheme": "oauth2",
+      "flow": "code",
+      "description": "A scheme",
+      "descriptions": {
+        "en": "A scheme"
+      },
+      "proxy": "https://example.com/proxy",
+      "authorization": "https://example.com/authorize",
+      "token": "https://example.com/token",
+      "refresh": "https://example.com/refresh",
+      "scopes": [
+        "read",
+        "write"
+      ]
+    }
+  },
+  "security": "x_sc"
+}

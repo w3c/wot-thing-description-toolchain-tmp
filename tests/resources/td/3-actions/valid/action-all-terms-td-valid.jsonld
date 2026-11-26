@@ -1,0 +1,47 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/wot-next/td",
+    {
+      "ex": "https://example.com/ns#"
+    }
+  ],
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "actions": {
+    "toggle": {
+      "forms": [
+        {
+          "href": "https://example.com/toggle"
+        }
+      ],
+      "@type": "ex:ToggleAction",
+      "title": "Toggle",
+      "titles": {
+        "en": "Toggle"
+      },
+      "description": "Toggles the lamp",
+      "descriptions": {
+        "en": "Toggles the lamp"
+      },
+      "input": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "integer"
+          }
+        }
+      },
+      "output": {
+        "type": "string"
+      },
+      "safe": false,
+      "idempotent": true,
+      "synchronous": true
+    }
+  }
+}

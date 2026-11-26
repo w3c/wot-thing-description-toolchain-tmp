@@ -1,0 +1,66 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "Constraint probe",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "@type": "Thing",
+  "id": "urn:uuid:55f01138-5c96-4b3d-a5d0-81319a2db677",
+  "titles": {
+    "en": "Constraint probe",
+    "de": "Pruefling"
+  },
+  "description": "A probe with every root term",
+  "descriptions": {
+    "en": "A probe with every root term"
+  },
+  "support": "mailto:support@example.com",
+  "base": "https://example.com/",
+  "links": [
+    {
+      "href": "https://example.com/target"
+    }
+  ],
+  "forms": [
+    {
+      "href": "https://example.com/all",
+      "op": "readallproperties"
+    }
+  ],
+  "schemaDefinitions": {
+    "error": {
+      "type": "string"
+    }
+  },
+  "properties": {
+    "status": {
+      "type": "string",
+      "forms": [
+        {
+          "href": "https://example.com/status"
+        }
+      ]
+    }
+  },
+  "actions": {
+    "toggle": {
+      "forms": [
+        {
+          "href": "https://example.com/toggle"
+        }
+      ]
+    }
+  },
+  "events": {
+    "overheating": {
+      "forms": [
+        {
+          "href": "https://example.com/oh"
+        }
+      ]
+    }
+  }
+}

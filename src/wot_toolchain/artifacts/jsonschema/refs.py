@@ -8,6 +8,23 @@ from .traversal import extract_ref_name, is_linkml_any, walk_schema
 from ...errors import SchemaError
 
 
+def _narrow_string_branches(siblings: dict[str, Any], values: list[str]) -> bool:
+    """Put ``values`` as ``enum`` on each string or string array branch of a ``oneOf``/``anyOf`` beside an enum ref.
+
+    Returns False and changes nothing when there is no such branch or a branch of another kind.
+    """
+    targets: list[dict[str, Any]] = []
+    for keyword in ("oneOf", "anyOf"):
+        for branch in siblings.get(keyword, []):
+            target = branch.get("items") if branch.get("type") == "array" else branch
+            if not isinstance(target, dict) or target.get("type") != "string":
+                return False
+            targets.append(target)
+    for target in targets:
+        target["enum"] = list(values)
+    return bool(targets)
+
+
 def resolve_refs(schema: dict[str, Any], sv: SchemaView) -> None:
     """Inline enum references, erase ``linkml:Any`` references and point the others at existing ``$defs``.
 
@@ -72,6 +89,8 @@ def resolve_refs(schema: dict[str, Any], sv: SchemaView) -> None:
 
         if ref_name in enum_values:
             siblings = {key: value for key, value in obj.items() if key != "$ref"}
+            if _narrow_string_branches(siblings, enum_values[ref_name]):
+                return siblings
             return {"type": "string", "enum": enum_values[ref_name]} | siblings
 
         if ref_name in any_class_names:

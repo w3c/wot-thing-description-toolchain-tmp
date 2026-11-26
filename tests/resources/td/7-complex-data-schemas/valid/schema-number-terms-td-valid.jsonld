@@ -1,0 +1,30 @@
+{
+  "@context": "https://www.w3.org/ns/wot-next/td",
+  "title": "t",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "properties": {
+    "p": {
+      "type": "object",
+      "properties": {
+        "a": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "exclusiveMinimum": -0.5,
+          "exclusiveMaximum": 100.5,
+          "multipleOf": 0.5
+        }
+      },
+      "forms": [
+        {
+          "href": "https://example.com/p"
+        }
+      ]
+    }
+  }
+}

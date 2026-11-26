@@ -109,19 +109,6 @@ slots:
     multivalued: true
     range: DataSchema
     inlined_as_list: true
-  allOf:
-    description: >-
-      Used to ensure that the data is valid against all of the specified schemas in the array.
-    slot_uri: jsonschema:allOf
-    domain: DataSchema
-    multivalued: true
-    range: DataSchema
-    inlined_as_list: true
-    comments:
-      - >-
-        The upstream JSON Schema ontology defines `jsonschema:allOf`, but the current td-next Data Schema vocabulary table does not list it; confirm its inclusion with the WoT Working Group.
-    annotations:
-      spec_exclude: true
   propertyName:
     description: >-
       Used to store the indexing name in the parent object when this schema appears as a property of an object schema.
@@ -297,7 +284,6 @@ classes:
       - default
       - unit
       - oneOf
-      - allOf
       - enum
       - readOnly
       - writeOnly
@@ -317,11 +303,6 @@ classes:
               - equals_string: "tm:ThingModel"
       type:
         range: DataSchemaType
-      allOf:
-        slot_uri: jsonschema:allOf
-        range: DataSchema
-        multivalued: true
-        inlined_as_list: true
       format:
         range: string
         description: >-
