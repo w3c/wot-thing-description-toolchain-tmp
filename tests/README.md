@@ -38,8 +38,6 @@ The specification HTML is built when `spec` is listed under `generators` in
 - `goldens/test_spec_form_sections.py` checks that the Form and
   ExpectedResponse sections of the generated specification contain the
   expected tables, operation types, and assertion ids.
-- `unit/spec/test_spec_content_html.py` checks the HTML rendered from
-  spec content blocks.
 - `unit/spec/test_default_assignments.py` checks which table rows of the
   LinkML schemas are marked "with default".
 - `goldens/test_assertion_inventory.py` compares assertion counts,

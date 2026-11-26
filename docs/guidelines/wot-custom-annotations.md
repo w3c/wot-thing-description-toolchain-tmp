@@ -138,124 +138,13 @@ The rows of a table that lists an enum come from the schema through an include m
 
 Generation fails (exit 5) for a file whose class has no section in the specification, a file that cannot be read, and an unknown or invalid include marker.
 
----
-
-### Content blocks (`spec_subsections`)
-
-The `spec_content` and `spec_intro_content` annotations no longer exist; the block format below is read only by `spec_subsections`.
-
-**What it does:** describes structured content blocks rendered into the HTML specification. Supports notes, paragraphs with testable assertions, ordered/unordered lists, enum tables, and raw markdown.
-
-**What you need to do:**
-
-- Add a `value` list where each item has a `type` field determining the content block kind.
-- For testable assertions, give segments an `id` field — this becomes an `rfc2119-assertion` anchor in the HTML. **Never change or delete an existing `id`** — external W3C implementations reference them.
-
-Available block types:
-
-| Type | Purpose | Key fields |
-|------|---------|------------|
-| `note` | Informative note box | `text`, optional `title` |
-| `paragraph` | Prose with optional assertion segments | `segments[].id`, `segments[].text` |
-| `list` | Ordered/unordered list of assertions | `items[].id`, `items[].text` |
-| `enum_table` | Table of enumeration values | `enum`, `columns` |
-| `markdown` | Raw markdown (no assertions) | `text` |
-
-#### `markdown`
-
-Plain prose. Processed for cross-references, RFC keywords, and term links, then wrapped in `<p>`. Use when no assertion IDs are needed.
-
-```yaml
-- type: markdown
-  text: |
-    A Thing Description MUST include a valid context.
-    See [[JSON-LD11]] for details.
-```
-
-Renders as: `<p>A Thing Description MUST include a valid context. See [[JSON-LD11]] for details.</p>`
-
-#### `paragraph`
-
-A structured paragraph composed of **segments**. All segments concatenate into a single `<p>`. Any segment with an `id` becomes an assertion `<span>`.
-
-Use `paragraph` instead of `markdown` only when you need to attach an `id` to a specific segment. Both process text identically.
-
-```yaml
-- type: paragraph
-  segments:
-    - text: Introductory sentence.
-    - id: td-my-assertion
-      text: TD Processors MUST do something specific.
-    - text: Closing sentence.
-```
-
-Renders as: `<p>Introductory sentence. <span class="rfc2119-assertion" id="td-my-assertion">TD Processors MUST do something specific.</span> Closing sentence.</p>`
-
-#### `list`
-
-Unordered list. Each item can optionally carry an assertion ID.
-
-```yaml
-- type: list
-  items:
-    - text: Plain list item.
-    - id: td-some-assertion
-      text: A Thing Description MUST satisfy this requirement.
-```
-
-#### `note`
-
-A ReSpec note block. The HTML structure differs based on whether `title` is present:
-
-- **Untitled** → `<div class="note"><p>text</p></div>` — ReSpec needs the block-level `<div>`.
-- **Titled** → `<p class="note" title="...">text</p>` — ReSpec reads the `title` attribute directly.
-
-```yaml
-# Untitled
-- type: note
-  text: This is an informative note.
-
-# Titled
-- type: note
-  title: Important caveat
-  text: This note has a title displayed by ReSpec.
-```
-
-#### `enum_table`
-
-Renders a LinkML enum as an HTML table. The toolchain reads the enum definition and generates rows automatically.
-
-```yaml
-- type: enum_table
-  enum: OperationType
-  caption: Well-known types
-  table_id: table-op-types
-  columns:
-    - field: name
-      header: Operation
-    - field: description
-      header: Description
-```
-
-Column `field` values:
-
-| Field | Source |
-|-------|--------|
-| `name` | The permissible value key (e.g., `readproperty`) |
-| `description` | The `description` field of the permissible value |
-| `comment:<prefix>` | Extracts from the value's `comments` list — finds the first comment starting with `<prefix>`, strips the prefix and ` - ` separator, returns the remainder |
-
-**Comment extraction example** — given an enum value with `comments: ["Thing to Consumer - All fields without writeOnly", "Consumer to Thing - No correlation"]`, using `field: "comment:Consumer to Thing"` produces `No correlation`.
-
 #### Text processing
 
-All text fields go through the same pipeline regardless of block type:
+Text in section prose files follows these conventions:
 
 - RFC 2119 keywords (`MUST`, `SHOULD`, `MAY`, etc.) are written as bare words; ReSpec marks them up. Do not write `*MUST*`: it renders as nested `<em>`.
 - `[[SPEC-NAME]]` → ReSpec bibliographic reference (see below)
 - Known terms (e.g., `Thing Description`, `TD Processors`) → cross-reference links via the glossary (see below)
-
-No HTML needed in text fields — write plain text with these conventions.
 
 #### Bibliographic references (`[[SPEC-NAME]]`)
 
@@ -296,34 +185,6 @@ Both support `aliases` — alternative spellings or plural forms that link to th
 - Adding a new class or concept to the spec that other sections reference by name → add an `id` entry matching the HTML anchor.
 - Referencing an external definition (e.g., an XML Schema datatype, a term from WoT Architecture) → add an `href` entry.
 - A term appears unlinked in generated HTML → check if it's missing from the glossary or if the casing doesn't match.
-
----
-
-### `spec_subsections`
-
-**What it does:** creates sub-headings with their own content blocks after the section prose of a class. Each subsection gets its own HTML `<section>` with a heading.
-
-**What you need to do:**
-
-- Add a `value` list where each item defines `id` (becomes the HTML anchor), `title` (the heading text), optional `class` (`informative` or `normative`), and `content` (the block types above).
-
-```yaml
-Form:
-  annotations:
-    spec_subsections:
-      value:
-        - id: sec-response-usage
-          title: Response-related Terms Usage
-          class: informative
-          content:
-            - type: paragraph
-              segments:
-                - id: td-expectedResponse-default-contentType
-                  text: |
-                    If not specified, the default content type...
-```
-
-Currently used on: `Form` (one subsection for response-related terms).
 
 ---
 
@@ -456,7 +317,6 @@ Currently used on: `SecurityScheme`.
 | `spec_description` | slot | HTML | Spec text with markup (`[[RFC]]`, backticks) |
 | `spec_default` | slot | HTML | Normative default value for vocab table |
 | `spec_exclude` | slot | HTML | Hide structural slot from vocab table |
-| `spec_subsections` | class | HTML | Sub-headings after class content |
 | `spec_type_values` | slot | HTML | Custom "Type" column in vocab table |
 | `jsonschema_flatten_subclasses` | class | JSON Schema | Merge subclass slots into parent |
 | `jsonschema_oneof_dispatch` | class | JSON Schema | Discriminated union from subclasses |
