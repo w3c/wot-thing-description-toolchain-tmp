@@ -1,13 +1,13 @@
 <p>In some cases additional responses might be possible. One example of this is error responses but in some cases there might also be additional successful responses. In this case, the `response` name-value pair is still used for the primary response but `additionalResponses` may also be provided, whose value is an array of `AdditionalExpectedResponse` objects. Each additional response must be distinguished in some way from the primary response, either by `contentType` or by protocol-specific settings such as error code header values. Each additional response may also have a data schema which can differ from the normal output data schema for the interaction.</p>
 Similar expected response, additional responses have the following considerations:
 <ul>
-<li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-contentType">If the content type of an additional expected response differs from the content type of the form, the `Form` instance *MUST* include an entry in the array associated with the name `additionalResponses`.
+<li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-contentType">If the content type of an additional expected response differs from the content type of the form, the `Form` instance MUST include an entry in the array associated with the name `additionalResponses`.
 </span></li>
-<li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-missing-contentType">If there is no `contentType` value defined in an additional expected response object, a Consumer *MUST* expect that the respective response does not contain any payload.
+<li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-missing-contentType">If there is no `contentType` value defined in an additional expected response object, a Consumer MUST expect that the respective response does not contain any payload.
 </span></li>
-<li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-schema">If the data schema of an additional expected response differs from the output data schema of the interaction, the `Form` *MUST* include an entry in the array associated with the name `additionalResponses` that includes a value for the name `schema`.
+<li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-schema">If the data schema of an additional expected response differs from the output data schema of the interaction, the `Form` MUST include an entry in the array associated with the name `additionalResponses` that includes a value for the name `schema`.
 </span></li>
-<li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-noSchemaWithoutPayload">The `schema` of an additional expected response object *MUST NOT* be defined when there is no `contentType` present.
+<li><span class="rfc2119-assertion" id="td-additionalExpectedResponse-noSchemaWithoutPayload">The `schema` of an additional expected response object MUST NOT be defined when there is no `contentType` present.
 </span></li>
 </ul>
 The different cases on the variation of request and response are explained above. The tables at [contentType-usage](#contentType-usage) summarize these cases in a concise manner.

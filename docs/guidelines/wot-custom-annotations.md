@@ -132,7 +132,7 @@ The prose of a class section is not kept in the schema. It lives in one file per
 - `<Class>.html` is placed **after** the vocabulary table of the class.
 - `<Class>.intro.html` is placed **before** the table, in place of the class description.
 
-A file holds the HTML fragment handed to Bikeshed: plain HTML plus the usual shorthands (`` `code` ``, `*MUST*`, `[[RFC8259]]`, Markdown links). Assertions are written as `<span class="rfc2119-assertion" id="...">`. **Never change or delete an existing `id`** — external W3C implementations reference them.
+A file holds the HTML fragment handed to Bikeshed: plain HTML plus the usual shorthands (`` `code` ``, `[[RFC8259]]`, Markdown links). RFC 2119 keywords are written as bare words (`MUST`); ReSpec marks them up. Assertions are written as `<span class="rfc2119-assertion" id="...">`. **Never change or delete an existing `id`** — external W3C implementations reference them.
 
 The rows of a table that lists an enum come from the schema through an include marker inside `<tbody>`, for example `%enum_rows('OperationType', 'name', 'description')%`. A column is `name`, `description` or `comment:<prefix>` (the text of the enum value comment that starts with `<prefix>:`).
 
@@ -168,11 +168,11 @@ Plain prose. Processed for cross-references, RFC keywords, and term links, then 
 ```yaml
 - type: markdown
   text: |
-    A Thing Description *MUST* include a valid context.
+    A Thing Description MUST include a valid context.
     See [[JSON-LD11]] for details.
 ```
 
-Renders as: `<p>A Thing Description <em>MUST</em> include a valid context. See [[JSON-LD11]] for details.</p>`
+Renders as: `<p>A Thing Description MUST include a valid context. See [[JSON-LD11]] for details.</p>`
 
 #### `paragraph`
 
@@ -185,11 +185,11 @@ Use `paragraph` instead of `markdown` only when you need to attach an `id` to a 
   segments:
     - text: Introductory sentence.
     - id: td-my-assertion
-      text: TD Processors *MUST* do something specific.
+      text: TD Processors MUST do something specific.
     - text: Closing sentence.
 ```
 
-Renders as: `<p>Introductory sentence. <span class="rfc2119-assertion" id="td-my-assertion">TD Processors <em>MUST</em> do something specific.</span> Closing sentence.</p>`
+Renders as: `<p>Introductory sentence. <span class="rfc2119-assertion" id="td-my-assertion">TD Processors MUST do something specific.</span> Closing sentence.</p>`
 
 #### `list`
 
@@ -200,7 +200,7 @@ Unordered list. Each item can optionally carry an assertion ID.
   items:
     - text: Plain list item.
     - id: td-some-assertion
-      text: A Thing Description *MUST* satisfy this requirement.
+      text: A Thing Description MUST satisfy this requirement.
 ```
 
 #### `note`
@@ -251,7 +251,7 @@ Column `field` values:
 
 All text fields go through the same pipeline regardless of block type:
 
-- `*MUST*`, `*SHOULD*`, `*MAY*`, etc. → `<em>MUST</em>` (RFC 2119 keywords)
+- RFC 2119 keywords (`MUST`, `SHOULD`, `MAY`, etc.) are written as bare words; ReSpec marks them up. Do not write `*MUST*`: it renders as nested `<em>`.
 - `[[SPEC-NAME]]` → ReSpec bibliographic reference (see below)
 - Known terms (e.g., `Thing Description`, `TD Processors`) → cross-reference links via the glossary (see below)
 

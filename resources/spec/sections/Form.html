@@ -1,11 +1,11 @@
 <div class="note">
 <p>The value of the `href` property in a Form instance can be a relative URI or an absolute URI.</p>
 </div>
-<p><span class="rfc2119-assertion" id="td-form-href-relative">To properly build the target URI, if base is present in the Thing level, the `href` value *MUST* be resolved using the base URI.
+<p><span class="rfc2119-assertion" id="td-form-href-relative">To properly build the target URI, if base is present in the Thing level, the `href` value MUST be resolved using the base URI.
 </span></p>
-<p>While this table defines the terms available in a form, <span class="rfc2119-assertion" id="td-form-additional-mediatype-metadata">Bindings *MAY* have additional information that specifies representation formats in more detail than the media type alone.
+<p>While this table defines the terms available in a form, <span class="rfc2119-assertion" id="td-form-additional-mediatype-metadata">Bindings MAY have additional information that specifies representation formats in more detail than the media type alone.
 </span> For example, in a TD with the Modbus Binding, `modv:mostSignificantByte` in a form describes the endianness of the payload. Please see [Bindings](#bindings) for further information. Furthermore, possible values for the `contentCoding` property can be found, e.g., in the IANA HTTP content coding registry.</p>
-<p>The list of possible operation types of a form is fixed. As of this version of the specification, it only includes the well-known types necessary to implement the WoT interaction model described in [[wot-architecture11]]. Future versions of the standard may extend this list but <span class="rfc2119-assertion" id="well-known-operation-types-only">operations types *MUST* be restricted to the values in the table below.
+<p>The list of possible operation types of a form is fixed. As of this version of the specification, it only includes the well-known types necessary to implement the WoT interaction model described in [[wot-architecture11]]. Future versions of the standard may extend this list but <span class="rfc2119-assertion" id="well-known-operation-types-only">operations types MUST be restricted to the values in the table below.
 </span></p>
 <div id="table-operation-types">
 <table class="def numbered">
@@ -23,5 +23,5 @@
 </div>
 A Thing Description of a WoT producer may have multiple forms entries with, e.g., different protocol and/or content types declarations that a Consumer could possibly support. In that case the Consumer may choose any form entry that works (e.g., the protocol and content type is supported) for them. When one form is chosen, it is expected that the Consumer will continue to use it as long as possible for every new interaction with the WoT producer.
 
-<p><span class="rfc2119-assertion" id="td-form-context-submission-target">As a Form but not just the `href` defines how to execute the interaction, `href` of multiple Forms *MAY* point to the same resource, where the different Forms represent different operations on that resource.
+<p><span class="rfc2119-assertion" id="td-form-context-submission-target">As a Form but not just the `href` defines how to execute the interaction, `href` of multiple Forms MAY point to the same resource, where the different Forms represent different operations on that resource.
 </span> For example, in a TD with the HTTP Binding, two Forms with HTTP GET and PUT methods can point to the same resource but represent different operations such as `readproperty` and `writeproperty`.</p>
