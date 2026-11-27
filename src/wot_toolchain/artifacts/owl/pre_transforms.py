@@ -255,6 +255,7 @@ def _clear_constraints(s: SchemaDefinition) -> None:
             attr_def.annotations = _rdf_annotations(attr_def)
         class_def.slot_usage = {}
         class_def.rules = []
+        class_def.none_of = []
         class_def.annotations = _rdf_annotations(class_def)
     for enum_def in cast(_Enums, s.enums).values():
         enum_def.annotations = _rdf_annotations(enum_def)
