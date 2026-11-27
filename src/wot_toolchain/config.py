@@ -10,6 +10,7 @@ from typing import Any, Literal
 import yaml
 from linkml.validator import validate
 
+from .artifacts.owl.options import MetadataProfile, OwlOptions, PermissibleValueKind
 from .errors import ConfigError
 
 DEFAULT_CONFIG = Path("wot-toolchain.yaml")
@@ -21,11 +22,12 @@ type _Kind = Literal["file", "directory"]
 
 @dataclass(frozen=True)
 class Vocabulary:
-    """A LinkML schema of the vocabulary, its prefix and its class diagram file name, if any."""
+    """A LinkML schema of the vocabulary, its prefix and the names of its class diagram and ontology files, if any."""
 
     schema: Path
     prefix: str
     diagram: str | None
+    ontology: str | None
 
 
 @dataclass(frozen=True)
@@ -54,6 +56,7 @@ class Config:
     generators: tuple[str, ...]
     top_class: str | None
     jsonschema_profile: Path | None
+    owl: OwlOptions
     vocabularies: tuple[Vocabulary, ...]
     diagram_range_labels: Mapping[str, str]
     spec: SpecConfig | None
@@ -81,6 +84,7 @@ def load_config(path: Path) -> Config:
         jsonschema_profile=_input(path, generators["jsonschema"]["schema"], "/generators/jsonschema/schema", "file")
         if generators.get("jsonschema", {}).get("schema")
         else None,
+        owl=_owl_options(generators.get("owl") or {}),
         vocabularies=vocabularies,
         diagram_range_labels=_range_labels((generators.get("visualization") or {}).get("range_labels")),
         spec=_spec(path, generators["spec"], vocabularies) if "spec" in generators else None,
@@ -108,6 +112,16 @@ def _read_yaml(path: Path) -> Any:
         raise ConfigError(f"{path}: config file is not valid YAML: {exc}") from exc
 
 
+def _owl_options(settings: dict[str, Any]) -> OwlOptions:
+    """Return the OWL options of the config; an absent setting keeps the option's default."""
+    defaults = OwlOptions()
+    return OwlOptions(
+        metadata_profile=MetadataProfile(settings.get("metadata_profile", defaults.metadata_profile)),
+        only_root_schema=settings.get("only_root_schema", defaults.only_root_schema),
+        permissible_values=PermissibleValueKind(settings.get("permissible_values", defaults.permissible_values)),
+    )
+
+
 def _vocabularies(path: Path, entries: list[dict[str, Any]]) -> tuple[Vocabulary, ...]:
     vocabularies: list[Vocabulary] = []
     for index, entry in enumerate(entries):
@@ -116,6 +130,7 @@ def _vocabularies(path: Path, entries: list[dict[str, Any]]) -> tuple[Vocabulary
             schema=_input(path, entry["schema"], f"{where}/schema", "file"),
             prefix=entry["prefix"],
             diagram=entry.get("diagram"),
+            ontology=entry.get("ontology"),
         )
         if any(other.prefix == vocabulary.prefix for other in vocabularies):
             raise _error(path, f"{where}/prefix", f"prefix {vocabulary.prefix!r} is used by more than one vocabulary")

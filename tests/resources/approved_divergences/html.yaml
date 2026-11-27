@@ -16,7 +16,7 @@ divergences:
       column: 3
     rationale: >-
       JSON-LD @language in the TD context promotes plain strings to
-      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+      rdf:langString; the OWL range is rdf:PlainLiteral to cover both types.
     expected_generated:
       text: string or rdf:langString
   - id: html-thing-description-type
@@ -30,7 +30,7 @@ divergences:
       column: 3
     rationale: >-
       JSON-LD @language in the TD context promotes plain strings to
-      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+      rdf:langString; the OWL range is rdf:PlainLiteral to cover both types.
     expected_generated:
       text: string or rdf:langString
   - id: html-interaction-affordance-title-type
@@ -44,7 +44,7 @@ divergences:
       column: 3
     rationale: >-
       JSON-LD @language in the TD context promotes plain strings to
-      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+      rdf:langString; the OWL range is rdf:PlainLiteral to cover both types.
     expected_generated:
       text: string or rdf:langString
   - id: html-interaction-affordance-description-type
@@ -58,7 +58,7 @@ divergences:
       column: 3
     rationale: >-
       JSON-LD @language in the TD context promotes plain strings to
-      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+      rdf:langString; the OWL range is rdf:PlainLiteral to cover both types.
     expected_generated:
       text: string or rdf:langString
   - id: html-data-schema-title-type
@@ -72,7 +72,7 @@ divergences:
       column: 3
     rationale: >-
       JSON-LD @language in the TD context promotes plain strings to
-      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+      rdf:langString; the OWL range is rdf:PlainLiteral to cover both types.
     expected_generated:
       text: string or rdf:langString
   - id: html-data-schema-description-type
@@ -86,7 +86,7 @@ divergences:
       column: 3
     rationale: >-
       JSON-LD @language in the TD context promotes plain strings to
-      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+      rdf:langString; the OWL range is rdf:PlainLiteral to cover both types.
     expected_generated:
       text: string or rdf:langString
   - id: html-security-scheme-description-type
@@ -100,7 +100,7 @@ divergences:
       column: 3
     rationale: >-
       JSON-LD @language in the TD context promotes plain strings to
-      rdf:langString; the OWL range is rdfs:Literal to cover both types.
+      rdf:langString; the OWL range is rdf:PlainLiteral to cover both types.
     expected_generated:
       text: string or rdf:langString
   - id: html-interaction-affordance-uri-variables-spacing

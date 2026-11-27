@@ -8,15 +8,19 @@ vocabularies:
   - schema: resources/schemas/thing_description.yaml
     prefix: td
     diagram: td.svg
+    ontology: td.ttl
   - schema: resources/schemas/hypermedia.yaml
     prefix: hctl
     diagram: hctl.svg
+    ontology: hctl.ttl
   - schema: resources/schemas/wot_security.yaml
     prefix: wotsec
     diagram: wotsec.svg
+    ontology: wotsec.ttl
   - schema: resources/schemas/jsonschema.yaml
     prefix: jsonschema
     diagram: jsonschema.svg
+    ontology: jsonschema.ttl
 
 generators:
   jsonschema:
@@ -25,6 +29,9 @@ generators:
   jsonldcontext:
   shacl:
   owl:
+    metadata_profile: rdfs
+    only_root_schema: true
+    permissible_values: instance
   linkml:
   visualization:
     # The class diagrams name these LinkML ranges as the published TD specification does.

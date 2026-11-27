@@ -14,7 +14,7 @@ This toolchain uses **one LinkML schema as the single source of truth** and gene
 | TD/TM JSON Schema | `resources/gens/jsonschema/jsonschema.json` |
 | JSON-LD Context | `resources/gens/jsonldcontext/context.jsonld` |
 | SHACL Shapes | `resources/gens/shacl/shapes.shacl.ttl` |
-| OWL Ontology | `resources/gens/owl/ontology.owl.ttl` |
+| OWL Ontologies | `resources/gens/owl/{td,hctl,jsonschema,wotsec}.ttl` |
 | Assertion CSVs | `resources/gens/assertions/` |
 
 ## Codebase Layout

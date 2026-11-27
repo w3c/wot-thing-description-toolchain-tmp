@@ -2,7 +2,7 @@ id: https://www.w3.org/2019/wot/hypermedia
 name: hypermedia
 title: Hypermedia Controls
 description: >-
-  Schema for the Hypermedia Controls vocabulary of the W3C Web of Things.
+  Vocabulary for hypermedia controls, in particular links and forms, in the W3C Web of Things.
 version: "td-next"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com

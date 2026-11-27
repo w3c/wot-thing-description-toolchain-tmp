@@ -46,6 +46,9 @@ classes:
       diagram:
         description: File name of the class diagram generated from this schema.
         pattern: '^(?!\.\.?$)[^/\\]+$'
+      ontology:
+        description: File name of the OWL ontology in Turtle generated from this schema.
+        pattern: '^(?!\.\.?$)[^/\\]+\.ttl$'
 
   Generators:
     description: Settings of each generator.
@@ -78,7 +81,22 @@ classes:
 
   ShaclSettings: {}
 
-  OwlSettings: {}
+  OwlSettings:
+    attributes:
+      metadata_profile:
+        description: The annotation property for descriptions.
+        range: OwlMetadataProfile
+        ifabsent: string(linkml)
+      only_root_schema:
+        description: >-
+          Whether each ontology describes only its own vocabulary, with an owl:imports for each schema it imports.
+          Without it, the ontology includes the imported schemas, like gen-owl --mergeimports.
+        range: boolean
+        ifabsent: "false"
+      permissible_values:
+        description: The kind of OWL entity for the permissible values of an enum.
+        range: OwlPermissibleValueKind
+        ifabsent: string(class)
 
   LinkmlSettings: {}
 
@@ -146,3 +164,20 @@ classes:
       label:
         description: Text shown for the range.
         required: true
+
+enums:
+  OwlMetadataProfile:
+    permissible_values:
+      linkml:
+        description: skos:definition, as in the LinkML metamodel and gen-owl.
+      rdfs:
+        description: rdfs:comment, shown by most OWL tools.
+
+  OwlPermissibleValueKind:
+    permissible_values:
+      class:
+        description: Subclasses of the enum's class, as in gen-owl.
+      individual:
+        description: Named individuals of the enum's class.
+      instance:
+        description: Instances of the enum's class only, without owl:NamedIndividual and owl:oneOf.

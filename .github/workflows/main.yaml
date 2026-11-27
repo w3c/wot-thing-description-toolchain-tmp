@@ -61,7 +61,10 @@ jobs:
             resources/gens/jsonschema/jsonschema.json \
             resources/gens/jsonldcontext/context.jsonld \
             resources/gens/shacl/shapes.shacl.ttl \
-            resources/gens/owl/ontology.owl.ttl \
+            resources/gens/owl/td.ttl \
+            resources/gens/owl/hctl.ttl \
+            resources/gens/owl/jsonschema.ttl \
+            resources/gens/owl/wotsec.ttl \
             resources/gens/linkml/linkml.yaml \
             resources/gens/index.html \
             resources/gens/static/visualization/td.svg \
