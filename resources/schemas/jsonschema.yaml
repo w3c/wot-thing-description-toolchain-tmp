@@ -2,7 +2,7 @@ id: https://www.w3.org/2019/wot/json-schema
 name: jsonschema
 title: JSON Schema in RDF
 description: >-
-  Schema for the JSON Schema in RDF vocabulary of the W3C Web of Things.
+  Vocabulary for data schema specifications in the W3C Web of Things Thing Description model.
 version: "td-next"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
@@ -111,6 +111,7 @@ slots:
     description: >-
       Used to store the indexing name in the parent object when this schema appears as a property of an object schema.
     slot_uri: jsonschema:propertyName
+    domain: DataSchema
     range: string
     annotations:
       spec_exclude: true

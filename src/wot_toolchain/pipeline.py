@@ -1,6 +1,7 @@
 import json
 import logging
 import shutil
+import warnings
 
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -10,27 +11,31 @@ from pathlib import Path
 
 from linkml.generators.jsonschemagen import JsonSchemaGenerator
 from linkml.generators.shaclgen import ShaclGenerator
-from linkml.generators.owlgen import OwlSchemaGenerator
 from linkml.generators.jsonldcontextgen import ContextGenerator
 from linkml.generators.linkmlgen import LinkmlGenerator
 from linkml_runtime.linkml_model import SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
+from rdflib import URIRef
 
 from .config import Config
 from .errors import GenerationError, SchemaError, WotToolchainError
 from .artifacts.jsonschema.generator import WotJsonSchemaGenerator
 from .artifacts.jsonschema.options import JsonSchemaOptions
 from .artifacts.jsonschema.postprocess import post_process_jsonschema
+from .artifacts.owl.generator import WotOwlGenerator
+from .artifacts.owl.postprocess import post_process_owl
+from .artifacts.owl.preprocess import preprocess_for_gen_owl
 from .artifacts.shacl.postprocess import post_process_shacl
 from .generators.visualization import generate_visualizations
 from .generators.respec import generate_respec_spec
+from .schema_utils import resolve_prefix_namespace
 
 # Hand-drawn spec figures copied from w3c/wot-thing-description visualization/.
 STATIC_VISUALIZATION_PATH = Path('resources') / 'static' / 'visualization'
 
 
 def _for_rdf(schema: SchemaDefinition) -> SchemaDefinition:
-    """Return a copy of ``schema`` without "not empty" on optional slots, which RDF would read as mandatory."""
+    """Return a copy of ``schema`` without "not empty" on optional slots, which SHACL would read as mandatory."""
     rdf_schema = deepcopy(schema)
     for slot in rdf_schema.slots.values():
         if slot.minimum_cardinality == 1 and not slot.required:
@@ -61,12 +66,6 @@ def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: P
         (output_dir / 'shapes.shacl.ttl').write_text(processed_shacl, encoding='utf-8')
         logging.info(f"SHACL shapes saved to {output_dir / 'shapes.shacl.ttl'}")
 
-    elif generator == 'owl':
-        logging.info("Proceeding with LinkML to OWL conversion")
-        owl_generator = OwlSchemaGenerator(_for_rdf(schema_view.schema))
-        (output_dir / 'ontology.owl.ttl').write_text(owl_generator.serialize())
-        logging.info(f"OWL ontology saved to {output_dir / 'ontology.owl.ttl'}")
-
     elif generator == 'jsonldcontext':
         logging.info("Proceeding with LinkML to JSON-LD Context conversion")
         context_generator = ContextGenerator(schema_view.schema, mergeimports=True)
@@ -81,6 +80,33 @@ def _run_linkml_generator(schema_view: SchemaView, generator: str, output_dir: P
 
     else:
         logging.warning(f"Unknown generator: {generator}")
+
+
+def _ontologies_by_namespace(config: Config, schema_view: SchemaView) -> dict[str, URIRef]:
+    """Return the ontology IRI of each vocabulary that has an ontology, by the namespace of its prefix."""
+    schema_ids = {schema.default_prefix: schema.id for schema in schema_view.schema_map.values()}
+    return {
+        resolve_prefix_namespace(schema_view, vocabulary.prefix): URIRef(schema_ids[vocabulary.prefix])
+        for vocabulary in config.vocabularies
+        if vocabulary.ontology is not None
+    }
+
+
+def _generate_ontologies(config: Config, schema_view: SchemaView) -> None:
+    """Write one OWL ontology per vocabulary that names an ontology file."""
+    output_dir = config.output_dir / "owl"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    ontologies = _ontologies_by_namespace(config, schema_view)
+    for vocabulary in config.vocabularies:
+        if vocabulary.ontology is None:
+            continue
+        # As YAML: the generator fails on a SchemaDefinition whose annotations are JsonObj.
+        schema = preprocess_for_gen_owl(str(vocabulary.schema))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            graph = WotOwlGenerator.from_options(schema, config.owl, ontologies).as_graph()
+        (output_dir / vocabulary.ontology).write_text(post_process_owl(graph, schema_view), encoding="utf-8")
+        logging.info(f"OWL ontology saved to {output_dir / vocabulary.ontology}")
 
 
 @contextmanager
@@ -101,6 +127,10 @@ def run_pipeline(config: Config) -> None:
 
     for generator in config.generators:
         if generator in ("visualization", "spec"):
+            continue
+        if generator == "owl":
+            with _generation_errors(generator):
+                _generate_ontologies(config, schema_view)
             continue
         logging.info(f"Proceeding with WoT resource generation for {generator}")
         with _generation_errors(generator):

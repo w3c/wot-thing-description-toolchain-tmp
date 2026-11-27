@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from linkml_runtime.linkml_model.meta import SchemaDefinition
+from linkml_runtime.linkml_model.meta import EnumDefinition, SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
 from .errors import SchemaError
@@ -155,3 +155,13 @@ def load_schema_view(schema_path: Path, *, merge_imports: bool) -> SchemaView:
         return SchemaView(schema_path, merge_imports=merge_imports)
     except yaml.YAMLError as exc:
         raise SchemaError(f"LinkML schema {schema_path} is not valid YAML: {exc}") from exc
+
+
+def local_name(iri: str) -> str:
+    """Return the part of ``iri`` after its last ``#`` and then its last ``/``."""
+    return iri.split("#")[-1].split("/")[-1]
+
+
+def is_non_ontological_enum(enum: EnumDefinition) -> bool:
+    """Return whether ``enum`` has no ``enum_uri`` or a ``linkml:`` one, so it has no ontology counterpart."""
+    return not enum.enum_uri or str(enum.enum_uri).startswith("linkml:")

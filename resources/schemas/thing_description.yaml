@@ -2,7 +2,7 @@ id: https://www.w3.org/2019/wot/td
 name: thing_description
 title: Thing Description
 description: >-
-  Schema for the Thing Description vocabulary of the W3C Web of Things.
+  Vocabulary to describe the metadata and interfaces of Things in the W3C Web of Things.
 version: "td-next"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
@@ -16,6 +16,7 @@ annotations:
       "@type": schema:Organization
       schema:name: W3C Web of Things Working Group
       schema:url: https://www.w3.org/WoT/WG/
+  owl:priorVersion: https://www.w3.org/2022/wot/td/v1.1
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -53,7 +54,7 @@ types:
       An RDF literal that may be a plain xsd:string or a language-tagged
       rdf:langString, depending on the active @language in the JSON-LD
       context of the TD instance.
-    uri: rdfs:Literal
+    uri: rdf:PlainLiteral
   langString:
     description: >-
       A language-tagged RDF string.
@@ -316,7 +317,6 @@ slots:
     annotations:
       spec_description: >-
         Provides a human-readable title (e.g., display a text for UI representation) based on a default language.
-      rdfs:subPropertyOf: dcterms:title
     range: literal
     exactly_one_of:
       - range: string
@@ -330,7 +330,6 @@ slots:
       spec_description: >-
         Provides multi-language human-readable titles (e.g., display a text for UI representation in different languages).
         Also see [=MultiLanguage=].
-      rdfs:subPropertyOf: dcterms:title
       jsonld_container: "@language"
     inlined: true
     multivalued: true

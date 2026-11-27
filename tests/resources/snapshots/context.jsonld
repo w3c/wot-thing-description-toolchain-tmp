@@ -188,7 +188,7 @@
     },
     "description": {
       "@id": "description",
-      "@type": "rdfs:Literal"
+      "@type": "rdf:PlainLiteral"
     },
     "descriptions": {
       "@id": "descriptionInLanguage",
@@ -443,7 +443,7 @@
     "td": "https://www.w3.org/2019/wot/td#",
     "title": {
       "@id": "title",
-      "@type": "rdfs:Literal"
+      "@type": "rdf:PlainLiteral"
     },
     "titles": {
       "@id": "titleInLanguage",

@@ -2,7 +2,7 @@ id: https://www.w3.org/2019/wot/security
 name: wot_security
 title: WoT Security
 description: >-
-  Schema for the WoT Security vocabulary of the W3C Web of Things.
+  Vocabulary for the security schemes of the W3C Web of Things.
 version: "td-next"
 license: http://purl.org/NET/rdflicense/cc-by4.0
 created_by: mailto:mahda.noura@siemens.com
@@ -141,7 +141,6 @@ slots:
       Set of authorization scope identifiers provided as an array. These are provided in tokens returned by an
       authorization server and associated with forms in order to identify what resources a client may access and how.
     slot_uri: wotsec:scopes
-    domain: OAuth2SecurityScheme
     range: string
     annotations:
       spec_description: >-

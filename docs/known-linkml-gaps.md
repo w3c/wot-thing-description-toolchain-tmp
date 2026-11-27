@@ -77,10 +77,10 @@ The JSON Schema postprocessor (`src/wot_toolchain/artifacts/jsonschema/postproce
 **Workaround:** `artifacts/jsonschema/generator.py` → `aliased_slot_name()` falls back to the alias of the slot the condition constrains
 **LinkML issue:** unknown
 
-### 15. "Not empty when present" becomes "mandatory" in SHACL and OWL
-**Symptom:** `enum` is optional but must not be empty when present. Slot-level `minimum_cardinality: 1` emits the right `minItems: 1` in JSON Schema, but LinkML also emits `sh:minCount 1` (SHACL) and `owl:minCardinality 1` (OWL), which make the slot mandatory. An empty array has no triples in RDF, so the bound can not be violated there.
-**Artifact:** `shapes.shacl.ttl`, `ontology.owl.ttl`
-**Workaround:** `pipeline.py` → `_for_rdf()` gives the SHACL and OWL generators a schema copy without `minimum_cardinality: 1` on slots that are not required. The spec table reads "mandatory" from `required` only (`specgen/tables.py`).
+### 15. "Not empty when present" becomes "mandatory" in SHACL
+**Symptom:** `enum` is optional but must not be empty when present. Slot-level `minimum_cardinality: 1` emits the right `minItems: 1` in JSON Schema, but LinkML also emits `sh:minCount 1` (SHACL), which makes the slot mandatory. The OWL ontologies carry no cardinality restrictions. An empty array has no triples in RDF, so the bound can not be violated there.
+**Artifact:** `shapes.shacl.ttl`
+**Workaround:** `pipeline.py` → `_for_rdf()` gives the SHACL generator a schema copy without `minimum_cardinality: 1` on slots that are not required. The spec table reads "mandatory" from `required` only (`specgen/tables.py`).
 **LinkML issue:** unknown
 
 ### 16. Keywords next to an inlined enum `$ref` were dropped
