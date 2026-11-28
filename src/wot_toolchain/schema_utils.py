@@ -143,8 +143,22 @@ def _jsonobj_to_dict(obj: Any) -> Any:
     return obj
 
 
-def load_schema_view(schema_path: Path, *, merge_imports: bool) -> SchemaView:
-    """Load a LinkML schema file.
+class SchemaStore:
+    """The schema views of one run: each schema file is read once per merge mode."""
+
+    def __init__(self) -> None:
+        self._views: dict[tuple[Path, bool], SchemaView] = {}
+
+    def view(self, schema_path: Path, *, merge_imports: bool) -> SchemaView:
+        """Return the shared view of ``schema_path``; callers must not mutate it or its schema."""
+        key = (schema_path.resolve(), merge_imports)
+        if key not in self._views:
+            self._views[key] = SchemaView(str(schema_path), merge_imports=merge_imports)
+        return self._views[key]
+
+
+def load_schema_view(store: SchemaStore, schema_path: Path, *, merge_imports: bool) -> SchemaView:
+    """Return the view of a LinkML schema file from ``store``.
 
     Raises:
         SchemaError: If the file is missing or is not valid YAML.
@@ -152,7 +166,7 @@ def load_schema_view(schema_path: Path, *, merge_imports: bool) -> SchemaView:
     if not schema_path.is_file():
         raise SchemaError(f"LinkML schema file not found: {schema_path}")
     try:
-        return SchemaView(schema_path, merge_imports=merge_imports)
+        return store.view(schema_path, merge_imports=merge_imports)
     except yaml.YAMLError as exc:
         raise SchemaError(f"LinkML schema {schema_path} is not valid YAML: {exc}") from exc
 

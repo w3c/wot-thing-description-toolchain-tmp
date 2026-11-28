@@ -13,6 +13,7 @@ from typing import Callable, Dict, List, Optional
 
 from ..config import SpecConfig
 from ..errors import GenerationError, SchemaError
+from ..schema_utils import SchemaStore
 from ..specgen.bikeshed_processor import process_fragments
 from ..specgen.prose import SectionProse
 from ..specgen.respec import build_jinja_env, assemble
@@ -169,27 +170,24 @@ def render_explicit_assertion_annotation(
     return "\n".join(rendered)
 
 
-def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Mapping[Path, str]) -> None:
+def generate_respec_spec(
+    sv: SchemaView, store: SchemaStore, spec: SpecConfig, schema_prefixes: Mapping[Path, str]
+) -> None:
     """
     Generate the ReSpec-compatible HTML document from the LinkML schema.
 
     This function:
-      • Loads the LinkML model
       • Converts Markdown and annotations to HTML
       • Applies glossary linking (bibliography [[...]] refs pass through for ReSpec)
       • Renders each class section with Jinja templates
       • Injects the resulting HTML into the ReSpec index template
 
     Args:
-        input_path: Path to the root LinkML YAML schema file.
+        sv: View of the root LinkML schema with its imports merged.
+        store: Source of the views of the section schemas.
         spec: Template, output, sections, prose, snippets and assertion paths of the specification.
         schema_prefixes: Module prefix per schema path, used for the section anchors.
     """
-    try:
-        sv = SchemaView(input_path, merge_imports=True)
-    except yaml.YAMLError as e:
-        raise SchemaError(f"{input_path}: LinkML schema could not be loaded: {e}") from e
-
     env = build_jinja_env(JINJA_TEMPLATE_DIR)
     section_tpl = env.get_template("class_section.jinja2")
 
@@ -204,7 +202,7 @@ def generate_respec_spec(input_path: Path, spec: SpecConfig, schema_prefixes: Ma
     file_to_classes: Dict[str, List[str]] = {}
     for section_path in spec.sections.values():
         try:
-            section_sv = SchemaView(section_path, merge_imports=False)
+            section_sv = store.view(section_path, merge_imports=False)
         except (yaml.YAMLError, OSError) as e:
             raise SchemaError(f"{section_path}: section schema could not be loaded: {e}") from e
         file_to_classes[section_path.name] = list(section_sv.all_classes(imports=False).keys())

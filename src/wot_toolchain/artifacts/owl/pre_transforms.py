@@ -110,7 +110,7 @@ def _promote_attributes(s: SchemaDefinition, view: SchemaView) -> None:
                 promoted.name = slot_name
                 slots[slot_name] = promoted
             cls_def.slots = list(cls_def.slots or []) + [slot_name]
-        cls_def.attributes = {}
+        cast(dict[str, SlotDefinition], cls_def.attributes).clear()
         if cls_def.slot_usage:
             su = cast(dict[str, SlotDefinition], cls_def.slot_usage)
             for old_name in attr_to_slot:
@@ -241,23 +241,28 @@ def _strip_dangling_slot_refs(s: SchemaDefinition) -> None:
 _Annotations = dict[str, Any]
 
 
-def _rdf_annotations(obj: SlotDefinition | ClassDefinition | EnumDefinition) -> _Annotations:
-    """Return only CURIE-keyed annotations (semantic, not constraint metadata)."""
-    anns = cast(_Annotations, obj.annotations or {})
-    return {k: v for k, v in anns.items() if ":" in k}
+def _keep_rdf_annotations(obj: SlotDefinition | ClassDefinition | EnumDefinition) -> None:
+    """Keep only the CURIE-keyed annotations of ``obj`` (semantic, not constraint metadata).
+
+    In place: a dict assigned to a LinkML model field becomes a JsonObj, which the OWL generator cannot read.
+    """
+    annotations = cast(_Annotations, obj.annotations)
+    for key in [key for key in annotations if ":" not in key]:
+        del annotations[key]
 
 
 def _clear_constraints(s: SchemaDefinition) -> None:
     for slot_def in cast(_Slots, s.slots).values():
-        slot_def.annotations = _rdf_annotations(slot_def)
+        _keep_rdf_annotations(slot_def)
     for class_def in cast(_Classes, s.classes).values():
         for attr_def in cast(dict[str, SlotDefinition], class_def.attributes or {}).values():
-            attr_def.annotations = _rdf_annotations(attr_def)
-        class_def.slot_usage = {}
+            _keep_rdf_annotations(attr_def)
+        cast(dict[str, SlotDefinition], class_def.slot_usage).clear()
         class_def.rules = []
-        class_def.annotations = _rdf_annotations(class_def)
+        class_def.none_of = []
+        _keep_rdf_annotations(class_def)
     for enum_def in cast(_Enums, s.enums).values():
-        enum_def.annotations = _rdf_annotations(enum_def)
+        _keep_rdf_annotations(enum_def)
     for type_def in s.types.values():
         type_def.pattern = None
         type_def.structured_pattern = None

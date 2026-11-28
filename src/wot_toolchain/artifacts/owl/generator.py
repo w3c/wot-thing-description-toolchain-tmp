@@ -81,7 +81,7 @@ class WotOwlGenerator(OwlSchemaGenerator):
 
     @classmethod
     def from_options(
-        cls, schema: SchemaDefinition | str, options: OwlOptions, ontologies: dict[str, URIRef] | None = None
+        cls, schema: SchemaDefinition, options: OwlOptions, ontologies: dict[str, URIRef] | None = None
     ) -> Self:
         """Build a generator for ``schema`` configured by ``options``; ``ontologies`` maps namespace to ontology IRI."""
         return cls(

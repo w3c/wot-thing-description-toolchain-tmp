@@ -12,6 +12,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 
 from ..artifacts.jsonschema.traversal import is_linkml_any
 from ..errors import GenerationError
+from ..schema_utils import SchemaStore
 
 ORANGE = "#C83500"
 BLUE_BORDER = "#8CCBF2"
@@ -231,17 +232,20 @@ def _build_dot_from_schema_view(sv: SchemaView, *, local_classes: set[str], rang
 
 
 def generate_visualizations(
-    root_schema: Path, diagrams: Iterable[tuple[Path, str]], visualization_dir: Path, range_labels: Mapping[str, str]
+    schema_view: SchemaView,
+    store: SchemaStore,
+    diagrams: Iterable[tuple[Path, str]],
+    visualization_dir: Path,
+    range_labels: Mapping[str, str],
 ) -> None:
-    """Draw the classes of each schema; the root schema and its imports define the slots that the classes use."""
+    """Draw the classes of each schema; ``schema_view``, the merged root schema, defines the slots they use."""
     if not _require_dot():
         raise GenerationError("Graphviz 'dot' executable not found; the diagrams cannot be drawn.")
 
     visualization_dir.mkdir(parents=True, exist_ok=True)
-    schema_view = SchemaView(str(root_schema), merge_imports=True)
 
     for path, target_svg in diagrams:
-        local_classes = set(SchemaView(str(path), merge_imports=False).schema.classes)
+        local_classes = set(store.view(path, merge_imports=False).schema.classes)
         dot_source = _build_dot_from_schema_view(schema_view, local_classes=local_classes, range_labels=range_labels)
         _dot_to_svg(dot_source, visualization_dir / target_svg)
         logging.info(f"Generated {target_svg}")
