@@ -224,3 +224,16 @@ divergences:
           owl:priorVersion: [https://www.w3.org/2022/wot/td/v1.1]
           dcterms:author: []
           dcterms:contributor: []
+  - id: owl-jsonschema-no-all-of-any-of
+    category: vocabulary-change
+    review: approved
+    upstream_locator:
+      kind: terms
+      iris:
+        - https://www.w3.org/2019/wot/json-schema#allOf
+        - https://www.w3.org/2019/wot/json-schema#anyOf
+    rationale: >-
+      Upstream declares both as object properties. The Data Schema vocabulary of the TD does not list them, so
+      the schema has no such slots and the generated ontology does not declare the terms.
+    expected_generated:
+      absent: [jsonschema:allOf, jsonschema:anyOf]
