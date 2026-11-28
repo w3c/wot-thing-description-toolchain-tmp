@@ -415,6 +415,9 @@ class WotOwlGenerator(OwlSchemaGenerator):
         e["annotations"] = {k: v for k, v in e.annotations.items() if ":" in k and k not in resource_annotations}
         if alias:
             e.name, e.alias = alias, None
+        elif isinstance(e, SlotDefinition) and (e.name.startswith("@") or str(uri).startswith(self._own_namespace())):
+            # The label of a property is the name of its term, which the JSON key need not be.
+            e.name = local_name(str(uri))
         super().add_metadata(e, uri)
         for predicate, value in resource_annotations.values():
             self.graph.add((uri, predicate, URIRef(value)))

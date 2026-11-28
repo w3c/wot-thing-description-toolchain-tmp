@@ -92,13 +92,6 @@ def _rename_slots(s: SchemaDefinition, context: OwlPreContext) -> None:
 
 OWL_PRE_TRANSFORMS: tuple[Transform, ...] = (
     Transform(
-        name="rename_slots_to_uri_local_names",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Renames slots to the local name of their slot_uri. gen-owl already builds IRIs from slot_uri, so the "
-        "only measured effect is on rdfs:label.",
-        apply=_rename_slots,
-    ),
-    Transform(
         name="strip_dangling_slot_refs",
         kind=TransformKind.WOT_SHAPING,
         reason="Removes references to slots that earlier passes deleted.",
