@@ -9,7 +9,6 @@ from linkml_runtime.utils.schemaview import SchemaView
 from .annotations import read_annotations
 from .cleanups import (
     clean_metadata,
-    simplify_exclusive_minimum,
 )
 from .partitions import build_enum_subset_partitions, narrow_form_subsets
 from .pruning import remove_excluded_defs, remove_unreferenced_candidate_defs
@@ -47,13 +46,6 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
         reason="Points each affordance's forms at its own Form variant, including the top-level properties of the "
         "tree_root class.",
         apply=narrow_form_subsets,
-    ),
-    Transform(
-        name="simplify_exclusive_minimum",
-        kind=TransformKind.COSMETIC,
-        reason="LinkML has no exclusive minimum, so minimum_value: 0 + none_of equals_number 0 becomes "
-        "minimum+not.anyOf.const. This pass rewrites that to exclusiveMinimum: 0 (multipleOf).",
-        apply=lambda schema, sv, config: simplify_exclusive_minimum(schema),
     ),
     Transform(
         name="remove_excluded_defs",

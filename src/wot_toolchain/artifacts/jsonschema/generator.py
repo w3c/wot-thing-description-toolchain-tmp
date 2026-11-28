@@ -56,6 +56,7 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
         # Upstream removes duplicate branches (string and langString) but leaves the one-item oneOf behind.
         if len(prop.get("oneOf", ())) == 1:
             prop.update(prop.pop("oneOf")[0])
+        self._state_exclusive_minimum(prop)
         prefix = annotation_tag_value(slot, PREFIX_MEMBERS)
         if prefix is not None and prop.is_array:
             prop["additionalItems"] = prop["items"]
@@ -72,6 +73,15 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
             return name
         constrained = self.schemaview.get_slot(slot.name)
         return constrained.alias if constrained is not None and constrained.alias else name
+
+    @staticmethod
+    def _state_exclusive_minimum(prop: JsonSchema) -> None:
+        """Write a minimum whose value is also excluded as exclusiveMinimum."""
+        # LinkML has no exclusive minimum; schemas state it as minimum_value plus none_of equals_number.
+        excluded = prop.get("not", {}).get("anyOf", ())
+        if "minimum" in prop and len(excluded) == 1 and excluded[0].get("const") == prop["minimum"]:
+            del prop["not"]
+            prop["exclusiveMinimum"] = prop.pop("minimum")
 
     def _restore_branch_type(self, slot: SlotDefinition | AnonymousSlotExpression, prop: JsonSchema) -> None:
         """Give a boolean branch with an explicit range the type upstream drops when it equals default_range."""
