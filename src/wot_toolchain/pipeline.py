@@ -101,7 +101,6 @@ def _generate_ontologies(config: Config, schema_view: SchemaView, store: SchemaS
     for vocabulary in config.vocabularies:
         if vocabulary.ontology is None:
             continue
-        # As YAML: the generator fails on a SchemaDefinition whose annotations are JsonObj.
         schema = preprocess_for_gen_owl(vocabulary.schema, store)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)

@@ -4,7 +4,6 @@ import copy
 from pathlib import Path
 from typing import cast
 
-from linkml_runtime.dumpers import yaml_dumper
 from linkml_runtime.linkml_model.meta import ClassDefinition, Prefix, SchemaDefinition, SlotDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
@@ -19,12 +18,12 @@ _Classes = dict[str, ClassDefinition]
 _Prefixes = dict[str, Prefix]
 
 
-def preprocess_for_gen_owl(schema_path: Path, store: SchemaStore) -> str:
-    """Return YAML string of schema ready for gen-owl."""
+def preprocess_for_gen_owl(schema_path: Path, store: SchemaStore) -> SchemaDefinition:
+    """Return a copy of the merged schema, transformed for gen-owl."""
     context = _context(schema_path, store)
     s: SchemaDefinition = copy.deepcopy(_get_schema(context.view))
     run_transforms(OWL_PRE_TRANSFORMS, s, context)
-    return cast(str, yaml_dumper.dumps(s))
+    return s
 
 
 def _context(schema_path: Path, store: SchemaStore) -> OwlPreContext:
