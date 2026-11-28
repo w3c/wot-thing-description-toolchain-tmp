@@ -16,15 +16,19 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
     Transform(
         name="remove_excluded_defs",
         kind=TransformKind.COSMETIC,
-        reason="Removes leftover LinkML defs: __identifier_optional defs.",
+        reason="Removes the __identifier_optional defs. Upstream writes them while it adds a def, where no "
+        "generator hook reaches them.",
         apply=remove_excluded_defs,
     ),
     Transform(
         name="remove_unreferenced_candidate_defs",
         kind=TransformKind.COSMETIC,
         reason="Drops defs that nothing references any more (linkml:Any, the top class, partitioned classes), "
-        "based on schema markers rather than hard-coded names.",
+        "based on schema markers rather than hard-coded names. Needs the references of every def, so it cannot run "
+        "per class. An __identifier_optional def copies the references of its class and would keep a candidate "
+        "that references itself.",
         apply=remove_unreferenced_candidate_defs,
+        after=("remove_excluded_defs",),
     ),
 )
 
