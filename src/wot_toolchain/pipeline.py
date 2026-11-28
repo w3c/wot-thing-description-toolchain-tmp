@@ -28,6 +28,7 @@ from .artifacts.owl.preprocess import preprocess_for_gen_owl
 from .artifacts.shacl.postprocess import post_process_shacl
 from .generators.visualization import generate_visualizations
 from .generators.respec import generate_respec_spec
+from .schema_utils import SchemaStore
 from .schema_utils import resolve_prefix_namespace
 
 # Hand-drawn spec figures copied from w3c/wot-thing-description visualization/.
@@ -92,7 +93,7 @@ def _ontologies_by_namespace(config: Config, schema_view: SchemaView) -> dict[st
     }
 
 
-def _generate_ontologies(config: Config, schema_view: SchemaView) -> None:
+def _generate_ontologies(config: Config, schema_view: SchemaView, store: SchemaStore) -> None:
     """Write one OWL ontology per vocabulary that names an ontology file."""
     output_dir = config.output_dir / "owl"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -101,7 +102,7 @@ def _generate_ontologies(config: Config, schema_view: SchemaView) -> None:
         if vocabulary.ontology is None:
             continue
         # As YAML: the generator fails on a SchemaDefinition whose annotations are JsonObj.
-        schema = preprocess_for_gen_owl(str(vocabulary.schema))
+        schema = preprocess_for_gen_owl(vocabulary.schema, store)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
             graph = WotOwlGenerator.from_options(schema, config.owl, ontologies).as_graph()
@@ -122,7 +123,8 @@ def _generation_errors(generator: str) -> Iterator[None]:
 
 def run_pipeline(config: Config) -> None:
     """Run the configured generators, the spec last; raises SchemaError or GenerationError."""
-    schema_view = _load_schema_view(config.root_schema)
+    store = SchemaStore()
+    schema_view = _load_schema_view(store, config.root_schema)
     logging.info(f"Input schema {config.root_schema} loaded successfully!")
 
     for generator in config.generators:
@@ -130,34 +132,34 @@ def run_pipeline(config: Config) -> None:
             continue
         if generator == "owl":
             with _generation_errors(generator):
-                _generate_ontologies(config, schema_view)
+                _generate_ontologies(config, schema_view, store)
             continue
         logging.info(f"Proceeding with WoT resource generation for {generator}")
         with _generation_errors(generator):
             view = schema_view
             if generator == "jsonschema" and config.jsonschema_profile is not None:
-                view = SchemaView(config.jsonschema_profile, merge_imports=True)
+                view = store.view(config.jsonschema_profile, merge_imports=True)
             _run_linkml_generator(view, generator, config.output_dir / generator, config.top_class)
 
     visualization_dir = config.output_dir / "static" / "visualization"
     if "visualization" in config.generators:
         diagrams = [(vocabulary.schema, vocabulary.diagram) for vocabulary in config.vocabularies if vocabulary.diagram]
         with _generation_errors("visualization"):
-            generate_visualizations(config.root_schema, diagrams, visualization_dir, config.diagram_range_labels)
+            generate_visualizations(schema_view, store, diagrams, visualization_dir, config.diagram_range_labels)
 
     if config.spec is not None:
         shutil.copytree(STATIC_VISUALIZATION_PATH, visualization_dir, dirs_exist_ok=True)
         logging.info("Starting ReSpec specification generation...")
         with _generation_errors("spec"):
-            generate_respec_spec(config.root_schema, config.spec, config.schema_prefixes)
+            generate_respec_spec(schema_view, store, config.spec, config.schema_prefixes)
         logging.info("ReSpec specification generation complete.")
 
 
-def _load_schema_view(schema_path: Path) -> SchemaView:
+def _load_schema_view(store: SchemaStore, schema_path: Path) -> SchemaView:
     if not schema_path.is_file():
         raise SchemaError(f"{schema_path}: LinkML schema file not found.")
     try:
-        schema_view = SchemaView(schema_path, merge_imports=True)
+        schema_view = store.view(schema_path, merge_imports=True)
         schema_view.all_classes()
     except Exception as exc:
         raise SchemaError(f"{schema_path}: LinkML schema could not be loaded: {exc}") from exc

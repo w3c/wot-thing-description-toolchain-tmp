@@ -11,7 +11,7 @@ from linkml_runtime.utils.schemaview import SchemaView
 from .pre_transforms import OWL_PRE_TRANSFORMS, OwlPreContext
 from ..transforms import run_transforms
 from ...errors import SchemaError
-from ...schema_utils import default_prefix, load_schema_view
+from ...schema_utils import SchemaStore, default_prefix, load_schema_view
 from ...schema_utils import get_schema as _get_schema
 
 _Slots = dict[str, SlotDefinition]
@@ -19,20 +19,20 @@ _Classes = dict[str, ClassDefinition]
 _Prefixes = dict[str, Prefix]
 
 
-def preprocess_for_gen_owl(schema_path: str) -> str:
+def preprocess_for_gen_owl(schema_path: Path, store: SchemaStore) -> str:
     """Return YAML string of schema ready for gen-owl."""
-    context = _context(schema_path)
+    context = _context(schema_path, store)
     s: SchemaDefinition = copy.deepcopy(_get_schema(context.view))
     run_transforms(OWL_PRE_TRANSFORMS, s, context)
     return cast(str, yaml_dumper.dumps(s))
 
 
-def _context(schema_path: str) -> OwlPreContext:
+def _context(schema_path: Path, store: SchemaStore) -> OwlPreContext:
     """Collect what the passes need from the schema at ``schema_path`` before any of them mutates its copy."""
     # Before merging: LinkML's merge would fail on a missing import with an untyped FileNotFoundError.
-    _require_local_imports(schema_path)
-    view = SchemaView(schema_path, merge_imports=True)
-    local_schema = _get_schema(SchemaView(schema_path, merge_imports=False))
+    _require_local_imports(schema_path, store)
+    view = store.view(schema_path, merge_imports=True)
+    local_schema = _get_schema(store.view(schema_path, merge_imports=False))
     local_slots = cast(_Slots, local_schema.slots)
     local_classes = cast(_Classes, local_schema.classes)
     return OwlPreContext(
@@ -49,12 +49,12 @@ def _namespace(view: SchemaView) -> str:
     return str(cast(Prefix, prefixes[default_prefix(view)]).prefix_reference)
 
 
-def _require_local_imports(schema_path: str) -> None:
+def _require_local_imports(schema_path: Path, store: SchemaStore) -> None:
     """Check that ``schema_path`` and every local import reachable from it exist."""
-    root_schema = _get_schema(load_schema_view(Path(schema_path), merge_imports=False))
+    root_schema = _get_schema(load_schema_view(store, schema_path, merge_imports=False))
 
     # Import cycles are legal in LinkML; walk each file once so they do not recurse forever.
-    visited: set[Path] = {Path(schema_path).resolve()}
+    visited: set[Path] = {schema_path.resolve()}
 
     def _walk(importer: str, imports: list[str], base_dir: Path) -> None:
         for import_name in imports:
@@ -67,7 +67,7 @@ def _require_local_imports(schema_path: str) -> None:
             if import_path.resolve() in visited:
                 continue
             visited.add(import_path.resolve())
-            sub_schema = _get_schema(SchemaView(str(import_path), merge_imports=False))
+            sub_schema = _get_schema(store.view(import_path, merge_imports=False))
             _walk(str(import_path), cast(list[str], sub_schema.imports or []), import_path.parent)
 
-    _walk(schema_path, cast(list[str], root_schema.imports or []), Path(schema_path).parent)
+    _walk(str(schema_path), cast(list[str], root_schema.imports or []), schema_path.parent)
