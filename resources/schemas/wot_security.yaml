@@ -28,6 +28,7 @@ prefixes:
 default_prefix: wotsec
 imports:
   - linkml:types
+  - thing_description
 
 enums:
   SecuritySchemeList:
