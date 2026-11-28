@@ -124,7 +124,7 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
         return cls
 
     def _state_oneof_dispatch(self, cls: ClassResult, sv: SchemaView) -> None:
-        """State a dispatch class as a oneOf of its direct subclasses (docs/known-linkml-gaps.md #9)."""
+        """State a dispatch class as a oneOf of its direct subclasses (docs/known-linkml-gaps.md #7)."""
         dispatch = annotation_tag_value(cls.source, ONEOF_DISPATCH)
         if not dispatch:
             return

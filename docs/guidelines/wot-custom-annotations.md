@@ -43,7 +43,7 @@ Before reaching for a `jsonschema_*` annotation, verify that native LinkML const
 - `exactly_one_of` with two range branches — generates a `oneOf` with single-value and array variants. Example: `@type` accepts a string or an array of strings.
 - `minimum_cardinality: 1` on a multivalued branch — generates `minItems: 1` in the array variant.
 - `minimum_value: N` — generates `minimum: N`.
-- `minimum_value: 0` combined with `none_of: [{equals_number: 0}]` — generates `exclusiveMinimum: 0` after postprocessor simplification. Example: `multipleOf` must be > 0.
+- `minimum_value: 0` combined with `none_of: [{equals_number: 0}]` — generates `exclusiveMinimum: 0` (the toolchain's JSON Schema generator rewrites the `minimum` + `not` pair). Example: `multipleOf` must be > 0.
 
 **Extensibility and maps:**
 
@@ -230,9 +230,9 @@ BearerSecurityScheme:
 
 ## JSON Schema Annotations (`jsonschema_*`)
 
-These annotations control how the JSON Schema postprocessor (`src/wot_toolchain/artifacts/jsonschema/postprocess.py`) transforms raw LinkML generator output. They have **no effect** on HTML, OWL, or SHACL output.
+These annotations control how the toolchain's JSON Schema generator (`src/wot_toolchain/artifacts/jsonschema/generator.py`) changes the output of the upstream LinkML generator. They have **no effect** on HTML, OWL, or SHACL output.
 
-The postprocessor reads these annotations via `_read_annotations()` and applies transforms in a fixed pipeline order. Adding an annotation to a class automatically activates the corresponding transform — no Python code changes needed.
+The generator hooks read these annotations while the schema is generated. Adding an annotation to a class automatically activates the corresponding rule — no Python code changes needed.
 
 ---
 

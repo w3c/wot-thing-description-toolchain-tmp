@@ -32,8 +32,8 @@ src/wot_toolchain/
   pipeline.py               ← runs the LinkML generators and the postprocessors
   generators/               ← respec.py (specification HTML), visualization.py (diagrams)
   artifacts/                ← adjust raw LinkML output to meet W3C WoT TD requirements
-    transforms.py           ← Transform (name, kind, reason) and run_transforms
-    jsonschema/              ← postprocess.py (transform list, entry point) and one module per group of transforms
+    transforms.py           ← Transform (name, kind, reason, after) and run_transforms
+    jsonschema/              ← generator.py (rules in generator hooks) and postprocess.py (two post-steps, entry point)
     shacl/postprocess.py
   specgen/                  ← HTML spec generation
     respec.py / bikeshed_processor.py
