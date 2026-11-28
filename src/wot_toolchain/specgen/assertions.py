@@ -39,26 +39,26 @@ import re
 import logging
 
 from dataclasses import dataclass
-from linkml_runtime.utils.schemaview import SchemaView
 from lxml import html
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from ..errors import GenerationError
 
 
-ASSERTION_TABLE   = "rfc2119-table-assertion"
-ASSERTION_INLINE  = "rfc2119-assertion"
+ASSERTION_TABLE = "rfc2119-table-assertion"
+ASSERTION_INLINE = "rfc2119-assertion"
 ASSERTION_DEFAULT = "rfc2119-default-assertion"
 
 
 @dataclass
 class Assertion:
     """One assertion extracted from a LinkML schema element."""
-    id: str                          # stable HTML id, e.g. "td-thing-id"
-    source_class: str                # LinkML class name
-    source_slot: Optional[str]       # slot name (None → class-level inline assertion)
-    text: str                        # description text (for CSV "Assertion" column)
+
+    id: str  # stable HTML id, e.g. "td-thing-id"
+    source_class: str  # LinkML class name
+    source_slot: Optional[str]  # slot name (None → class-level inline assertion)
+    text: str  # description text (for CSV "Assertion" column)
     assertion_type: str = ASSERTION_TABLE
     schema_prefix: str = ""
 
@@ -89,178 +89,10 @@ def make_slot_assertion_id(prefix: str, class_name: str, slot_name: str) -> str:
 
     Format:  td-vocab-<slot-normalized>--<ClassName>
 
-    This is the single source of truth called by both tables.py (emitting <tr>)
-    and extract_all_table_assertions() (building the CSV).
+    This is the single source of truth, called by tables.py when it emits a <tr>.
     """
 
     return f"td-vocab-{_normalize_slot_name(slot_name)}--{class_name}"
-
-
-def make_class_assertion_id(prefix: str, class_name: str) -> str:
-    """Return the stable assertion ID for a class-level inline assertion."""
-    return f"{prefix}-vocab--{class_name}"
-
-
-# RFC 2119 detection (inline/paragraph assertions only)
-_RFC2119_RE = re.compile(
-    r"\b(MUST(?:\s+NOT)?|SHALL(?:\s+NOT)?|SHOULD(?:\s+NOT)?|"
-    r"REQUIRED|RECOMMENDED|MAY|OPTIONAL)\b"
-)
-
-
-def _has_rfc2119(text: str) -> bool:
-    return bool(_RFC2119_RE.search(text or ""))
-
-
-def _get_annotation_str(annotations: dict, key: str) -> Optional[str]:
-    ann = annotations.get(key)
-    if ann is None:
-        return None
-    return str(getattr(ann, "value", ann))
-
-
-def _is_inline_assertion(annotations: dict, description: str) -> bool:
-    explicit = _get_annotation_str(annotations, "is_assertion")
-    if explicit and explicit.lower() == "true":
-        return True
-    return _has_rfc2119(description or "")
-
-
-def _inline_assertion_type(annotations: dict) -> str:
-    val = _get_annotation_str(annotations, "assertion_type")
-    if val in (ASSERTION_TABLE, ASSERTION_INLINE, ASSERTION_DEFAULT):
-        return val
-    return ASSERTION_INLINE
-
-
-
-def extract_all_table_assertions(
-    section_schemas: Dict[str, Path],
-    prefix_map: Dict[str, str],
-) -> List[Assertion]:
-    """
-    Walk every section schema and return one Assertion per (class, slot) pair –
-    i.e. one per vocabulary-term table row.
-
-    ALL table rows are assertions regardless of whether their description
-    contains RFC 2119 keywords.
-
-    section_schemas:
-        Ordered dict of section_id → schema Path (from Config.section_schemas).
-    prefix_map:
-        Maps schema file stem → short ID prefix (e.g. "thing_description" → "td").
-    """
-    assertions: List[Assertion] = []
-    seen: set[str] = set()
-
-    for _section_id, schema_path in section_schemas.items():
-        if not schema_path.exists():
-            logging.warning("Skipping missing schema for assertions: %s", schema_path)
-            continue
-
-        prefix = prefix_map.get(schema_path.stem, schema_path.stem)
-
-        try:
-            # merge_imports=False: only classes defined in THIS file,
-            # matching how generators.respec builds file_to_classes.
-            sv = SchemaView(str(schema_path), merge_imports=False)
-        except Exception as exc:
-            logging.error("Cannot load %s for assertion extraction: %s", schema_path, exc)
-            continue
-
-        for class_name, class_def in sv.all_classes().items():
-            slot_names = list(getattr(class_def, "slots", None) or [])
-            slot_names.extend((getattr(class_def, "attributes", None) or {}).keys())
-
-            seen_slots: set[str] = set()
-            for slot_name in slot_names:
-                if slot_name in seen_slots:
-                    continue
-                seen_slots.add(slot_name)
-                aid = make_slot_assertion_id(prefix, class_name, slot_name)
-                if aid in seen:
-                    continue
-                seen.add(aid)
-
-                try:
-                    slot_def = sv.induced_slot(slot_name, class_name)
-                    desc = getattr(slot_def, "description", "") or ""
-                except Exception:
-                    desc = ""
-
-                assertions.append(Assertion(
-                    id=aid,
-                    source_class=class_name,
-                    source_slot=slot_name,
-                    text=desc,
-                    assertion_type=ASSERTION_TABLE,
-                    schema_prefix=prefix,
-                ))
-
-    assertions.sort(key=lambda a: a.id)
-    logging.info("Extracted %d table assertions across all section schemas", len(assertions))
-    return assertions
-
-
-def extract_inline_assertions(
-    section_schemas: Dict[str, Path],
-    prefix_map: Dict[str, str],
-) -> List[Assertion]:
-    """
-    Extract class-level *inline* assertions (.rfc2119-assertion /
-    .rfc2119-default-assertion) – text that appears in the prose outside of
-    vocabulary tables and contains RFC 2119 language or is explicitly annotated
-    with ``is_assertion: true``.
-    """
-    assertions: List[Assertion] = []
-    seen: set[str] = set()
-
-    for _section_id, schema_path in section_schemas.items():
-        if not schema_path.exists():
-            continue
-        prefix = prefix_map.get(schema_path.stem, schema_path.stem)
-        try:
-            sv = SchemaView(str(schema_path), merge_imports=False)
-        except Exception as exc:
-            logging.error("Cannot load %s for inline assertion extraction: %s", schema_path, exc)
-            continue
-
-        for class_name, class_def in sv.all_classes().items():
-            annotations = getattr(class_def, "annotations", None) or {}
-            raw_desc = getattr(class_def, "description", "") or ""
-            if _is_inline_assertion(annotations, raw_desc):
-                aid = make_class_assertion_id(prefix, class_name)
-                if aid not in seen:
-                    seen.add(aid)
-                    assertions.append(Assertion(
-                        id=aid,
-                        source_class=class_name,
-                        source_slot=None,
-                        text=raw_desc,
-                        assertion_type=_inline_assertion_type(annotations),
-                        schema_prefix=prefix,
-                    ))
-
-    assertions.sort(key=lambda a: a.id)
-    return assertions
-
-
-def extract_all_assertions(
-    section_schemas: Dict[str, Path],
-    prefix_map: Dict[str, str],
-) -> List[Assertion]:
-    """Combined, deduplicated, sorted list of table + inline assertions."""
-    combined = (
-        extract_all_table_assertions(section_schemas, prefix_map)
-        + extract_inline_assertions(section_schemas, prefix_map)
-    )
-    seen: set[str] = set()
-    unique: List[Assertion] = []
-    for a in sorted(combined, key=lambda x: x.id):
-        if a.id not in seen:
-            seen.add(a.id)
-            unique.append(a)
-    return unique
 
 
 def extract_html_assertions(html_path: Path) -> List[Assertion]:
