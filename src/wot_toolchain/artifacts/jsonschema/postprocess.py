@@ -12,20 +12,11 @@ from .cleanups import (
 )
 from .partitions import build_enum_subset_partitions
 from .pruning import remove_excluded_defs, remove_unreferenced_candidate_defs
-from .subclasses import flatten_subclasses
 from ..transforms import Transform, TransformKind, run_transforms
 
 logger = logging.getLogger(__name__)
 
 JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
-    Transform(
-        name="flatten_subclasses",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Merges the properties of the direct subclasses of a class annotated jsonschema_flatten_subclasses "
-        "into that class, deletes the subclass defs, and copies the merged properties to the classes that use it as "
-        "a mixin.",
-        apply=flatten_subclasses,
-    ),
     Transform(
         name="build_enum_subset_partitions",
         kind=TransformKind.WOT_SHAPING,
@@ -68,7 +59,6 @@ def post_process_jsonschema(
     config.top_class = top_class
 
     logger.info("JSON Schema postprocessor: reading annotations")
-    logger.debug(f"  flatten_subclass_parents: {config.flatten_subclass_parents}")
     logger.debug(f"  enum_subset_partitions: {[e.class_name for e in config.enum_subset_partitions]}")
 
     run_transforms(JSONSCHEMA_TRANSFORMS, schema, schema_view, config)

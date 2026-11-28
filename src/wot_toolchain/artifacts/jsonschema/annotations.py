@@ -21,7 +21,6 @@ class EnumSubsetPartitionConfig:
 class TransformConfig:
     """The transforms requested by the ``jsonschema_*`` annotations of a schema."""
 
-    flatten_subclass_parents: list[str] = field(default_factory=list)
     enum_subset_partitions: list[EnumSubsetPartitionConfig] = field(default_factory=list)
     # Class whose content is the top-level schema; set by the caller, not by an annotation.
     top_class: str | None = None
@@ -32,9 +31,6 @@ def read_annotations(sv: SchemaView) -> TransformConfig:
     config = TransformConfig()
 
     for cls_name, cls_def in sv.all_classes().items():
-        if _get_annotation_value(cls_def, "jsonschema_flatten_subclasses"):
-            config.flatten_subclass_parents.append(cls_name)
-
         esp = _get_annotation_value(cls_def, "jsonschema_enum_subset_partition")
         if esp:
             enum_name = esp["enum"]

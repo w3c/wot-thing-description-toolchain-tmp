@@ -19,6 +19,7 @@ from .refs import resolve_refs
 from ...schema_utils import annotation_tag_value
 
 PREFIX_MEMBERS = "jsonschema_prefix_members"
+FLATTEN_SUBCLASSES = "jsonschema_flatten_subclasses"
 ENUM_SUBSET_PARTITION = "jsonschema_enum_subset_partition"
 FORM_SUBSET = "jsonschema_form_subset"
 ONEOF_DISPATCH = "jsonschema_oneof_dispatch"
@@ -139,7 +140,39 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
         self, slot: Iterable[SlotDefinition], cls: ClassDefinition, sv: SchemaView
     ) -> Iterable[SlotDefinition]:
         """Leave out identifier slots: they are map keys, not JSON members."""
-        return [candidate for candidate in slot if not candidate.identifier]
+        members = [candidate for candidate in slot if not candidate.identifier]
+        return members + self._flattened_subclass_members(cls, members, sv)
+
+    def before_generate_classes(self, cls: Iterable[ClassDefinition], sv: SchemaView) -> Iterable[ClassDefinition]:
+        """Leave out the direct subclasses of a flattened class: that class states their members."""
+        return [candidate for candidate in cls if not self._flattens_subclasses(candidate.is_a, sv)]
+
+    @staticmethod
+    def _flattens_subclasses(class_name: str | None, sv: SchemaView) -> bool:
+        """Return whether the class is annotated jsonschema_flatten_subclasses."""
+        return class_name is not None and bool(annotation_tag_value(sv.get_class(class_name), FLATTEN_SUBCLASSES))
+
+    def _flattened_subclass_members(
+        self, cls: ClassDefinition, members: list[SlotDefinition], sv: SchemaView
+    ) -> list[SlotDefinition]:
+        """Return the optional members a flattened class, or a class that mixes one in, takes from the subclasses."""
+        names = {self.aliased_slot_name(member) for member in members}
+        added: list[SlotDefinition] = []
+        for parent in (cls.name, *cls.mixins):
+            if not self._flattens_subclasses(parent, sv):
+                continue
+            for subclass in sv.all_classes().values():
+                if subclass.is_a != parent:
+                    continue
+                for member in sv.class_induced_slots(subclass.name):
+                    name = self.aliased_slot_name(member)
+                    if member.identifier or name in names:
+                        continue
+                    names.add(name)
+                    optional = copy.copy(member)
+                    optional.required = False
+                    added.append(optional)
+        return added
 
     def after_generate_class_slot(self, slot: SlotResult, cls: ClassDefinition, sv: SchemaView) -> SlotResult:
         """Drop the type upstream emits next to the oneOf of a class property."""
