@@ -10,7 +10,7 @@ from .annotations import read_annotations
 from .cleanups import (
     clean_metadata,
 )
-from .partitions import build_enum_subset_partitions, narrow_form_subsets
+from .partitions import build_enum_subset_partitions
 from .pruning import remove_excluded_defs, remove_unreferenced_candidate_defs
 from .refs import resolve_refs
 from .subclasses import build_oneof_dispatch, flatten_subclasses
@@ -39,13 +39,6 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
         kind=TransformKind.WOT_SHAPING,
         reason="Splits Form into one variant per op subset (root/property/action/event) to match TD 1.1.",
         apply=lambda schema, sv, config: build_enum_subset_partitions(schema, config),
-    ),
-    Transform(
-        name="narrow_form_subsets",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Points each affordance's forms at its own Form variant, including the top-level properties of the "
-        "tree_root class.",
-        apply=narrow_form_subsets,
     ),
     Transform(
         name="remove_excluded_defs",
@@ -95,7 +88,6 @@ def post_process_jsonschema(
     logger.debug(f"  flatten_subclass_parents: {config.flatten_subclass_parents}")
     logger.debug(f"  oneof_dispatches: {[d.class_name for d in config.oneof_dispatches]}")
     logger.debug(f"  enum_subset_partitions: {[e.class_name for e in config.enum_subset_partitions]}")
-    logger.debug(f"  form_subset_narrows: {[n.class_name for n in config.form_subset_narrows]}")
 
     run_transforms(JSONSCHEMA_TRANSFORMS, schema, schema_view, config)
 

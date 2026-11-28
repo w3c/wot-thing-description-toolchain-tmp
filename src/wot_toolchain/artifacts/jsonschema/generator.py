@@ -17,6 +17,8 @@ from .options import JsonSchemaOptions
 from ...schema_utils import annotation_tag_value
 
 PREFIX_MEMBERS = "jsonschema_prefix_members"
+ENUM_SUBSET_PARTITION = "jsonschema_enum_subset_partition"
+FORM_SUBSET = "jsonschema_form_subset"
 
 
 class WotJsonSchemaGenerator(JsonSchemaGenerator):
@@ -113,7 +115,26 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
         # The top-level type conflicts with exactly_one_of branches of different types.
         if "oneOf" in slot.schema_:
             slot.schema_.pop("type", None)
+        self._narrow_to_subset_variant(slot, cls, sv)
         return slot
+
+    @staticmethod
+    def _narrow_to_subset_variant(slot: SlotResult, cls: ClassDefinition, sv: SchemaView) -> None:
+        """Narrow the array items of a jsonschema_form_subset slot to its subset variant."""
+        subset = annotation_tag_value(slot.source, FORM_SUBSET)
+        if not subset or "items" not in slot.schema_:
+            return
+        for name, partitioned in sv.all_classes().items():
+            partition = annotation_tag_value(partitioned, ENUM_SUBSET_PARTITION)
+            if not partition:
+                continue
+            values = sv.get_enum(partition["enum"]).permissible_values.values()
+            if not any(subset in (value.in_subset or []) for value in values):
+                continue
+            # Items of a subclass of the partitioned class keep the subclass next to the variant.
+            items, variant = slot.schema_["items"], {"$ref": f"#/$defs/{name}_element_{subset}"}
+            slot.schema_["items"] = variant if items == {"$ref": f"#/$defs/{name}"} else {"allOf": [items, variant]}
+            return
 
     def before_generate_class_slot(self, slot: SlotDefinition, cls: ClassDefinition, sv: SchemaView) -> SlotDefinition:
         """Hand upstream a copy of a type designator slot without the flag."""

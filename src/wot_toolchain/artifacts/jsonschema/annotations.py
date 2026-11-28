@@ -27,23 +27,12 @@ class EnumSubsetPartitionConfig:
 
 
 @dataclass
-class FormSubsetNarrowConfig:
-    """A slot whose array items narrow to one subset variant of a partitioned class (``jsonschema_form_subset``)."""
-
-    class_name: str
-    slot_name: str
-    subset_name: str
-    partition_class: str
-
-
-@dataclass
 class TransformConfig:
     """The transforms requested by the ``jsonschema_*`` annotations of a schema."""
 
     flatten_subclass_parents: list[str] = field(default_factory=list)
     oneof_dispatches: list[OneOfDispatchConfig] = field(default_factory=list)
     enum_subset_partitions: list[EnumSubsetPartitionConfig] = field(default_factory=list)
-    form_subset_narrows: list[FormSubsetNarrowConfig] = field(default_factory=list)
     # Class whose content is the top-level schema; set by the caller, not by an annotation.
     top_class: str | None = None
 
@@ -84,26 +73,5 @@ def read_annotations(sv: SchemaView) -> TransformConfig:
                     subsets=subsets,
                 )
             )
-
-    for cls_name, cls_def in sv.all_classes().items():
-        if not cls_def.slot_usage:
-            continue
-        for slot_name, slot_usage in cls_def.slot_usage.items():
-            subset_val = _get_annotation_value(slot_usage, "jsonschema_form_subset")
-            if subset_val:
-                partition_class = None
-                for esp in config.enum_subset_partitions:
-                    if subset_val in esp.subsets:
-                        partition_class = esp.class_name
-                        break
-                if partition_class:
-                    config.form_subset_narrows.append(
-                        FormSubsetNarrowConfig(
-                            class_name=cls_name,
-                            slot_name=slot_name,
-                            subset_name=subset_val,
-                            partition_class=partition_class,
-                        )
-                    )
 
     return config

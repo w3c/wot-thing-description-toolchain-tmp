@@ -92,7 +92,7 @@ The JSON Schema postprocessor (`src/wot_toolchain/artifacts/jsonschema/postproce
 ### 17. The partition dropped a subclass used as array item
 **Symptom:** W3C root-level forms require `op`. The class `RootForm` in the JSON Schema profile states that, but the enum subset partition replaced the `items` of the root `forms` by its own variant and dropped the subclass.
 **Artifact:** `jsonschema.json`
-**Workaround:** `artifacts/jsonschema/partitions.py` → `_narrow_slot_items()` keeps a subclass of the partitioned class and adds the variant next to it (`allOf`)
+**Workaround:** `artifacts/jsonschema/generator.py` → `_narrow_to_subset_variant()` keeps a subclass of the partitioned class and adds the variant next to it (`allOf`)
 **LinkML issue:** not a LinkML gap — toolchain transform
 
 ### 18. The catch-all branch of a oneOf dispatch was untyped
