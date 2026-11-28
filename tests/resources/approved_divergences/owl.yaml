@@ -1,0 +1,22 @@
+schema_version: 1
+upstream:
+  repository: w3c/wot-thing-description
+  artifact: ontology/td.ttl
+policy: >-
+  Entries are terms of the generated ontology that differ on purpose from the upstream ontology, each reviewed.
+divergences:
+  - id: owl-td-has-version-info
+    category: vocabulary-change
+    review: approved
+    upstream_locator:
+      kind: term
+      iri: https://www.w3.org/2019/wot/td#versionInfo
+    rationale: >-
+      Upstream td:versionInfo is an annotation property that names td:Thing and td:VersionInfo only with
+      schema:domainIncludes and schema:rangeIncludes. Its value is a td:VersionInfo node, so in TD 2.0 it is an
+      object property with that domain and range, renamed so that it does not read like the class td:VersionInfo.
+    expected_generated:
+      iri: https://www.w3.org/2019/wot/td#hasVersionInfo
+      type: owl:ObjectProperty
+      domain: td:Thing
+      range: td:VersionInfo
