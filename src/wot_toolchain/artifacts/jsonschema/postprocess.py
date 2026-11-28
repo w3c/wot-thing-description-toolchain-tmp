@@ -9,7 +9,6 @@ from linkml_runtime.utils.schemaview import SchemaView
 from .annotations import read_annotations
 from .cleanups import (
     clean_metadata,
-    dedup_oneof,
     simplify_exclusive_minimum,
 )
 from .partitions import build_enum_subset_partitions, narrow_form_subsets
@@ -48,13 +47,6 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
         reason="Points each affordance's forms at its own Form variant, including the top-level properties of the "
         "tree_root class.",
         apply=narrow_form_subsets,
-    ),
-    Transform(
-        name="dedup_oneof",
-        kind=TransformKind.COSMETIC,
-        reason="Collapses a single-branch oneOf (e.g. title, from string|langString). Upstream already removes "
-        "duplicate branches but leaves the one-item oneOf behind.",
-        apply=lambda schema, sv, config: dedup_oneof(schema),
     ),
     Transform(
         name="simplify_exclusive_minimum",

@@ -53,6 +53,9 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
         prop = super().get_subschema_for_slot(slot, omit_type, include_null, cls)
         if not omit_type:
             self._restore_branch_type(slot, prop)
+        # Upstream removes duplicate branches (string and langString) but leaves the one-item oneOf behind.
+        if len(prop.get("oneOf", ())) == 1:
+            prop.update(prop.pop("oneOf")[0])
         prefix = annotation_tag_value(slot, PREFIX_MEMBERS)
         if prefix is not None and prop.is_array:
             prop["additionalItems"] = prop["items"]

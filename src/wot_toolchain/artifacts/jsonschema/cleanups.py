@@ -6,25 +6,6 @@ from typing import Any
 from .traversal import walk_schema
 
 
-def dedup_oneof(schema: dict[str, Any]) -> None:
-    """Deduplicate identical oneOf branches (e.g. string vs langString both map to {"type":"string"})."""
-
-    def _dedup(obj: dict[str, Any]) -> None:
-        if "oneOf" not in obj or not isinstance(obj["oneOf"], list):
-            return
-        unique: list[dict[str, Any]] = []
-        for item in obj["oneOf"]:
-            if item not in unique:
-                unique.append(item)
-        if len(unique) == 1:
-            obj.pop("oneOf")
-            obj.update(unique[0])
-        elif len(unique) < len(obj["oneOf"]):
-            obj["oneOf"] = unique
-
-    walk_schema(schema, _dedup)
-
-
 def simplify_exclusive_minimum(schema: dict[str, Any]) -> None:
     """Rewrite ``minimum`` plus a ``not`` of that same constant to ``exclusiveMinimum``."""
 
