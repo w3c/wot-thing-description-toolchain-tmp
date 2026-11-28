@@ -88,8 +88,8 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
     Transform(
         name="clean_metadata",
         kind=TransformKind.COSMETIC,
-        reason="Removes per-def description/title and metamodel_version, and sets version from the schema.",
-        apply=lambda schema, sv, config: clean_metadata(schema, sv),
+        reason="Removes per-def description/title.",
+        apply=lambda schema, sv, config: clean_metadata(schema),
     ),
 )
 
@@ -100,7 +100,7 @@ def post_process_jsonschema(
     """Return a transformed copy of raw LinkML JSON Schema output; ``raw_schema`` is not modified.
 
     Applies the transforms requested by the ``jsonschema_*`` annotations of ``schema_view`` and fixed clean-ups,
-    and takes ``version`` and ``title`` from ``schema_view``. ``top_class`` names the class whose content is the
+    and takes ``title`` from ``schema_view``. ``top_class`` names the class whose content is the
     top-level schema; its own def is dropped when nothing references it.
     """
     schema = copy.deepcopy(raw_schema)

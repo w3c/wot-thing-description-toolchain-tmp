@@ -4,7 +4,7 @@ import copy
 from collections.abc import Iterable
 from typing import Self
 
-from linkml.generators.jsonschemagen import JsonSchema, JsonSchemaGenerator, SlotResult
+from linkml.generators.jsonschemagen import JsonSchema, JsonSchemaGenerator, SchemaResult, SlotResult
 from linkml_runtime.linkml_model.meta import (
     AnonymousSlotExpression,
     ClassDefinition,
@@ -81,6 +81,13 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
         typ, _fmt, reference = self.get_type_info_for_slot_subschema(slot)
         if typ and reference is None:
             target["type"] = typ
+
+    def after_generate_schema(self, schema: SchemaResult, sv: SchemaView) -> SchemaResult:
+        """Drop the LinkML metamodel version, and the version of a schema that has none."""
+        schema.schema_.pop("metamodel_version", None)
+        if schema.schema_.get("version") is None:
+            schema.schema_.pop("version", None)
+        return schema
 
     def before_generate_class_slots(
         self, slot: Iterable[SlotDefinition], cls: ClassDefinition, sv: SchemaView

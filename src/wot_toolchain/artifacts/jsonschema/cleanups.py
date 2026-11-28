@@ -2,7 +2,6 @@
 
 from typing import Any
 
-from linkml_runtime.utils.schemaview import SchemaView
 
 from .traversal import walk_schema
 
@@ -45,15 +44,9 @@ def simplify_exclusive_minimum(schema: dict[str, Any]) -> None:
     walk_schema(schema, _fix)
 
 
-def clean_metadata(schema: dict[str, Any], sv: SchemaView) -> None:
-    """Drop each definition's ``description`` and ``title`` and ``metamodel_version``; take ``version`` from ``sv``."""
+def clean_metadata(schema: dict[str, Any]) -> None:
+    """Drop each definition's ``description`` and ``title``."""
     for defn in schema.get("$defs", {}).values():
         if isinstance(defn, dict):
             defn.pop("description", None)
             defn.pop("title", None)
-
-    schema.pop("metamodel_version", None)
-    if sv.schema.version:
-        schema["version"] = sv.schema.version
-    else:
-        schema.pop("version", None)
