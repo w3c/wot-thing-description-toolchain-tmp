@@ -3,7 +3,7 @@
 import copy
 from typing import Self
 
-from linkml.generators.jsonschemagen import JsonSchema, JsonSchemaGenerator
+from linkml.generators.jsonschemagen import JsonSchema, JsonSchemaGenerator, SlotResult
 from linkml_runtime.linkml_model.meta import (
     AnonymousSlotExpression,
     ClassDefinition,
@@ -80,6 +80,13 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
         typ, _fmt, reference = self.get_type_info_for_slot_subschema(slot)
         if typ and reference is None:
             target["type"] = typ
+
+    def after_generate_class_slot(self, slot: SlotResult, cls: ClassDefinition, sv: SchemaView) -> SlotResult:
+        """Drop the type upstream emits next to the oneOf of a class property."""
+        # The top-level type conflicts with exactly_one_of branches of different types.
+        if "oneOf" in slot.schema_:
+            slot.schema_.pop("type", None)
+        return slot
 
     def before_generate_class_slot(self, slot: SlotDefinition, cls: ClassDefinition, sv: SchemaView) -> SlotDefinition:
         """Hand upstream a copy of a type designator slot without the flag."""

@@ -10,7 +10,6 @@ from .annotations import read_annotations
 from .cleanups import (
     clean_metadata,
     dedup_oneof,
-    normalize_types,
     remove_identifier_slots,
     simplify_exclusive_minimum,
 )
@@ -57,13 +56,6 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
         reason="Collapses a single-branch oneOf (e.g. title, from string|langString). Upstream already removes "
         "duplicate branches but leaves the one-item oneOf behind.",
         apply=lambda schema, sv, config: dedup_oneof(schema),
-    ),
-    Transform(
-        name="normalize_types",
-        kind=TransformKind.LINKML_BUG,
-        reason="LinkML emits a top-level type next to oneOf for exactly_one_of, which conflicts when branches have "
-        "different types.",
-        apply=lambda schema, sv, config: normalize_types(schema),
     ),
     Transform(
         name="simplify_exclusive_minimum",

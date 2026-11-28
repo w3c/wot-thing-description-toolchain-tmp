@@ -27,20 +27,6 @@ def dedup_oneof(schema: dict[str, Any]) -> None:
     walk_schema(schema, _dedup)
 
 
-def normalize_types(schema: dict[str, Any]) -> None:
-    """Drop ``type`` from each property that also has a ``oneOf``."""
-
-    def _strip_oneof_type(props: dict[str, Any]) -> None:
-        for prop in props.values():
-            if isinstance(prop, dict) and "oneOf" in prop:
-                prop.pop("type", None)
-
-    _strip_oneof_type(schema.get("properties", {}))
-    for defn in schema.get("$defs", {}).values():
-        if isinstance(defn, dict) and "properties" in defn:
-            _strip_oneof_type(defn["properties"])
-
-
 def simplify_exclusive_minimum(schema: dict[str, Any]) -> None:
     """Rewrite ``minimum`` plus a ``not`` of that same constant to ``exclusiveMinimum``."""
 
