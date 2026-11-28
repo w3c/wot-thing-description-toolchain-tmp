@@ -27,6 +27,7 @@ class Transform:
     kind: TransformKind
     reason: str
     apply: Callable[..., None]
+    after: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         """Reject a blank name or reason."""
@@ -36,8 +37,19 @@ class Transform:
             raise ValueError(f"Transform {self.name!r} reason must not be blank")
 
 
+def _require_declared_order(transforms: Sequence[Transform]) -> None:
+    """Reject a list in which a transform does not come after every transform it names in ``after``."""
+    earlier: set[str] = set()
+    for transform in transforms:
+        missing = [name for name in transform.after if name not in earlier]
+        if missing:
+            raise GenerationError(f"Transform {transform.name!r} must run after {missing}, which do not precede it")
+        earlier.add(transform.name)
+
+
 def run_transforms(transforms: Sequence[Transform], *args: object) -> None:
-    """Apply each transform to ``args`` in order; a failure names the transform."""
+    """Apply each transform to ``args`` in its declared order; a failure names the transform."""
+    _require_declared_order(transforms)
     for transform in transforms:
         logger.debug("Running transform %s", transform.name)
         try:

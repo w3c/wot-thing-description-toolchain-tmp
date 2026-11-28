@@ -45,24 +45,24 @@ Each entry: **what the gap is**, **which artifact(s) affected**, **current worka
 ## JSON Schema Generator
 
 ### 6. JSON Schema generator cannot express all W3C TD structural patterns
-The JSON Schema postprocessor (`src/wot_toolchain/artifacts/jsonschema/postprocess.py`) contains active transforms that compensate for generator gaps — including subclass flattening, oneOf dispatch, form variants, type normalization, identifier slot removal, ref resolution, and metadata cleanup. Gaps #9, #10, and #11 below document specific transforms; additional undocumented transforms (`_normalize_types`, `_simplify_exclusive_minimum`, `_remove_identifier_slots`, `_remove_excluded_defs`, `_resolve_refs`, `_clean_metadata`) handle structural adjustments the generator cannot produce natively.
+The hooks of `WotJsonSchemaGenerator` (`src/wot_toolchain/artifacts/jsonschema/generator.py`) compensate for generator gaps while the schema is generated — including subclass flattening, oneOf dispatch, enum subset partitions, identifier slot removal, ref resolution, and metadata cleanup. Gaps #7, #8, and #9 below document specific rules; further rules in the same hooks (dropping the type next to a `oneOf`, `exclusiveMinimum`, leaving out enum defs) handle structural adjustments the upstream generator cannot produce natively. Two post-steps remain in `artifacts/jsonschema/postprocess.py`: `remove_excluded_defs` and `remove_unreferenced_candidate_defs`.
 
 ### 7. No oneOf dispatch on a discriminator slot
 **Symptom:** W3C `securityScheme` is a oneOf over the known schemes plus `additionalSecurityScheme` with a prefixed `scheme`; the generator does not use `designates_type` for this.
 **Artifact:** `jsonschema.json`
-**Workaround:** `artifacts/jsonschema/postprocess.py` → `_build_oneof_dispatch()`, driven by the `jsonschema_oneof_dispatch` annotation
+**Workaround:** `artifacts/jsonschema/generator.py` → `after_generate_class()`, driven by the `jsonschema_oneof_dispatch` annotation
 **LinkML issue:** none found (2026-09-09)
 
 ### 8. No form variants per affordance type
 **Symptom:** W3C has one form definition per location (root, property, action, event) with its own `op` values; the generator emits a single Form.
 **Artifact:** `jsonschema.json`
-**Workaround:** `artifacts/jsonschema/postprocess.py` → `_build_form_variants()`, driven by the `jsonschema_form_variants` annotation; the base branch takes the forms without `op`
+**Workaround:** `artifacts/jsonschema/generator.py` → `_state_enum_subset_partition()`, driven by the `jsonschema_enum_subset_partition` annotation; `_narrow_to_subset_variant()` points a `jsonschema_form_subset` slot at its variant
 **LinkML issue:** none found (2026-09-09)
 
 ### 9. Inlined dict slots always allow the object form
 **Symptom:** For `titles`/`descriptions` the generator emits `anyOf` of the object form and the SimpleDict string form; W3C allows only the string form.
 **Artifact:** `jsonschema.json`
-**Workaround:** `artifacts/jsonschema/postprocess.py` → `_fix_additional_props_anyof()`, keeps only the string form for a key + one string value class
+**Workaround:** `artifacts/jsonschema/refs.py` → `_fix_additional_props_anyof()` inside `resolve_refs()`, keeps only the string form for a key + one string value class
 **LinkML issue:** none found (2026-09-09)
 
 ### 13. `list_elements_unique` emits no `uniqueItems`
@@ -92,13 +92,13 @@ The JSON Schema postprocessor (`src/wot_toolchain/artifacts/jsonschema/postproce
 ### 17. The partition dropped a subclass used as array item
 **Symptom:** W3C root-level forms require `op`. The class `RootForm` in the JSON Schema profile states that, but the enum subset partition replaced the `items` of the root `forms` by its own variant and dropped the subclass.
 **Artifact:** `jsonschema.json`
-**Workaround:** `artifacts/jsonschema/partitions.py` → `_narrow_slot_items()` keeps a subclass of the partitioned class and adds the variant next to it (`allOf`)
+**Workaround:** `artifacts/jsonschema/generator.py` → `_narrow_to_subset_variant()` keeps a subclass of the partitioned class and adds the variant next to it (`allOf`)
 **LinkML issue:** not a LinkML gap — toolchain transform
 
 ### 18. The catch-all branch of a oneOf dispatch was untyped
 **Symptom:** The branch for values outside the known subclasses (gap #7) only constrained the discriminator; W3C `additionalSecurityScheme` also types the members of the base scheme.
 **Artifact:** `jsonschema.json`
-**Workaround:** `artifacts/jsonschema/subclasses.py` → `build_oneof_dispatch()` builds the catch-all from the dispatch class's own definition, without identifier slots
+**Workaround:** `artifacts/jsonschema/generator.py` → `_unknown_branch()` builds the catch-all from the dispatch class's own definition, without identifier slots
 **LinkML issue:** not a LinkML gap — toolchain transform
 
 ---

@@ -7,104 +7,28 @@ from typing import Any
 from linkml_runtime.utils.schemaview import SchemaView
 
 from .annotations import read_annotations
-from .cleanups import (
-    clean_metadata,
-    dedup_oneof,
-    normalize_types,
-    remove_identifier_slots,
-    simplify_exclusive_minimum,
-)
-from .partitions import build_enum_subset_partitions, narrow_form_subsets
 from .pruning import remove_excluded_defs, remove_unreferenced_candidate_defs
-from .refs import resolve_refs
-from .subclasses import build_oneof_dispatch, flatten_subclasses
 from ..transforms import Transform, TransformKind, run_transforms
 
 logger = logging.getLogger(__name__)
 
 JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
     Transform(
-        name="flatten_subclasses",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Merges the properties of the direct subclasses of a class annotated jsonschema_flatten_subclasses "
-        "into that class, deletes the subclass defs, and copies the merged properties to the classes that use it as "
-        "a mixin.",
-        apply=flatten_subclasses,
-    ),
-    Transform(
-        name="build_oneof_dispatch",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Builds the W3C securityScheme oneOf over known schemes plus a catch-all whose scheme must have a "
-        "prefix. LinkML has no oneOf on a discriminator.",
-        apply=build_oneof_dispatch,
-    ),
-    Transform(
-        name="build_enum_subset_partitions",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Splits Form into one variant per op subset (root/property/action/event) to match TD 1.1.",
-        apply=lambda schema, sv, config: build_enum_subset_partitions(schema, config),
-    ),
-    Transform(
-        name="narrow_form_subsets",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Points each affordance's forms at its own Form variant, including the top-level properties of the "
-        "tree_root class.",
-        apply=narrow_form_subsets,
-    ),
-    Transform(
-        name="dedup_oneof",
-        kind=TransformKind.COSMETIC,
-        reason="Collapses a single-branch oneOf (e.g. title, from string|langString). Upstream already removes "
-        "duplicate branches but leaves the one-item oneOf behind.",
-        apply=lambda schema, sv, config: dedup_oneof(schema),
-    ),
-    Transform(
-        name="normalize_types",
-        kind=TransformKind.LINKML_BUG,
-        reason="LinkML emits a top-level type next to oneOf for exactly_one_of, which conflicts when branches have "
-        "different types.",
-        apply=lambda schema, sv, config: normalize_types(schema),
-    ),
-    Transform(
-        name="simplify_exclusive_minimum",
-        kind=TransformKind.COSMETIC,
-        reason="LinkML has no exclusive minimum, so minimum_value: 0 + none_of equals_number 0 becomes "
-        "minimum+not.anyOf.const. This pass rewrites that to exclusiveMinimum: 0 (multipleOf).",
-        apply=lambda schema, sv, config: simplify_exclusive_minimum(schema),
-    ),
-    Transform(
-        name="remove_identifier_slots",
-        kind=TransformKind.WOT_SHAPING,
-        reason="LinkML identifier slots are used as map keys and are not JSON members in TD documents.",
-        apply=lambda schema, sv, config: remove_identifier_slots(schema, sv),
-    ),
-    Transform(
         name="remove_excluded_defs",
         kind=TransformKind.COSMETIC,
-        reason="Removes leftover LinkML defs: standalone enum defs and __identifier_optional defs.",
+        reason="Removes the __identifier_optional defs. Upstream writes them while it adds a def, where no "
+        "generator hook reaches them.",
         apply=remove_excluded_defs,
     ),
-    Transform(
-        name="resolve_refs",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Fixes references after removals: inlines enums, empties linkml:Any, maps identifier_optional refs to "
-        "the base def, and rewrites definitions to $defs. Keeps only the string form for titles/descriptions, as W3C "
-        "requires.",
-        apply=lambda schema, sv, config: resolve_refs(schema, sv),
-    ),
-    # After resolve_refs: it erases refs to linkml:Any defs and drops anyOf branches that still reference candidates.
     Transform(
         name="remove_unreferenced_candidate_defs",
         kind=TransformKind.COSMETIC,
         reason="Drops defs that nothing references any more (linkml:Any, the top class, partitioned classes), "
-        "based on schema markers rather than hard-coded names.",
+        "based on schema markers rather than hard-coded names. Needs the references of every def, so it cannot run "
+        "per class. An __identifier_optional def copies the references of its class and would keep a candidate "
+        "that references itself.",
         apply=remove_unreferenced_candidate_defs,
-    ),
-    Transform(
-        name="clean_metadata",
-        kind=TransformKind.COSMETIC,
-        reason="Removes per-def description/title and metamodel_version, and sets version from the schema.",
-        apply=lambda schema, sv, config: clean_metadata(schema, sv),
+        after=("remove_excluded_defs",),
     ),
 )
 
@@ -115,7 +39,7 @@ def post_process_jsonschema(
     """Return a transformed copy of raw LinkML JSON Schema output; ``raw_schema`` is not modified.
 
     Applies the transforms requested by the ``jsonschema_*`` annotations of ``schema_view`` and fixed clean-ups,
-    and takes ``version`` and ``title`` from ``schema_view``. ``top_class`` names the class whose content is the
+    and takes ``title`` from ``schema_view``. ``top_class`` names the class whose content is the
     top-level schema; its own def is dropped when nothing references it.
     """
     schema = copy.deepcopy(raw_schema)
@@ -123,10 +47,7 @@ def post_process_jsonschema(
     config.top_class = top_class
 
     logger.info("JSON Schema postprocessor: reading annotations")
-    logger.debug(f"  flatten_subclass_parents: {config.flatten_subclass_parents}")
-    logger.debug(f"  oneof_dispatches: {[d.class_name for d in config.oneof_dispatches]}")
-    logger.debug(f"  enum_subset_partitions: {[e.class_name for e in config.enum_subset_partitions]}")
-    logger.debug(f"  form_subset_narrows: {[n.class_name for n in config.form_subset_narrows]}")
+    logger.debug(f"  partitioned_classes: {config.partitioned_classes}")
 
     run_transforms(JSONSCHEMA_TRANSFORMS, schema, schema_view, config)
 

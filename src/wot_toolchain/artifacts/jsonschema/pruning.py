@@ -26,7 +26,7 @@ def _drop_candidate_defs(defs: dict[str, Any], sv: SchemaView, config: Transform
     Returns:
         The names of the candidate defs present in ``defs``.
     """
-    partitioned = {esp.class_name for esp in config.enum_subset_partitions}
+    partitioned = set(config.partitioned_classes)
     return {
         name
         for name, cls_def in sv.all_classes().items()
@@ -93,17 +93,13 @@ def remove_unreferenced_candidate_defs(schema: dict[str, Any], sv: SchemaView, c
 
 
 def remove_excluded_defs(schema: dict[str, Any], sv: SchemaView, config: TransformConfig) -> None:
-    """Delete the definitions of enums and of ``__identifier_optional`` variants."""
+    """Delete the definitions of ``__identifier_optional`` variants."""
     defs = schema.get("$defs", {})
     to_remove = set()
 
     for name in list(defs.keys()):
         if name.endswith("__identifier_optional"):
             to_remove.add(name)
-
-    for enum_name in sv.all_enums():
-        if enum_name in defs:
-            to_remove.add(enum_name)
 
     for name in to_remove:
         if name in defs:
