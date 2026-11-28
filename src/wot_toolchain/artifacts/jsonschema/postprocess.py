@@ -7,9 +7,6 @@ from typing import Any
 from linkml_runtime.utils.schemaview import SchemaView
 
 from .annotations import read_annotations
-from .cleanups import (
-    clean_metadata,
-)
 from .pruning import remove_excluded_defs, remove_unreferenced_candidate_defs
 from ..transforms import Transform, TransformKind, run_transforms
 
@@ -28,12 +25,6 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
         reason="Drops defs that nothing references any more (linkml:Any, the top class, partitioned classes), "
         "based on schema markers rather than hard-coded names.",
         apply=remove_unreferenced_candidate_defs,
-    ),
-    Transform(
-        name="clean_metadata",
-        kind=TransformKind.COSMETIC,
-        reason="Removes per-def description/title.",
-        apply=lambda schema, sv, config: clean_metadata(schema),
     ),
 )
 

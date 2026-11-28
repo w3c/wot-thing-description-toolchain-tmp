@@ -102,10 +102,14 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
             target["type"] = typ
 
     def after_generate_schema(self, schema: SchemaResult, sv: SchemaView) -> SchemaResult:
-        """Drop the LinkML metamodel version, and the version of a schema that has none."""
+        """Drop the LinkML metamodel version, the version of a schema that has none, and each def's own metadata."""
         schema.schema_.pop("metamodel_version", None)
         if schema.schema_.get("version") is None:
             schema.schema_.pop("version", None)
+        # Here rather than per class: upstream titles every def when it is added, after the class hook has run.
+        for definition in schema.schema_.get("$defs", {}).values():
+            definition.pop("description", None)
+            definition.pop("title", None)
         return schema
 
     def before_generate_enums(self, enum: Iterable[EnumDefinition], sv: SchemaView) -> Iterable[EnumDefinition]:
