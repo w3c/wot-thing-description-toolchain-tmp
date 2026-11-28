@@ -207,12 +207,25 @@ class WotOwlGenerator(OwlSchemaGenerator):
 
     @cached_property
     def _class_properties(self) -> dict[URIRef, tuple[str, SlotDefinition]]:
-        """Per property IRI that a class defines, the name of the last such class and the property as a slot."""
+        """Per property IRI that a class defines, the name of a class that defines it and the property as a slot."""
         properties: dict[URIRef, tuple[str, SlotDefinition]] = {}
         for name, cls in self.schemaview.all_classes().items():
             for slot in (*self._renamed_usages(cls), *self._attributes(cls)):
-                properties[self._prop_uri(slot)] = (name, slot)
+                uri = self._prop_uri(slot)
+                if uri in properties:
+                    self._require_same_range(uri, properties[uri], (name, slot))
+                properties[uri] = (name, slot)
         return properties
+
+    def _require_same_range(self, uri: URIRef, *definitions: tuple[str, SlotDefinition]) -> None:
+        """Fail when the classes that define the property ``uri`` give it different ranges."""
+        # A property has one rdfs:range; picking one definition would depend on the order of the classes.
+        default = self.schemaview.schema.default_range
+        ranges = {owner: slot.range or default for owner, slot in definitions}
+        if len(set(ranges.values())) > 1:
+            source = self.schemaview.schema.source_file or self.schemaview.schema.name
+            stated = " and ".join(f"{range_!r} in class {owner!r}" for owner, range_ in ranges.items())
+            raise SchemaError(f"{source}: property <{uri}> has range {stated}; one property has one range.")
 
     def _attributes(self, cls: ClassDefinition) -> list[SlotDefinition]:
         """Return the attributes of ``cls`` that name a property, each named by its IRI; none if it names no term."""
