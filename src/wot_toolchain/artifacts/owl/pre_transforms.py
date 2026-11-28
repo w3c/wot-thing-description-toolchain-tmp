@@ -163,26 +163,6 @@ def _strip_non_ontological_enums(s: SchemaDefinition) -> None:
             slot_def.range = "string"
 
 
-def _fix_enum_pv_labels(s: SchemaDefinition, view: SchemaView) -> None:
-    """Rename PV keys to match meaning IRI local name for correct rdfs:label."""
-    for ename, edef in cast(_Enums, s.enums).items():
-        if not edef.permissible_values:
-            continue
-        pvs = cast(dict[str, PermissibleValue], edef.permissible_values)
-        renames: list[tuple[str, str]] = []
-        for key, pv in pvs.items():
-            if not pv.meaning:
-                continue
-            expanded = _expand_curie(view, pv.meaning, f"meaning {pv.meaning!r} of permissible value '{ename}.{key}'")
-            pv_name = local_name(expanded)
-            if pv_name and pv_name != key:
-                renames.append((key, pv_name))
-        for old_key, new_key in renames:
-            pv = pvs.pop(old_key)
-            pv.text = new_key
-            pvs[new_key] = pv
-
-
 def _strip_no_uri_classes(s: SchemaDefinition, no_uri_classes: AbstractSet[str]) -> None:
     """Remove classes without class_uri and clear refs to them."""
     classes = cast(_Classes, s.classes)
@@ -288,13 +268,6 @@ OWL_PRE_TRANSFORMS: tuple[Transform, ...] = (
         reason="Enums without enum_uri are JSON-Schema-only. Keeping them produced double-# IRIs, which pyoxigraph "
         "rejected.",
         apply=lambda s, c: _strip_non_ontological_enums(s),
-    ),
-    Transform(
-        name="fix_enum_pv_labels",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Renames permissible-value keys to the local name of their meaning, so the value IRIs and labels "
-        "follow the WoT vocabulary.",
-        apply=lambda s, c: _fix_enum_pv_labels(s, c.view),
     ),
     Transform(
         name="strip_dangling_slot_refs",

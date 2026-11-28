@@ -31,7 +31,8 @@ from ..rdf_terms import (
     language_map_property_iris,
     most_general_classes,
 )
-from ...schema_utils import resolve_prefix_namespace
+from ...errors import SchemaError
+from ...schema_utils import local_name, resolve_prefix_namespace
 
 # INSTANCE is emitted by WotOwlGenerator.add_enum, so upstream keeps its default for it.
 _PERMISSIBLE_VALUE_TYPES: dict[PermissibleValueKind, URIRef] = {
@@ -394,6 +395,7 @@ class WotOwlGenerator(OwlSchemaGenerator):
         """Emit ``e``; INSTANCE values are typed by the enum class only."""
         if self._is_out_of_scope(self._enum_uri(e.name)):
             return
+        e = self._named_by_meaning(e)
         if self.permissible_values is not PermissibleValueKind.INSTANCE:
             super().add_enum(e)
             return
@@ -408,6 +410,29 @@ class WotOwlGenerator(OwlSchemaGenerator):
         for pv in e.permissible_values.values():
             if pv.meaning:
                 self._add_enum_instance(pv, enum_uri)
+
+    def _named_by_meaning(self, e: EnumDefinition) -> EnumDefinition:
+        """Return a copy of ``e`` whose values that have a ``meaning`` are named by the local name of that IRI."""
+        # The JSON value may differ from the term it denotes (``invokeaction`` for ``td:invokeAction``).
+        values: dict[str, PermissibleValue] = {}
+        for text, pv in e.permissible_values.items():
+            if pv.meaning:
+                pv = copy.copy(pv)
+                pv.text = local_name(self._expand_meaning(pv, e)) or text
+            values[pv.text] = pv
+        renamed = copy.copy(e)
+        # Item assignment, as linkml's own normalisation does; attribute assignment wraps a dict in a JsonObj.
+        renamed["permissible_values"] = values
+        return renamed
+
+    def _expand_meaning(self, pv: PermissibleValue, e: EnumDefinition) -> str:
+        """Return the IRI that ``pv`` of ``e`` denotes."""
+        try:
+            return str(self.schemaview.expand_curie(pv.meaning))
+        except ValueError as exc:
+            source = self.schemaview.schema.source_file or self.schemaview.schema.name
+            element = f"meaning {pv.meaning!r} of permissible value '{e.name}.{pv.text}'"
+            raise SchemaError(f"{source}: cannot expand {element}: {exc}") from exc
 
     def _add_enum_instance(self, pv: PermissibleValue, enum_uri: URIRef) -> None:
         """Emit ``pv`` as an instance of ``enum_uri``, named by its ``meaning``."""
