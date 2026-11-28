@@ -178,9 +178,9 @@ class WotOwlGenerator(OwlSchemaGenerator):
                 self.graph.remove((class_uri, OWL.disjointUnionOf, operands))
 
     def add_slot(self, slot: SlotDefinition, attribute: bool = False) -> None:
-        """Emit ``slot`` unless it is out of scope, with every class of its domain."""
+        """Emit ``slot`` unless it names no term or is out of scope, with every class of its domain."""
         uri = self._prop_uri(slot)
-        if self._is_out_of_scope(uri):
+        if not slot.slot_uri or self._is_out_of_scope(uri):
             return
         # Upstream emits rdfs:domain from the slot's own domain only, as one named class (owlgen.py:1186).
         without_domain = copy.copy(slot)

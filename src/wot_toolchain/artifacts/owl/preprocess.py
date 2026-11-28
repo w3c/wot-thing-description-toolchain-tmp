@@ -4,7 +4,7 @@ import copy
 from pathlib import Path
 from typing import cast
 
-from linkml_runtime.linkml_model.meta import ClassDefinition, Prefix, SchemaDefinition, SlotDefinition
+from linkml_runtime.linkml_model.meta import ClassDefinition, Prefix, SchemaDefinition
 from linkml_runtime.utils.schemaview import SchemaView
 
 from .pre_transforms import OWL_PRE_TRANSFORMS, OwlPreContext
@@ -13,7 +13,6 @@ from ...errors import SchemaError
 from ...schema_utils import SchemaStore, default_prefix, load_schema_view
 from ...schema_utils import get_schema as _get_schema
 
-_Slots = dict[str, SlotDefinition]
 _Classes = dict[str, ClassDefinition]
 _Prefixes = dict[str, Prefix]
 
@@ -32,13 +31,11 @@ def _context(schema_path: Path, store: SchemaStore) -> OwlPreContext:
     _require_local_imports(schema_path, store)
     view = store.view(schema_path, merge_imports=True)
     local_schema = _get_schema(store.view(schema_path, merge_imports=False))
-    local_slots = cast(_Slots, local_schema.slots)
     local_classes = cast(_Classes, local_schema.classes)
     return OwlPreContext(
         view=view,
         namespace=_namespace(view),
         no_uri_classes=frozenset(name for name, cls in local_classes.items() if not cls.class_uri),
-        original_no_uri_slots=frozenset(name for name, slot in local_slots.items() if not slot.slot_uri),
     )
 
 

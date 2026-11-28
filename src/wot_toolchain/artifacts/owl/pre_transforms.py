@@ -33,21 +33,6 @@ class OwlPreContext:
     view: SchemaView
     namespace: str
     no_uri_classes: AbstractSet[str]
-    original_no_uri_slots: AbstractSet[str]
-
-
-def _remove_slots(s: SchemaDefinition, names: set[str]) -> None:
-    """Remove named slots and all class references to them."""
-    slots = cast(_Slots, s.slots)
-    for name in names:
-        slots.pop(name, None)
-    for cls_def in cast(_Classes, s.classes).values():
-        if cls_def.slots:
-            cls_def.slots = [sn for sn in cls_def.slots if str(sn) not in names]
-        if cls_def.slot_usage:
-            su = cast(dict[str, SlotDefinition], cls_def.slot_usage)
-            for k in [k for k in su if k in names]:
-                del su[k]
 
 
 def _expand_curie(view: SchemaView, curie: str, element: str) -> str:
@@ -190,13 +175,6 @@ def _strip_foreign_mixins(
         cls_def.mixins = keep
 
 
-def _strip_no_uri_original_slots(s: SchemaDefinition, original_no_uri_slots: AbstractSet[str]) -> None:
-    """Remove slots that never had a slot_uri in the unmerged schema."""
-    slots = cast(_Slots, s.slots)
-    present = {name for name in slots if name in original_no_uri_slots}
-    _remove_slots(s, present)
-
-
 def _strip_dangling_slot_refs(s: SchemaDefinition) -> None:
     """Remove class slot references that have no matching top-level slot definition."""
     existing = set(cast(_Slots, s.slots).keys())
@@ -242,12 +220,6 @@ OWL_PRE_TRANSFORMS: tuple[Transform, ...] = (
         reason="gen-owl does not declare the property of a slot_usage that gives its slot another slot_uri "
         "(e.g. jsonschema:properties in ObjectSchema).",
         apply=lambda s, c: _promote_renamed_usages(s, c.view),
-    ),
-    Transform(
-        name="strip_no_uri_original_slots",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Removes slots without slot_uri.",
-        apply=lambda s, c: _strip_no_uri_original_slots(s, c.original_no_uri_slots),
     ),
     Transform(
         name="strip_dangling_slot_refs",
