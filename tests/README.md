@@ -52,7 +52,9 @@ The specification HTML is built when `spec` is listed under `generators` in
   and rendered examples.
 - `goldens/test_approved_divergences.py` validates the documents in
   `resources/approved_divergences/`, which record reviewed corrections to
-  upstream text and deliberately complete generated snippets.
+  upstream text and deliberately complete generated snippets. For `owl.yaml`
+  it also checks that every recorded term has the recorded statements in the
+  generated ontologies.
 - `unit/cli/test_cli.py` tests the command line interface and
   `unit/artifacts/shacl/test_shacl_postprocessor.py` tests the SHACL
   postprocessor.

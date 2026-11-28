@@ -115,7 +115,7 @@ slots:
   version:
     description: >-
       Provides version information.
-    slot_uri: td:versionInfo
+    slot_uri: td:hasVersionInfo
     domain: Thing
     implements:
       - owl:ObjectProperty

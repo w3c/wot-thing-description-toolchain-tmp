@@ -1,0 +1,239 @@
+schema_version: 1
+upstream:
+  repository: w3c/wot-thing-description
+  artifact: ontology/{td,hctl,wotsec,jsonschema}.ttl
+  revision: 7fe7899f
+policy: >-
+  Entries are terms of the generated ontology that differ on purpose from the upstream ontology, each reviewed.
+divergences:
+  - id: owl-td-has-version-info
+    category: vocabulary-change
+    review: approved
+    upstream_locator:
+      kind: term
+      iri: https://www.w3.org/2019/wot/td#versionInfo
+    rationale: >-
+      Upstream td:versionInfo is an annotation property without domain or range, the class td:VersionInfo is not
+      declared, and td:instance and td:model name the property td:versionInfo as their domain. The value is a
+      td:VersionInfo node, so in TD 2.0 it is an object property with that domain and range, renamed so that it
+      does not read like the class td:VersionInfo.
+    expected_generated:
+      terms:
+        td:hasVersionInfo:
+          rdf:type: [owl:ObjectProperty]
+          rdfs:domain: [td:Thing]
+          rdfs:range: [td:VersionInfo]
+        td:VersionInfo:
+          rdf:type: [owl:Class]
+        td:instance:
+          rdfs:domain: [td:VersionInfo]
+        td:model:
+          rdfs:domain: [td:VersionInfo]
+      absent: [td:versionInfo]
+  - id: owl-domain-and-range-axioms
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: predicates
+      predicates: [schema:domainIncludes, schema:rangeIncludes]
+    rationale: >-
+      Upstream td.ttl, hctl.ttl and wotsec.ttl state no rdfs:domain and no rdfs:range; they use
+      schema:domainIncludes and schema:rangeIncludes, and many properties have neither. The generated ontologies
+      state rdfs:domain and rdfs:range wherever the schema gives them.
+    expected_generated:
+      absent:
+        - http://schema.org/domainIncludes
+        - http://schema.org/rangeIncludes
+        - https://schema.org/domainIncludes
+        - https://schema.org/rangeIncludes
+  - id: owl-usage-domains
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: terms
+      iris:
+        - https://www.w3.org/2019/wot/td#name
+        - https://www.w3.org/2019/wot/security#scopes
+        - https://www.w3.org/2019/wot/td#hasUriTemplateSchema
+        - https://www.w3.org/2019/wot/hypermedia#forContentType
+    rationale: >-
+      The domain of a property is every class that uses it in the schema. Upstream names one class for each of
+      these properties.
+    expected_generated:
+      terms:
+        td:name:
+          rdfs:domain: [jsonschema:DataSchema, td:InteractionAffordance]
+        wotsec:scopes:
+          rdfs:domain: [hctl:Form, wotsec:OAuth2SecurityScheme]
+        td:hasUriTemplateSchema:
+          rdfs:domain: [td:InteractionAffordance, td:Thing]
+        hctl:forContentType:
+          rdfs:domain: [hctl:AdditionalExpectedResponse, hctl:ExpectedResponse, hctl:Form]
+  - id: owl-xsd-datatypes
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: terms
+      iris: [http://schema.org/Text, http://schema.org/Boolean, http://schema.org/URL]
+    rationale: >-
+      Upstream names schema.org types as the values of datatype properties. The generated ontologies use XSD
+      datatypes throughout.
+    expected_generated:
+      terms:
+        td:name:
+          rdfs:range: [xsd:string]
+        td:isSafe:
+          rdfs:range: [xsd:boolean]
+        td:baseURI:
+          rdfs:range: [xsd:anyURI]
+      absent:
+        - http://schema.org/Text
+        - http://schema.org/Boolean
+        - http://schema.org/URL
+        - https://schema.org/Text
+        - https://schema.org/Boolean
+        - https://schema.org/URL
+  - id: owl-title-and-description-plain-literal
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: terms
+      iris: [https://www.w3.org/2019/wot/td#title, https://www.w3.org/2019/wot/td#description]
+    rationale: >-
+      Upstream gives schema:Text. A title or description is a string with or without a language tag.
+    expected_generated:
+      terms:
+        td:title:
+          rdfs:range: [rdf:PlainLiteral]
+        td:description:
+          rdfs:range: [rdf:PlainLiteral]
+  - id: owl-language-map-lang-string
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: terms
+      iris:
+        - https://www.w3.org/2019/wot/td#titleInLanguage
+        - https://www.w3.org/2019/wot/td#descriptionInLanguage
+    rationale: >-
+      Upstream gives schema:Text. The values of a JSON-LD language map are language-tagged strings.
+    expected_generated:
+      terms:
+        td:titleInLanguage:
+          rdfs:range: [rdf:langString]
+        td:descriptionInLanguage:
+          rdfs:range: [rdf:langString]
+  - id: owl-title-no-dcterms-super-property
+    category: vocabulary-change
+    review: approved
+    upstream_locator:
+      kind: terms
+      iris: [https://www.w3.org/2019/wot/td#title, https://www.w3.org/2019/wot/td#titleInLanguage]
+    rationale: >-
+      Upstream states rdfs:subPropertyOf dcterms:title on both. The generated ontology does not.
+    expected_generated:
+      terms:
+        td:title:
+          rdfs:subPropertyOf: []
+        td:titleInLanguage:
+          rdfs:subPropertyOf: []
+  - id: owl-support-contact-range
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: term
+      iri: https://www.w3.org/2019/wot/td#supportContact
+    rationale: >-
+      Upstream td:supportContact is an annotation property without domain or range. Its value is a URI.
+    expected_generated:
+      terms:
+        td:supportContact:
+          rdf:type: [owl:AnnotationProperty]
+          rdfs:domain: [td:Thing]
+          rdfs:range: [xsd:anyURI]
+  - id: owl-uri-valued-datatype-properties
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: terms
+      iris:
+        - https://www.w3.org/2019/wot/security#authorization
+        - https://www.w3.org/2019/wot/security#token
+        - https://www.w3.org/2019/wot/security#refresh
+    rationale: >-
+      Upstream types these as object properties. A slot whose value is a URI is a datatype property.
+    expected_generated:
+      terms:
+        wotsec:authorization:
+          rdf:type: [owl:DatatypeProperty]
+          rdfs:range: [xsd:anyURI]
+        wotsec:token:
+          rdf:type: [owl:DatatypeProperty]
+          rdfs:range: [xsd:anyURI]
+        wotsec:refresh:
+          rdf:type: [owl:DatatypeProperty]
+          rdfs:range: [xsd:anyURI]
+  - id: owl-class-valued-type-and-scheme
+    category: semantic-correction
+    review: approved
+    upstream_locator:
+      kind: missing-terms
+      iris:
+        - https://www.w3.org/2019/wot/json-schema#type
+        - https://www.w3.org/2019/wot/security#scheme
+    rationale: >-
+      Upstream has neither term. Each is an object property whose range is the owl:oneOf of the classes named
+      by the meaning of the enum values; the test compares the members.
+    expected_generated:
+      terms:
+        jsonschema:type:
+          rdf:type: [owl:ObjectProperty]
+          rdfs:range:
+            - jsonschema:ArraySchema
+            - jsonschema:BooleanSchema
+            - jsonschema:IntegerSchema
+            - jsonschema:NullSchema
+            - jsonschema:NumberSchema
+            - jsonschema:ObjectSchema
+            - jsonschema:StringSchema
+        wotsec:scheme:
+          rdf:type: [owl:ObjectProperty]
+          rdfs:range:
+            - wotsec:APIKeySecurityScheme
+            - wotsec:AutoSecurityScheme
+            - wotsec:BasicSecurityScheme
+            - wotsec:BearerSecurityScheme
+            - wotsec:ComboSecurityScheme
+            - wotsec:DigestSecurityScheme
+            - wotsec:NoSecurityScheme
+            - wotsec:OAuth2SecurityScheme
+            - wotsec:PSKSecurityScheme
+  - id: owl-header-metadata
+    category: vocabulary-change
+    review: approved
+    upstream_locator:
+      kind: term
+      iri: https://www.w3.org/2019/wot/td
+    rationale: >-
+      Upstream lists dcterms:author and two dcterms:contributor values and has no owl:priorVersion. The
+      generated header takes its metadata from the schema: one dcterms:creator, no earlier contributors, the
+      schema description as rdfs:comment, and owl:priorVersion pointing at TD 1.1.
+    expected_generated:
+      terms:
+        https://www.w3.org/2019/wot/td:
+          owl:priorVersion: [https://www.w3.org/2022/wot/td/v1.1]
+          dcterms:author: []
+          dcterms:contributor: []
+  - id: owl-jsonschema-no-all-of-any-of
+    category: vocabulary-change
+    review: approved
+    upstream_locator:
+      kind: terms
+      iris:
+        - https://www.w3.org/2019/wot/json-schema#allOf
+        - https://www.w3.org/2019/wot/json-schema#anyOf
+    rationale: >-
+      Upstream declares both as object properties. The Data Schema vocabulary of the TD does not list them, so
+      the schema has no such slots and the generated ontology does not declare the terms.
+    expected_generated:
+      absent: [jsonschema:allOf, jsonschema:anyOf]
