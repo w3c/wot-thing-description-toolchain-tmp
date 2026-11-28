@@ -8,15 +8,6 @@ from ...schema_utils import annotation_tag_value as _get_annotation_value
 
 
 @dataclass
-class OneOfDispatchConfig:
-    """A class whose definition becomes a ``oneOf`` of its direct subclasses (``jsonschema_oneof_dispatch``)."""
-
-    class_name: str
-    discriminator: str
-    include_unknown: bool = False
-
-
-@dataclass
 class EnumSubsetPartitionConfig:
     """A class split into one variant per subset of an enum slot's values (``jsonschema_enum_subset_partition``)."""
 
@@ -31,7 +22,6 @@ class TransformConfig:
     """The transforms requested by the ``jsonschema_*`` annotations of a schema."""
 
     flatten_subclass_parents: list[str] = field(default_factory=list)
-    oneof_dispatches: list[OneOfDispatchConfig] = field(default_factory=list)
     enum_subset_partitions: list[EnumSubsetPartitionConfig] = field(default_factory=list)
     # Class whose content is the top-level schema; set by the caller, not by an annotation.
     top_class: str | None = None
@@ -44,16 +34,6 @@ def read_annotations(sv: SchemaView) -> TransformConfig:
     for cls_name, cls_def in sv.all_classes().items():
         if _get_annotation_value(cls_def, "jsonschema_flatten_subclasses"):
             config.flatten_subclass_parents.append(cls_name)
-
-        oneof = _get_annotation_value(cls_def, "jsonschema_oneof_dispatch")
-        if oneof:
-            config.oneof_dispatches.append(
-                OneOfDispatchConfig(
-                    class_name=cls_name,
-                    discriminator=oneof["discriminator"],
-                    include_unknown=oneof.get("include_unknown", False),
-                )
-            )
 
         esp = _get_annotation_value(cls_def, "jsonschema_enum_subset_partition")
         if esp:

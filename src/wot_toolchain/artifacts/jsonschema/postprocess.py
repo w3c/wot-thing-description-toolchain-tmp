@@ -13,7 +13,7 @@ from .cleanups import (
 from .partitions import build_enum_subset_partitions
 from .pruning import remove_excluded_defs, remove_unreferenced_candidate_defs
 from .refs import resolve_refs
-from .subclasses import build_oneof_dispatch, flatten_subclasses
+from .subclasses import flatten_subclasses
 from ..transforms import Transform, TransformKind, run_transforms
 
 logger = logging.getLogger(__name__)
@@ -26,13 +26,6 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
         "into that class, deletes the subclass defs, and copies the merged properties to the classes that use it as "
         "a mixin.",
         apply=flatten_subclasses,
-    ),
-    Transform(
-        name="build_oneof_dispatch",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Builds the W3C securityScheme oneOf over known schemes plus a catch-all whose scheme must have a "
-        "prefix. LinkML has no oneOf on a discriminator.",
-        apply=build_oneof_dispatch,
     ),
     Transform(
         name="build_enum_subset_partitions",
@@ -86,7 +79,6 @@ def post_process_jsonschema(
 
     logger.info("JSON Schema postprocessor: reading annotations")
     logger.debug(f"  flatten_subclass_parents: {config.flatten_subclass_parents}")
-    logger.debug(f"  oneof_dispatches: {[d.class_name for d in config.oneof_dispatches]}")
     logger.debug(f"  enum_subset_partitions: {[e.class_name for e in config.enum_subset_partitions]}")
 
     run_transforms(JSONSCHEMA_TRANSFORMS, schema, schema_view, config)

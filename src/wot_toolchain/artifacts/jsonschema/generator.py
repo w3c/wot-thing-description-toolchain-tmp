@@ -4,7 +4,7 @@ import copy
 from collections.abc import Iterable
 from typing import Self
 
-from linkml.generators.jsonschemagen import JsonSchema, JsonSchemaGenerator, SchemaResult, SlotResult
+from linkml.generators.jsonschemagen import ClassResult, JsonSchema, JsonSchemaGenerator, SchemaResult, SlotResult
 from linkml_runtime.linkml_model.meta import (
     AnonymousSlotExpression,
     ClassDefinition,
@@ -20,6 +20,7 @@ from ...schema_utils import annotation_tag_value
 PREFIX_MEMBERS = "jsonschema_prefix_members"
 ENUM_SUBSET_PARTITION = "jsonschema_enum_subset_partition"
 FORM_SUBSET = "jsonschema_form_subset"
+ONEOF_DISPATCH = "jsonschema_oneof_dispatch"
 
 
 class WotJsonSchemaGenerator(JsonSchemaGenerator):
@@ -108,6 +109,28 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
     def before_generate_enums(self, enum: Iterable[EnumDefinition], sv: SchemaView) -> Iterable[EnumDefinition]:
         """Leave out the enum defs: each use of an enum states its values in place."""
         return []
+
+    def after_generate_class(self, cls: ClassResult, sv: SchemaView) -> ClassResult:
+        """State a dispatch class as a oneOf of its direct subclasses (docs/known-linkml-gaps.md #9)."""
+        dispatch = annotation_tag_value(cls.source, ONEOF_DISPATCH)
+        if not dispatch:
+            return cls
+        subclasses = sorted(name for name, candidate in sv.all_classes().items() if candidate.is_a == cls.source.name)
+        branches: list[JsonSchema] = [JsonSchema.ref_for(name) for name in subclasses]
+        if dispatch.get("include_unknown", False):
+            branches.append(self._unknown_branch(cls, dispatch["discriminator"]))
+        cls.schema_ = JsonSchema({"oneOf": branches})
+        return cls
+
+    @staticmethod
+    def _unknown_branch(cls: ClassResult, discriminator: str) -> JsonSchema:
+        """Return the dispatch class itself, for a discriminator value with a prefix."""
+        # A prefixed value, so that the catch-all does not overlap the known subclasses.
+        unknown = JsonSchema(cls.schema_)
+        unknown["description"] = f"Additional {cls.source.name} not covered by known subclasses"
+        unknown["properties"] = unknown.get("properties", {}) | {discriminator: {"type": "string", "pattern": ".+:.*"}}
+        unknown["required"] = [name for name in unknown.get("required", []) if name != discriminator] + [discriminator]
+        return unknown
 
     def before_generate_class_slots(
         self, slot: Iterable[SlotDefinition], cls: ClassDefinition, sv: SchemaView

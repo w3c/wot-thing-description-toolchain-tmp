@@ -50,7 +50,7 @@ The JSON Schema postprocessor (`src/wot_toolchain/artifacts/jsonschema/postproce
 ### 7. No oneOf dispatch on a discriminator slot
 **Symptom:** W3C `securityScheme` is a oneOf over the known schemes plus `additionalSecurityScheme` with a prefixed `scheme`; the generator does not use `designates_type` for this.
 **Artifact:** `jsonschema.json`
-**Workaround:** `artifacts/jsonschema/postprocess.py` → `_build_oneof_dispatch()`, driven by the `jsonschema_oneof_dispatch` annotation
+**Workaround:** `artifacts/jsonschema/generator.py` → `after_generate_class()`, driven by the `jsonschema_oneof_dispatch` annotation
 **LinkML issue:** none found (2026-09-09)
 
 ### 8. No form variants per affordance type
@@ -98,7 +98,7 @@ The JSON Schema postprocessor (`src/wot_toolchain/artifacts/jsonschema/postproce
 ### 18. The catch-all branch of a oneOf dispatch was untyped
 **Symptom:** The branch for values outside the known subclasses (gap #7) only constrained the discriminator; W3C `additionalSecurityScheme` also types the members of the base scheme.
 **Artifact:** `jsonschema.json`
-**Workaround:** `artifacts/jsonschema/subclasses.py` → `build_oneof_dispatch()` builds the catch-all from the dispatch class's own definition, without identifier slots
+**Workaround:** `artifacts/jsonschema/generator.py` → `_unknown_branch()` builds the catch-all from the dispatch class's own definition, without identifier slots
 **LinkML issue:** not a LinkML gap — toolchain transform
 
 ---

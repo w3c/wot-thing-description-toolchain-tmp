@@ -45,37 +45,3 @@ def flatten_subclasses(schema: dict[str, Any], sv: SchemaView, config: Transform
                         if prop_name not in target_props:
                             target_props[prop_name] = prop_schema
                     logger.debug(f"Propagated flattened props to mixin user {cls_name}")
-
-
-def build_oneof_dispatch(schema: dict[str, Any], sv: SchemaView, config: TransformConfig) -> None:
-    """Replace each dispatch class definition by a ``oneOf`` of its direct subclass definitions."""
-    defs = schema.get("$defs", {})
-
-    for dispatch in config.oneof_dispatches:
-        cls_name = dispatch.class_name
-        if cls_name not in defs:
-            continue
-
-        subclass_refs: list[dict[str, Any]] = []
-        for sub_name, sub_def in sv.all_classes().items():
-            if sub_def.is_a == cls_name and sub_name in defs:
-                subclass_refs.append({"$ref": f"#/$defs/{sub_name}"})
-
-        one_of_list = sorted(subclass_refs, key=lambda x: x["$ref"])
-
-        # W3C additionalSecurityScheme: a prefixed scheme, so the catch-all does not overlap the known schemes
-        # (KNOWN_LINKML_GAPS.md #9).
-        if dispatch.include_unknown:
-            # The catch-all keeps the members of the dispatch class itself, so they stay typed.
-            identifiers = {slot.name for slot in sv.class_induced_slots(cls_name) if slot.identifier}
-            unknown = {key: value for key, value in defs[cls_name].items() if key != "title"}
-            unknown["description"] = f"Additional {cls_name} not covered by known subclasses"
-            unknown["properties"] = {
-                name: prop for name, prop in unknown.get("properties", {}).items() if name not in identifiers
-            } | {dispatch.discriminator: {"type": "string", "pattern": ".+:.*"}}
-            unknown["required"] = [
-                name for name in unknown.get("required", []) if name not in identifiers and name != dispatch.discriminator
-            ] + [dispatch.discriminator]
-            one_of_list.append(unknown)
-
-        defs[cls_name] = {"oneOf": one_of_list}
