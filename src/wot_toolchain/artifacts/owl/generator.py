@@ -32,7 +32,7 @@ from ..rdf_terms import (
     most_general_classes,
 )
 from ...errors import SchemaError
-from ...schema_utils import local_name, resolve_prefix_namespace
+from ...schema_utils import is_non_ontological_enum, local_name, resolve_prefix_namespace
 
 # INSTANCE is emitted by WotOwlGenerator.add_enum, so upstream keeps its default for it.
 _PERMISSIBLE_VALUE_TYPES: dict[PermissibleValueKind, URIRef] = {
@@ -185,6 +185,9 @@ class WotOwlGenerator(OwlSchemaGenerator):
         # Upstream emits rdfs:domain from the slot's own domain only, as one named class (owlgen.py:1186).
         without_domain = copy.copy(slot)
         without_domain.domain = None
+        # The values of an enum that names no vocabulary term are plain strings.
+        if (enum := self.schemaview.get_enum(slot.range)) and is_non_ontological_enum(enum):
+            without_domain.range = "string"
         super().add_slot(without_domain, attribute)
         if (uri, RDF.type, None) not in self.graph or (uri, RDFS.domain, None) in self.graph:
             return
@@ -393,7 +396,7 @@ class WotOwlGenerator(OwlSchemaGenerator):
 
     def add_enum(self, e: EnumDefinition) -> None:
         """Emit ``e``; INSTANCE values are typed by the enum class only."""
-        if self._is_out_of_scope(self._enum_uri(e.name)):
+        if is_non_ontological_enum(e) or self._is_out_of_scope(self._enum_uri(e.name)):
             return
         e = self._named_by_meaning(e)
         if self.permissible_values is not PermissibleValueKind.INSTANCE:

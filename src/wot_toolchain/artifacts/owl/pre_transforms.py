@@ -150,19 +150,6 @@ def _attr_slot_name(attr_name: str, attr_def: SlotDefinition, view: SchemaView) 
     return local_name(expanded)
 
 
-def _strip_non_ontological_enums(s: SchemaDefinition) -> None:
-    """Remove enums without enum_uri or with linkml: enum_uri (type discriminators)."""
-    enums = cast(_Enums, s.enums)
-    to_remove = [name for name, edef in enums.items() if is_non_ontological_enum(edef)]
-    for name in to_remove:
-        del enums[name]
-
-    removed = set(to_remove)
-    for slot_def in cast(_Slots, s.slots).values():
-        if slot_def.range in removed:
-            slot_def.range = "string"
-
-
 def _strip_no_uri_classes(s: SchemaDefinition, no_uri_classes: AbstractSet[str]) -> None:
     """Remove classes without class_uri and clear refs to them."""
     classes = cast(_Classes, s.classes)
@@ -261,13 +248,6 @@ OWL_PRE_TRANSFORMS: tuple[Transform, ...] = (
         kind=TransformKind.WOT_SHAPING,
         reason="Removes slots without slot_uri.",
         apply=lambda s, c: _strip_no_uri_original_slots(s, c.original_no_uri_slots),
-    ),
-    Transform(
-        name="strip_non_ontological_enums",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Enums without enum_uri are JSON-Schema-only. Keeping them produced double-# IRIs, which pyoxigraph "
-        "rejected.",
-        apply=lambda s, c: _strip_non_ontological_enums(s),
     ),
     Transform(
         name="strip_dangling_slot_refs",
