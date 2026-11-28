@@ -30,12 +30,9 @@ def _context(schema_path: Path, store: SchemaStore) -> OwlPreContext:
     # Before merging: LinkML's merge would fail on a missing import with an untyped FileNotFoundError.
     _require_local_imports(schema_path, store)
     view = store.view(schema_path, merge_imports=True)
-    local_schema = _get_schema(store.view(schema_path, merge_imports=False))
-    local_classes = cast(_Classes, local_schema.classes)
     return OwlPreContext(
         view=view,
         namespace=_namespace(view),
-        no_uri_classes=frozenset(name for name, cls in local_classes.items() if not cls.class_uri),
     )
 
 

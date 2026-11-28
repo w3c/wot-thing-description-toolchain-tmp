@@ -32,7 +32,6 @@ class OwlPreContext:
 
     view: SchemaView
     namespace: str
-    no_uri_classes: AbstractSet[str]
 
 
 def _expand_curie(view: SchemaView, curie: str, element: str) -> str:
@@ -83,6 +82,10 @@ def _promote_attributes(s: SchemaDefinition, view: SchemaView) -> None:
     slots = cast(_Slots, s.slots)
     for cls_def in cast(_Classes, s.classes).values():
         if not cls_def.attributes:
+            continue
+        if not cls_def.class_uri:
+            # A class without a class_uri names no term, and neither do its attributes.
+            cast(dict[str, SlotDefinition], cls_def.attributes).clear()
             continue
         attr_to_slot: dict[str, str] = {}
         for attr_name, attr_def in list(cast(dict[str, SlotDefinition], cls_def.attributes).items()):
@@ -135,46 +138,6 @@ def _attr_slot_name(attr_name: str, attr_def: SlotDefinition, view: SchemaView) 
     return local_name(expanded)
 
 
-def _strip_no_uri_classes(s: SchemaDefinition, no_uri_classes: AbstractSet[str]) -> None:
-    """Remove classes without class_uri and clear refs to them."""
-    classes = cast(_Classes, s.classes)
-    for name in list(no_uri_classes):
-        classes.pop(name, None)
-
-    for cls_def in classes.values():
-        if cls_def.is_a in no_uri_classes:
-            cls_def.is_a = None
-        if cls_def.mixins:
-            cls_def.mixins = [m for m in cls_def.mixins if str(m) not in no_uri_classes]
-
-    for slot_def in cast(_Slots, s.slots).values():
-        if slot_def.range in no_uri_classes:
-            slot_def.range = None
-
-
-def _strip_foreign_mixins(
-    s: SchemaDefinition,
-    local_ns: str,
-    view: SchemaView,
-) -> None:
-    """Strip mixins whose class_uri resolves to a foreign namespace."""
-    classes = cast(_Classes, s.classes)
-    for cls_def in classes.values():
-        if not cls_def.mixins:
-            continue
-        keep = []
-        for m in cls_def.mixins:
-            mixin_cls = classes.get(str(m))
-            if mixin_cls and mixin_cls.class_uri:
-                expanded = _expand_curie(
-                    view, mixin_cls.class_uri, f"class_uri {mixin_cls.class_uri!r} of mixin {str(m)!r}"
-                )
-                if not expanded.startswith(local_ns):
-                    continue
-            keep.append(m)
-        cls_def.mixins = keep
-
-
 def _strip_dangling_slot_refs(s: SchemaDefinition) -> None:
     """Remove class slot references that have no matching top-level slot definition."""
     existing = set(cast(_Slots, s.slots).keys())
@@ -195,18 +158,6 @@ OWL_PRE_TRANSFORMS: tuple[Transform, ...] = (
         reason="Renames slots to the local name of their slot_uri. gen-owl already builds IRIs from slot_uri, so the "
         "only measured effect is on rdfs:label.",
         apply=_rename_slots,
-    ),
-    Transform(
-        name="strip_no_uri_classes",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Removes classes without class_uri, which have no term in the ontology.",
-        apply=lambda s, c: _strip_no_uri_classes(s, c.no_uri_classes),
-    ),
-    Transform(
-        name="strip_foreign_mixins",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Prevents subClassOf links into another module's classes (e.g. PropertyAffordance to DataSchema).",
-        apply=lambda s, c: _strip_foreign_mixins(s, c.namespace, c.view),
     ),
     Transform(
         name="promote_attributes",

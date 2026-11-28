@@ -157,17 +157,33 @@ class WotOwlGenerator(OwlSchemaGenerator):
                 self.graph.add((term, RDFS.isDefinedBy, ontology))
 
     def add_class(self, cls: ClassDefinition) -> None:
-        """Emit ``cls`` without linking its class_uri to its native URI."""
-        if self._is_out_of_scope(self._class_uri(cls.name)):
+        """Emit ``cls`` unless it names no term or is out of scope, under its parents of this vocabulary."""
+        if not cls.class_uri or self._is_out_of_scope(self._class_uri(cls.name)):
             return
         # Upstream turns rules and none_of into class axioms inline in add_class, with no hook.
         without_constraints = copy.copy(cls)
         without_constraints.rules, without_constraints.none_of = [], []
+        if cls.is_a and not self._names_term(cls.is_a):
+            without_constraints.is_a = None
+        without_constraints.mixins = [mixin for mixin in cls.mixins if self._is_own_class(mixin)]
         super().add_class(without_constraints)
         # Upstream adds class_uri skos:exactMatch native URI inline in add_class (owlgen.py:510-516), with no hook.
         mapped_uri = URIRef(self.schemaview.get_uri(cls, expand=True, native=not self.use_native_uris))
         self.graph.remove((self._class_uri(cls.name), SKOS.exactMatch, mapped_uri))
         self._drop_empty_disjoint_unions(self._class_uri(cls.name))
+
+    def _names_term(self, class_name: str) -> bool:
+        """Return whether the class has a class_uri; one without it only shapes the JSON."""
+        cls = self.schemaview.get_class(class_name)
+        return cls is None or bool(cls.class_uri)
+
+    def _is_own_class(self, class_name: str) -> bool:
+        """Return whether the class names a term of this vocabulary."""
+        # A mixin of another vocabulary shares its slots in JSON; it is not a superclass in RDF.
+        cls = self.schemaview.get_class(class_name)
+        if cls is None:
+            return True
+        return bool(cls.class_uri) and str(self._class_uri(class_name)).startswith(self._own_namespace())
 
     def _drop_empty_disjoint_unions(self, class_uri: URIRef) -> None:
         """Remove a disjoint union without operands, which would make the class unsatisfiable."""
@@ -188,6 +204,8 @@ class WotOwlGenerator(OwlSchemaGenerator):
         # The values of an enum that names no vocabulary term are plain strings.
         if (enum := self.schemaview.get_enum(slot.range)) and is_non_ontological_enum(enum):
             without_domain.range = "string"
+        if slot.range and not self._names_term(slot.range):
+            without_domain.range = None
         super().add_slot(without_domain, attribute)
         if (uri, RDF.type, None) not in self.graph or (uri, RDFS.domain, None) in self.graph:
             return
