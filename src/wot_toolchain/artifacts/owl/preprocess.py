@@ -4,42 +4,18 @@ import copy
 from pathlib import Path
 from typing import cast
 
-from linkml_runtime.linkml_model.meta import ClassDefinition, Prefix, SchemaDefinition
-from linkml_runtime.utils.schemaview import SchemaView
+from linkml_runtime.linkml_model.meta import SchemaDefinition
 
-from .pre_transforms import OWL_PRE_TRANSFORMS, OwlPreContext
-from ..transforms import run_transforms
 from ...errors import SchemaError
-from ...schema_utils import SchemaStore, default_prefix, load_schema_view
+from ...schema_utils import SchemaStore, load_schema_view
 from ...schema_utils import get_schema as _get_schema
-
-_Classes = dict[str, ClassDefinition]
-_Prefixes = dict[str, Prefix]
 
 
 def preprocess_for_gen_owl(schema_path: Path, store: SchemaStore) -> SchemaDefinition:
-    """Return a copy of the merged schema, transformed for gen-owl."""
-    context = _context(schema_path, store)
-    s: SchemaDefinition = copy.deepcopy(_get_schema(context.view))
-    run_transforms(OWL_PRE_TRANSFORMS, s, context)
-    return s
-
-
-def _context(schema_path: Path, store: SchemaStore) -> OwlPreContext:
-    """Collect what the passes need from the schema at ``schema_path`` before any of them mutates its copy."""
+    """Return a copy of the merged schema for gen-owl."""
     # Before merging: LinkML's merge would fail on a missing import with an untyped FileNotFoundError.
     _require_local_imports(schema_path, store)
-    view = store.view(schema_path, merge_imports=True)
-    return OwlPreContext(
-        view=view,
-        namespace=_namespace(view),
-    )
-
-
-def _namespace(view: SchemaView) -> str:
-    """Return the namespace URI of the default prefix of the schema of ``view``."""
-    prefixes = cast(_Prefixes, _get_schema(view).prefixes)
-    return str(cast(Prefix, prefixes[default_prefix(view)]).prefix_reference)
+    return copy.deepcopy(_get_schema(store.view(schema_path, merge_imports=True)))
 
 
 def _require_local_imports(schema_path: Path, store: SchemaStore) -> None:
