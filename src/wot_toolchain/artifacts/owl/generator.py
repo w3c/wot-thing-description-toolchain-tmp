@@ -54,34 +54,6 @@ _LINKML_NAMESPACE = "https://w3id.org/linkml/"
 _BUILT_IN_NAMESPACES = (str(RDF), str(RDFS), str(OWL))
 
 
-def declare_super_properties(graph: Graph) -> None:
-    """Declare each undeclared parent of an object or datatype property of ``graph`` with the kind of its child."""
-    for kind in (OWL.ObjectProperty, OWL.DatatypeProperty):
-        for child in set(graph.subjects(RDF.type, kind)):
-            for parent in set(graph.objects(child, RDFS.subPropertyOf)):
-                if (parent, RDF.type, None) not in graph:
-                    graph.add((parent, RDF.type, kind))
-
-
-def declare_referenced_classes(graph: Graph) -> None:
-    """Declare as owl:Class each named resource that ``graph`` uses as a class without defining it.
-
-    An XSD datatype is never a class, whatever position it stands in.
-    """
-    object_properties = set(graph.subjects(RDF.type, OWL.ObjectProperty))
-    unions = [members for union, members in graph.subject_objects(OWL.unionOf) if (union, RDF.type, OWL.Class) in graph]
-    referenced = {
-        *graph.objects(None, RDFS.domain),
-        *graph.objects(None, RDFS.subClassOf),
-        *graph.objects(None, RDF.type),
-        *(range_ for property_, range_ in graph.subject_objects(RDFS.range) if property_ in object_properties),
-        *(member for members in unions for member in Collection(graph, members)),
-    }
-    for resource in referenced:
-        if isinstance(resource, URIRef) and not str(resource).startswith((*_BUILT_IN_NAMESPACES, str(XSD))):
-            graph.add((resource, RDF.type, OWL.Class))
-
-
 @dataclass
 class WotOwlGenerator(OwlSchemaGenerator):
     """OWL generator configured as the WoT toolchain runs it."""
@@ -131,21 +103,57 @@ class WotOwlGenerator(OwlSchemaGenerator):
         )
 
     def as_graph(self) -> Graph:
-        """Build the ontology graph and declare the classes and properties it refers to."""
+        """Build the ontology graph, then declare the terms it refers to without declaring them."""
         graph: Graph = super().as_graph()
-        declare_super_properties(graph)
-        declare_referenced_classes(graph)
-        self._name_defining_ontologies(graph)
+        # Upstream states subclass, range and super-property axioms without a hook for the term they name, so the
+        # undeclared ones are read off the finished graph. Nothing is emitted after this step.
+        for term, kind in sorted(self._undeclared_references()):
+            self._declare(term, kind)
         return graph
 
-    def _name_defining_ontologies(self, graph: Graph) -> None:
-        """Link each declared term that another vocabulary defines to that vocabulary's ontology."""
-        for term in set(graph.subjects(RDF.type, None)):
-            if not isinstance(term, URIRef) or (term, RDFS.isDefinedBy, None) in graph:
-                continue
-            for namespace, ontology in self.ontologies.items():
-                if str(term).startswith(namespace) and ontology != graph.identifier:
-                    graph.add((term, RDFS.isDefinedBy, ontology))
+    def _undeclared_references(self) -> set[tuple[URIRef, URIRef]]:
+        """Return each named term the graph refers to without declaring it, with the kind its use gives it.
+
+        A parent of an object or datatype property is a property of the same kind. A resource in the position of a
+        class is a class; an XSD datatype is never one, whatever position it stands in.
+        """
+        graph = self.graph
+        references: set[tuple[URIRef, URIRef]] = set()
+        for kind in (OWL.ObjectProperty, OWL.DatatypeProperty):
+            for child in graph.subjects(RDF.type, kind):
+                for parent in graph.objects(child, RDFS.subPropertyOf):
+                    if isinstance(parent, URIRef) and (parent, RDF.type, None) not in graph:
+                        references.add((parent, kind))
+        object_properties = set(graph.subjects(RDF.type, OWL.ObjectProperty))
+        unions = [m for u, m in graph.subject_objects(OWL.unionOf) if (u, RDF.type, OWL.Class) in graph]
+        classes = {
+            *graph.objects(None, RDFS.domain),
+            *graph.objects(None, RDFS.subClassOf),
+            *graph.objects(None, RDF.type),
+            *(range_ for property_, range_ in graph.subject_objects(RDFS.range) if property_ in object_properties),
+            *(member for members in unions for member in Collection(graph, members)),
+        }
+        for resource in classes:
+            if isinstance(resource, URIRef) and not str(resource).startswith((*_BUILT_IN_NAMESPACES, str(XSD))):
+                if (resource, RDF.type, OWL.Class) not in graph:
+                    references.add((resource, OWL.Class))
+        return references
+
+    def _declare(self, term: URIRef, kind: URIRef) -> None:
+        """Declare ``term`` as a ``kind``, naming the ontology that defines it."""
+        self.graph.add((term, RDF.type, kind))
+        self._name_defining_ontology(term)
+
+    def _name_defining_ontology(self, term: URIRef) -> None:
+        """Link ``term`` to the ontology of its vocabulary, unless it already names one.
+
+        A term of this vocabulary that this ontology does not describe gets no link.
+        """
+        if (term, RDFS.isDefinedBy, None) in self.graph:
+            return
+        for namespace, ontology in self.ontologies.items():
+            if str(term).startswith(namespace) and ontology != self.graph.identifier:
+                self.graph.add((term, RDFS.isDefinedBy, ontology))
 
     def add_class(self, cls: ClassDefinition) -> None:
         """Emit ``cls`` without linking its class_uri to its native URI."""
@@ -327,9 +335,11 @@ class WotOwlGenerator(OwlSchemaGenerator):
         super().add_metadata(e, uri)
         for predicate, value in resource_annotations.values():
             self.graph.add((uri, predicate, URIRef(value)))
-        # Upstream never emits rdfs:isDefinedBy; elements with a foreign IRI are defined elsewhere.
+        # Upstream never emits rdfs:isDefinedBy.
         if str(uri).startswith(self._own_namespace()):
             self.graph.add((uri, RDFS.isDefinedBy, self.graph.identifier))
+        else:
+            self._name_defining_ontology(uri)
         self._drop_untagged_predicate_languages(uri)
 
     def _drop_untagged_predicate_languages(self, uri: URIRef) -> None:
