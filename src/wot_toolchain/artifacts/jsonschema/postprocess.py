@@ -43,7 +43,7 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
     Transform(
         name="remove_excluded_defs",
         kind=TransformKind.COSMETIC,
-        reason="Removes leftover LinkML defs: standalone enum defs and __identifier_optional defs.",
+        reason="Removes leftover LinkML defs: __identifier_optional defs.",
         apply=remove_excluded_defs,
     ),
     Transform(

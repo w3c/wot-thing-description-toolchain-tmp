@@ -8,6 +8,7 @@ from linkml.generators.jsonschemagen import JsonSchema, JsonSchemaGenerator, Sch
 from linkml_runtime.linkml_model.meta import (
     AnonymousSlotExpression,
     ClassDefinition,
+    EnumDefinition,
     SchemaDefinition,
     SlotDefinition,
 )
@@ -103,6 +104,10 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
         if schema.schema_.get("version") is None:
             schema.schema_.pop("version", None)
         return schema
+
+    def before_generate_enums(self, enum: Iterable[EnumDefinition], sv: SchemaView) -> Iterable[EnumDefinition]:
+        """Leave out the enum defs: each use of an enum states its values in place."""
+        return []
 
     def before_generate_class_slots(
         self, slot: Iterable[SlotDefinition], cls: ClassDefinition, sv: SchemaView
