@@ -77,35 +77,6 @@ def _apply_renames(s: SchemaDefinition, renames: dict[str, str]) -> None:
                 su[new_key] = v
 
 
-def _promote_attributes(s: SchemaDefinition, view: SchemaView) -> None:
-    """Promote class attributes to top-level slots for global rdfs:range."""
-    slots = cast(_Slots, s.slots)
-    for cls_def in cast(_Classes, s.classes).values():
-        if not cls_def.attributes:
-            continue
-        if not cls_def.class_uri:
-            # A class without a class_uri names no term, and neither do its attributes.
-            cast(dict[str, SlotDefinition], cls_def.attributes).clear()
-            continue
-        attr_to_slot: dict[str, str] = {}
-        for attr_name, attr_def in list(cast(dict[str, SlotDefinition], cls_def.attributes).items()):
-            if not attr_def.slot_uri:
-                continue
-            slot_name = _attr_slot_name(attr_name, attr_def, view)
-            attr_to_slot[attr_name] = slot_name
-            if slot_name not in slots or attr_def.slot_uri:
-                promoted = copy.deepcopy(attr_def)
-                promoted.name = slot_name
-                slots[slot_name] = promoted
-            cls_def.slots = list(cls_def.slots or []) + [slot_name]
-        cast(dict[str, SlotDefinition], cls_def.attributes).clear()
-        if cls_def.slot_usage:
-            su = cast(dict[str, SlotDefinition], cls_def.slot_usage)
-            for old_name in attr_to_slot:
-                if old_name in su:
-                    su.pop(old_name)
-
-
 def _set_fields(slot: SlotDefinition) -> dict[str, Any]:
     """Return the fields of ``slot`` that carry a value."""
     return {field: value for field, value in vars(slot).items() if value not in (None, [], {})}
@@ -131,13 +102,6 @@ def _promote_renamed_usages(s: SchemaDefinition, view: SchemaView) -> None:
             del usages[slot_name]
 
 
-def _attr_slot_name(attr_name: str, attr_def: SlotDefinition, view: SchemaView) -> str:
-    if not attr_def.slot_uri:
-        return attr_name
-    expanded = _expand_curie(view, attr_def.slot_uri, f"slot_uri {attr_def.slot_uri!r} of attribute {attr_name!r}")
-    return local_name(expanded)
-
-
 def _strip_dangling_slot_refs(s: SchemaDefinition) -> None:
     """Remove class slot references that have no matching top-level slot definition."""
     existing = set(cast(_Slots, s.slots).keys())
@@ -158,12 +122,6 @@ OWL_PRE_TRANSFORMS: tuple[Transform, ...] = (
         reason="Renames slots to the local name of their slot_uri. gen-owl already builds IRIs from slot_uri, so the "
         "only measured effect is on rdfs:label.",
         apply=_rename_slots,
-    ),
-    Transform(
-        name="promote_attributes",
-        kind=TransformKind.LINKML_GAP,
-        reason="gen-owl gives class attributes no global rdfs:range.",
-        apply=lambda s, c: _promote_attributes(s, c.view),
     ),
     Transform(
         name="promote_renamed_usages",

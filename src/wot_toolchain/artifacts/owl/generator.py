@@ -158,7 +158,10 @@ class WotOwlGenerator(OwlSchemaGenerator):
 
     def add_class(self, cls: ClassDefinition) -> None:
         """Emit ``cls`` unless it names no term or is out of scope, under its parents of this vocabulary."""
-        if not cls.class_uri or self._is_out_of_scope(self._class_uri(cls.name)):
+        if not cls.class_uri:
+            return
+        self._add_attributes(cls)
+        if self._is_out_of_scope(self._class_uri(cls.name)):
             return
         # Upstream turns rules and none_of into class axioms inline in add_class, with no hook.
         without_constraints = copy.copy(cls)
@@ -193,7 +196,31 @@ class WotOwlGenerator(OwlSchemaGenerator):
             if (operands, RDF.first, None) not in self.graph:
                 self.graph.remove((class_uri, OWL.disjointUnionOf, operands))
 
+    def _add_attributes(self, cls: ClassDefinition) -> None:
+        """Emit the attributes of ``cls`` that define their property, each named by its IRI."""
+        for attribute in cls.attributes.values():
+            if attribute.slot_uri and self._attribute_owners[self._prop_uri(attribute)] == cls.name:
+                named_by_iri = copy.copy(attribute)
+                named_by_iri.name = local_name(str(self._prop_uri(attribute)))
+                self._add_property(named_by_iri)
+
+    @cached_property
+    def _attribute_owners(self) -> dict[URIRef, str]:
+        """Per property IRI, the name of the class whose attribute defines it: the last one that names a term."""
+        owners: dict[URIRef, str] = {}
+        for name, cls in self.schemaview.all_classes().items():
+            if cls.class_uri:
+                owners |= {self._prop_uri(a): name for a in cls.attributes.values() if a.slot_uri}
+        return owners
+
     def add_slot(self, slot: SlotDefinition, attribute: bool = False) -> None:
+        """Emit ``slot`` unless an attribute defines its property."""
+        # Upstream gives an attribute no rdfs:range and drops one that shares its IRI with another
+        # (owlgen.py:1162-1175); add_class emits the attributes as properties instead.
+        if not attribute and self._prop_uri(slot) not in self._attribute_owners:
+            self._add_property(slot)
+
+    def _add_property(self, slot: SlotDefinition) -> None:
         """Emit ``slot`` unless it names no term or is out of scope, with every class of its domain."""
         uri = self._prop_uri(slot)
         if not slot.slot_uri or self._is_out_of_scope(uri):
@@ -206,7 +233,7 @@ class WotOwlGenerator(OwlSchemaGenerator):
             without_domain.range = "string"
         if slot.range and not self._names_term(slot.range):
             without_domain.range = None
-        super().add_slot(without_domain, attribute)
+        super().add_slot(without_domain)
         if (uri, RDF.type, None) not in self.graph or (uri, RDFS.domain, None) in self.graph:
             return
         if domain := self._domain_classes(slot, uri):
