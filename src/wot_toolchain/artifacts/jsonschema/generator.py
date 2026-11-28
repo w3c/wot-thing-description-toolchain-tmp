@@ -2,7 +2,7 @@
 
 import copy
 from collections.abc import Iterable
-from typing import Self
+from typing import Any, Self
 
 from linkml.generators.jsonschemagen import ClassResult, JsonSchema, JsonSchemaGenerator, SchemaResult, SlotResult
 from linkml_runtime.linkml_model.meta import (
@@ -14,13 +14,13 @@ from linkml_runtime.linkml_model.meta import (
 )
 from linkml_runtime.utils.schemaview import SchemaView
 
+from .annotations import ENUM_SUBSET_PARTITION
 from .options import JsonSchemaOptions
 from .refs import resolve_refs
 from ...schema_utils import annotation_tag_value
 
 PREFIX_MEMBERS = "jsonschema_prefix_members"
 FLATTEN_SUBCLASSES = "jsonschema_flatten_subclasses"
-ENUM_SUBSET_PARTITION = "jsonschema_enum_subset_partition"
 FORM_SUBSET = "jsonschema_form_subset"
 ONEOF_DISPATCH = "jsonschema_oneof_dispatch"
 
@@ -113,18 +113,66 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
         return []
 
     def after_generate_class(self, cls: ClassResult, sv: SchemaView) -> ClassResult:
-        """Resolve the references of a class; state a dispatch class as a oneOf of its direct subclasses."""
+        """Resolve the references of a class, then state it as a oneOf when it is a dispatch or partitioned class."""
         cls.schema_ = JsonSchema(resolve_refs(cls.schema_, sv))
-        # docs/known-linkml-gaps.md #9
+        self._state_oneof_dispatch(cls, sv)
+        self._state_enum_subset_partition(cls, sv)
+        return cls
+
+    def _state_oneof_dispatch(self, cls: ClassResult, sv: SchemaView) -> None:
+        """State a dispatch class as a oneOf of its direct subclasses (docs/known-linkml-gaps.md #9)."""
         dispatch = annotation_tag_value(cls.source, ONEOF_DISPATCH)
         if not dispatch:
-            return cls
+            return
         subclasses = sorted(name for name, candidate in sv.all_classes().items() if candidate.is_a == cls.source.name)
         branches: list[JsonSchema] = [JsonSchema.ref_for(name) for name in subclasses]
         if dispatch.get("include_unknown", False):
             branches.append(self._unknown_branch(cls, dispatch["discriminator"]))
         cls.schema_ = JsonSchema({"oneOf": branches})
-        return cls
+
+    def _state_enum_subset_partition(self, cls: ClassResult, sv: SchemaView) -> None:
+        """State a partitioned class as a oneOf of one variant def per subset of its enum slot."""
+        partition = annotation_tag_value(cls.source, ENUM_SUBSET_PARTITION)
+        if not partition:
+            return
+        slot_name, name = partition["slot"], cls.source.name
+        properties = dict(cls.schema_.get("properties", {}))
+        slot_schema = properties.pop(slot_name, {})
+        base_name = f"{name}_element_base"
+        base = {
+            "type": "object",
+            "properties": properties,
+            "required": cls.schema_.get("required", []),
+            "additionalProperties": cls.schema_.get("additionalProperties", True),
+        }
+        self.top_level_schema.add_def(base_name, JsonSchema(base))
+        constraints = self._array_constraints(slot_schema)
+        variants: list[JsonSchema] = []
+        for subset, values in self._subset_values(partition["enum"], sv).items():
+            array_branch = {"type": "array", "items": {"enum": values}} | constraints
+            narrowed = {"oneOf": [{"const": value} for value in values] + [array_branch]}
+            narrowing = {"type": "object", "properties": {slot_name: narrowed}}
+            variant_name = f"{name}_element_{subset}"
+            variant = {"allOf": [{"$ref": f"#/$defs/{base_name}"}, narrowing]}
+            self.top_level_schema.add_def(variant_name, JsonSchema(variant))
+            variants.append(JsonSchema({"$ref": f"#/$defs/{variant_name}"}))
+        cls.schema_ = JsonSchema({"oneOf": variants})
+
+    @staticmethod
+    def _subset_values(enum_name: str, sv: SchemaView) -> dict[str, list[str]]:
+        """Return the permissible values of an enum by the subsets they are in."""
+        subsets: dict[str, list[str]] = {}
+        for value_name, value in sv.get_enum(enum_name).permissible_values.items():
+            for subset in value.in_subset or []:
+                subsets.setdefault(subset, []).append(value_name)
+        return subsets
+
+    @staticmethod
+    def _array_constraints(slot_schema: dict[str, Any]) -> dict[str, Any]:
+        """Return the array keywords (e.g. minItems) of the array form of a slot subschema, without its items."""
+        branches = [slot_schema, *slot_schema.get("oneOf", []), *slot_schema.get("anyOf", [])]
+        array: dict[str, Any] = next((branch for branch in branches if branch.get("type") == "array"), {})
+        return {key: value for key, value in array.items() if key not in ("type", "items")}
 
     @staticmethod
     def _unknown_branch(cls: ClassResult, discriminator: str) -> JsonSchema:

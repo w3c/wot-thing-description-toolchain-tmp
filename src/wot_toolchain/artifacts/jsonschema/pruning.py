@@ -26,7 +26,7 @@ def _drop_candidate_defs(defs: dict[str, Any], sv: SchemaView, config: Transform
     Returns:
         The names of the candidate defs present in ``defs``.
     """
-    partitioned = {esp.class_name for esp in config.enum_subset_partitions}
+    partitioned = set(config.partitioned_classes)
     return {
         name
         for name, cls_def in sv.all_classes().items()

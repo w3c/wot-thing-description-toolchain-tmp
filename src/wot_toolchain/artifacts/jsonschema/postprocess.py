@@ -10,19 +10,12 @@ from .annotations import read_annotations
 from .cleanups import (
     clean_metadata,
 )
-from .partitions import build_enum_subset_partitions
 from .pruning import remove_excluded_defs, remove_unreferenced_candidate_defs
 from ..transforms import Transform, TransformKind, run_transforms
 
 logger = logging.getLogger(__name__)
 
 JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
-    Transform(
-        name="build_enum_subset_partitions",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Splits Form into one variant per op subset (root/property/action/event) to match TD 1.1.",
-        apply=lambda schema, sv, config: build_enum_subset_partitions(schema, config),
-    ),
     Transform(
         name="remove_excluded_defs",
         kind=TransformKind.COSMETIC,
@@ -59,7 +52,7 @@ def post_process_jsonschema(
     config.top_class = top_class
 
     logger.info("JSON Schema postprocessor: reading annotations")
-    logger.debug(f"  enum_subset_partitions: {[e.class_name for e in config.enum_subset_partitions]}")
+    logger.debug(f"  partitioned_classes: {config.partitioned_classes}")
 
     run_transforms(JSONSCHEMA_TRANSFORMS, schema, schema_view, config)
 
