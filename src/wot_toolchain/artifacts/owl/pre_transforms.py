@@ -77,31 +77,6 @@ def _apply_renames(s: SchemaDefinition, renames: dict[str, str]) -> None:
                 su[new_key] = v
 
 
-def _set_fields(slot: SlotDefinition) -> dict[str, Any]:
-    """Return the fields of ``slot`` that carry a value."""
-    return {field: value for field, value in vars(slot).items() if value not in (None, [], {})}
-
-
-def _promote_renamed_usages(s: SchemaDefinition, view: SchemaView) -> None:
-    """Promote each slot_usage that gives its slot another slot_uri to a top-level slot of its own."""
-    slots = cast(_Slots, s.slots)
-    for class_name, cls_def in cast(_Classes, s.classes).items():
-        usages = cast(dict[str, SlotDefinition], cls_def.slot_usage or {})
-        for slot_name, usage in list(usages.items()):
-            base = slots.get(slot_name)
-            if not usage.slot_uri or (base is not None and usage.slot_uri == base.slot_uri):
-                continue
-            element = f"slot_uri {usage.slot_uri!r} of slot_usage '{class_name}.{slot_name}'"
-            unrelated = {"domain": None, "is_a": None, "subproperty_of": None, "from_schema": cls_def.from_schema}
-            fields = (_set_fields(base) if base is not None else {}) | _set_fields(usage) | unrelated
-            fields["name"] = local_name(_expand_curie(view, usage.slot_uri, element))
-            promoted = SlotDefinition(**copy.deepcopy(fields))
-            slots[promoted.name] = promoted
-            own = [str(sn) for sn in cls_def.slots or [] if str(sn) != slot_name]
-            cls_def.slots = [*own, promoted.name]
-            del usages[slot_name]
-
-
 def _strip_dangling_slot_refs(s: SchemaDefinition) -> None:
     """Remove class slot references that have no matching top-level slot definition."""
     existing = set(cast(_Slots, s.slots).keys())
@@ -122,13 +97,6 @@ OWL_PRE_TRANSFORMS: tuple[Transform, ...] = (
         reason="Renames slots to the local name of their slot_uri. gen-owl already builds IRIs from slot_uri, so the "
         "only measured effect is on rdfs:label.",
         apply=_rename_slots,
-    ),
-    Transform(
-        name="promote_renamed_usages",
-        kind=TransformKind.LINKML_GAP,
-        reason="gen-owl does not declare the property of a slot_usage that gives its slot another slot_uri "
-        "(e.g. jsonschema:properties in ObjectSchema).",
-        apply=lambda s, c: _promote_renamed_usages(s, c.view),
     ),
     Transform(
         name="strip_dangling_slot_refs",

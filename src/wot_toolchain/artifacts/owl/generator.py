@@ -3,7 +3,7 @@
 import copy
 from dataclasses import dataclass, field
 from functools import cached_property
-from typing import Self
+from typing import Any, Self
 
 from linkml.generators import owlgen
 from linkml.generators.owlgen import OwlSchemaGenerator
@@ -53,6 +53,11 @@ _LINKML_NAMESPACE = "https://w3id.org/linkml/"
 
 # Vocabularies whose properties OWL 2 declares itself.
 _BUILT_IN_NAMESPACES = (str(RDF), str(RDFS), str(OWL))
+
+
+def _set_fields(slot: SlotDefinition) -> dict[str, Any]:
+    """Return the fields of ``slot`` that carry a value."""
+    return {name: value for name, value in vars(slot).items() if value not in (None, [], {})}
 
 
 @dataclass
@@ -158,10 +163,8 @@ class WotOwlGenerator(OwlSchemaGenerator):
 
     def add_class(self, cls: ClassDefinition) -> None:
         """Emit ``cls`` unless it names no term or is out of scope, under its parents of this vocabulary."""
-        if not cls.class_uri:
-            return
-        self._add_attributes(cls)
-        if self._is_out_of_scope(self._class_uri(cls.name)):
+        self._add_class_properties(cls)
+        if not cls.class_uri or self._is_out_of_scope(self._class_uri(cls.name)):
             return
         # Upstream turns rules and none_of into class axioms inline in add_class, with no hook.
         without_constraints = copy.copy(cls)
@@ -196,28 +199,50 @@ class WotOwlGenerator(OwlSchemaGenerator):
             if (operands, RDF.first, None) not in self.graph:
                 self.graph.remove((class_uri, OWL.disjointUnionOf, operands))
 
-    def _add_attributes(self, cls: ClassDefinition) -> None:
-        """Emit the attributes of ``cls`` that define their property, each named by its IRI."""
-        for attribute in cls.attributes.values():
-            if attribute.slot_uri and self._attribute_owners[self._prop_uri(attribute)] == cls.name:
-                named_by_iri = copy.copy(attribute)
-                named_by_iri.name = local_name(str(self._prop_uri(attribute)))
-                self._add_property(named_by_iri)
+    def _add_class_properties(self, cls: ClassDefinition) -> None:
+        """Emit the properties that ``cls`` defines: its attributes and its slot usages under another IRI."""
+        for owner, slot in self._class_properties.values():
+            if owner == cls.name:
+                self._add_property(slot)
 
     @cached_property
-    def _attribute_owners(self) -> dict[URIRef, str]:
-        """Per property IRI, the name of the class whose attribute defines it: the last one that names a term."""
-        owners: dict[URIRef, str] = {}
+    def _class_properties(self) -> dict[URIRef, tuple[str, SlotDefinition]]:
+        """Per property IRI that a class defines, the name of the last such class and the property as a slot."""
+        properties: dict[URIRef, tuple[str, SlotDefinition]] = {}
         for name, cls in self.schemaview.all_classes().items():
-            if cls.class_uri:
-                owners |= {self._prop_uri(a): name for a in cls.attributes.values() if a.slot_uri}
-        return owners
+            for slot in (*self._renamed_usages(cls), *self._attributes(cls)):
+                properties[self._prop_uri(slot)] = (name, slot)
+        return properties
+
+    def _attributes(self, cls: ClassDefinition) -> list[SlotDefinition]:
+        """Return the attributes of ``cls`` that name a property, each named by its IRI; none if it names no term."""
+        attributes = [a for a in cls.attributes.values() if a.slot_uri] if cls.class_uri else []
+        return [self._named_by_iri(copy.copy(attribute)) for attribute in attributes]
+
+    def _renamed_usages(self, cls: ClassDefinition) -> list[SlotDefinition]:
+        """Return each slot_usage of ``cls`` that gives its slot another IRI, as a property of its own."""
+        # Upstream reads slot_usage for class restrictions only and never declares the property it names.
+        renamed = []
+        for usage in cls.slot_usage.values():
+            base = self.schemaview.get_slot(usage.name, attributes=False)
+            if not usage.slot_uri or (base is not None and self._prop_uri(usage) == self._prop_uri(base)):
+                continue
+            # The new property is not the base slot under another name: it shares neither its domain nor its parents.
+            unrelated = {"domain": None, "is_a": None, "subproperty_of": None, "from_schema": cls.from_schema}
+            fields = (_set_fields(base) if base is not None else {}) | _set_fields(usage) | unrelated
+            renamed.append(self._named_by_iri(SlotDefinition(**copy.deepcopy(fields))))
+        return renamed
+
+    def _named_by_iri(self, slot: SlotDefinition) -> SlotDefinition:
+        """Name ``slot`` by the local name of its IRI."""
+        slot.name = local_name(str(self._prop_uri(slot)))
+        return slot
 
     def add_slot(self, slot: SlotDefinition, attribute: bool = False) -> None:
-        """Emit ``slot`` unless an attribute defines its property."""
+        """Emit ``slot`` unless a class defines its property."""
         # Upstream gives an attribute no rdfs:range and drops one that shares its IRI with another
         # (owlgen.py:1162-1175); add_class emits the attributes as properties instead.
-        if not attribute and self._prop_uri(slot) not in self._attribute_owners:
+        if not attribute and self._prop_uri(slot) not in self._class_properties:
             self._add_property(slot)
 
     def _add_property(self, slot: SlotDefinition) -> None:
