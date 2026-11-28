@@ -238,38 +238,6 @@ def _strip_dangling_slot_refs(s: SchemaDefinition) -> None:
             cls_def.slots = [sn for sn in cls_def.slots if str(sn) in existing]
 
 
-_Annotations = dict[str, Any]
-
-
-def _keep_rdf_annotations(obj: SlotDefinition | ClassDefinition | EnumDefinition) -> None:
-    """Keep only the CURIE-keyed annotations of ``obj`` (semantic, not constraint metadata).
-
-    In place: a dict assigned to a LinkML model field becomes a JsonObj, which the OWL generator cannot read.
-    """
-    annotations = cast(_Annotations, obj.annotations)
-    for key in [key for key in annotations if ":" not in key]:
-        del annotations[key]
-
-
-def _clear_constraints(s: SchemaDefinition) -> None:
-    for slot_def in cast(_Slots, s.slots).values():
-        _keep_rdf_annotations(slot_def)
-    for class_def in cast(_Classes, s.classes).values():
-        for attr_def in cast(dict[str, SlotDefinition], class_def.attributes or {}).values():
-            _keep_rdf_annotations(attr_def)
-        cast(dict[str, SlotDefinition], class_def.slot_usage).clear()
-        class_def.rules = []
-        class_def.none_of = []
-        _keep_rdf_annotations(class_def)
-    for enum_def in cast(_Enums, s.enums).values():
-        _keep_rdf_annotations(enum_def)
-    for type_def in s.types.values():
-        type_def.pattern = None
-        type_def.structured_pattern = None
-        type_def.minimum_value = None
-        type_def.maximum_value = None
-
-
 def _rename_slots(s: SchemaDefinition, context: OwlPreContext) -> None:
     """Rename slots to the local name of their slot_uri."""
     _apply_renames(s, _collect_renames(s, context.namespace, context.view))
@@ -327,12 +295,6 @@ OWL_PRE_TRANSFORMS: tuple[Transform, ...] = (
         reason="Renames permissible-value keys to the local name of their meaning, so the value IRIs and labels "
         "follow the WoT vocabulary.",
         apply=lambda s, c: _fix_enum_pv_labels(s, c.view),
-    ),
-    Transform(
-        name="clear_constraints",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Prevents blank-node owl:Restriction axioms, which the WoT ontology does not use.",
-        apply=lambda s, c: _clear_constraints(s),
     ),
     Transform(
         name="strip_dangling_slot_refs",

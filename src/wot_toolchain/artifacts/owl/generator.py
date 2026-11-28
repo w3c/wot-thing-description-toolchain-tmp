@@ -159,7 +159,10 @@ class WotOwlGenerator(OwlSchemaGenerator):
         """Emit ``cls`` without linking its class_uri to its native URI."""
         if self._is_out_of_scope(self._class_uri(cls.name)):
             return
-        super().add_class(cls)
+        # Upstream turns rules and none_of into class axioms inline in add_class, with no hook.
+        without_constraints = copy.copy(cls)
+        without_constraints.rules, without_constraints.none_of = [], []
+        super().add_class(without_constraints)
         # Upstream adds class_uri skos:exactMatch native URI inline in add_class (owlgen.py:510-516), with no hook.
         mapped_uri = URIRef(self.schemaview.get_uri(cls, expand=True, native=not self.use_native_uris))
         self.graph.remove((self._class_uri(cls.name), SKOS.exactMatch, mapped_uri))
@@ -276,8 +279,13 @@ class WotOwlGenerator(OwlSchemaGenerator):
 
     def add_type(self, typ: TypeDefinition) -> None:
         """Emit ``typ`` unless it is out of scope."""
-        if not self._is_out_of_scope(self._type_uri(typ.name)):
-            super().add_type(typ)
+        if self._is_out_of_scope(self._type_uri(typ.name)):
+            return
+        # Upstream turns the facets of a type into owl:withRestrictions, with no hook.
+        without_facets = copy.copy(typ)
+        without_facets.pattern = without_facets.structured_pattern = None
+        without_facets.minimum_value = without_facets.maximum_value = None
+        super().add_type(without_facets)
 
     def get_own_slots(self, cls: ClassDefinition | AnonymousClassExpression) -> list[SlotDefinition]:
         """Return no slots, so classes carry no slot restrictions; constraints are published as SHACL."""
@@ -326,12 +334,13 @@ class WotOwlGenerator(OwlSchemaGenerator):
         alias = getattr(e, "alias", None)
         # Upstream emits every CURIE-keyed annotation value as a Literal (owlgen.py:424), with no hook.
         resource_annotations = self._resource_annotations(e)
-        if alias or resource_annotations:
-            e = copy.copy(e)
-            # Item assignment, as linkml's own normalisation does; attribute assignment wraps a dict in a JsonObj.
-            e["annotations"] = {k: v for k, v in e.annotations.items() if k not in resource_annotations}
-            if alias:
-                e.name, e.alias = alias, None
+        e = copy.copy(e)
+        # Upstream emits an annotation without a prefix as a property of the schema's namespace;
+        # such annotations configure the other generators and name no vocabulary term.
+        # Item assignment, as linkml's own normalisation does; attribute assignment wraps a dict in a JsonObj.
+        e["annotations"] = {k: v for k, v in e.annotations.items() if ":" in k and k not in resource_annotations}
+        if alias:
+            e.name, e.alias = alias, None
         super().add_metadata(e, uri)
         for predicate, value in resource_annotations.values():
             self.graph.add((uri, predicate, URIRef(value)))
