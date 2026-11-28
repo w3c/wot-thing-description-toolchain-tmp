@@ -15,6 +15,7 @@ from linkml_runtime.linkml_model.meta import (
 from linkml_runtime.utils.schemaview import SchemaView
 
 from .options import JsonSchemaOptions
+from .refs import resolve_refs
 from ...schema_utils import annotation_tag_value
 
 PREFIX_MEMBERS = "jsonschema_prefix_members"
@@ -111,7 +112,9 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
         return []
 
     def after_generate_class(self, cls: ClassResult, sv: SchemaView) -> ClassResult:
-        """State a dispatch class as a oneOf of its direct subclasses (docs/known-linkml-gaps.md #9)."""
+        """Resolve the references of a class; state a dispatch class as a oneOf of its direct subclasses."""
+        cls.schema_ = JsonSchema(resolve_refs(cls.schema_, sv))
+        # docs/known-linkml-gaps.md #9
         dispatch = annotation_tag_value(cls.source, ONEOF_DISPATCH)
         if not dispatch:
             return cls

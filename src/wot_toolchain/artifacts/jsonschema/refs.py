@@ -1,4 +1,4 @@
-"""Transform that resolves the ``$ref`` values left dangling or indirect by the upstream generator."""
+"""Resolution of the ``$ref`` values the upstream generator leaves dangling or indirect in a class def."""
 
 from typing import Any
 
@@ -25,13 +25,13 @@ def _narrow_string_branches(siblings: dict[str, Any], values: list[str]) -> bool
     return bool(targets)
 
 
-def resolve_refs(schema: dict[str, Any], sv: SchemaView) -> None:
-    """Inline enum references, erase ``linkml:Any`` references and point the others at existing ``$defs``.
+def resolve_refs(schema: dict[str, Any], sv: SchemaView) -> dict[str, Any]:
+    """Return ``schema`` with enum references inlined, ``linkml:Any`` references erased, the others on class defs.
 
     Raises:
         SchemaError: If the slots of a referenced class cannot be resolved.
     """
-    valid_def_names = set(schema.get("$defs", {}).keys())
+    class_names = set(sv.all_classes())
 
     enum_values: dict[str, list[str]] = {}
     for enum_name, enum_def in sv.all_enums().items():
@@ -95,13 +95,14 @@ def resolve_refs(schema: dict[str, Any], sv: SchemaView) -> None:
 
         if ref_name in any_class_names:
             del obj["$ref"]
-        elif ref_name not in valid_def_names:
+        elif ref_name not in class_names:
             base = ref_name.replace("__identifier_optional", "")
-            if base in valid_def_names:
+            if base in class_names:
                 obj["$ref"] = f"#/$defs/{base}"
         elif not ref.startswith("#/$defs/"):
             obj["$ref"] = f"#/$defs/{ref_name}"
 
         return None
 
-    walk_schema(schema, _resolve)
+    resolved: dict[str, Any] = walk_schema(schema, _resolve)
+    return resolved

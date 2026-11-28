@@ -12,7 +12,6 @@ from .cleanups import (
 )
 from .partitions import build_enum_subset_partitions
 from .pruning import remove_excluded_defs, remove_unreferenced_candidate_defs
-from .refs import resolve_refs
 from .subclasses import flatten_subclasses
 from ..transforms import Transform, TransformKind, run_transforms
 
@@ -39,15 +38,6 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
         reason="Removes leftover LinkML defs: __identifier_optional defs.",
         apply=remove_excluded_defs,
     ),
-    Transform(
-        name="resolve_refs",
-        kind=TransformKind.WOT_SHAPING,
-        reason="Fixes references after removals: inlines enums, empties linkml:Any, maps identifier_optional refs to "
-        "the base def, and rewrites definitions to $defs. Keeps only the string form for titles/descriptions, as W3C "
-        "requires.",
-        apply=lambda schema, sv, config: resolve_refs(schema, sv),
-    ),
-    # After resolve_refs: it erases refs to linkml:Any defs and drops anyOf branches that still reference candidates.
     Transform(
         name="remove_unreferenced_candidate_defs",
         kind=TransformKind.COSMETIC,
