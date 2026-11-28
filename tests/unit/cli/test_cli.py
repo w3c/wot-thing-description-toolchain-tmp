@@ -8,6 +8,7 @@ from pathlib import Path
 
 import yaml
 from click.testing import CliRunner
+import rdflib
 
 from wot_toolchain.cli import main
 
@@ -132,3 +133,56 @@ def test_invalid_snippet_metadata_exits_5(tmp_path, caplog):
     assert result.exit_code == 5
     assert "_snippets.yaml" in caplog.text
     assert "sidebar" in caplog.text
+
+
+_RANGE_CONFLICT_SCHEMA = """\
+id: https://example.org/probe
+name: probe
+prefixes:
+  linkml: https://w3id.org/linkml/
+  pb: https://example.org/probe#
+default_prefix: pb
+default_range: string
+imports:
+  - linkml:types
+classes:
+  Endpoint:
+    class_uri: pb:Endpoint
+    attributes:
+      local:
+        slot_uri: pb:local
+        range: integer
+  Other:
+    class_uri: pb:Other
+    attributes:
+      local:
+        slot_uri: pb:local
+        range: {other_range}
+"""
+
+
+def _one_ontology_config(tmp_path: Path, other_range: str) -> Path:
+    """Write a schema whose two classes define pb:local, and a config that generates only its ontology."""
+    (tmp_path / "probe.yaml").write_text(_RANGE_CONFLICT_SCHEMA.format(other_range=other_range), encoding="utf-8")
+    vocabulary = {"schema": "probe.yaml", "prefix": "pb", "ontology": "probe.ttl"}
+    data = {"root_schema": "probe.yaml", "output_dir": "out", "vocabularies": [vocabulary]}
+    data["generators"] = {"owl": yaml.safe_load(REPO_CONFIG.read_text(encoding="utf-8"))["generators"]["owl"]}
+    config = tmp_path / "wot-toolchain.yaml"
+    config.write_text(yaml.safe_dump(data), encoding="utf-8")
+    return config
+
+
+def test_one_property_with_two_ranges_exits_4(tmp_path, caplog):
+    result = CliRunner().invoke(main, ["generate-wot-resources", "-c", str(_one_ontology_config(tmp_path, "string"))])
+    assert result.exit_code == 4
+    expected = "has range 'integer' in class 'Endpoint' and 'string' in class 'Other'; one property has one range."
+    assert f"property <https://example.org/probe#local> {expected}" in caplog.text
+
+
+def test_one_property_with_one_range_in_two_classes_is_generated(tmp_path):
+    result = CliRunner().invoke(main, ["generate-wot-resources", "-c", str(_one_ontology_config(tmp_path, "integer"))])
+    assert result.exit_code == 0
+    ontology = rdflib.Graph().parse(tmp_path / "out" / "owl" / "probe.ttl")
+    assert list(ontology.objects(rdflib.URIRef("https://example.org/probe#local"), rdflib.RDFS.range)) == [
+        rdflib.XSD.integer
+    ]

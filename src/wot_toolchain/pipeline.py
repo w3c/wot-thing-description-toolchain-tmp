@@ -104,8 +104,8 @@ def _generate_ontologies(config: Config, schema_view: SchemaView, store: SchemaS
         schema = preprocess_for_gen_owl(vocabulary.schema, store)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
-            graph = WotOwlGenerator.from_options(schema, config.owl, ontologies).as_graph()
-        (output_dir / vocabulary.ontology).write_text(post_process_owl(graph, schema_view), encoding="utf-8")
+            graph = WotOwlGenerator.from_options(schema, config.owl, ontologies, schema_view).as_graph()
+        (output_dir / vocabulary.ontology).write_text(post_process_owl(graph), encoding="utf-8")
         logging.info(f"OWL ontology saved to {output_dir / vocabulary.ontology}")
 
 

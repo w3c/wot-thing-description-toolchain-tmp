@@ -30,6 +30,7 @@ prefixes:
 default_prefix: jsonschema
 imports:
   - linkml:types
+  - thing_description
 
 types:
   NonNegativeInteger:

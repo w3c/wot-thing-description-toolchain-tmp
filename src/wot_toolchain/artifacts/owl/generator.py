@@ -2,7 +2,8 @@
 
 import copy
 from dataclasses import dataclass, field
-from typing import Self
+from functools import cached_property
+from typing import Any, Self
 
 from linkml.generators import owlgen
 from linkml.generators.owlgen import OwlSchemaGenerator
@@ -17,12 +18,21 @@ from linkml_runtime.linkml_model.meta import (
     SlotDefinition,
     TypeDefinition,
 )
+from linkml_runtime.utils.schemaview import SchemaView
 from rdflib import OWL, RDF, RDFS, SKOS, XSD, BNode, Graph, Literal, URIRef
 from rdflib.collection import Collection
 
 from .header import add_ontology_header
 from .options import OwlOptions, PermissibleValueKind
-from ...schema_utils import resolve_prefix_namespace
+from ..rdf_terms import (
+    class_valued_properties,
+    domain_classes_by_property,
+    indexed_classes_by_property,
+    language_map_property_iris,
+    most_general_classes,
+)
+from ...errors import SchemaError
+from ...schema_utils import is_non_ontological_enum, local_name, resolve_prefix_namespace
 
 # INSTANCE is emitted by WotOwlGenerator.add_enum, so upstream keeps its default for it.
 _PERMISSIBLE_VALUE_TYPES: dict[PermissibleValueKind, URIRef] = {
@@ -38,36 +48,16 @@ _IRI_PREFIXES = ("http://", "https://", "urn:")
 # Annotation predicates whose text the published ontologies tag with a language.
 _LANGUAGE_TAGGED_PREDICATES = frozenset({SKOS.definition, RDFS.comment, RDFS.label})
 
+# The ontology has no LinkML terms.
+_LINKML_NAMESPACE = "https://w3id.org/linkml/"
+
 # Vocabularies whose properties OWL 2 declares itself.
 _BUILT_IN_NAMESPACES = (str(RDF), str(RDFS), str(OWL))
 
 
-def declare_super_properties(graph: Graph) -> None:
-    """Declare each undeclared parent of an object or datatype property of ``graph`` with the kind of its child."""
-    for kind in (OWL.ObjectProperty, OWL.DatatypeProperty):
-        for child in set(graph.subjects(RDF.type, kind)):
-            for parent in set(graph.objects(child, RDFS.subPropertyOf)):
-                if (parent, RDF.type, None) not in graph:
-                    graph.add((parent, RDF.type, kind))
-
-
-def declare_referenced_classes(graph: Graph) -> None:
-    """Declare as owl:Class each named resource that ``graph`` uses as a class without defining it.
-
-    An XSD datatype is never a class, whatever position it stands in.
-    """
-    object_properties = set(graph.subjects(RDF.type, OWL.ObjectProperty))
-    unions = [members for union, members in graph.subject_objects(OWL.unionOf) if (union, RDF.type, OWL.Class) in graph]
-    referenced = {
-        *graph.objects(None, RDFS.domain),
-        *graph.objects(None, RDFS.subClassOf),
-        *graph.objects(None, RDF.type),
-        *(range_ for property_, range_ in graph.subject_objects(RDFS.range) if property_ in object_properties),
-        *(member for members in unions for member in Collection(graph, members)),
-    }
-    for resource in referenced:
-        if isinstance(resource, URIRef) and not str(resource).startswith((*_BUILT_IN_NAMESPACES, str(XSD))):
-            graph.add((resource, RDF.type, OWL.Class))
+def _set_fields(slot: SlotDefinition) -> dict[str, Any]:
+    """Return the fields of ``slot`` that carry a value."""
+    return {name: value for name, value in vars(slot).items() if value not in (None, [], {})}
 
 
 @dataclass
@@ -78,15 +68,25 @@ class WotOwlGenerator(OwlSchemaGenerator):
     only_root_schema: bool = False
     # Ontology IRI by vocabulary namespace, naming where a term of another vocabulary is defined.
     ontologies: dict[str, URIRef] = field(default_factory=dict)
+    # The schema before OWL preprocessing: it still has the enums, domain_of and JSON-LD annotations.
+    source: SchemaView | None = None
 
     @classmethod
     def from_options(
-        cls, schema: SchemaDefinition, options: OwlOptions, ontologies: dict[str, URIRef] | None = None
+        cls,
+        schema: SchemaDefinition,
+        options: OwlOptions,
+        ontologies: dict[str, URIRef] | None = None,
+        source: SchemaView | None = None,
     ) -> Self:
-        """Build a generator for ``schema`` configured by ``options``; ``ontologies`` maps namespace to ontology IRI."""
+        """Build a generator for ``schema`` configured by ``options``.
+
+        ``ontologies`` maps namespace to ontology IRI; ``source`` is the schema before OWL preprocessing.
+        """
         return cls(
             schema,
             ontologies=ontologies or {},
+            source=source,
             # Reason not recorded; True adds OWL shadows of the metamodel classes, i.e. punning (owlgen.py:132).
             metaclasses=False,
             # Reason not recorded; True represents types as classes, so every slot becomes an ObjectProperty.
@@ -109,31 +109,87 @@ class WotOwlGenerator(OwlSchemaGenerator):
         )
 
     def as_graph(self) -> Graph:
-        """Build the ontology graph and declare the classes and properties it refers to."""
+        """Build the ontology graph, then declare the terms it refers to without declaring them."""
         graph: Graph = super().as_graph()
-        declare_super_properties(graph)
-        declare_referenced_classes(graph)
-        self._name_defining_ontologies(graph)
+        # Upstream states subclass, range and super-property axioms without a hook for the term they name, so the
+        # undeclared ones are read off the finished graph. Nothing is emitted after this step.
+        for term, kind in sorted(self._undeclared_references()):
+            self._declare(term, kind)
         return graph
 
-    def _name_defining_ontologies(self, graph: Graph) -> None:
-        """Link each declared term that another vocabulary defines to that vocabulary's ontology."""
-        for term in set(graph.subjects(RDF.type, None)):
-            if not isinstance(term, URIRef) or (term, RDFS.isDefinedBy, None) in graph:
-                continue
-            for namespace, ontology in self.ontologies.items():
-                if str(term).startswith(namespace) and ontology != graph.identifier:
-                    graph.add((term, RDFS.isDefinedBy, ontology))
+    def _undeclared_references(self) -> set[tuple[URIRef, URIRef]]:
+        """Return each named term the graph refers to without declaring it, with the kind its use gives it.
+
+        A parent of an object or datatype property is a property of the same kind. A resource in the position of a
+        class is a class; an XSD datatype is never one, whatever position it stands in.
+        """
+        graph = self.graph
+        references: set[tuple[URIRef, URIRef]] = set()
+        for kind in (OWL.ObjectProperty, OWL.DatatypeProperty):
+            for child in graph.subjects(RDF.type, kind):
+                for parent in graph.objects(child, RDFS.subPropertyOf):
+                    if isinstance(parent, URIRef) and (parent, RDF.type, None) not in graph:
+                        references.add((parent, kind))
+        object_properties = set(graph.subjects(RDF.type, OWL.ObjectProperty))
+        unions = [m for u, m in graph.subject_objects(OWL.unionOf) if (u, RDF.type, OWL.Class) in graph]
+        classes = {
+            *graph.objects(None, RDFS.domain),
+            *graph.objects(None, RDFS.subClassOf),
+            *graph.objects(None, RDF.type),
+            *(range_ for property_, range_ in graph.subject_objects(RDFS.range) if property_ in object_properties),
+            *(member for members in unions for member in Collection(graph, members)),
+        }
+        for resource in classes:
+            if isinstance(resource, URIRef) and not str(resource).startswith((*_BUILT_IN_NAMESPACES, str(XSD))):
+                if (resource, RDF.type, OWL.Class) not in graph:
+                    references.add((resource, OWL.Class))
+        return references
+
+    def _declare(self, term: URIRef, kind: URIRef) -> None:
+        """Declare ``term`` as a ``kind``, naming the ontology that defines it."""
+        self.graph.add((term, RDF.type, kind))
+        self._name_defining_ontology(term)
+
+    def _name_defining_ontology(self, term: URIRef) -> None:
+        """Link ``term`` to the ontology of its vocabulary, unless it already names one.
+
+        A term of this vocabulary that this ontology does not describe gets no link.
+        """
+        if (term, RDFS.isDefinedBy, None) in self.graph:
+            return
+        for namespace, ontology in self.ontologies.items():
+            if str(term).startswith(namespace) and ontology != self.graph.identifier:
+                self.graph.add((term, RDFS.isDefinedBy, ontology))
 
     def add_class(self, cls: ClassDefinition) -> None:
-        """Emit ``cls`` without linking its class_uri to its native URI."""
-        if self._is_out_of_scope(self._class_uri(cls.name)):
+        """Emit ``cls`` unless it names no term or is out of scope, under its parents of this vocabulary."""
+        self._add_class_properties(cls)
+        if not cls.class_uri or self._is_out_of_scope(self._class_uri(cls.name)):
             return
-        super().add_class(cls)
+        # Upstream turns rules and none_of into class axioms inline in add_class, with no hook.
+        without_constraints = copy.copy(cls)
+        without_constraints.rules, without_constraints.none_of = [], []
+        if cls.is_a and not self._names_term(cls.is_a):
+            without_constraints.is_a = None
+        without_constraints.mixins = [mixin for mixin in cls.mixins if self._is_own_class(mixin)]
+        super().add_class(without_constraints)
         # Upstream adds class_uri skos:exactMatch native URI inline in add_class (owlgen.py:510-516), with no hook.
         mapped_uri = URIRef(self.schemaview.get_uri(cls, expand=True, native=not self.use_native_uris))
         self.graph.remove((self._class_uri(cls.name), SKOS.exactMatch, mapped_uri))
         self._drop_empty_disjoint_unions(self._class_uri(cls.name))
+
+    def _names_term(self, class_name: str) -> bool:
+        """Return whether the class has a class_uri; one without it only shapes the JSON."""
+        cls = self.schemaview.get_class(class_name)
+        return cls is None or bool(cls.class_uri)
+
+    def _is_own_class(self, class_name: str) -> bool:
+        """Return whether the class names a term of this vocabulary."""
+        # A mixin of another vocabulary shares its slots in JSON; it is not a superclass in RDF.
+        cls = self.schemaview.get_class(class_name)
+        if cls is None:
+            return True
+        return bool(cls.class_uri) and str(self._class_uri(class_name)).startswith(self._own_namespace())
 
     def _drop_empty_disjoint_unions(self, class_uri: URIRef) -> None:
         """Remove a disjoint union without operands, which would make the class unsatisfiable."""
@@ -143,12 +199,159 @@ class WotOwlGenerator(OwlSchemaGenerator):
             if (operands, RDF.first, None) not in self.graph:
                 self.graph.remove((class_uri, OWL.disjointUnionOf, operands))
 
+    def _add_class_properties(self, cls: ClassDefinition) -> None:
+        """Emit the properties that ``cls`` defines: its attributes and its slot usages under another IRI."""
+        for owner, slot in self._class_properties.values():
+            if owner == cls.name:
+                self._add_property(slot)
+
+    @cached_property
+    def _class_properties(self) -> dict[URIRef, tuple[str, SlotDefinition]]:
+        """Per property IRI that a class defines, the name of a class that defines it and the property as a slot."""
+        properties: dict[URIRef, tuple[str, SlotDefinition]] = {}
+        for name, cls in self.schemaview.all_classes().items():
+            for slot in (*self._renamed_usages(cls), *self._attributes(cls)):
+                uri = self._prop_uri(slot)
+                if uri in properties:
+                    self._require_same_range(uri, properties[uri], (name, slot))
+                properties[uri] = (name, slot)
+        return properties
+
+    def _require_same_range(self, uri: URIRef, *definitions: tuple[str, SlotDefinition]) -> None:
+        """Fail when the classes that define the property ``uri`` give it different ranges."""
+        # A property has one rdfs:range; picking one definition would depend on the order of the classes.
+        default = self.schemaview.schema.default_range
+        ranges = {owner: slot.range or default for owner, slot in definitions}
+        if len(set(ranges.values())) > 1:
+            source = self.schemaview.schema.source_file or self.schemaview.schema.name
+            stated = " and ".join(f"{range_!r} in class {owner!r}" for owner, range_ in ranges.items())
+            raise SchemaError(f"{source}: property <{uri}> has range {stated}; one property has one range.")
+
+    def _attributes(self, cls: ClassDefinition) -> list[SlotDefinition]:
+        """Return the attributes of ``cls`` that name a property, each named by its IRI; none if it names no term."""
+        attributes = [a for a in cls.attributes.values() if a.slot_uri] if cls.class_uri else []
+        return [self._named_by_iri(copy.copy(attribute)) for attribute in attributes]
+
+    def _renamed_usages(self, cls: ClassDefinition) -> list[SlotDefinition]:
+        """Return each slot_usage of ``cls`` that gives its slot another IRI, as a property of its own."""
+        # Upstream reads slot_usage for class restrictions only and never declares the property it names.
+        renamed = []
+        for usage in cls.slot_usage.values():
+            base = self.schemaview.get_slot(usage.name, attributes=False)
+            if not usage.slot_uri or (base is not None and self._prop_uri(usage) == self._prop_uri(base)):
+                continue
+            # The new property is not the base slot under another name: it shares neither its domain nor its parents.
+            unrelated = {"domain": None, "is_a": None, "subproperty_of": None, "from_schema": cls.from_schema}
+            fields = (_set_fields(base) if base is not None else {}) | _set_fields(usage) | unrelated
+            renamed.append(self._named_by_iri(SlotDefinition(**copy.deepcopy(fields))))
+        return renamed
+
+    def _named_by_iri(self, slot: SlotDefinition) -> SlotDefinition:
+        """Name ``slot`` by the local name of its IRI."""
+        slot.name = local_name(str(self._prop_uri(slot)))
+        return slot
+
     def add_slot(self, slot: SlotDefinition, attribute: bool = False) -> None:
-        """Emit ``slot`` unless it is out of scope."""
+        """Emit ``slot`` unless a class defines its property."""
+        # Upstream gives an attribute no rdfs:range and drops one that shares its IRI with another
+        # (owlgen.py:1162-1175); add_class emits the attributes as properties instead.
+        if not attribute and self._prop_uri(slot) not in self._class_properties:
+            self._add_property(slot)
+
+    def _add_property(self, slot: SlotDefinition) -> None:
+        """Emit ``slot`` unless it names no term or is out of scope, with every class of its domain."""
         uri = self._prop_uri(slot)
-        if self._is_out_of_scope(uri):
+        if not slot.slot_uri or self._is_out_of_scope(uri):
             return
-        super().add_slot(slot, attribute)
+        # Upstream emits rdfs:domain from the slot's own domain only, as one named class (owlgen.py:1186).
+        without_domain = copy.copy(slot)
+        without_domain.domain = None
+        # The values of an enum that names no vocabulary term are plain strings.
+        if (enum := self.schemaview.get_enum(slot.range)) and is_non_ontological_enum(enum):
+            without_domain.range = "string"
+        if slot.range and not self._names_term(slot.range):
+            without_domain.range = None
+        super().add_slot(without_domain)
+        if (uri, RDF.type, None) not in self.graph or (uri, RDFS.domain, None) in self.graph:
+            return
+        if domain := self._domain_classes(slot, uri):
+            self.graph.add((uri, RDFS.domain, self._class_or_union(domain)))
+
+    def _domain_classes(self, slot: SlotDefinition, uri: URIRef) -> list[URIRef]:
+        """Return the classes of the domain of ``slot``, sorted.
+
+        They are its declared domain, else the classes that use it, together with the classes whose instances it
+        indexes: a property named by ``jsonld_index`` on a slot is stated on the values of that slot.
+        """
+        declared = {str(self._class_uri(slot.domain))} if slot.domain else self._using_classes.get(str(uri), set())
+        indexed = self._indexed_classes.get(str(uri))
+        if self.source is None or not indexed or not declared <= self._class_names.keys():
+            return sorted(URIRef(iri) for iri in declared)
+        general = most_general_classes(self.source, indexed | {self._class_names[iri] for iri in declared})
+        return sorted(URIRef(iri) for iri, name in self._class_names.items() if name in general)
+
+    def _class_or_union(self, classes: list[URIRef]) -> URIRef | BNode:
+        """Return the single class of ``classes``, or a new owl:unionOf class over all of them."""
+        if len(classes) == 1:
+            return classes[0]
+        union = BNode()
+        self.graph.add((union, RDF.type, OWL.Class))
+        self.graph.add((union, OWL.unionOf, Collection(self.graph, BNode(), list(classes)).uri))
+        return union
+
+    @cached_property
+    def _using_classes(self) -> dict[str, set[str]]:
+        """Per property IRI, the IRIs of the classes that use it."""
+        return domain_classes_by_property(self.source) if self.source else {}
+
+    @cached_property
+    def _indexed_classes(self) -> dict[str, set[str]]:
+        """Per JSON-LD index property IRI, the names of the classes whose instances it indexes."""
+        return indexed_classes_by_property(self.source) if self.source else {}
+
+    @cached_property
+    def _class_names(self) -> dict[str, str]:
+        """The name of each class of the source schema, by class IRI."""
+        if self.source is None:
+            return {}
+        classes = self.source.all_classes()
+        return {self.source.expand_curie(cls.class_uri): name for name, cls in classes.items() if cls.class_uri}
+
+    @cached_property
+    def _language_map_properties(self) -> set[str]:
+        """The IRIs of the properties serialized as a JSON-LD language map."""
+        return language_map_property_iris(self.source) if self.source else set()
+
+    @cached_property
+    def _class_values(self) -> dict[str, list[str]]:
+        """Per property IRI, the IRIs of the classes that the values of its enum name by ``meaning``."""
+        return class_valued_properties(self.source) if self.source else {}
+
+    def slot_owl_type(self, slot: SlotDefinition) -> URIRef:
+        """Return the kind of property ``slot`` is in RDF, which its JSON range does not always tell."""
+        role: URIRef = super().slot_owl_type(slot)
+        # A slot whose enum values each name a class holds that class in RDF, not the JSON string.
+        if role == OWL.DatatypeProperty and str(self._prop_uri(slot)) in self._class_values:
+            return OWL.ObjectProperty
+        # A slot of range Any gets no range, and a property without a range is a datatype property.
+        if role == OWL.ObjectProperty and slot.range and str(self._range_uri(slot)).startswith(_LINKML_NAMESPACE):
+            return OWL.DatatypeProperty
+        return role
+
+    def _rdf_range(self, slot: SlotDefinition) -> URIRef | BNode | None:
+        """Return the range ``slot`` has in RDF where it is not its JSON range, else None."""
+        uri = str(self._prop_uri(slot))
+        role = self.slot_owl_type(slot)
+        if role == OWL.ObjectProperty and uri in self._class_values:
+            one_of = BNode()
+            self.graph.add((one_of, RDF.type, OWL.Class))
+            classes = Collection(self.graph, BNode(), [URIRef(iri) for iri in self._class_values[uri]])
+            self.graph.add((one_of, OWL.oneOf, classes.uri))
+            return one_of
+        # The values of a language map are language-tagged strings, not the class that models the map in JSON.
+        if role == OWL.DatatypeProperty and uri in self._language_map_properties:
+            return RDF.langString
+        return None
 
     def _type_values_are_nodes(self, type_name: str) -> bool:
         """Treat the values of every type as literals, so a slot of range ``uri`` is a datatype property."""
@@ -163,8 +366,13 @@ class WotOwlGenerator(OwlSchemaGenerator):
 
     def add_type(self, typ: TypeDefinition) -> None:
         """Emit ``typ`` unless it is out of scope."""
-        if not self._is_out_of_scope(self._type_uri(typ.name)):
-            super().add_type(typ)
+        if self._is_out_of_scope(self._type_uri(typ.name)):
+            return
+        # Upstream turns the facets of a type into owl:withRestrictions, with no hook.
+        without_facets = copy.copy(typ)
+        without_facets.pattern = without_facets.structured_pattern = None
+        without_facets.minimum_value = without_facets.maximum_value = None
+        super().add_type(without_facets)
 
     def get_own_slots(self, cls: ClassDefinition | AnonymousClassExpression) -> list[SlotDefinition]:
         """Return no slots, so classes carry no slot restrictions; constraints are published as SHACL."""
@@ -179,12 +387,20 @@ class WotOwlGenerator(OwlSchemaGenerator):
         main_slot: SlotDefinition | None = None,
         owl_types: set[URIRef] | None = None,
     ) -> URIRef | BNode | None:
-        """Return the named range of ``slot`` only; boolean branches and value constraints are published as SHACL."""
+        """Return the named range of ``slot`` only; boolean branches and value constraints are published as SHACL.
+
+        The range of a property itself is its range in RDF, and never a LinkML term.
+        """
+        if cls is None and isinstance(slot, SlotDefinition) and (rdf_range := self._rdf_range(slot)):
+            return rdf_range
         # Upstream intersects the range with branch and datatype-restriction expressions (owlgen.py:857-927).
         named_range = SlotDefinition(name=(main_slot or slot).name, range=slot.range)
         expr: URIRef | BNode | None = super().transform_class_slot_expression(
             cls, named_range, main_slot or named_range, owl_types
         )
+        # A slot of range Any gets rdfs:range linkml:Any upstream.
+        if cls is None and isinstance(expr, URIRef) and str(expr).startswith(_LINKML_NAMESPACE):
+            return None
         return expr
 
     def add_metadata(self, e: SchemaDefinition | Definition | PermissibleValue, uri: URIRef) -> None:
@@ -205,18 +421,24 @@ class WotOwlGenerator(OwlSchemaGenerator):
         alias = getattr(e, "alias", None)
         # Upstream emits every CURIE-keyed annotation value as a Literal (owlgen.py:424), with no hook.
         resource_annotations = self._resource_annotations(e)
-        if alias or resource_annotations:
-            e = copy.copy(e)
-            # Item assignment, as linkml's own normalisation does; attribute assignment wraps a dict in a JsonObj.
-            e["annotations"] = {k: v for k, v in e.annotations.items() if k not in resource_annotations}
-            if alias:
-                e.name, e.alias = alias, None
+        e = copy.copy(e)
+        # Upstream emits an annotation without a prefix as a property of the schema's namespace;
+        # such annotations configure the other generators and name no vocabulary term.
+        # Item assignment, as linkml's own normalisation does; attribute assignment wraps a dict in a JsonObj.
+        e["annotations"] = {k: v for k, v in e.annotations.items() if ":" in k and k not in resource_annotations}
+        if alias:
+            e.name, e.alias = alias, None
+        elif isinstance(e, SlotDefinition) and (e.name.startswith("@") or str(uri).startswith(self._own_namespace())):
+            # The label of a property is the name of its term, which the JSON key need not be.
+            e.name = local_name(str(uri))
         super().add_metadata(e, uri)
         for predicate, value in resource_annotations.values():
             self.graph.add((uri, predicate, URIRef(value)))
-        # Upstream never emits rdfs:isDefinedBy; elements with a foreign IRI are defined elsewhere.
+        # Upstream never emits rdfs:isDefinedBy.
         if str(uri).startswith(self._own_namespace()):
             self.graph.add((uri, RDFS.isDefinedBy, self.graph.identifier))
+        else:
+            self._name_defining_ontology(uri)
         self._drop_untagged_predicate_languages(uri)
 
     def _drop_untagged_predicate_languages(self, uri: URIRef) -> None:
@@ -260,8 +482,9 @@ class WotOwlGenerator(OwlSchemaGenerator):
 
     def add_enum(self, e: EnumDefinition) -> None:
         """Emit ``e``; INSTANCE values are typed by the enum class only."""
-        if self._is_out_of_scope(self._enum_uri(e.name)):
+        if is_non_ontological_enum(e) or self._is_out_of_scope(self._enum_uri(e.name)):
             return
+        e = self._named_by_meaning(e)
         if self.permissible_values is not PermissibleValueKind.INSTANCE:
             super().add_enum(e)
             return
@@ -276,6 +499,29 @@ class WotOwlGenerator(OwlSchemaGenerator):
         for pv in e.permissible_values.values():
             if pv.meaning:
                 self._add_enum_instance(pv, enum_uri)
+
+    def _named_by_meaning(self, e: EnumDefinition) -> EnumDefinition:
+        """Return a copy of ``e`` whose values that have a ``meaning`` are named by the local name of that IRI."""
+        # The JSON value may differ from the term it denotes (``invokeaction`` for ``td:invokeAction``).
+        values: dict[str, PermissibleValue] = {}
+        for text, pv in e.permissible_values.items():
+            if pv.meaning:
+                pv = copy.copy(pv)
+                pv.text = local_name(self._expand_meaning(pv, e)) or text
+            values[pv.text] = pv
+        renamed = copy.copy(e)
+        # Item assignment, as linkml's own normalisation does; attribute assignment wraps a dict in a JsonObj.
+        renamed["permissible_values"] = values
+        return renamed
+
+    def _expand_meaning(self, pv: PermissibleValue, e: EnumDefinition) -> str:
+        """Return the IRI that ``pv`` of ``e`` denotes."""
+        try:
+            return str(self.schemaview.expand_curie(pv.meaning))
+        except ValueError as exc:
+            source = self.schemaview.schema.source_file or self.schemaview.schema.name
+            element = f"meaning {pv.meaning!r} of permissible value '{e.name}.{pv.text}'"
+            raise SchemaError(f"{source}: cannot expand {element}: {exc}") from exc
 
     def _add_enum_instance(self, pv: PermissibleValue, enum_uri: URIRef) -> None:
         """Emit ``pv`` as an instance of ``enum_uri``, named by its ``meaning``."""
