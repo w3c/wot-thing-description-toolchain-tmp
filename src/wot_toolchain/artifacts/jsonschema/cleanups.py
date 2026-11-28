@@ -5,7 +5,6 @@ from typing import Any
 from linkml_runtime.utils.schemaview import SchemaView
 
 from .traversal import walk_schema
-from ...errors import SchemaError
 
 
 def dedup_oneof(schema: dict[str, Any]) -> None:
@@ -44,37 +43,6 @@ def simplify_exclusive_minimum(schema: dict[str, Any]) -> None:
                 obj["exclusiveMinimum"] = val
 
     walk_schema(schema, _fix)
-
-
-def remove_identifier_slots(schema: dict[str, Any], sv: SchemaView) -> None:
-    """Drop identifier slots from the properties and required lists of each class definition.
-
-    Definitions that are not LinkML classes (e.g. generated ``__identifier_optional`` variants) are left untouched.
-
-    Raises:
-        SchemaError: If the slots of a class definition cannot be resolved.
-    """
-    defs = schema.get("$defs", {})
-    all_classes = sv.all_classes()
-
-    for cls_name in list(defs.keys()):
-        defn = defs[cls_name]
-        if not isinstance(defn, dict) or "properties" not in defn or cls_name not in all_classes:
-            continue
-
-        try:
-            induced_slots = sv.class_induced_slots(cls_name)
-        except ValueError as exc:
-            raise SchemaError(f"class {cls_name!r}: cannot resolve its slots: {exc}") from exc
-
-        for slot in induced_slots:
-            if getattr(slot, "identifier", False) and slot.name in defn["properties"]:
-                defn["properties"].pop(slot.name)
-                req = defn.get("required", [])
-                if slot.name in req:
-                    req.remove(slot.name)
-                if not req:
-                    defn.pop("required", None)
 
 
 def clean_metadata(schema: dict[str, Any], sv: SchemaView) -> None:

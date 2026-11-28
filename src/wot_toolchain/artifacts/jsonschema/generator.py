@@ -1,6 +1,7 @@
 """Upstream linkml JSON Schema generator with the WoT toolchain's fixed arguments."""
 
 import copy
+from collections.abc import Iterable
 from typing import Self
 
 from linkml.generators.jsonschemagen import JsonSchema, JsonSchemaGenerator, SlotResult
@@ -80,6 +81,12 @@ class WotJsonSchemaGenerator(JsonSchemaGenerator):
         typ, _fmt, reference = self.get_type_info_for_slot_subschema(slot)
         if typ and reference is None:
             target["type"] = typ
+
+    def before_generate_class_slots(
+        self, slot: Iterable[SlotDefinition], cls: ClassDefinition, sv: SchemaView
+    ) -> Iterable[SlotDefinition]:
+        """Leave out identifier slots: they are map keys, not JSON members."""
+        return [candidate for candidate in slot if not candidate.identifier]
 
     def after_generate_class_slot(self, slot: SlotResult, cls: ClassDefinition, sv: SchemaView) -> SlotResult:
         """Drop the type upstream emits next to the oneOf of a class property."""

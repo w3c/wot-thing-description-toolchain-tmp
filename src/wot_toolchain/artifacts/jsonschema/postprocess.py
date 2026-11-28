@@ -10,7 +10,6 @@ from .annotations import read_annotations
 from .cleanups import (
     clean_metadata,
     dedup_oneof,
-    remove_identifier_slots,
     simplify_exclusive_minimum,
 )
 from .partitions import build_enum_subset_partitions, narrow_form_subsets
@@ -63,12 +62,6 @@ JSONSCHEMA_TRANSFORMS: tuple[Transform, ...] = (
         reason="LinkML has no exclusive minimum, so minimum_value: 0 + none_of equals_number 0 becomes "
         "minimum+not.anyOf.const. This pass rewrites that to exclusiveMinimum: 0 (multipleOf).",
         apply=lambda schema, sv, config: simplify_exclusive_minimum(schema),
-    ),
-    Transform(
-        name="remove_identifier_slots",
-        kind=TransformKind.WOT_SHAPING,
-        reason="LinkML identifier slots are used as map keys and are not JSON members in TD documents.",
-        apply=lambda schema, sv, config: remove_identifier_slots(schema, sv),
     ),
     Transform(
         name="remove_excluded_defs",
